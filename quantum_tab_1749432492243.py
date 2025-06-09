@@ -147,4 +147,4 @@ def render():
             st.markdown("**Quantum Score:** N/A")
             st.markdown("_This document does not appear to contain any quantum-related content._")
 
-        st.markdown("—" * 15)
+        st.markdown("<hr class='document-separator'>", unsafe_allow_html=True)

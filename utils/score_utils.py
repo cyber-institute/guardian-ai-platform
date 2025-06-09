@@ -37,22 +37,56 @@ def draw_scorecard(title, score):
         fig.update_layout(height=300)
         st.plotly_chart(fig, use_container_width=True)
     else:
-        # Fallback visualization using Streamlit components
+        # Enhanced fallback visualization using Streamlit components
         st.markdown(f"### {title}")
         
-        # Create a progress bar representation
-        st.metric(label="Score", value=f"{score:.1f}/100")
-        st.progress(score / 100)
+        # Create columns for better layout
+        col1, col2 = st.columns([3, 1])
         
-        # Color-coded status
-        if score >= 75:
-            st.success(f"Excellent: {score:.1f}%")
-        elif score >= 50:
-            st.warning(f"Good: {score:.1f}%")
-        elif score >= 25:
-            st.warning(f"Moderate: {score:.1f}%")
-        else:
-            st.error(f"Needs Improvement: {score:.1f}%")
+        with col1:
+            # Enhanced progress bar with color coding
+            progress_color = "#22c55e" if score >= 75 else "#f59e0b" if score >= 50 else "#ef4444"
+            
+            st.markdown(f"""
+            <div style="
+                background: #f1f5f9; 
+                border-radius: 10px; 
+                padding: 1rem; 
+                margin: 1rem 0;
+                border-left: 4px solid {progress_color};
+            ">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 600; color: #374151;">Quantum Maturity Score</span>
+                    <span style="font-size: 1.5rem; font-weight: 700; color: {progress_color};">{score:.1f}/100</span>
+                </div>
+                <div style="
+                    background: #e5e7eb; 
+                    border-radius: 6px; 
+                    height: 12px; 
+                    margin-top: 0.5rem;
+                    overflow: hidden;
+                ">
+                    <div style="
+                        background: {progress_color}; 
+                        height: 100%; 
+                        width: {score}%; 
+                        transition: width 0.5s ease;
+                        border-radius: 6px;
+                    "></div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            # Status indicator
+            if score >= 75:
+                st.success("Excellent")
+            elif score >= 50:
+                st.warning("Good")
+            elif score >= 25:
+                st.warning("Moderate")
+            else:
+                st.error("Needs Work")
 
 def get_score_analysis(score, category):
     """
