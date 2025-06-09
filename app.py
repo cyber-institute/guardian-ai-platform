@@ -4,7 +4,7 @@ from datetime import datetime
 
 def main():
     st.set_page_config(
-        page_title="Quantum Maturity Scoring",
+        page_title="Quantum Maturity Score",
         page_icon="🔐",
         layout="wide",
         initial_sidebar_state="expanded"
@@ -125,7 +125,7 @@ def main():
     # Main header
     st.markdown("""
     <div class="quantum-header">
-        <h1>🔐 Quantum Maturity Assessment Platform</h1>
+        <h1>🔐 Quantum Maturity Score</h1>
         <p>AI-powered quantum readiness evaluation system</p>
     </div>
     """, unsafe_allow_html=True)
