@@ -4,7 +4,7 @@ from utils.score_utils import draw_scorecard, get_score_analysis, get_deep_diagn
 from utils.hf_ai_scoring import evaluate_quantum_maturity_hf
 
 def render():
-    st.header("🧠 Quantum Maturity Score (Hybrid AI + Stored Data)")
+    st.header("Quantum Maturity")
     
     # Show compact legend at top
     st.markdown("**Maturity Levels:** 🔴 Initial  🟠 Basic  🟡 Developing  🟢 Advanced  🟣 Expert")
