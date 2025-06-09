@@ -167,7 +167,7 @@ def main():
         """, unsafe_allow_html=True)
     
     # Create tabs for different sections
-    tab1, tab2, tab3 = st.tabs(["📊 Document Analysis", "📄 Add Document", "🗄️ Database Status"])
+    tab1, tab2, tab3 = st.tabs(["📄 All Documents", "📄 Add Document", "🗄️ Database Status"])
     
     with tab1:
         render()
