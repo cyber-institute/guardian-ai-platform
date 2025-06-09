@@ -307,16 +307,15 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Cyber Institute credit with centered logo
-    col1, col2, col3 = st.columns([3, 1, 3])
+    # Cyber Institute credit with logo inline
+    col1, col2, col3 = st.columns([2, 1, 2])
     with col2:
-        try:
-            st.image("assets/cyber_institute_logo.jpg", width=40)
-        except:
-            pass
-        st.markdown('<div style="text-align: center; font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">Developed by Cyber Institute</div>', unsafe_allow_html=True)
-    
-    st.markdown('<div style="margin-bottom: 2rem;"></div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 2rem;">
+            <img src="assets/cyber_institute_logo.jpg" width="40" height="40" style="border-radius: 50%; margin-right: 0.5rem;">
+            <span style="font-size: 0.9rem; color: #6b7280;">Developed by Cyber Institute</span>
+        </div>
+        """, unsafe_allow_html=True)
     
     # Enhanced sidebar with government/nonprofit styling
     with st.sidebar:
