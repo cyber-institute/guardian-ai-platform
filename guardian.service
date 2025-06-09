@@ -1,0 +1,15 @@
+[Unit]
+Description=GUARDIAN Quantum Maturity Assessment Tool
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/guardian-app
+Environment=PATH=/home/ubuntu/guardian-app/venv/bin
+ExecStart=/home/ubuntu/guardian-app/venv/bin/streamlit run app.py --server.port 8501
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
