@@ -4,7 +4,7 @@ from datetime import datetime
 
 def main():
     st.set_page_config(
-        page_title="Quantum Maturity Score",
+        page_title="GUARDIAN - AI Risk Analysis Navigator",
         page_icon="🔐",
         layout="wide",
         initial_sidebar_state="expanded"
@@ -125,8 +125,8 @@ def main():
     # Main header
     st.markdown("""
     <div class="quantum-header">
-        <h1>🔐 Quantum Maturity Score</h1>
-        <p>AI-powered quantum readiness evaluation system</p>
+        <h1>🔐 GUARDIAN</h1>
+        <p>Global Unified AI Risk Discovery & Impact Analysis Navigator</p>
     </div>
     """, unsafe_allow_html=True)
     
