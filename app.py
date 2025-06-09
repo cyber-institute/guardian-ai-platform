@@ -435,7 +435,7 @@ def main():
         """, unsafe_allow_html=True)
     
     # Create tabs for different sections
-    tab1, tab2, tab3, tab4 = st.tabs(["All Documents", "Quantum Maturity", "Add Document", "Database Status"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["All Documents", "Quantum Maturity", "Add Document", "Database Status", "About"])
     
     with tab1:
         render()
@@ -452,6 +452,10 @@ def main():
     
     with tab4:
         render_database_status()
+    
+    with tab5:
+        from about_tab import render as render_about
+        render_about()
 
 def render_database_status():
     """Render database status and management interface."""
