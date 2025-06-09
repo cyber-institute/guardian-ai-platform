@@ -36,11 +36,14 @@ class DatabaseManager:
             with self.engine.connect() as conn:
                 result = conn.execute(text(query), params or {})
                 if result.returns_rows:
-                    return [dict(row._mapping) for row in result]
-                return result.rowcount
+                    rows = result.fetchall()
+                    return [dict(row._mapping) for row in rows]
+                else:
+                    conn.commit()
+                    return result.rowcount
         except SQLAlchemyError as e:
             logger.error(f"Query execution failed: {e}")
-            return None
+            return []
     
     def fetch_documents(self):
         """Fetch all documents from the database."""

@@ -1,5 +1,6 @@
 import streamlit as st
 from quantum_tab_1749432492243 import render
+from datetime import datetime
 
 def main():
     st.set_page_config(
@@ -125,8 +126,118 @@ def main():
         </div>
         """, unsafe_allow_html=True)
     
-    # Main content
-    render()
+    # Create tabs for different sections
+    tab1, tab2, tab3 = st.tabs(["📊 Document Analysis", "📄 Add Document", "🗄️ Database Status"])
+    
+    with tab1:
+        render()
+    
+    with tab2:
+        from components.document_uploader import render_document_uploader, render_bulk_upload
+        render_document_uploader()
+        st.markdown("---")
+        render_bulk_upload()
+    
+    with tab3:
+        render_database_status()
+
+def render_database_status():
+    """Render database status and management interface."""
+    from utils.database import db_manager
+    from utils.db import fetch_documents
+    
+    st.markdown("### 🗄️ Database Management")
+    
+    # Connection status
+    if db_manager.engine:
+        st.success("✅ Connected to PostgreSQL database")
+    else:
+        st.error("❌ Database connection failed")
+        return
+    
+    # Database statistics
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        # Document count
+        doc_count = db_manager.execute_query("SELECT COUNT(*) as count FROM documents")
+        count = doc_count[0]['count'] if doc_count and len(doc_count) > 0 else 0
+        st.metric("Total Documents", count)
+    
+    with col2:
+        # Assessment count
+        assessment_count = db_manager.execute_query("SELECT COUNT(*) as count FROM assessments")
+        a_count = assessment_count[0]['count'] if assessment_count and len(assessment_count) > 0 else 0
+        st.metric("Total Assessments", a_count)
+    
+    with col3:
+        # Average score
+        avg_score = db_manager.execute_query("SELECT AVG(quantum_score) as avg FROM documents WHERE quantum_score > 0")
+        avg = round(avg_score[0]['avg'], 1) if avg_score and len(avg_score) > 0 and avg_score[0]['avg'] else 0
+        st.metric("Average Score", f"{avg}/100")
+    
+    st.markdown("---")
+    
+    # Recent documents
+    st.markdown("#### 📋 Recent Documents")
+    recent_docs = db_manager.execute_query("""
+        SELECT title, quantum_score, document_type, created_at 
+        FROM documents 
+        ORDER BY created_at DESC 
+        LIMIT 5
+    """)
+    
+    if recent_docs:
+        for doc in recent_docs:
+            col1, col2, col3 = st.columns([3, 1, 1])
+            with col1:
+                st.write(f"**{doc['title']}**")
+            with col2:
+                st.write(f"Score: {doc['quantum_score']}")
+            with col3:
+                st.write(doc['document_type'])
+    else:
+        st.info("No documents found")
+    
+    st.markdown("---")
+    
+    # Database actions
+    st.markdown("#### ⚙️ Database Actions")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if st.button("🔄 Refresh Data", help="Reload data from database"):
+            st.rerun()
+    
+    with col2:
+        if st.button("📊 Export Data", help="Export all documents as JSON"):
+            try:
+                documents = fetch_documents()
+                st.download_button(
+                    label="📥 Download JSON",
+                    data=str(documents),
+                    file_name=f"quantum_documents_{datetime.now().strftime('%Y%m%d')}.json",
+                    mime="application/json"
+                )
+            except Exception as e:
+                st.error(f"Export failed: {e}")
+    
+    # Database schema info
+    with st.expander("🔍 Database Schema"):
+        schema_info = db_manager.execute_query("""
+            SELECT table_name, column_name, data_type, is_nullable
+            FROM information_schema.columns 
+            WHERE table_schema = 'public' 
+            ORDER BY table_name, ordinal_position
+        """)
+        
+        if schema_info:
+            import pandas as pd
+            df = pd.DataFrame(schema_info)
+            st.dataframe(df, use_container_width=True)
+        else:
+            st.write("Schema information not available")
 
 if __name__ == "__main__":
     main()
