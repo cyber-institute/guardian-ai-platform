@@ -180,7 +180,7 @@ def main():
     
     /* Button styling */
     .stButton > button {
-        background: linear-gradient(145deg, #3b82f6 0%, #1e40af 100%);
+        background: linear-gradient(145deg, #6b7280 0%, #4b5563 100%);
         color: white;
         border: none;
         border-radius: 8px;
@@ -191,9 +191,9 @@ def main():
     }
     
     .stButton > button:hover {
-        background: linear-gradient(145deg, #1e40af 0%, #1e3a8a 100%);
+        background: linear-gradient(145deg, #4b5563 0%, #374151 100%);
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
     }
     
     /* Metric styling */
