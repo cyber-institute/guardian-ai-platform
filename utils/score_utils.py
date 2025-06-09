@@ -15,21 +15,21 @@ def draw_scorecard(title, score):
     else:
         maturity_level = min(5, max(1, round(score)))
     
-    # Level definitions with improved color progression
+    # Level definitions with color progression
     level_names = {1: "Initial", 2: "Basic", 3: "Developing", 4: "Advanced", 5: "Expert"}
     level_colors = {
-        1: "#22c55e",  # Green
-        2: "#cd7f32",  # Bronze
-        3: "#c0c0c0",  # Silver
-        4: "#ffd700",  # Gold
-        5: "#e5e4e2"   # Platinum
+        1: "#dc2626",  # Red
+        2: "#f97316",  # Orange
+        3: "#eab308",  # Yellow
+        4: "#22c55e",  # Green
+        5: "#8b5cf6"   # Purple
     }
     level_text_colors = {
-        1: "#ffffff",  # White text on green
-        2: "#ffffff",  # White text on bronze
-        3: "#374151",  # Dark text on silver
-        4: "#374151",  # Dark text on gold
-        5: "#374151"   # Dark text on platinum
+        1: "#ffffff",  # White text
+        2: "#ffffff",  # White text
+        3: "#374151",  # Dark text on yellow
+        4: "#ffffff",  # White text
+        5: "#ffffff"   # White text
     }
     level_descriptions = {
         1: "Minimal quantum awareness",
@@ -44,33 +44,53 @@ def draw_scorecard(title, score):
     for i in range(1, 6):
         if i <= maturity_level:
             badges_html += f"""
-            <div style='display: inline-block; margin: 0 0.4rem; width: 60px; height: 60px; 
+            <div style='display: inline-block; margin: 0 0.3rem; width: 40px; height: 40px; 
                         background: {level_colors[i]}; color: {level_text_colors[i]}; border-radius: 50%; 
-                        font-weight: 700; font-size: 1.2rem; box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+                        font-weight: 700; font-size: 0.9rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                         display: flex; align-items: center; justify-content: center;
-                        border: 3px solid {level_colors[i]};'>
+                        border: 2px solid {level_colors[i]};'>
                 {i}
             </div>"""
         else:
             badges_html += f"""
-            <div style='display: inline-block; margin: 0 0.4rem; width: 60px; height: 60px; 
+            <div style='display: inline-block; margin: 0 0.3rem; width: 40px; height: 40px; 
                         background: #f3f4f6; color: #9ca3af; border-radius: 50%; 
-                        font-weight: 600; font-size: 1.2rem; border: 3px dashed #d1d5db;
+                        font-weight: 600; font-size: 0.9rem; border: 2px dashed #d1d5db;
                         display: flex; align-items: center; justify-content: center;'>
                 {i}
             </div>"""
+    
+    # Create legend
+    legend_html = ""
+    for i in range(1, 6):
+        legend_html += f"""
+        <div style='display: flex; align-items: center; margin: 0.3rem 0;'>
+            <div style='width: 20px; height: 20px; background: {level_colors[i]}; border-radius: 50%; 
+                        margin-right: 0.5rem; flex-shrink: 0;'></div>
+            <span style='font-size: 0.8rem; color: #374151;'>{i}: {level_names[i]}</span>
+        </div>"""
     
     st.markdown(f"""
     <div style='padding: 1.5rem; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); 
                 border-radius: 12px; margin: 1rem 0; border: 1px solid #e2e8f0;'>
         <h3 style='margin: 0 0 1rem 0; color: #374151; text-align: center; font-family: Inter, sans-serif;'>{title}</h3>
-        <div style='text-align: center; margin: 1.5rem 0;'>{badges_html}</div>
-        <div style='text-align: center; margin: 1rem 0;'>
-            <div style='font-size: 1.4rem; font-weight: 700; color: {level_colors[maturity_level]}; margin-bottom: 0.5rem;'>
-                Level {maturity_level}: {level_names[maturity_level]}
+        
+        <div style='display: flex; justify-content: center; align-items: center; gap: 2rem;'>
+            <div style='text-align: center;'>
+                <div style='margin: 1rem 0;'>{badges_html}</div>
+                <div style='margin: 1rem 0;'>
+                    <div style='font-size: 1.3rem; font-weight: 700; color: {level_colors[maturity_level]}; margin-bottom: 0.3rem;'>
+                        Level {maturity_level}: {level_names[maturity_level]}
+                    </div>
+                    <div style='font-size: 0.9rem; color: #6b7280; font-style: italic;'>
+                        {level_descriptions[maturity_level]}
+                    </div>
+                </div>
             </div>
-            <div style='font-size: 1rem; color: #6b7280; font-style: italic;'>
-                {level_descriptions[maturity_level]}
+            
+            <div style='border-left: 1px solid #e5e7eb; padding-left: 1.5rem;'>
+                <div style='font-size: 0.9rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;'>Legend:</div>
+                {legend_html}
             </div>
         </div>
     </div>
