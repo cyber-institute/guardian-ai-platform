@@ -305,8 +305,8 @@ def main():
         <h1 style="
             margin: 0;
             font-size: 2.8rem;
-            font-weight: 600;
-            font-family: 'Source Serif Pro', serif;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
             letter-spacing: -0.02em;
             color: #1f2937;
         ">GUARDIAN</h1>
