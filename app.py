@@ -79,6 +79,46 @@ def main():
         border-radius: 8px;
         margin: 1rem 0;
     }
+    
+    .document-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .document-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    
+    .score-badge {
+        transition: transform 0.2s ease;
+    }
+    
+    .score-badge:hover {
+        transform: scale(1.1);
+    }
+    
+    .category-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin: 1rem 0;
+    }
+    
+    @media (max-width: 768px) {
+        .category-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .document-card {
+            flex-direction: column;
+        }
+        
+        .score-section {
+            margin-top: 1rem;
+            justify-content: space-around;
+        }
+    }
     </style>
     """, unsafe_allow_html=True)
     
