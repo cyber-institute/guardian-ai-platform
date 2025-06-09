@@ -36,30 +36,34 @@ def main():
     }
     
     .quantum-header {
-        background: linear-gradient(135deg, #1e3a8a 0%, #312e81 50%, #1e40af 100%);
-        padding: 3rem 2rem;
-        border-radius: 12px;
-        margin-bottom: 2.5rem;
-        color: white;
-        text-align: center;
-        box-shadow: 0 8px 32px rgba(30, 58, 138, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: linear-gradient(135deg, #1e3a8a 0%, #312e81 50%, #1e40af 100%) !important;
+        padding: 3rem 2rem !important;
+        border-radius: 12px !important;
+        margin-bottom: 2.5rem !important;
+        color: white !important;
+        text-align: center !important;
+        box-shadow: 0 8px 32px rgba(30, 58, 138, 0.15) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        width: 100% !important;
+        display: block !important;
     }
     
     .quantum-header h1 {
-        margin: 0;
-        font-size: 2.8rem;
-        font-weight: 600;
-        font-family: 'Source Serif Pro', serif;
-        letter-spacing: -0.02em;
+        margin: 0 !important;
+        font-size: 2.8rem !important;
+        font-weight: 600 !important;
+        font-family: 'Source Serif Pro', serif !important;
+        letter-spacing: -0.02em !important;
+        color: white !important;
     }
     
     .quantum-header p {
-        margin: 1rem 0 0 0;
-        font-size: 1.15rem;
-        opacity: 0.9;
-        font-weight: 400;
-        letter-spacing: 0.01em;
+        margin: 1rem 0 0 0 !important;
+        font-size: 1.15rem !important;
+        opacity: 0.9 !important;
+        font-weight: 400 !important;
+        letter-spacing: 0.01em !important;
+        color: white !important;
     }
     
     .metric-card {
@@ -289,11 +293,36 @@ def main():
     </style>
     """, unsafe_allow_html=True)
     
-    # Main header
+    # Main header with inline styling for reliability
     st.markdown("""
-    <div class="quantum-header">
-        <h1>GUARDIAN</h1>
-        <p>Global Unified AI Risk Discovery & Impact Analysis Navigator</p>
+    <div style="
+        background: linear-gradient(135deg, #1e3a8a 0%, #312e81 50%, #1e40af 100%);
+        padding: 3rem 2rem;
+        border-radius: 12px;
+        margin-bottom: 2.5rem;
+        color: white;
+        text-align: center;
+        box-shadow: 0 8px 32px rgba(30, 58, 138, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        width: 100%;
+        display: block;
+    ">
+        <h1 style="
+            margin: 0;
+            font-size: 2.8rem;
+            font-weight: 600;
+            font-family: 'Source Serif Pro', serif;
+            letter-spacing: -0.02em;
+            color: white;
+        ">GUARDIAN</h1>
+        <p style="
+            margin: 1rem 0 0 0;
+            font-size: 1.15rem;
+            opacity: 0.9;
+            font-weight: 400;
+            letter-spacing: 0.01em;
+            color: white;
+        ">Global Unified AI Risk Discovery & Impact Analysis Navigator</p>
     </div>
     """, unsafe_allow_html=True)
     
