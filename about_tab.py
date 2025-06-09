@@ -120,11 +120,11 @@ def render():
     
     # Score legend with enhanced styling
     score_descriptions = [
-        ("🔴", "Level 1 - Initial", "Limited quantum awareness with significant gaps in understanding and preparation"),
-        ("🟠", "Level 2 - Developing", "Basic quantum concepts recognized but implementation strategies lacking"),
-        ("🟡", "Level 3 - Defined", "Moderate quantum readiness with structured approaches emerging"),
-        ("🟢", "Level 4 - Managed", "Strong quantum capabilities with systematic risk management"),
-        ("🟣", "Level 5 - Optimized", "Advanced quantum integration with comprehensive governance frameworks")
+        ('<div style="width: 30px; height: 30px; background: #DC2626; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">1</div>', "Level 1 - Initial", "Limited quantum awareness with significant gaps in understanding and preparation"),
+        ('<div style="width: 30px; height: 30px; background: #EA580C; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">2</div>', "Level 2 - Developing", "Basic quantum concepts recognized but implementation strategies lacking"),
+        ('<div style="width: 30px; height: 30px; background: #D97706; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">3</div>', "Level 3 - Defined", "Moderate quantum readiness with structured approaches emerging"),
+        ('<div style="width: 30px; height: 30px; background: #059669; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">4</div>', "Level 4 - Managed", "Strong quantum capabilities with systematic risk management"),
+        ('<div style="width: 30px; height: 30px; background: #7C3AED; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">5</div>', "Level 5 - Optimized", "Advanced quantum integration with comprehensive governance frameworks")
     ]
     
     for badge, level, description in score_descriptions:
@@ -138,7 +138,7 @@ def render():
             border-radius: 8px;
             border-left: 3px solid #e5e7eb;
         ">
-            <span style="font-size: 1.5rem; margin-right: 1rem;">{badge}</span>
+            <div style="margin-right: 1rem;">{badge}</div>
             <div>
                 <strong style="color: #374151;">{level}</strong><br>
                 <span style="color: #6b7280; font-size: 0.9rem;">{description}</span>
