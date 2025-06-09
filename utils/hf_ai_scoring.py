@@ -18,15 +18,25 @@ def get_classifier():
         return None
     if classifier is None:
         try:
-            # Use a lightweight model for zero-shot classification
+            # Use a lightweight model for zero-shot classification with proper device mapping
             classifier = pipeline(
                 "zero-shot-classification",
                 model="facebook/bart-large-mnli",
-                device=-1  # Use CPU
+                device_map="auto",
+                torch_dtype="auto"
             )
         except Exception as e:
             print(f"Error initializing classifier: {e}")
-            classifier = None
+            try:
+                # Fallback to CPU-only mode
+                classifier = pipeline(
+                    "zero-shot-classification",
+                    model="facebook/bart-large-mnli",
+                    device="cpu"
+                )
+            except Exception as e2:
+                print(f"Fallback classifier also failed: {e2}")
+                classifier = None
     return classifier
 
 def evaluate_quantum_maturity_hf(text):

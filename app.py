@@ -1,5 +1,5 @@
 import streamlit as st
-from quantum_tab_1749432492243 import render
+from all_docs_tab import render
 from datetime import datetime
 
 def main():
