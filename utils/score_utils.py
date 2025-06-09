@@ -15,9 +15,22 @@ def draw_scorecard(title, score):
     else:
         maturity_level = min(5, max(1, round(score)))
     
-    # Level definitions
+    # Level definitions with improved color progression
     level_names = {1: "Initial", 2: "Basic", 3: "Developing", 4: "Advanced", 5: "Expert"}
-    level_colors = {1: "#dc2626", 2: "#f59e0b", 3: "#d97706", 4: "#059669", 5: "#10b981"}
+    level_colors = {
+        1: "#22c55e",  # Green
+        2: "#cd7f32",  # Bronze
+        3: "#c0c0c0",  # Silver
+        4: "#ffd700",  # Gold
+        5: "#e5e4e2"   # Platinum
+    }
+    level_text_colors = {
+        1: "#ffffff",  # White text on green
+        2: "#ffffff",  # White text on bronze
+        3: "#374151",  # Dark text on silver
+        4: "#374151",  # Dark text on gold
+        5: "#374151"   # Dark text on platinum
+    }
     level_descriptions = {
         1: "Minimal quantum awareness",
         2: "Basic understanding of quantum risks", 
@@ -26,21 +39,24 @@ def draw_scorecard(title, score):
         5: "Expert-level quantum maturity"
     }
     
-    # Create level badges
+    # Create circular level badges
     badges_html = ""
     for i in range(1, 6):
         if i <= maturity_level:
             badges_html += f"""
-            <div style='display: inline-block; margin: 0 0.25rem; padding: 0.75rem 1.25rem; 
-                        background: {level_colors[i]}; color: white; border-radius: 10px; 
-                        font-weight: 600; font-size: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+            <div style='display: inline-block; margin: 0 0.4rem; width: 60px; height: 60px; 
+                        background: {level_colors[i]}; color: {level_text_colors[i]}; border-radius: 50%; 
+                        font-weight: 700; font-size: 1.2rem; box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+                        display: flex; align-items: center; justify-content: center;
+                        border: 3px solid {level_colors[i]};'>
                 {i}
             </div>"""
         else:
             badges_html += f"""
-            <div style='display: inline-block; margin: 0 0.25rem; padding: 0.75rem 1.25rem; 
-                        background: #e5e7eb; color: #9ca3af; border-radius: 10px; 
-                        font-weight: 600; font-size: 1rem; border: 2px dashed #d1d5db;'>
+            <div style='display: inline-block; margin: 0 0.4rem; width: 60px; height: 60px; 
+                        background: #f3f4f6; color: #9ca3af; border-radius: 50%; 
+                        font-weight: 600; font-size: 1.2rem; border: 3px dashed #d1d5db;
+                        display: flex; align-items: center; justify-content: center;'>
                 {i}
             </div>"""
     
