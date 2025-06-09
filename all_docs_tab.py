@@ -267,5 +267,5 @@ def render_card_view(docs):
             """, unsafe_allow_html=True)
             
             if content:
-                with st.expander("📄 Content Preview"):
+                with st.expander("Content Preview"):
                     st.write(content[:300] + "..." if len(content) > 300 else content)
