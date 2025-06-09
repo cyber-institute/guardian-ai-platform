@@ -1,36 +1,58 @@
 import streamlit as st
-import plotly.graph_objects as go
+try:
+    import plotly.graph_objects as go
+    PLOTLY_AVAILABLE = True
+except ImportError:
+    PLOTLY_AVAILABLE = False
 
 def draw_scorecard(title, score):
     """
     Draw a visual scorecard for quantum maturity scores.
     """
-    # Create a gauge chart using Plotly
-    fig = go.Figure(go.Indicator(
-        mode = "gauge+number+delta",
-        value = score,
-        domain = {'x': [0, 1], 'y': [0, 1]},
-        title = {'text': title},
-        delta = {'reference': 50},
-        gauge = {
-            'axis': {'range': [None, 100]},
-            'bar': {'color': "darkblue"},
-            'steps': [
-                {'range': [0, 25], 'color': "lightgray"},
-                {'range': [25, 50], 'color': "yellow"},
-                {'range': [50, 75], 'color': "orange"},
-                {'range': [75, 100], 'color': "green"}
-            ],
-            'threshold': {
-                'line': {'color': "red", 'width': 4},
-                'thickness': 0.75,
-                'value': 90
+    if PLOTLY_AVAILABLE:
+        # Create a gauge chart using Plotly
+        fig = go.Figure(go.Indicator(
+            mode = "gauge+number+delta",
+            value = score,
+            domain = {'x': [0, 1], 'y': [0, 1]},
+            title = {'text': title},
+            delta = {'reference': 50},
+            gauge = {
+                'axis': {'range': [None, 100]},
+                'bar': {'color': "darkblue"},
+                'steps': [
+                    {'range': [0, 25], 'color': "lightgray"},
+                    {'range': [25, 50], 'color': "yellow"},
+                    {'range': [50, 75], 'color': "orange"},
+                    {'range': [75, 100], 'color': "green"}
+                ],
+                'threshold': {
+                    'line': {'color': "red", 'width': 4},
+                    'thickness': 0.75,
+                    'value': 90
+                }
             }
-        }
-    ))
-    
-    fig.update_layout(height=300)
-    st.plotly_chart(fig, use_container_width=True)
+        ))
+        
+        fig.update_layout(height=300)
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        # Fallback visualization using Streamlit components
+        st.markdown(f"### {title}")
+        
+        # Create a progress bar representation
+        st.metric(label="Score", value=f"{score:.1f}/100")
+        st.progress(score / 100)
+        
+        # Color-coded status
+        if score >= 75:
+            st.success(f"Excellent: {score:.1f}%")
+        elif score >= 50:
+            st.warning(f"Good: {score:.1f}%")
+        elif score >= 25:
+            st.warning(f"Moderate: {score:.1f}%")
+        else:
+            st.error(f"Needs Improvement: {score:.1f}%")
 
 def get_score_analysis(score, category):
     """

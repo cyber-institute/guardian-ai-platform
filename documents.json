@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Post-Quantum Cryptography Implementation Strategy",
+    "quantum_q": 75,
+    "text": "This document outlines our comprehensive approach to implementing post-quantum cryptography standards. We reference NIST PQC guidelines and include a detailed migration roadmap with quarterly milestones. Our implementation plan covers lattice-based cryptography, hash-based signatures, and code-based encryption methods. The timeline spans 18 months with testing phases and validation checkpoints.",
+    "content": "Post-quantum cryptography implementation with NIST standards compliance and migration strategy."
+  },
+  {
+    "title": "Quantum Risk Assessment Report",
+    "quantum_q": 45,
+    "text": "Initial assessment of quantum computing threats to our current cryptographic infrastructure. Basic awareness of quantum vulnerabilities identified in RSA and ECC implementations. Limited discussion of quantum-safe alternatives without specific implementation details.",
+    "content": "Basic quantum risk evaluation covering current vulnerabilities."
+  },
+  {
+    "title": "Advanced Quantum Security Framework",
+    "quantum_q": 90,
+    "text": "Comprehensive quantum security framework incorporating FIPS 203 and FIPS 204 standards. Detailed implementation plan with quantum-resistant algorithms, key management protocols, and hybrid classical-quantum approaches. Includes rigorous testing methodology, compliance validation, and continuous monitoring roadmap with specific deployment phases.",
+    "content": "Complete quantum security implementation with validated controls and monitoring."
+  }
+]

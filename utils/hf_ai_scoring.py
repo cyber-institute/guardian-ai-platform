@@ -1,6 +1,10 @@
 import os
-from transformers import pipeline
 import re
+try:
+    from transformers import pipeline
+    HF_AVAILABLE = True
+except ImportError:
+    HF_AVAILABLE = False
 
 # Initialize the classifier once to avoid repeated loading
 classifier = None
@@ -10,6 +14,8 @@ def get_classifier():
     Get or initialize the Hugging Face zero-shot classifier.
     """
     global classifier
+    if not HF_AVAILABLE:
+        return None
     if classifier is None:
         try:
             # Use a lightweight model for zero-shot classification
