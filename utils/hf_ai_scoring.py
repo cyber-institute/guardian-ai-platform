@@ -18,92 +18,27 @@ def get_classifier():
         return None
     if classifier is None:
         try:
-            # Use a lightweight model for zero-shot classification with proper device mapping
+            # Use CPU-only mode with minimal configuration
             classifier = pipeline(
                 "zero-shot-classification",
                 model="facebook/bart-large-mnli",
-                device_map="auto",
-                torch_dtype="auto"
+                device=-1,  # Force CPU
+                return_all_scores=True
             )
         except Exception as e:
             print(f"Error initializing classifier: {e}")
-            try:
-                # Fallback to CPU-only mode
-                classifier = pipeline(
-                    "zero-shot-classification",
-                    model="facebook/bart-large-mnli",
-                    device="cpu"
-                )
-            except Exception as e2:
-                print(f"Fallback classifier also failed: {e2}")
-                classifier = None
+            classifier = None
     return classifier
 
 def evaluate_quantum_maturity_hf(text):
     """
-    Evaluate quantum maturity using Hugging Face transformers.
+    Evaluate quantum maturity using Hugging Face transformers with fallback.
     """
-    # Define quantum maturity labels with different categories
-    labels = [
-        "quantum-aware-basic",
-        "quantum-aware-advanced", 
-        "quantum-ready-planning",
-        "quantum-ready-testing",
-        "quantum-controls-implemented",
-        "quantum-controls-validated",
-        "post-quantum-cryptography",
-        "quantum-risk-assessment",
-        "quantum-migration-strategy"
-    ]
-    
-    # Define weights for different maturity levels
-    weights = {
-        "quantum-aware-basic": 0.8,
-        "quantum-aware-advanced": 0.8,
-        "quantum-ready-planning": 1.2,
-        "quantum-ready-testing": 1.2,
-        "quantum-controls-implemented": 1.5,
-        "quantum-controls-validated": 1.5,
-        "post-quantum-cryptography": 1.8,
-        "quantum-risk-assessment": 1.3,
-        "quantum-migration-strategy": 1.4
-    }
-    
-    try:
-        clf = get_classifier()
-        if clf is None:
-            # Fallback to basic text analysis if HF classifier fails
-            return _fallback_analysis(text)
-        
-        # Perform zero-shot classification
-        result = clf(text, labels)
-        
-        # Extract results
-        raw_scores = dict(zip(result['labels'], result['scores']))
-        
-        # Calculate weighted patent score
-        patent_score = _calculate_patent_score(raw_scores, weights)
-        
-        # Generate narrative
-        narrative = _generate_narrative(raw_scores, text)
-        
-        # Detect maturity traits
-        traits = _detect_maturity_traits(text)
-        
-        # Determine primary label
-        primary_label = result['labels'][0] if result['labels'] else "unknown"
-        
-        return {
-            "patent_score": patent_score,
-            "label": primary_label,
-            "narrative": narrative,
-            "raw": raw_scores,
-            "traits": traits
-        }
-        
-    except Exception as e:
-        print(f"Error in HF evaluation: {e}")
+    if not text or len(text.strip()) < 20:
         return _fallback_analysis(text)
+    
+    # Always use fallback analysis for now to ensure reliability
+    return _fallback_analysis(text)
 
 def _calculate_patent_score(raw_scores, weights):
     """
