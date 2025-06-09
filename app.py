@@ -293,60 +293,30 @@ def main():
     </style>
     """, unsafe_allow_html=True)
     
-    # Main header and credits combined for perfect alignment
-    try:
-        import base64
-        with open("assets/cyber_institute_logo.jpg", "rb") as f:
-            logo_data = base64.b64encode(f.read()).decode()
-        
-        st.markdown(f"""
-        <div style="
-            padding: 2rem 0 1rem 0;
-            margin-bottom: 2rem;
-            text-align: center;
-            width: 100%;
-            display: block;
-        ">
-            <h1 style="
-                margin: 0 0 1rem 0;
-                font-size: 2.8rem;
-                font-weight: bold;
-                font-family: Arial, sans-serif;
-                letter-spacing: -0.02em;
-                color: #B91C2C;
-                text-align: center;
-            ">GUARDIAN</h1>
-            
-            <div style="text-align: center;">
-                <img src="data:image/jpeg;base64,{logo_data}" width="40" height="40" style="border-radius: 50%; margin-bottom: 0.5rem;">
-                <div style="font-size: 0.9rem; color: #6b7280;">
-                    Developed by Cyber Institute
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-    except:
+    # Main header - simplified approach
+    st.markdown("""
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h1 style="
+            margin: 0 0 1rem 0;
+            font-size: 2.8rem;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+            letter-spacing: -0.02em;
+            color: #B91C2C;
+        ">GUARDIAN</h1>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Cyber Institute credit with logo - using columns for better alignment
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
+        try:
+            st.image("assets/cyber_institute_logo.jpg", width=40)
+        except:
+            pass
         st.markdown("""
-        <div style="
-            padding: 2rem 0 1rem 0;
-            margin-bottom: 2rem;
-            text-align: center;
-            width: 100%;
-            display: block;
-        ">
-            <h1 style="
-                margin: 0 0 1rem 0;
-                font-size: 2.8rem;
-                font-weight: bold;
-                font-family: Arial, sans-serif;
-                letter-spacing: -0.02em;
-                color: #B91C2C;
-                text-align: center;
-            ">GUARDIAN</h1>
-            
-            <div style="text-align: center; font-size: 0.9rem; color: #6b7280;">
-                Developed by Cyber Institute
-            </div>
+        <div style="text-align: center; font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">
+            Developed by Cyber Institute
         </div>
         """, unsafe_allow_html=True)
     
