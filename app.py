@@ -125,14 +125,14 @@ def main():
     # Main header
     st.markdown("""
     <div class="quantum-header">
-        <h1>🔐 GUARDIAN</h1>
+        <h1>GUARDIAN</h1>
         <p>Global Unified AI Risk Discovery & Impact Analysis Navigator</p>
     </div>
     """, unsafe_allow_html=True)
     
     # Sidebar information
     with st.sidebar:
-        st.markdown("### 📊 Assessment Overview")
+        st.markdown("### Assessment Overview")
         st.markdown("""
         <div class="sidebar-info">
         <strong>Evaluation Criteria:</strong><br>
@@ -144,7 +144,7 @@ def main():
         </div>
         """, unsafe_allow_html=True)
         
-        st.markdown("### 🎯 Scoring Scale")
+        st.markdown("### Scoring Scale")
         st.markdown("""
         <div class="sidebar-info">
         <strong>90-100:</strong> Quantum-Ready<br>
@@ -155,7 +155,7 @@ def main():
         </div>
         """, unsafe_allow_html=True)
         
-        st.markdown("### 🔍 Analysis Features")
+        st.markdown("### Analysis Features")
         st.markdown("""
         <div class="sidebar-info">
         • AI-powered text analysis<br>
@@ -167,7 +167,7 @@ def main():
         """, unsafe_allow_html=True)
     
     # Create tabs for different sections
-    tab1, tab2, tab3 = st.tabs(["📄 All Documents", "📄 Add Document", "🗄️ Database Status"])
+    tab1, tab2, tab3 = st.tabs(["All Documents", "Add Document", "Database Status"])
     
     with tab1:
         render()

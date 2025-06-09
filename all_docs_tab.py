@@ -17,7 +17,7 @@ def is_probably_quantum(content):
     return any(kw in content.lower() for kw in keywords)
 
 def render():
-    st.markdown("<h2 style='text-align:center;'>📄 All Uploaded Documents</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align:center;'>All Uploaded Documents</h2>", unsafe_allow_html=True)
     
     try:
         all_docs = fetch_documents()
@@ -47,13 +47,13 @@ def render():
         if current_selection not in available_types:
             current_selection = "All"
         st.session_state["filters"]["doc_type"] = st.selectbox(
-            "📂 Document Type", 
+            "Document Type", 
             available_types, 
             index=available_types.index(current_selection)
         )
     
     with col2:
-        if st.button("🔄 Clear Filters"):
+        if st.button("Clear Filters"):
             st.session_state["filters"] = {
                 "doc_type": "All",
                 "source_multi": []
@@ -62,7 +62,7 @@ def render():
     
     with col3:
         st.session_state["filters"]["source_multi"] = st.multiselect(
-            "🌍 Filter by Source", 
+            "Filter by Source", 
             sources, 
             default=st.session_state["filters"]["source_multi"]
         )
@@ -80,15 +80,15 @@ def render():
     col1, col2 = st.columns([3, 1])
     with col1:
         display_mode = st.selectbox(
-            "🎨 Display Style", 
+            "Display Style", 
             ["cards", "compact", "table", "grid", "minimal"],
             index=["cards", "compact", "table", "grid", "minimal"].index(display_mode),
             format_func=lambda x: {
-                "cards": "🎴 Card View",
-                "compact": "📦 Compact Cards", 
-                "table": "📊 Table View",
-                "grid": "⬜ Grid Layout",
-                "minimal": "📄 Minimal List"
+                "cards": "Card View",
+                "compact": "Compact Cards", 
+                "table": "Table View",
+                "grid": "Grid Layout",
+                "minimal": "Minimal List"
             }[x]
         )
     st.session_state["display_mode"] = display_mode
@@ -101,13 +101,13 @@ def render():
     if len(docs) > per_page:
         col1, col2, col3 = st.columns((1, 2, 1))
         with col1:
-            if st.button("⬅️ Prev") and page > 0:
+            if st.button("Previous") and page > 0:
                 st.session_state["doc_page"] = page - 1
                 st.rerun()
         with col2:
             st.write(f"Page {page + 1} of {total_pages}")
         with col3:
-            if st.button("Next ➡️") and page < total_pages - 1:
+            if st.button("Next") and page < total_pages - 1:
                 st.session_state["doc_page"] = page + 1
                 st.rerun()
 
@@ -116,9 +116,9 @@ def render():
     page_docs = docs[start:end]
 
     # Help section
-    with st.expander("📖 What do these scores mean?"):
+    with st.expander("What do these scores mean?"):
         st.markdown("""
-        **🔐 Quantum Maturity Scores**
+        **Quantum Maturity Scores**
         - **Quantum Maturity**: Readiness for quantum threats (e.g., crypto-agility, PQC controls)
         - **Implementation**: Evidence of actual deployment or migration planning
         - **Standards**: Compliance with NIST and other quantum-safe standards
@@ -149,7 +149,7 @@ def render():
 
     # Summary statistics
     st.markdown("---")
-    st.markdown("### 📊 Collection Summary")
+    st.markdown("### Collection Summary")
     
     col1, col2, col3, col4 = st.columns(4)
     with col1:
