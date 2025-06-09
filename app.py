@@ -308,7 +308,7 @@ def main():
             font-weight: bold;
             font-family: Arial, sans-serif;
             letter-spacing: -0.02em;
-            color: #dc2626;
+            color: #C41E3A;
         ">GUARDIAN</h1>
         <p style="
             margin: 0.5rem 0 0 0;
