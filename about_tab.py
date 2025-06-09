@@ -32,7 +32,7 @@ def render():
     
     with col1:
         st.markdown("""
-        ### 🎯 **Core Capabilities**
+        ### **Core Capabilities**
         
         **Real-Time Policy Analysis**
         - Instant evaluation of documents against quantum readiness frameworks
@@ -52,7 +52,7 @@ def render():
     
     with col2:
         st.markdown("""
-        ### 🌐 **Who Benefits?**
+        ### **Who Benefits?**
         
         **Government Agencies**
         - Policy compliance verification
@@ -74,7 +74,7 @@ def render():
     st.markdown("---")
     
     st.markdown("""
-    ### 🔧 **Technical Architecture**
+    ### **Technical Architecture**
     
     GUARDIAN employs a sophisticated multi-layered approach to governance analysis:
     """)
@@ -84,7 +84,7 @@ def render():
     
     with col1:
         st.markdown("""
-        **🧠 AI Decision Layer**
+        **AI Decision Layer**
         - Transformer-based language models
         - Named Entity Recognition (NER)
         - Semantic vector comparison
@@ -93,7 +93,7 @@ def render():
     
     with col2:
         st.markdown("""
-        **📊 Risk Evaluation Engine**
+        **Risk Evaluation Engine**
         - Cybersecurity risk scoring
         - Ethical alignment assessment
         - Dual-modality risk framework
@@ -102,7 +102,7 @@ def render():
     
     with col3:
         st.markdown("""
-        **🔄 Adaptive Learning**
+        **Adaptive Learning**
         - Continuous model refinement
         - Semantic drift detection
         - User feedback integration
@@ -113,7 +113,7 @@ def render():
     st.markdown("---")
     
     st.markdown("""
-    ### 📈 **Quantum Maturity Scoring**
+    ### **Quantum Maturity Scoring**
     
     Our five-tier scoring system provides clear, actionable insights:
     """)
@@ -150,7 +150,7 @@ def render():
     st.markdown("---")
     
     st.markdown("""
-    ### 🏛️ **Research Foundation**
+    ### **Research Foundation**
     
     GUARDIAN is built upon extensive research and development, drawing from:
     
