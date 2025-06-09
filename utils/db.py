@@ -1,44 +1,42 @@
-import os
-import json
+from utils.database import db_manager
 
 def fetch_documents():
     """
-    Fetch documents from the database or file system.
+    Fetch documents from the PostgreSQL database.
     Returns a list of document dictionaries with quantum maturity data.
     """
-    # Check if there's a documents file or database connection
-    documents_file = os.getenv("DOCUMENTS_FILE", "documents.json")
-    
     try:
-        if os.path.exists(documents_file):
-            with open(documents_file, 'r') as f:
-                documents = json.load(f)
-                return documents
-        else:
-            # Return empty list if no documents found
-            return []
+        return db_manager.fetch_documents()
     except Exception as e:
         print(f"Error fetching documents: {e}")
         return []
 
 def save_document(document):
     """
-    Save a document to the database or file system.
+    Save a document to the PostgreSQL database.
     """
-    documents_file = os.getenv("DOCUMENTS_FILE", "documents.json")
-    
     try:
-        # Load existing documents
-        documents = fetch_documents()
-        
-        # Add the new document
-        documents.append(document)
-        
-        # Save back to file
-        with open(documents_file, 'w') as f:
-            json.dump(documents, f, indent=2)
-            
-        return True
+        return db_manager.save_document(document)
     except Exception as e:
         print(f"Error saving document: {e}")
         return False
+
+def save_assessment(document_id, assessment_data):
+    """
+    Save assessment results to the database.
+    """
+    try:
+        return db_manager.save_assessment(document_id, assessment_data)
+    except Exception as e:
+        print(f"Error saving assessment: {e}")
+        return False
+
+def get_assessment_history(document_id):
+    """
+    Get assessment history for a document.
+    """
+    try:
+        return db_manager.get_assessment_history(document_id)
+    except Exception as e:
+        print(f"Error fetching assessment history: {e}")
+        return []
