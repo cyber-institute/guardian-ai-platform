@@ -201,19 +201,25 @@ def render_database_status():
     with col1:
         # Document count
         doc_count = db_manager.execute_query("SELECT COUNT(*) as count FROM documents")
-        count = doc_count[0]['count'] if doc_count and len(doc_count) > 0 else 0
+        count = 0
+        if doc_count and isinstance(doc_count, list) and len(doc_count) > 0:
+            count = doc_count[0]['count']
         st.metric("Total Documents", count)
     
     with col2:
         # Assessment count
         assessment_count = db_manager.execute_query("SELECT COUNT(*) as count FROM assessments")
-        a_count = assessment_count[0]['count'] if assessment_count and len(assessment_count) > 0 else 0
+        a_count = 0
+        if assessment_count and isinstance(assessment_count, list) and len(assessment_count) > 0:
+            a_count = assessment_count[0]['count']
         st.metric("Total Assessments", a_count)
     
     with col3:
         # Average score
         avg_score = db_manager.execute_query("SELECT AVG(quantum_score) as avg FROM documents WHERE quantum_score > 0")
-        avg = round(avg_score[0]['avg'], 1) if avg_score and len(avg_score) > 0 and avg_score[0]['avg'] else 0
+        avg = 0
+        if avg_score and isinstance(avg_score, list) and len(avg_score) > 0 and avg_score[0]['avg']:
+            avg = round(avg_score[0]['avg'], 1)
         st.metric("Average Score", f"{avg}/100")
     
     st.markdown("---")
@@ -227,7 +233,7 @@ def render_database_status():
         LIMIT 5
     """)
     
-    if recent_docs:
+    if recent_docs and isinstance(recent_docs, list):
         for doc in recent_docs:
             col1, col2, col3 = st.columns([3, 1, 1])
             with col1:

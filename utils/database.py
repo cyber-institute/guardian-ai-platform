@@ -60,19 +60,20 @@ class DatabaseManager:
         
         # Convert to format expected by the application
         documents = []
-        for row in results:
-            doc = {
-                'id': row['id'],
-                'title': row['title'],
-                'content': row['content'],
-                'text': row['text'],
-                'quantum_q': float(row['quantum_q']) if row['quantum_q'] else 0,
-                'document_type': row['document_type'],
-                'source': row['source'],
-                'created_at': row['created_at'],
-                'updated_at': row['updated_at']
-            }
-            documents.append(doc)
+        if isinstance(results, list):
+            for row in results:
+                doc = {
+                    'id': row['id'],
+                    'title': row['title'],
+                    'content': row['content'],
+                    'text': row['text'],
+                    'quantum_q': float(row['quantum_q']) if row['quantum_q'] else 0,
+                    'document_type': row['document_type'],
+                    'source': row['source'],
+                    'created_at': row['created_at'],
+                    'updated_at': row['updated_at']
+                }
+                documents.append(doc)
         
         return documents
     
