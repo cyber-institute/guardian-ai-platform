@@ -311,15 +311,12 @@ def main():
     col1, col2, col3 = st.columns([3, 1, 3])
     with col2:
         try:
-            st.image("assets/cyber_institute_logo.jpg", width=40, use_column_width=False)
+            st.image("assets/cyber_institute_logo.jpg", width=40)
         except:
             pass
-        
-    st.markdown("""
-    <div style="text-align: center; font-size: 0.9rem; color: #6b7280; margin-bottom: 2rem;">
-        Developed by Cyber Institute
-    </div>
-    """, unsafe_allow_html=True)
+        st.markdown('<div style="text-align: center; font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">Developed by Cyber Institute</div>', unsafe_allow_html=True)
+    
+    st.markdown('<div style="margin-bottom: 2rem;"></div>', unsafe_allow_html=True)
     
     # Enhanced sidebar with government/nonprofit styling
     with st.sidebar:
