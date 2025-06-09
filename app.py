@@ -298,7 +298,7 @@ def main():
     <div style="text-align: center; margin-bottom: 2rem;">
         <h1 style="
             margin: 0 0 1rem 0;
-            font-size: 2.8rem;
+            font-size: 5.6rem;
             font-weight: bold;
             font-family: Arial, sans-serif;
             letter-spacing: -0.02em;
