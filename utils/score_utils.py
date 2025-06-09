@@ -60,70 +60,45 @@ def draw_scorecard(title, score):
                 {i}
             </div>"""
     
-    # Create legend
+    # Create compact legend
     legend_html = ""
     for i in range(1, 6):
         legend_html += f"""
-        <div style='display: flex; align-items: center; margin: 0.3rem 0;'>
-            <div style='width: 20px; height: 20px; background: {level_colors[i]}; border-radius: 50%; 
-                        margin-right: 0.5rem; flex-shrink: 0;'></div>
-            <span style='font-size: 0.8rem; color: #374151;'>{i}: {level_names[i]}</span>
+        <div style='display: flex; align-items: center; margin: 0.1rem 0;'>
+            <div style='width: 12px; height: 12px; background: {level_colors[i]}; border-radius: 50%; 
+                        margin-right: 0.4rem; flex-shrink: 0;'></div>
+            <span style='font-size: 0.7rem; color: #374151;'>{i}: {level_names[i]}</span>
         </div>"""
     
-    # Create the main container
-    col1, col2 = st.columns([2, 1])
-    
-    with col1:
-        st.markdown(f"### {title}")
+    # Compact scoring display
+    st.markdown(f"""
+    <div style='background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); 
+                border-radius: 8px; padding: 1rem; margin: 0.5rem 0; border: 1px solid #e2e8f0;'>
+        <div style='text-align: center; margin-bottom: 0.5rem;'>
+            <h4 style='margin: 0; color: #374151; font-size: 1.1rem;'>{title}</h4>
+        </div>
         
-        # Create circle badges using Streamlit columns instead of HTML
-        circle_cols = st.columns(5)
-        for i, col in enumerate(circle_cols, 1):
-            with col:
-                if i <= maturity_level:
-                    # Filled circle with appropriate color
-                    st.markdown(f"""
-                    <div style='text-align: center;'>
-                        <div style='width: 40px; height: 40px; background: {level_colors[i]}; 
-                                    color: {level_text_colors[i]}; border-radius: 50%; 
-                                    font-weight: 700; font-size: 0.9rem; 
-                                    display: flex; align-items: center; justify-content: center;
-                                    margin: 0 auto; border: 2px solid {level_colors[i]};'>
-                            {i}
-                        </div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                else:
-                    # Empty circle
-                    st.markdown(f"""
-                    <div style='text-align: center;'>
-                        <div style='width: 40px; height: 40px; background: #f3f4f6; 
-                                    color: #9ca3af; border-radius: 50%; 
-                                    font-weight: 600; font-size: 0.9rem; 
-                                    display: flex; align-items: center; justify-content: center;
-                                    margin: 0 auto; border: 2px dashed #d1d5db;'>
-                            {i}
-                        </div>
-                    </div>
-                    """, unsafe_allow_html=True)
-        
-        # Current level display
-        st.markdown(f"""
-        <div style='text-align: center; margin-top: 1rem;'>
-            <div style='font-size: 1.3rem; font-weight: 700; color: {level_colors[maturity_level]};'>
-                Level {maturity_level}: {level_names[maturity_level]}
+        <div style='display: flex; justify-content: center; align-items: center; gap: 1.5rem; flex-wrap: wrap;'>
+            <div style='display: flex; gap: 0.5rem; align-items: center;'>
+                {badges_html}
             </div>
-            <div style='font-size: 0.9rem; color: #6b7280; font-style: italic; margin-top: 0.3rem;'>
-                {level_descriptions[maturity_level]}
+            
+            <div style='text-align: center;'>
+                <div style='font-size: 1.1rem; font-weight: 700; color: {level_colors[maturity_level]}; margin: 0;'>
+                    Level {maturity_level}: {level_names[maturity_level]}
+                </div>
+                <div style='font-size: 0.75rem; color: #6b7280; margin: 0;'>
+                    {level_descriptions[maturity_level]}
+                </div>
+            </div>
+            
+            <div style='border-left: 1px solid #d1d5db; padding-left: 1rem;'>
+                <div style='font-size: 0.75rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;'>Legend:</div>
+                {legend_html}
             </div>
         </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown("**Legend:**")
-        for i in range(1, 6):
-            color_circle = f'<span style="display: inline-block; width: 15px; height: 15px; background: {level_colors[i]}; border-radius: 50%; margin-right: 8px; vertical-align: middle;"></span>'
-            st.markdown(f"{color_circle}{i}: {level_names[i]}", unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
 
 def get_score_analysis(score, category, doc_title="", doc_content="", doc_type=None):
     """
