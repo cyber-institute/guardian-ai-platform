@@ -321,26 +321,26 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Cyber Institute credit with logo
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col1:
-        try:
-            import base64
-            with open("assets/cyber_institute_logo.jpg", "rb") as f:
-                logo_data = base64.b64encode(f.read()).decode()
-            
-            st.markdown(f"""
-            <div style="display: flex; align-items: center; font-size: 0.9rem; color: #6b7280; margin-bottom: 1rem;">
-                <span style="margin-right: 0.5rem;">Developed by Cyber Institute</span>
-                <img src="data:image/jpeg;base64,{logo_data}" width="30" height="30" style="border-radius: 50%;">
-            </div>
-            """, unsafe_allow_html=True)
-        except:
-            st.markdown("""
-            <div style="font-size: 0.9rem; color: #6b7280; margin-bottom: 1rem;">
+    # Cyber Institute credit with logo - centered
+    try:
+        import base64
+        with open("assets/cyber_institute_logo.jpg", "rb") as f:
+            logo_data = base64.b64encode(f.read()).decode()
+        
+        st.markdown(f"""
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <img src="data:image/jpeg;base64,{logo_data}" width="40" height="40" style="border-radius: 50%; margin-bottom: 0.5rem;">
+            <div style="font-size: 0.9rem; color: #6b7280;">
                 Developed by Cyber Institute
             </div>
-            """, unsafe_allow_html=True)
+        </div>
+        """, unsafe_allow_html=True)
+    except:
+        st.markdown("""
+        <div style="text-align: center; font-size: 0.9rem; color: #6b7280; margin-bottom: 1.5rem;">
+            Developed by Cyber Institute
+        </div>
+        """, unsafe_allow_html=True)
     
     # Enhanced sidebar with government/nonprofit styling
     with st.sidebar:
