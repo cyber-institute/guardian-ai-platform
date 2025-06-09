@@ -226,7 +226,7 @@ def render_table_view(docs):
 
 def render_minimal_list(docs):
     """Render documents in minimal list format."""
-    for doc in docs:
+    for idx, doc in enumerate(docs):
         title = doc.get('title', 'Untitled Document')
         quantum_score = doc.get("quantum_score", 0)
         doc_type = doc.get('document_type', 'Unknown')
@@ -238,7 +238,7 @@ def render_minimal_list(docs):
         with col2:
             st.markdown(get_badge(int(quantum_score)), unsafe_allow_html=True)
         with col3:
-            if st.button("View", key=f"view_{doc.get('id', i)}"):
+            if st.button("View", key=f"view_{idx}"):
                 with st.expander("Document Details", expanded=True):
                     st.write(doc.get('content', 'No content')[:500])
 
