@@ -308,12 +308,21 @@ def main():
     """, unsafe_allow_html=True)
     
     # Cyber Institute credit with logo inline
-    col1, col2, col3 = st.columns([2, 1, 2])
-    with col2:
-        st.markdown("""
+    try:
+        import base64
+        with open("assets/cyber_institute_logo.jpg", "rb") as f:
+            logo_data = base64.b64encode(f.read()).decode()
+        
+        st.markdown(f"""
         <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 2rem;">
-            <img src="assets/cyber_institute_logo.jpg" width="40" height="40" style="border-radius: 50%; margin-right: 0.5rem;">
-            <span style="font-size: 0.9rem; color: #6b7280;">Developed by Cyber Institute</span>
+            <img src="data:image/jpeg;base64,{logo_data}" width="40" height="40" style="border-radius: 50%; margin-right: 0.5rem;">
+            <span style="font-size: 0.9rem; color: #6b7280; white-space: nowrap;">Developed by Cyber Institute</span>
+        </div>
+        """, unsafe_allow_html=True)
+    except:
+        st.markdown("""
+        <div style="text-align: center; font-size: 0.9rem; color: #6b7280; margin-bottom: 2rem;">
+            Developed by Cyber Institute
         </div>
         """, unsafe_allow_html=True)
     
