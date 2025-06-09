@@ -10,104 +10,194 @@ def main():
         initial_sidebar_state="expanded"
     )
     
-    # Custom CSS styling
+    # Custom CSS styling - Government/Nonprofit Theme
     st.markdown("""
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Serif+Pro:wght@400;600&display=swap');
+    
     .main > div {
         padding-top: 2rem;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
     .quantum-header {
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        padding: 2rem;
-        border-radius: 10px;
-        margin-bottom: 2rem;
+        background: linear-gradient(135deg, #1e3a8a 0%, #312e81 50%, #1e40af 100%);
+        padding: 3rem 2rem;
+        border-radius: 12px;
+        margin-bottom: 2.5rem;
         color: white;
         text-align: center;
+        box-shadow: 0 8px 32px rgba(30, 58, 138, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
     
     .quantum-header h1 {
         margin: 0;
-        font-size: 2.5rem;
-        font-weight: 700;
+        font-size: 2.8rem;
+        font-weight: 600;
+        font-family: 'Source Serif Pro', serif;
+        letter-spacing: -0.02em;
     }
     
     .quantum-header p {
-        margin: 0.5rem 0 0 0;
-        font-size: 1.2rem;
+        margin: 1rem 0 0 0;
+        font-size: 1.15rem;
         opacity: 0.9;
+        font-weight: 400;
+        letter-spacing: 0.01em;
     }
     
     .metric-card {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        border-left: 4px solid #667eea;
+        background: #ffffff;
+        padding: 1.75rem;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.04);
+        border-left: 4px solid #3b82f6;
         margin: 1rem 0;
+        border-top: 1px solid #e5e7eb;
     }
     
     .score-excellent {
-        border-left-color: #22c55e;
+        border-left-color: #059669;
+        background: linear-gradient(145deg, #ffffff 0%, #f0fdf4 100%);
     }
     
     .score-good {
-        border-left-color: #f59e0b;
+        border-left-color: #d97706;
+        background: linear-gradient(145deg, #ffffff 0%, #fffbeb 100%);
     }
     
     .score-moderate {
-        border-left-color: #ef4444;
+        border-left-color: #dc2626;
+        background: linear-gradient(145deg, #ffffff 0%, #fef2f2 100%);
     }
     
     .document-separator {
         border: none;
-        height: 2px;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        margin: 2rem 0;
+        height: 1px;
+        background: linear-gradient(90deg, #e5e7eb 0%, #9ca3af 50%, #e5e7eb 100%);
+        margin: 2.5rem 0;
         border-radius: 1px;
     }
     
     .stExpander > details > summary {
-        background-color: #f8fafc;
-        border-radius: 8px;
-        padding: 1rem;
+        background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
+        border-radius: 10px;
+        padding: 1.25rem;
+        border: 1px solid #e2e8f0;
+        font-weight: 500;
     }
     
     .sidebar-info {
-        background: #f1f5f9;
-        padding: 1rem;
-        border-radius: 8px;
-        margin: 1rem 0;
+        background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin: 1.25rem 0;
+        border: 1px solid #e2e8f0;
+        color: #374151;
     }
     
     .document-card {
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         cursor: pointer;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
     }
     
     .document-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 20px 48px rgba(0, 0, 0, 0.06);
+        border-color: #3b82f6;
     }
     
     .score-badge {
-        transition: transform 0.2s ease;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
     }
     
     .score-badge:hover {
-        transform: scale(1.1);
+        transform: scale(1.05);
     }
     
     .category-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-        margin: 1rem 0;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.75rem;
+        margin: 1.5rem 0;
+    }
+    
+    /* Enhanced Typography */
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Source Serif Pro', serif;
+        color: #1f2937;
+        font-weight: 600;
+    }
+    
+    p, div, span {
+        color: #374151;
+        line-height: 1.6;
+    }
+    
+    /* Tab styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 2px;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        background: #f8fafc;
+        border-radius: 8px 8px 0 0;
+        border: 1px solid #e2e8f0;
+        font-weight: 500;
+        color: #6b7280;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background: #ffffff;
+        color: #1e40af;
+        border-bottom: 2px solid #3b82f6;
+    }
+    
+    /* Button styling */
+    .stButton > button {
+        background: linear-gradient(145deg, #3b82f6 0%, #1e40af 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.3s ease;
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .stButton > button:hover {
+        background: linear-gradient(145deg, #1e40af 0%, #1e3a8a 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    
+    /* Metric styling */
+    [data-testid="metric-container"] {
+        background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+        border: 1px solid #e5e7eb;
+        padding: 1rem;
+        border-radius: 10px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
     
     @media (max-width: 768px) {
         .category-grid {
             grid-template-columns: 1fr;
+            gap: 1.25rem;
+        }
+        
+        .quantum-header h1 {
+            font-size: 2.2rem;
+        }
+        
+        .quantum-header p {
+            font-size: 1rem;
         }
         
         .document-card {
@@ -130,39 +220,95 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Sidebar information
+    # Enhanced sidebar with government/nonprofit styling
     with st.sidebar:
-        st.markdown("### Assessment Overview")
+        # Government seal-style header
         st.markdown("""
-        <div class="sidebar-info">
-        <strong>Evaluation Criteria:</strong><br>
-        • Post-Quantum Cryptography<br>
-        • Risk Assessment<br>
-        • Implementation Planning<br>
-        • Standards Compliance<br>
-        • Migration Strategy
+        <div style="
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
+        ">
+            <h3 style="margin: 0; font-family: 'Source Serif Pro', serif; font-weight: 600;">
+                🔐 Risk Assessment Framework
+            </h3>
+            <p style="margin: 0.5rem 0 0 0; opacity: 0.9; font-size: 0.9rem;">
+                Official Quantum Readiness Evaluation
+            </p>
         </div>
         """, unsafe_allow_html=True)
         
-        st.markdown("### Scoring Scale")
+        st.markdown("### Assessment Methodology")
         st.markdown("""
         <div class="sidebar-info">
-        <strong>90-100:</strong> Quantum-Ready<br>
-        <strong>75-89:</strong> Advanced<br>
-        <strong>50-74:</strong> Developing<br>
-        <strong>25-49:</strong> Basic<br>
-        <strong>0-24:</strong> Initial
+        <strong>Core Evaluation Areas:</strong><br><br>
+        🔒 <strong>Post-Quantum Cryptography</strong><br>
+        Assessment of quantum-resistant algorithms<br><br>
+        ⚠️ <strong>Risk Assessment</strong><br>
+        Vulnerability identification and impact analysis<br><br>
+        📋 <strong>Implementation Planning</strong><br>
+        Strategy development and roadmap creation<br><br>
+        ✅ <strong>Standards Compliance</strong><br>
+        NIST, FIPS, and industry standard adherence<br><br>
+        🔄 <strong>Migration Strategy</strong><br>
+        Transition planning and execution framework
         </div>
         """, unsafe_allow_html=True)
         
-        st.markdown("### Analysis Features")
+        st.markdown("### Maturity Classification")
         st.markdown("""
         <div class="sidebar-info">
-        • AI-powered text analysis<br>
-        • Keyword density scoring<br>
-        • Maturity trait detection<br>
-        • Standards reference checking<br>
-        • Implementation gap analysis
+        <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+            <div style="width: 12px; height: 12px; background: #059669; border-radius: 2px; margin-right: 8px;"></div>
+            <strong>90-100: Quantum-Ready</strong>
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+            <div style="width: 12px; height: 12px; background: #10b981; border-radius: 2px; margin-right: 8px;"></div>
+            <strong>75-89: Advanced</strong>
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+            <div style="width: 12px; height: 12px; background: #d97706; border-radius: 2px; margin-right: 8px;"></div>
+            <strong>50-74: Developing</strong>
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+            <div style="width: 12px; height: 12px; background: #f59e0b; border-radius: 2px; margin-right: 8px;"></div>
+            <strong>25-49: Basic</strong>
+        </div>
+        <div style="display: flex; align-items: center;">
+            <div style="width: 12px; height: 12px; background: #dc2626; border-radius: 2px; margin-right: 8px;"></div>
+            <strong>0-24: Initial</strong>
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("### Technical Capabilities")
+        st.markdown("""
+        <div class="sidebar-info">
+        <strong>Analysis Engine:</strong><br><br>
+        • Intelligent text processing<br>
+        • Quantum keyword detection<br>
+        • Compliance verification<br>
+        • Maturity trait identification<br>
+        • Gap analysis reporting<br>
+        • Standards cross-referencing<br><br>
+        <em>Powered by advanced natural language processing and domain-specific evaluation algorithms.</em>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Add contact/support section
+        st.markdown("### Support Resources")
+        st.markdown("""
+        <div class="sidebar-info">
+        <strong>Need Assistance?</strong><br><br>
+        📚 Documentation available<br>
+        🎯 Training materials provided<br>
+        📞 Technical support accessible<br>
+        🔄 Regular updates included<br><br>
+        <small><em>This tool supports federal agencies and organizations in preparing for the post-quantum cryptography transition.</em></small>
         </div>
         """, unsafe_allow_html=True)
     

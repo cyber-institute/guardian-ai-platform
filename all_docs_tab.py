@@ -4,11 +4,11 @@ from utils.hf_ai_scoring import evaluate_quantum_maturity_hf
 
 def get_badge(score):
     if score >= 80:
-        return f"<span style='background-color:#2eb875;color:white;padding:2px 6px;border-radius:6px'>{score}</span>"
+        return f"<span style='background: linear-gradient(135deg, #059669 0%, #10b981 100%);color:white;padding:4px 12px;border-radius:8px;font-weight:600;font-family:Inter,sans-serif;box-shadow:0 2px 4px rgba(5,150,105,0.2)'>{score}</span>"
     elif score >= 50:
-        return f"<span style='background-color:#ff6b27;color:white;padding:2px 6px;border-radius:6px'>{score}</span>"
+        return f"<span style='background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);color:white;padding:4px 12px;border-radius:8px;font-weight:600;font-family:Inter,sans-serif;box-shadow:0 2px 4px rgba(217,119,6,0.2)'>{score}</span>"
     else:
-        return f"<span style='background-color:#dc3545;color:white;padding:2px 6px;border-radius:6px'>{score}</span>"
+        return f"<span style='background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);color:white;padding:4px 12px;border-radius:8px;font-weight:600;font-family:Inter,sans-serif;box-shadow:0 2px 4px rgba(220,38,38,0.2)'>{score}</span>"
 
 def is_probably_quantum(content):
     if not content:

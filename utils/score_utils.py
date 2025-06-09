@@ -18,23 +18,28 @@ def draw_scorecard(title, score):
             title = {'text': title},
             delta = {'reference': 50},
             gauge = {
-                'axis': {'range': [None, 100]},
-                'bar': {'color': "darkblue"},
+                'axis': {'range': [None, 100], 'tickfont': {'size': 14, 'family': 'Inter'}},
+                'bar': {'color': "#1e40af", 'thickness': 0.8},
                 'steps': [
-                    {'range': [0, 25], 'color': "lightgray"},
-                    {'range': [25, 50], 'color': "yellow"},
-                    {'range': [50, 75], 'color': "orange"},
-                    {'range': [75, 100], 'color': "green"}
+                    {'range': [0, 25], 'color': "#f3f4f6"},
+                    {'range': [25, 50], 'color': "#fef3c7"},
+                    {'range': [50, 75], 'color': "#fed7aa"},
+                    {'range': [75, 100], 'color': "#d1fae5"}
                 ],
                 'threshold': {
-                    'line': {'color': "red", 'width': 4},
+                    'line': {'color': "#dc2626", 'width': 3},
                     'thickness': 0.75,
                     'value': 90
                 }
             }
         ))
         
-        fig.update_layout(height=300)
+        fig.update_layout(
+            height=300,
+            font=dict(family="Inter, sans-serif", size=14, color="#374151"),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)"
+        )
         st.plotly_chart(fig, use_container_width=True)
     else:
         # Enhanced fallback visualization using Streamlit components
@@ -44,8 +49,8 @@ def draw_scorecard(title, score):
         col1, col2 = st.columns([3, 1])
         
         with col1:
-            # Enhanced progress bar with color coding
-            progress_color = "#22c55e" if score >= 75 else "#f59e0b" if score >= 50 else "#ef4444"
+            # Enhanced progress bar with government theme color coding
+            progress_color = "#059669" if score >= 75 else "#d97706" if score >= 50 else "#dc2626"
             
             st.markdown(f"""
             <div style="
