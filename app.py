@@ -18,6 +18,21 @@ def main():
     .main > div {
         padding-top: 2rem;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background-color: #ffffff;
+    }
+    
+    .stApp {
+        background-color: #ffffff;
+    }
+    
+    .stApp > header {
+        background-color: transparent;
+    }
+    
+    .main .block-container {
+        background-color: #ffffff;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
     }
     
     .quantum-header {
@@ -184,6 +199,68 @@ def main():
         padding: 1rem;
         border-radius: 10px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Force light theme overrides */
+    .stApp, .main, .block-container, .element-container {
+        background-color: #ffffff !important;
+        color: #374151 !important;
+    }
+    
+    /* Sidebar light theme */
+    .css-1d391kg, .css-1cypcdb, .sidebar .sidebar-content {
+        background-color: #f8fafc !important;
+        color: #374151 !important;
+    }
+    
+    /* Text input styling */
+    .stTextInput > div > div > input {
+        background-color: #ffffff !important;
+        color: #374151 !important;
+        border: 1px solid #d1d5db !important;
+        border-radius: 8px !important;
+    }
+    
+    /* Select box styling */
+    .stSelectbox > div > div > div {
+        background-color: #ffffff !important;
+        color: #374151 !important;
+        border: 1px solid #d1d5db !important;
+    }
+    
+    /* Multiselect styling */
+    .stMultiSelect > div > div > div {
+        background-color: #ffffff !important;
+        color: #374151 !important;
+    }
+    
+    /* File uploader styling */
+    .stFileUploader > div {
+        background-color: #f8fafc !important;
+        border: 2px dashed #d1d5db !important;
+        border-radius: 8px !important;
+    }
+    
+    /* Dataframe styling */
+    .stDataFrame {
+        background-color: #ffffff !important;
+    }
+    
+    /* Expander styling */
+    .streamlit-expanderHeader {
+        background-color: #f8fafc !important;
+        color: #374151 !important;
+    }
+    
+    /* Alert styling */
+    .stAlert {
+        background-color: #ffffff !important;
+        border-radius: 8px !important;
+    }
+    
+    /* Progress bar styling */
+    .stProgress .st-bo {
+        background-color: #e5e7eb !important;
     }
     
     @media (max-width: 768px) {
