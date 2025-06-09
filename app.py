@@ -293,17 +293,12 @@ def main():
     </style>
     """, unsafe_allow_html=True)
     
-    # Main header with inline styling for reliability
+    # Main header without background
     st.markdown("""
     <div style="
-        background: linear-gradient(135deg, #1e3a8a 0%, #312e81 50%, #1e40af 100%);
-        padding: 3rem 2rem;
-        border-radius: 12px;
-        margin-bottom: 2.5rem;
-        color: white;
+        padding: 2rem 0 1rem 0;
+        margin-bottom: 2rem;
         text-align: center;
-        box-shadow: 0 8px 32px rgba(30, 58, 138, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.1);
         width: 100%;
         display: block;
     ">
@@ -313,18 +308,39 @@ def main():
             font-weight: 600;
             font-family: 'Source Serif Pro', serif;
             letter-spacing: -0.02em;
-            color: white;
+            color: #1f2937;
         ">GUARDIAN</h1>
         <p style="
-            margin: 1rem 0 0 0;
-            font-size: 1.15rem;
-            opacity: 0.9;
+            margin: 0.5rem 0 0 0;
+            font-size: 1rem;
             font-weight: 400;
             letter-spacing: 0.01em;
-            color: white;
-        ">Global Unified AI Risk Discovery & Impact Analysis Navigator</p>
+            color: #6b7280;
+            font-style: italic;
+        ">(Global Unified AI Risk Discovery & Impact Analysis Navigator)</p>
     </div>
     """, unsafe_allow_html=True)
+    
+    # Cyber Institute credit with logo
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col1:
+        try:
+            import base64
+            with open("assets/cyber_institute_logo.jpg", "rb") as f:
+                logo_data = base64.b64encode(f.read()).decode()
+            
+            st.markdown(f"""
+            <div style="display: flex; align-items: center; font-size: 0.9rem; color: #6b7280; margin-bottom: 1rem;">
+                <span style="margin-right: 0.5rem;">Developed by Cyber Institute</span>
+                <img src="data:image/jpeg;base64,{logo_data}" width="30" height="30" style="border-radius: 50%;">
+            </div>
+            """, unsafe_allow_html=True)
+        except:
+            st.markdown("""
+            <div style="font-size: 0.9rem; color: #6b7280; margin-bottom: 1rem;">
+                Developed by Cyber Institute
+            </div>
+            """, unsafe_allow_html=True)
     
     # Enhanced sidebar with government/nonprofit styling
     with st.sidebar:
