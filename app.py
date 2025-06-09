@@ -310,14 +310,7 @@ def main():
             letter-spacing: -0.02em;
             color: #B91C2C;
         ">GUARDIAN</h1>
-        <p style="
-            margin: 0.5rem 0 0 0;
-            font-size: 2rem;
-            font-weight: 400;
-            letter-spacing: 0.01em;
-            color: #6b7280;
-            font-style: italic;
-        ">(<span style="color: #B91C2C; font-weight: bold;">G</span>lobal <span style="color: #B91C2C; font-weight: bold;">U</span>nified <span style="color: #B91C2C; font-weight: bold;">A</span>I <span style="color: #B91C2C; font-weight: bold;">R</span>isk <span style="color: #B91C2C; font-weight: bold;">D</span>iscovery & <span style="color: #B91C2C; font-weight: bold;">I</span>mpact <span style="color: #B91C2C; font-weight: bold;">A</span>nalysis <span style="color: #B91C2C; font-weight: bold;">N</span>avigator)</p>
+
     </div>
     """, unsafe_allow_html=True)
     
