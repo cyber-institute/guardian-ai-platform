@@ -45,7 +45,7 @@ def render():
         - Semantic understanding of regulatory language
         
         **Quantum Maturity Assessment**
-        - Five-tier scoring system (🔴🟠🟡🟢🟣)
+        - Five-tier scoring system with numbered levels (1-5)
         - Comprehensive risk evaluation across multiple dimensions
         - Actionable insights for quantum readiness improvement
         """)
