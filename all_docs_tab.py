@@ -53,7 +53,31 @@ def render():
         )
     
     with col2:
-        if st.button("Clear Filters"):
+        st.markdown("""
+        <style>
+        .clear-filters-btn {
+            background: linear-gradient(145deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            margin-top: 1.5rem;
+            width: 100%;
+        }
+        .clear-filters-btn:hover {
+            background: linear-gradient(145deg, #dc2626 0%, #b91c1c 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        if st.button("🗑️ Clear Filters", key="clear_filters", help="Reset all filters to default values"):
             st.session_state["filters"] = {
                 "doc_type": "All",
                 "source_multi": []
