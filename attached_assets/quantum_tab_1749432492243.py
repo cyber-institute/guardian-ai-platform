@@ -45,20 +45,21 @@ def render():
 
                 st.markdown("### Confidence Scores (Raw)")
                 for label, conf in raw_conf.items():
-    try:
-        score_value = float(conf)
-        st.markdown(f"{label}: **{score_value:.2f}**")
-    except (ValueError, TypeError):
-        st.markdown(f"{label}: *non-numeric result*")
+                    try:
+                        score_value = float(conf)
+                        st.markdown(f"{label}: **{score_value:.2f}**")
+                    except (ValueError, TypeError):
+                        st.markdown(f"{label}: *non-numeric result*")
 
-    st.markdown("### Maturity Trait Detection")
+                st.markdown("### Maturity Trait Detection")
                 st.markdown(f"- Implementation Plan: {'✅' if traits.get('implementation_plan') else '❌'}")
                 st.markdown(f"- Standards Reference: {'✅' if traits.get('standards_reference') else '❌'}")
                 st.markdown(f"- Roadmap/Timeline: {'✅' if traits.get('roadmap_timeline') else '❌'}")
 
                 st.markdown("### How Scores Are Weighted")
                 st.markdown("""
-                - Awareness labels weighted **0.8**                 - Readiness labels weighted **1.2**
+                - Awareness labels weighted **0.8**
+                - Readiness labels weighted **1.2**
                 - Controls labels weighted **1.5**
                 
                 The final maturity score is based on the weighted average of all matched labels.
@@ -81,4 +82,3 @@ def render():
             st.markdown("_This document does not appear to contain any quantum-related content._")
 
         st.markdown("—" * 15)
-
