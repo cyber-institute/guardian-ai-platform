@@ -32,7 +32,10 @@ def render():
             draw_scorecard("Quantum Ethics", score)
 
             st.markdown("### Analysis")
-            st.markdown(get_score_analysis(score, "quantum ethics"))
+            st.markdown(get_score_analysis(score, "quantum ethics", 
+                                         doc_title=doc.get("title", ""), 
+                                         doc_content=text_blob or "", 
+                                         doc_type=doc.get("document_type")))
 
             st.markdown("### Key Factors")
             st.markdown("- Post-Quantum\n- Surveillance\n- Weaponization\n- Cryptographic Migration")

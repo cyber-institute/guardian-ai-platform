@@ -13,9 +13,10 @@ def render_document_uploader():
         
         with col1:
             title = st.text_input("Document Title*", placeholder="e.g., Quantum Security Assessment")
+            from utils.document_classifier import DOCUMENT_TYPES
             document_type = st.selectbox(
                 "Document Type",
-                ["strategy", "assessment", "framework", "policy", "implementation", "research"]
+                list(DOCUMENT_TYPES.keys())
             )
         
         with col2:
@@ -111,12 +112,18 @@ def render_bulk_upload():
                     # Read file content
                     content = uploaded_file.read().decode('utf-8')
                     
+                    # Detect document type intelligently
+                    from utils.document_classifier import detect_document_type
+                    
+                    file_title = uploaded_file.name.replace('.txt', '').replace('.md', '').replace('.csv', '')
+                    detected_type = detect_document_type(file_title, content)
+                    
                     # Prepare document
                     document_data = {
-                        'title': uploaded_file.name.replace('.txt', '').replace('.md', ''),
+                        'title': file_title,
                         'content': content[:200] + "..." if len(content) > 200 else content,
                         'text': content,
-                        'document_type': 'uploaded',
+                        'document_type': detected_type,
                         'source': 'file_upload',
                         'quantum_q': 0
                     }

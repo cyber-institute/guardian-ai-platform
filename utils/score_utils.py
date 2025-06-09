@@ -96,41 +96,17 @@ def draw_scorecard(title, score):
     </div>
     """, unsafe_allow_html=True)
 
-def get_score_analysis(score, category):
+def get_score_analysis(score, category, doc_title="", doc_content="", doc_type=None):
     """
-    Generate analysis text based on the quantum maturity score (1-5 scale).
+    Generate contextual analysis text based on quantum maturity score and document type.
     """
-    # Convert score to 1-5 scale if it's on 0-100 scale
-    if score > 5:
-        maturity_level = min(5, max(1, round(score / 20)))
-    else:
-        maturity_level = min(5, max(1, round(score)))
+    from utils.document_classifier import detect_document_type, get_contextual_analysis_text
     
-    if maturity_level == 5:
-        return f"""
-        **Expert-level {category} maturity!** Your organization demonstrates advanced understanding 
-        and implementation of quantum-safe practices. You are well-prepared for the quantum era.
-        """
-    elif maturity_level == 4:
-        return f"""
-        **Advanced {category} foundation.** Your organization shows strong awareness and solid 
-        implementation of quantum-safe practices. Consider fine-tuning specific areas.
-        """
-    elif maturity_level == 3:
-        return f"""
-        **Developing {category} awareness.** Your organization has good understanding but 
-        needs continued improvement in quantum readiness implementation.
-        """
-    elif maturity_level == 2:
-        return f"""
-        **Basic {category} preparation.** Your organization shows fundamental quantum awareness. 
-        Focus on expanding knowledge and building implementation strategies.
-        """
-    else:
-        return f"""
-        **Initial {category} readiness.** Your organization is beginning quantum preparedness. 
-        Start with basic education and risk assessment activities.
-        """
+    # Detect document type if not provided
+    if not doc_type:
+        doc_type = detect_document_type(doc_title, doc_content)
+    
+    return get_contextual_analysis_text(score, category, doc_type, doc_title)
 
 def get_deep_diagnostics(score, category):
     """
