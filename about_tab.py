@@ -22,7 +22,7 @@ def render():
         </p>
         <p style="font-size: 1.1rem; line-height: 1.7; color: #374151;">
             Developed by the Cyber Institute, this system bridges the gap between complex regulatory 
-            frameworks and practical compliance needs for organizations navigating the quantum technology landscape.
+            frameworks and practical compliance needs for organizations navigating the emerging technologies landscape.
         </p>
     </div>
     """, unsafe_allow_html=True)
