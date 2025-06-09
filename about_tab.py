@@ -16,13 +16,15 @@ def render():
             What is GUARDIAN?
         </h2>
         <p style="font-size: 1.1rem; line-height: 1.7; color: #374151; margin-bottom: 1rem;">
-            <strong>GUARDIAN</strong> (Global Unified AI Risk Discovery & Impact Analysis Navigator) is an 
-            AI-powered governance platform that provides real-time assessment and analysis of emerging 
-            technology policies, with specialized focus on AI cybersecurity and quantum maturity evaluations and their ethical implementations.
+            <strong>GUARDIAN</strong> (Global Unified AI Risk Discovery & Impact Analysis Navigator) is a 
+            comprehensive AI-powered governance platform that integrates multiple patented technologies for 
+            real-time policy evaluation, cybersecurity assessment, and ethical compliance analysis across 
+            AI and quantum technology domains.
         </p>
         <p style="font-size: 1.1rem; line-height: 1.7; color: #374151;">
-            Developed by the Cyber Institute, this system bridges the gap between complex regulatory 
-            frameworks and practical compliance needs for organizations navigating the emerging technologies landscape.
+            Developed by the Cyber Institute, this unified system combines three breakthrough patent technologies: 
+            Real-Time Dynamic Governance, AI-Powered Policy Evaluation, and Quantum Cybersecurity Framework 
+            to provide organizations with comprehensive governance solutions for emerging technologies.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -34,20 +36,25 @@ def render():
         st.markdown("""
         ### **Core Capabilities**
         
-        **Real-Time Policy Analysis**
-        - Instant evaluation of documents against quantum readiness frameworks
-        - Dynamic scoring using AI-powered assessment algorithms
-        - Cross-jurisdictional policy harmonization
+        **AI-Powered Policy Repository**
+        - Hybrid data collection via APIs, document parsing, and web scraping
+        - Unbiased policy summarization using transformer-based models
+        - Cross-jurisdictional policy comparison and harmonization
         
-        **Intelligent Document Classification**
-        - Automatic detection of document types (policies, standards, strategies)
-        - Context-aware analysis tailored to document purpose
-        - Semantic understanding of regulatory language
+        **Cybersecurity & Ethics Gap Analysis**
+        - Machine learning-powered compliance gap scoring
+        - Alignment with global frameworks (NIST, OECD, EU AI Act)
+        - Real-time vulnerability assessment and mitigation recommendations
         
-        **Quantum Maturity Assessment**
-        - Five-tier scoring system with numbered levels (1-5)
-        - Comprehensive risk evaluation across multiple dimensions
-        - Actionable insights for quantum readiness improvement
+        **Quantum Cybersecurity Framework**
+        - Five-tier maturity evaluation algorithm (QCMEA)
+        - Bayesian inference for dynamic threat assessment
+        - Post-quantum cryptography readiness evaluation
+        
+        **Policy Optimization & Stress Testing**
+        - Reinforcement learning for policy customization
+        - Sandbox environment for regulatory impact simulation
+        - Probabilistic adoption scoring and effectiveness prediction
         """)
     
     with col2:
@@ -85,28 +92,28 @@ def render():
     with col1:
         st.markdown("""
         **AI Decision Layer**
-        - Transformer-based language models
-        - Named Entity Recognition (NER)
-        - Semantic vector comparison
-        - Reinforcement learning optimization
+        - BERT and GPT-4 transformer models
+        - Named Entity Recognition (NER) for policy extraction
+        - Fuzzy logic-based probabilistic scoring
+        - Sentiment analysis for bias detection
         """)
     
     with col2:
         st.markdown("""
         **Risk Evaluation Engine**
-        - Cybersecurity risk scoring
-        - Ethical alignment assessment
-        - Dual-modality risk framework
-        - Real-time threat simulation
+        - Graph Neural Networks (GNNs) for interdependency analysis
+        - Dual-modality cybersecurity and ethics scoring
+        - Quantum threat simulation and validation
+        - Real-time vulnerability assessment
         """)
     
     with col3:
         st.markdown("""
         **Adaptive Learning**
-        - Continuous model refinement
-        - Semantic drift detection
-        - User feedback integration
-        - Dynamic policy updates
+        - Bayesian inference for dynamic updates
+        - Reinforcement learning policy optimization
+        - Semantic drift detection and retraining
+        - Continuous compliance monitoring
         """)
     
     # Scoring methodology section
@@ -152,21 +159,38 @@ def render():
     st.markdown("""
     ### **Research Foundation**
     
-    GUARDIAN is built upon extensive research and development, drawing from:
+    GUARDIAN integrates cutting-edge research across multiple domains:
     
-    - **Global Policy Frameworks**: Integration with UN, NIST, OECD, and ISO standards
-    - **Academic Research**: Collaboration with leading quantum technology researchers
-    - **Industry Expertise**: Real-world insights from quantum computing practitioners
-    - **Regulatory Analysis**: Comprehensive study of emerging quantum governance landscapes
+    - **AI Policy Evaluation**: Advanced NLP models for bias-free policy summarization and gap analysis
+    - **Quantum Cybersecurity**: Post-quantum cryptography standards and maturity assessment frameworks
+    - **Regulatory Compliance**: Integration with NIST, OECD, EU AI Act, and UNESCO AI Ethics guidelines
+    - **Machine Learning Innovation**: Bayesian inference, reinforcement learning, and graph neural networks
     """)
     
     # Patent and IP section
     st.markdown("""
-    ### 📋 **Intellectual Property**
+    ---
     
-    GUARDIAN technology is protected under patent applications including "System for Real-Time 
-    Dynamic Governance of Emerging Technologies" - a comprehensive framework for AI-driven 
-    policy analysis and risk assessment in the quantum technology domain.
+    ### **Patented Technology Foundation**
+    
+    GUARDIAN integrates three breakthrough patent technologies:
+    
+    **1. Real-Time Dynamic Governance Framework**
+    - Adaptive AI-driven policy assessment with continuous learning
+    - Multi-modal risk evaluation across cybersecurity and ethical domains
+    - Real-time threat detection and mitigation recommendations
+    
+    **2. AI-Powered Policy Evaluation and Ethical Compliance System**
+    - Hybrid policy collection via APIs, parsing, and compliant web scraping
+    - Unbiased summarization using transformer models with bias detection
+    - Cybersecurity and ethics gap analysis with quantifiable scoring
+    - Reinforcement learning-based policy optimization and sandbox stress testing
+    
+    **3. Quantum Cybersecurity Framework for Policy Assessment**
+    - Five-tier Quantum Cybersecurity Maturity Evaluation Algorithm (QCMEA)
+    - Bayesian inference for dynamic threat assessment and policy updates
+    - Graph Neural Networks for interdependency analysis and cascading risk detection
+    - Post-quantum cryptography readiness evaluation and implementation guidance
     """)
     
     # Contact and development info
