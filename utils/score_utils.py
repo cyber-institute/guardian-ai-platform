@@ -74,34 +74,25 @@ def draw_scorecard(title, score):
     with st.container():
         st.markdown(f"**{title}**")
         
-        # Create horizontal layout
-        col1, col2, col3 = st.columns([2, 2, 1])
+        # Create compact horizontal layout
+        col1, col2 = st.columns([1, 2])
         
         with col1:
-            # Circle badges in columns
-            circle_cols = st.columns(5)
-            for i, circle_col in enumerate(circle_cols, 1):
-                with circle_col:
-                    if i <= maturity_level:
-                        # Use colored emoji circles or simple text badges
-                        color_map = {1: "🔴", 2: "🟠", 3: "🟡", 4: "🟢", 5: "🟣"}
-                        st.markdown(f"<div style='text-align: center; font-size: 1.5rem;'>{color_map[i]}</div>", unsafe_allow_html=True)
-                        st.markdown(f"<div style='text-align: center; font-size: 0.7rem; font-weight: bold;'>{i}</div>", unsafe_allow_html=True)
-                    else:
-                        st.markdown(f"<div style='text-align: center; font-size: 1.5rem;'>⚪</div>", unsafe_allow_html=True)
-                        st.markdown(f"<div style='text-align: center; font-size: 0.7rem; color: #999;'>{i}</div>", unsafe_allow_html=True)
+            # Circle badges in a single row
+            circles_display = ""
+            for i in range(1, 6):
+                if i <= maturity_level:
+                    color_map = {1: "🔴", 2: "🟠", 3: "🟡", 4: "🟢", 5: "🟣"}
+                    circles_display += f"{color_map[i]} "
+                else:
+                    circles_display += "⚪ "
+            
+            st.markdown(f"<div style='font-size: 1.2rem; text-align: center;'>{circles_display}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='text-align: center; font-size: 0.8rem; color: #666;'>1  2  3  4  5</div>", unsafe_allow_html=True)
         
         with col2:
             st.markdown(f"**Level {maturity_level}: {level_names[maturity_level]}**")
             st.caption(level_descriptions[maturity_level])
-        
-        with col3:
-            st.markdown("**Legend:**")
-            st.markdown("🔴 1: Initial")
-            st.markdown("🟠 2: Basic") 
-            st.markdown("🟡 3: Developing")
-            st.markdown("🟢 4: Advanced")
-            st.markdown("🟣 5: Expert")
 
 def get_score_analysis(score, category, doc_title="", doc_content="", doc_type=None):
     """

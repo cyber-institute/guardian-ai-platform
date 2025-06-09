@@ -5,6 +5,11 @@ from utils.hf_ai_scoring import evaluate_quantum_maturity_hf
 
 def render():
     st.header("🧠 Quantum Maturity Score (Hybrid AI + Stored Data)")
+    
+    # Show compact legend at top
+    st.markdown("**Maturity Levels:** 🔴 Initial  🟠 Basic  🟡 Developing  🟢 Advanced  🟣 Expert")
+    st.markdown("---")
+    
     documents = fetch_documents()
     st.write("Found", len(documents), "documents.")
 
