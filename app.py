@@ -312,7 +312,7 @@ def main():
         ">GUARDIAN</h1>
         <p style="
             margin: 0.5rem 0 0 0;
-            font-size: 1rem;
+            font-size: 2rem;
             font-weight: 400;
             letter-spacing: 0.01em;
             color: #6b7280;
