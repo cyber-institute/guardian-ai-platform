@@ -7,120 +7,93 @@ except ImportError:
 
 def draw_scorecard(title, score):
     """
-    Draw a visual scorecard for quantum maturity scores.
+    Draw a visual scorecard for quantum maturity scores (1-5 scale).
     """
-    if PLOTLY_AVAILABLE:
-        # Create a gauge chart using Plotly
-        fig = go.Figure(go.Indicator(
-            mode = "gauge+number+delta",
-            value = score,
-            domain = {'x': [0, 1], 'y': [0, 1]},
-            title = {'text': title},
-            delta = {'reference': 50},
-            gauge = {
-                'axis': {'range': [None, 100], 'tickfont': {'size': 14, 'family': 'Inter'}},
-                'bar': {'color': "#1e40af", 'thickness': 0.8},
-                'steps': [
-                    {'range': [0, 25], 'color': "#f3f4f6"},
-                    {'range': [25, 50], 'color': "#fef3c7"},
-                    {'range': [50, 75], 'color': "#fed7aa"},
-                    {'range': [75, 100], 'color': "#d1fae5"}
-                ],
-                'threshold': {
-                    'line': {'color': "#dc2626", 'width': 3},
-                    'thickness': 0.75,
-                    'value': 90
-                }
-            }
-        ))
-        
-        fig.update_layout(
-            height=300,
-            font=dict(family="Inter, sans-serif", size=14, color="#374151"),
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)"
-        )
-        st.plotly_chart(fig, use_container_width=True)
+    # Convert score to 1-5 scale if it's on 0-100 scale
+    if score > 5:
+        maturity_level = min(5, max(1, round(score / 20)))
     else:
-        # Enhanced fallback visualization using Streamlit components
-        st.markdown(f"### {title}")
-        
-        # Create columns for better layout
-        col1, col2 = st.columns([3, 1])
-        
-        with col1:
-            # Enhanced progress bar with government theme color coding
-            progress_color = "#059669" if score >= 75 else "#d97706" if score >= 50 else "#dc2626"
-            
-            st.markdown(f"""
-            <div style="
-                background: #f1f5f9; 
-                border-radius: 10px; 
-                padding: 1rem; 
-                margin: 1rem 0;
-                border-left: 4px solid {progress_color};
-            ">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-weight: 600; color: #374151;">Quantum Maturity Score</span>
-                    <span style="font-size: 1.5rem; font-weight: 700; color: {progress_color};">{score:.1f}/100</span>
-                </div>
-                <div style="
-                    background: #e5e7eb; 
-                    border-radius: 6px; 
-                    height: 12px; 
-                    margin-top: 0.5rem;
-                    overflow: hidden;
-                ">
-                    <div style="
-                        background: {progress_color}; 
-                        height: 100%; 
-                        width: {score}%; 
-                        transition: width 0.5s ease;
-                        border-radius: 6px;
-                    "></div>
-                </div>
+        maturity_level = min(5, max(1, round(score)))
+    
+    # Level definitions
+    level_names = {1: "Initial", 2: "Basic", 3: "Developing", 4: "Advanced", 5: "Expert"}
+    level_colors = {1: "#dc2626", 2: "#f59e0b", 3: "#d97706", 4: "#059669", 5: "#10b981"}
+    level_descriptions = {
+        1: "Minimal quantum awareness",
+        2: "Basic understanding of quantum risks", 
+        3: "Developing quantum readiness strategies",
+        4: "Advanced quantum security implementation",
+        5: "Expert-level quantum maturity"
+    }
+    
+    # Create level badges
+    badges_html = ""
+    for i in range(1, 6):
+        if i <= maturity_level:
+            badges_html += f"""
+            <div style='display: inline-block; margin: 0 0.25rem; padding: 0.75rem 1.25rem; 
+                        background: {level_colors[i]}; color: white; border-radius: 10px; 
+                        font-weight: 600; font-size: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+                {i}
+            </div>"""
+        else:
+            badges_html += f"""
+            <div style='display: inline-block; margin: 0 0.25rem; padding: 0.75rem 1.25rem; 
+                        background: #e5e7eb; color: #9ca3af; border-radius: 10px; 
+                        font-weight: 600; font-size: 1rem; border: 2px dashed #d1d5db;'>
+                {i}
+            </div>"""
+    
+    st.markdown(f"""
+    <div style='padding: 1.5rem; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); 
+                border-radius: 12px; margin: 1rem 0; border: 1px solid #e2e8f0;'>
+        <h3 style='margin: 0 0 1rem 0; color: #374151; text-align: center; font-family: Inter, sans-serif;'>{title}</h3>
+        <div style='text-align: center; margin: 1.5rem 0;'>{badges_html}</div>
+        <div style='text-align: center; margin: 1rem 0;'>
+            <div style='font-size: 1.4rem; font-weight: 700; color: {level_colors[maturity_level]}; margin-bottom: 0.5rem;'>
+                Level {maturity_level}: {level_names[maturity_level]}
             </div>
-            """, unsafe_allow_html=True)
-        
-        with col2:
-            # Status indicator
-            if score >= 75:
-                st.success("Excellent")
-            elif score >= 50:
-                st.warning("Good")
-            elif score >= 25:
-                st.warning("Moderate")
-            else:
-                st.error("Needs Work")
+            <div style='font-size: 1rem; color: #6b7280; font-style: italic;'>
+                {level_descriptions[maturity_level]}
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 def get_score_analysis(score, category):
     """
-    Generate analysis text based on the quantum maturity score.
+    Generate analysis text based on the quantum maturity score (1-5 scale).
     """
-    if score >= 80:
+    # Convert score to 1-5 scale if it's on 0-100 scale
+    if score > 5:
+        maturity_level = min(5, max(1, round(score / 20)))
+    else:
+        maturity_level = min(5, max(1, round(score)))
+    
+    if maturity_level == 5:
         return f"""
-        **Excellent {category} maturity!** Your organization demonstrates advanced understanding 
+        **Expert-level {category} maturity!** Your organization demonstrates advanced understanding 
         and implementation of quantum-safe practices. You are well-prepared for the quantum era.
         """
-    elif score >= 60:
+    elif maturity_level == 4:
         return f"""
-        **Good {category} foundation.** Your organization shows solid awareness and some 
-        implementation of quantum-safe practices. Consider strengthening specific areas.
+        **Advanced {category} foundation.** Your organization shows strong awareness and solid 
+        implementation of quantum-safe practices. Consider fine-tuning specific areas.
         """
-    elif score >= 40:
+    elif maturity_level == 3:
         return f"""
-        **Moderate {category} awareness.** Your organization has basic understanding but 
-        needs significant improvement in quantum readiness implementation.
+        **Developing {category} awareness.** Your organization has good understanding but 
+        needs continued improvement in quantum readiness implementation.
         """
-    elif score >= 20:
+    elif maturity_level == 2:
         return f"""
-        **Limited {category} preparation.** Your organization shows minimal quantum awareness. 
-        Immediate action is recommended to begin quantum readiness initiatives.
+        **Basic {category} preparation.** Your organization shows fundamental quantum awareness. 
+        Focus on expanding knowledge and building implementation strategies.
         """
     else:
         return f"""
-        **Minimal {category} readiness.** Your organization lacks quantum preparedness. 
-        Critical action needed to address quantum security risks.
+        **Initial {category} readiness.** Your organization is beginning quantum preparedness. 
+        Start with basic education and risk assessment activities.
         """
 
 def get_deep_diagnostics(score, category):
