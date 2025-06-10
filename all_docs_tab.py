@@ -47,7 +47,7 @@ def is_probably_quantum(content):
 def render():
     
     # Enhanced refresh button with display style controls
-    col1, col2, col3 = st.columns([2, 2, 6])
+    col1, col2 = st.columns([1, 1])
     with col1:
         if st.button("🔄 Refresh Analysis", help="Update all documents with improved metadata extraction"):
             with st.spinner("Updating all documents with improved analysis..."):
@@ -77,7 +77,8 @@ def render():
                 "table": "Table View",
                 "grid": "Grid Layout",
                 "minimal": "Minimal List"
-            }[x]
+            }[x],
+            label_visibility="collapsed"
         )
         st.session_state["display_mode"] = display_mode
     
