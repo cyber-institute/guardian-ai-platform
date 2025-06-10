@@ -45,62 +45,59 @@ def extract_metadata_fallback(content: str, source: str = "") -> Dict[str, Optio
 def extract_title_fallback(content: str, source: str) -> str:
     """Extract document title using pattern matching."""
     
-    # Enhanced title patterns for government and AI content
+    # Clean content for better processing
+    clean_content = content.replace('\n', ' ').replace('\r', ' ')
+    clean_content = re.sub(r'\s+', ' ', clean_content)
+    
+    # Look for specific title patterns that are likely to be actual document titles
     title_patterns = [
-        # Joint guidance and multi-line titles - capture full title
-        r'JOINT GUIDANCE\s*\n\s*(DEPLOYING AI SYSTEMS SECURELY:\s*(?:\n[^.\n]+)*?)(?:\n\n|\nDeploying|\nThe)',
-        r'(DEPLOYING AI SYSTEMS SECURELY:\s*Best Security Practices[^.\n]*(?:\n[^.\n]*)*?)(?:\n\n|\nDeploying|\nThe)',
-        r'(Best Security Practices\s*For Deploying[^.\n]*(?:\n[^.\n]*)*?)(?:\n\n|\nDeploying|\nThe)',
+        # HTML title and heading tags (most reliable)
+        r'<title[^>]*>([^<]+)</title>',
+        r'<h1[^>]*>([^<]+)</h1>',
+        r'<h2[^>]*>([^<]+)</h2>',
         
-        # Specific AI/Cybersecurity title patterns - prioritize these
-        r'(Artificial Intelligence\s+Cybersecurity\s+Guidelines?)',
-        r'(AI\s+Systems?\s+Security)',
-        r'(Deploying\s+AI\s+Systems?\s+Securely)',
-        r'(AI\s+(?:Cybersecurity|Security)\s+(?:Framework|Guidelines?|Guidance))',
-        r'(Artificial Intelligence\s+(?:Security|Cybersecurity)\s+(?:Framework|Guidelines?|Guidance))',
-        r'(Cybersecurity\s+for\s+(?:AI|Artificial Intelligence))',
-        r'(Machine Learning\s+Security\s+(?:Framework|Guidelines?|Guidance))',
+        # Joint guidance patterns
+        r'JOINT GUIDANCE\s+([A-Z][^.!?]+(?:Guidelines?|Framework|Playbook|Advisory))',
         
-        # HTML title and heading tags
-        r'<title[^>]*>([^<]+)</title>',  # HTML title tag
-        r'<h1[^>]*>([^<]+)</h1>',  # H1 tag
-        r'<h2[^>]*>([^<]+)</h2>',  # H2 tag
+        # Specific document type patterns (standalone)
+        r'\b(AI\s+Security\s+Playbook(?:\s+for\s+[^.!?]+)?)\b',
+        r'\b(AI\s+Development\s+Security\s+Guidelines?)\b',
+        r'\b(Artificial\s+Intelligence\s+Cybersecurity\s+Guidelines?)\b',
+        r'\b(AI\s+Systems?\s+Security\s+(?:Framework|Guidelines?|Guidance))\b',
+        r'\b(Cybersecurity\s+(?:Framework|Guidelines?|Advisory)\s+for\s+AI)\b',
+        r'\b(Joint\s+Cybersecurity\s+Advisory)\b',
         
-        # Multi-line title patterns for government documents
-        r'([A-Z][A-Z\s]{10,}:\s*[^.\n]+(?:\n[^.\n]+)*?)(?:\n\n|\nThe|\n[A-Z][a-z])',
-        
-        # Government agency documents
-        r'((?:CISA|NIST|NSA)\s+[^.\n]{10,60})',
-        
-        # Standalone meaningful titles (not part of lists or descriptions)
-        r'^\s*([A-Z][^.\n]{15,80})\s*$',  # Single line titles
-        r'title:\s*(.+)',  # Title: format
-        r'Title:\s*(.+)',  # Title: format
-        r'TITLE:\s*(.+)',  # TITLE: format
-        
-        # Content-based title extraction with proper boundaries
-        r'([A-Z][^.\n]{15,60}(?:Guidelines?|Framework|Strategy|Policy|Report|Practices|Guidance))',
+        # Document format patterns
+        r'(?:^|\n)\s*([A-Z][A-Za-z\s]{10,60}(?:Guidelines?|Framework|Strategy|Policy|Report|Playbook|Advisory))\s*(?:\n|$)',
     ]
     
     for pattern in title_patterns:
         try:
-            match = re.search(pattern, content[:1000], re.IGNORECASE | re.MULTILINE)
+            match = re.search(pattern, content[:800], re.IGNORECASE | re.MULTILINE)
             if match:
                 title = match.group(1).strip()
-                # Clean up HTML entities and extra whitespace
-                title = re.sub(r'<[^>]+>', '', title)  # Remove HTML tags
-                title = re.sub(r'\s+', ' ', title)  # Normalize whitespace
+                # Clean up the title
+                title = re.sub(r'<[^>]+>', '', title)
+                title = re.sub(r'\s+', ' ', title)
                 title = title.replace('&nbsp;', ' ').replace('&amp;', '&')
                 
-                if (len(title) > 10 and 
-                    not title.lower().startswith('http') and
-                    not title.lower().startswith('skip to') and
-                    not title.lower().startswith('search') and
-                    not title.lower().startswith('webpage') and
-                    not title.lower().startswith('document from') and
-                    not title.lower().startswith('pdf from') and
-                    not title.isdigit()):
-                    return title[:100]
+                # Strict validation for title quality
+                if (10 <= len(title) <= 100 and
+                    title[0].isupper() and  # Must start with capital
+                    not any(title.lower().startswith(bad) for bad in [
+                        'http', 'skip', 'search', 'menu', 'while', 'to ', 'the ', 'this ', 
+                        'for ', 'in ', 'on ', 'with ', 'by ', 'also ', 'lso ', 'they ', 'it '
+                    ]) and
+                    not any(title.lower().endswith(bad) for bad in [
+                        ',', ' and', ' or', ' the', ' of', ' to', ' in', ' t', ' can', ' that'
+                    ]) and
+                    not title.isdigit() and
+                    # Must contain relevant keywords for AI/cybersecurity content
+                    any(keyword in title.lower() for keyword in [
+                        'ai', 'artificial', 'cybersecurity', 'security', 'guidelines', 
+                        'framework', 'playbook', 'advisory', 'guidance', 'policy'
+                    ])):
+                    return title
         except (IndexError, AttributeError):
             continue
     
@@ -126,16 +123,33 @@ def extract_title_fallback(content: str, source: str) -> str:
     if 'machine learning' in content_words and 'security' in content_words:
         key_phrases.append("Machine Learning Security")
     
-    # Try to find the first meaningful sentence or heading
-    sentences = content[:500].split('\n')
-    for sentence in sentences:
-        sentence = sentence.strip()
-        if (len(sentence) > 15 and len(sentence) < 80 and 
-            not sentence.lower().startswith('skip') and
-            not sentence.lower().startswith('search') and
-            not sentence.lower().startswith('menu') and
-            any(word in sentence.lower() for word in ['security', 'cybersecurity', 'ai', 'artificial', 'framework', 'guidance', 'policy'])):
-            return sentence
+    # Try to find actual document titles/headings (avoid partial sentences)
+    lines = content[:800].split('\n')
+    for line in lines:
+        line = line.strip()
+        # Look for lines that could be titles (not partial sentences)
+        if (15 <= len(line) <= 80 and 
+            not line.lower().startswith('skip') and
+            not line.lower().startswith('search') and
+            not line.lower().startswith('menu') and
+            not line.lower().startswith('while') and
+            not line.lower().startswith('to ') and
+            not line.lower().startswith('the ') and
+            not line.lower().startswith('this ') and
+            not line.lower().startswith('for ') and
+            not line.lower().startswith('in ') and
+            not line.lower().startswith('on ') and
+            not line.lower().startswith('with ') and
+            not line.endswith(',') and  # Avoid partial sentences
+            not line.endswith(' and') and
+            not line.endswith(' or') and
+            not line.endswith(' the') and
+            not line.endswith(' of') and
+            # Must contain relevant keywords
+            any(word in line.lower() for word in ['security', 'cybersecurity', 'ai', 'artificial', 'framework', 'guidance', 'policy', 'playbook', 'guidelines']) and
+            # Should look like a title (capitalized properly)
+            (line[0].isupper() or line.istitle())):
+            return line
     
     # Use key phrases if found
     if key_phrases:
