@@ -420,7 +420,7 @@ def render_patent_technology_section():
     )
     
     if patent_section == "Patent Application Overview":
-        from patent_tab import render as render_patent
+        from patent_tab_fixed import render as render_patent
         render_patent()
         
     elif patent_section == "Patent Frameworks & Scoring":

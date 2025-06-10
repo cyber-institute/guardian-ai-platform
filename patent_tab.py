@@ -298,32 +298,7 @@ def render_cyber_calculator():
         st.markdown(risk_dial, unsafe_allow_html=True)
         st.markdown(f"**Score:** {total_risk:.2f}/5")
         
-        # Disabled plotly gauge
-        # fig = go.Figure(go.Indicator(
-        #     mode = "gauge+number+delta",
-        #     value = total_risk,
-        #     title = {'text': "Cybersecurity Risk Score"},
-        #     domain = {'x': [0, 1], 'y': [0, 1]},
-            gauge = {
-                'axis': {'range': [None, 5]},
-                'bar': {'color': "#EF4444"},
-                'steps': [
-                    {'range': [0, 1], 'color': "#D1FAE5"},
-                    {'range': [1, 2], 'color': "#FEF3C7"},
-                    {'range': [2, 3], 'color': "#FED7AA"},
-                    {'range': [3, 4], 'color': "#FECACA"},
-                    {'range': [4, 5], 'color': "#FEE2E2"}
-                ],
-                'threshold': {
-                    'line': {'color': "red", 'width': 4},
-                    'thickness': 0.75,
-                    'value': 4
-                }
-            }
-        ))
-        
-        fig.update_layout(height=300, margin=dict(l=20, r=20, t=40, b=20))
-        st.plotly_chart(fig, use_container_width=True)
+        # Plotly gauge disabled to fix circular import issue
         
         # Risk interpretation
         if total_risk < 1:
