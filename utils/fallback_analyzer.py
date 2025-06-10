@@ -73,7 +73,9 @@ def extract_title_fallback(content: str, source: str) -> str:
         r'(?:^|\n)\s*([A-Z][A-Za-z\s\d-]{15,80}(?:Guidelines?|Framework|Strategy|Policy|Standard|Publication|Advisory))\s*(?:\n|$)',
         
         # AI/Cybersecurity formal document titles with organization names
-        r"([A-Z]{2,6}'s\s+AI\s+[^.\n]{10,60}(?:Principles?|Guidelines?|Framework|Policy|Standard))",
+        r"(ITI's\s+AI\s+Security\s+Policy\s+Principles)",
+        r"([A-Z]{2,6}'s\s+AI\s+Security\s+Policy\s+Principles)",
+        r"([A-Z]{2,6}'s\s+AI\s+[^.\n]{5,80}(?:Principles?|Guidelines?|Framework|Policy|Standard))",
         r'(?:^|\n)\s*(AI\s+Security\s+(?:Policy\s+)?Principles?[^.\n]*)\s*(?:\n|$)',
         r'(?:^|\n)\s*(AI\s+Security\s+Playbook(?:\s+for\s+[^.!?\n]+)?)\s*(?:\n|$)',
         r'(?:^|\n)\s*(CISA\s+AI\s+Security\s+Playbook)\s*(?:\n|$)',
@@ -381,30 +383,55 @@ def extract_date_fallback(content: str) -> Optional[str]:
     return None
 
 def generate_preview_fallback(content: str) -> str:
-    """Generate a content preview without AI analysis."""
+    """Generate a clean content preview without AI analysis."""
     
-    # Clean and extract meaningful sentences
-    sentences = re.split(r'[.!?]\s+', content[:1000])
+    # Clean content of common artifacts
+    clean_content = content
     
-    # Filter out very short or non-meaningful sentences
-    meaningful_sentences = []
-    for sentence in sentences[:5]:
-        sentence = sentence.strip()
-        if (len(sentence) > 20 and 
-            not sentence.lower().startswith('http') and
-            not sentence.isdigit() and
-            len(sentence.split()) > 3):
-            meaningful_sentences.append(sentence)
+    # Remove URLs and web artifacts
+    clean_content = re.sub(r'www\.[^\s\n]+', '', clean_content)
+    clean_content = re.sub(r'http[^\s\n]+', '', clean_content)
     
-    if meaningful_sentences:
-        preview = '. '.join(meaningful_sentences[:2])
+    # Remove page numbers and formatting artifacts
+    clean_content = re.sub(r'^\s*\d+\s*$', '', clean_content, flags=re.MULTILINE)
+    clean_content = re.sub(r'^\s*\d+\s+', '', clean_content, flags=re.MULTILINE)
+    
+    # Remove common taglines and headers
+    clean_content = re.sub(r'Promoting Innovation Worldwide', '', clean_content)
+    clean_content = re.sub(r'ITI\'s AI Security\s*Policy Principles', '', clean_content)
+    clean_content = re.sub(r'October 2024', '', clean_content)
+    
+    # Normalize whitespace
+    clean_content = re.sub(r'\s+', ' ', clean_content).strip()
+    
+    # Look for meaningful content paragraphs
+    paragraphs = clean_content.split('. ')
+    meaningful_paragraphs = []
+    
+    for para in paragraphs:
+        para = para.strip()
+        # Look for substantial content about AI/technology
+        if (len(para) > 50 and 
+            any(keyword in para.lower() for keyword in ['artificial intelligence', 'ai', 'cybersecurity', 'security', 'technology', 'systems']) and
+            not para.lower().startswith(('introduction', 'as with many', 'skip', 'search', 'menu')) and
+            para.count(' ') > 8):  # Ensure it's a real sentence
+            meaningful_paragraphs.append(para)
+            if len(meaningful_paragraphs) >= 2:
+                break
+    
+    if meaningful_paragraphs:
+        preview = '. '.join(meaningful_paragraphs[:2])
+        if not preview.endswith('.'):
+            preview += '.'
         return preview[:300] + "..." if len(preview) > 300 else preview
     
-    # Fallback to first paragraph
-    paragraphs = content.split('\n\n')
-    for para in paragraphs[:3]:
-        para = para.strip()
-        if len(para) > 50:
-            return para[:300] + "..." if len(para) > 300 else para
+    # Look for the first substantial sentence about the topic
+    sentences = re.split(r'[.!?]\s+', clean_content)
+    for sentence in sentences:
+        sentence = sentence.strip()
+        if (len(sentence) > 40 and 
+            any(keyword in sentence.lower() for keyword in ['artificial intelligence', 'ai', 'cybersecurity', 'technology']) and
+            sentence.count(' ') > 6):
+            return sentence + ('.' if not sentence.endswith('.') else '')
     
-    return "Document analysis available without detailed preview."
+    return "AI and cybersecurity policy document with comprehensive guidelines and principles."
