@@ -45,27 +45,61 @@ def extract_metadata_fallback(content: str, source: str = "") -> Dict[str, Optio
 def extract_title_fallback(content: str, source: str) -> str:
     """Extract document title using pattern matching."""
     
-    # Try common title patterns
+    # Enhanced title patterns for government and AI content
     title_patterns = [
-        r'^(.{1,100})\n',  # First line
+        # AI/Cybersecurity specific patterns
+        r'(AI\s+(?:Cybersecurity|Security|Framework|Guidelines?)[^.\n]{0,50})',
+        r'(Artificial Intelligence\s+(?:Cybersecurity|Security)[^.\n]{0,50})',
+        r'(Cybersecurity\s+(?:AI|Artificial Intelligence)[^.\n]{0,50})',
+        r'(Machine Learning\s+Security[^.\n]{0,30})',
+        
+        # Government document patterns
+        r'<title[^>]*>([^<]+)</title>',  # HTML title tag
+        r'<h1[^>]*>([^<]+)</h1>',  # H1 tag
+        r'(CISA\s+[^.\n]{10,60})',  # CISA documents
+        r'(NIST\s+[^.\n]{10,60})',  # NIST documents
+        
+        # General title patterns
+        r'^([A-Z][^.\n]{15,80})\n',  # First substantial line
         r'title:\s*(.+)',  # Title: format
         r'Title:\s*(.+)',  # Title: format
         r'TITLE:\s*(.+)',  # TITLE: format
-        r'([A-Z][^.\n]{10,80})',  # Capitalized sentence
+        
+        # Content-based title extraction
+        r'([A-Z][^.\n]{20,80}(?:Guidelines?|Framework|Strategy|Policy|Report))',
     ]
     
     for pattern in title_patterns:
         try:
-            match = re.search(pattern, content[:500], re.IGNORECASE | re.MULTILINE)
+            match = re.search(pattern, content[:1000], re.IGNORECASE | re.MULTILINE)
             if match:
                 title = match.group(1).strip()
-                if len(title) > 10 and not title.lower().startswith('http'):
+                # Clean up HTML entities and extra whitespace
+                title = re.sub(r'<[^>]+>', '', title)  # Remove HTML tags
+                title = re.sub(r'\s+', ' ', title)  # Normalize whitespace
+                title = title.replace('&nbsp;', ' ').replace('&amp;', '&')
+                
+                if (len(title) > 10 and 
+                    not title.lower().startswith('http') and
+                    not title.lower().startswith('skip to') and
+                    not title.lower().startswith('search') and
+                    not title.isdigit()):
                     return title[:100]
-        except IndexError:
+        except (IndexError, AttributeError):
             continue
     
-    # Fallback to source-based title
-    if 'pdf' in source.lower():
+    # Enhanced source-based fallback
+    if 'cisa.gov' in source.lower():
+        if 'ai' in content.lower()[:500] or 'artificial intelligence' in content.lower()[:500]:
+            return "CISA AI Cybersecurity Guidance"
+        else:
+            return "CISA Cybersecurity Document"
+    elif 'nist.gov' in source.lower():
+        if 'ai' in content.lower()[:500]:
+            return "NIST AI Security Framework"
+        else:
+            return "NIST Cybersecurity Document"
+    elif 'pdf' in source.lower():
         return f"PDF Document from {source.split('/')[-2] if '/' in source else 'URL'}"
     elif source:
         return f"Document from {source.split('/')[-2] if '/' in source else source}"
@@ -76,6 +110,26 @@ def classify_document_type_fallback(content: str) -> str:
     """Classify document type based on content patterns."""
     
     content_lower = content.lower()
+    
+    # AI/Cybersecurity specific classifications
+    if any(word in content_lower for word in ['ai cybersecurity', 'artificial intelligence security', 'machine learning security']):
+        if 'framework' in content_lower or 'guideline' in content_lower:
+            return 'Framework'
+        elif 'policy' in content_lower:
+            return 'Policy'
+        else:
+            return 'Guideline'
+    
+    # Government document indicators
+    if any(word in content_lower for word in ['cisa', 'nist', 'federal', 'government']):
+        if 'framework' in content_lower:
+            return 'Framework'
+        elif 'guideline' in content_lower or 'guidance' in content_lower:
+            return 'Guideline'
+        elif 'standard' in content_lower:
+            return 'Standard'
+        else:
+            return 'Policy'
     
     # Policy/Framework indicators
     if any(word in content_lower for word in ['policy', 'framework', 'standard', 'guideline']):
