@@ -2,54 +2,91 @@ import streamlit as st
 import plotly.graph_objects as go
 
 def create_dial_gauge(value, max_value=100):
-    """Create a speedometer-style dial gauge exactly matching the reference image."""
+    """Create a speedometer-style dial gauge using HTML/CSS to avoid Plotly issues."""
     
-    fig = go.Figure()
+    # Calculate needle rotation (0-180 degrees for half circle)
+    rotation = (value / max_value) * 180
     
-    # Create the exact speedometer gauge from the reference
-    fig.add_trace(go.Indicator(
-        mode = "gauge+number",
-        value = value,
-        domain = {'x': [0, 1], 'y': [0, 1]},
-        number = {
-            'font': {'size': 24, 'color': '#555555'}, 
-            'valueformat': '.0f'
-        },
-        gauge = {
-            'axis': {
-                'range': [0, max_value],
-                'tickwidth': 0,
-                'visible': False
-            },
-            'bar': {
-                'color': '#555555',  # Dark gray needle exactly like reference
-                'thickness': 0.03   # Very thin sharp needle
-            },
-            'bgcolor': "white",
-            'borderwidth': 4,
-            'bordercolor': "#666666",  # Dark gray border like reference
-            'steps': [
-                {'range': [0, 16.67], 'color': '#FF4444'},    # Red segment
-                {'range': [16.67, 33.33], 'color': '#FF8800'}, # Orange segment
-                {'range': [33.33, 50], 'color': '#FFCC00'},    # Yellow segment
-                {'range': [50, 66.67], 'color': '#88DD00'},    # Yellow-green segment
-                {'range': [66.67, 83.33], 'color': '#44BB44'}, # Light green segment
-                {'range': [83.33, max_value], 'color': '#22AA22'} # Green segment
-            ]
-        }
-    ))
+    # Create HTML dial gauge
+    dial_html = f"""
+    <div style="position: relative; width: 100px; height: 50px; margin: 0 auto;">
+        <!-- Gauge background -->
+        <div style="
+            width: 100px;
+            height: 50px;
+            border: 4px solid #666;
+            border-bottom: none;
+            border-radius: 100px 100px 0 0;
+            background: conic-gradient(
+                from 180deg,
+                #FF4444 0deg,
+                #FF4444 30deg,
+                #FF8800 30deg,
+                #FF8800 60deg,
+                #FFCC00 60deg,
+                #FFCC00 90deg,
+                #88DD00 90deg,
+                #88DD00 120deg,
+                #44BB44 120deg,
+                #44BB44 150deg,
+                #22AA22 150deg,
+                #22AA22 180deg
+            );
+            position: relative;
+        ">
+        </div>
+        
+        <!-- Inner white circle -->
+        <div style="
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 80px;
+            height: 40px;
+            background: white;
+            border-radius: 80px 80px 0 0;
+        "></div>
+        
+        <!-- Needle -->
+        <div style="
+            position: absolute;
+            bottom: 0px;
+            left: 48px;
+            width: 2px;
+            height: 35px;
+            background: #555;
+            transform-origin: bottom center;
+            transform: rotate({rotation - 90}deg);
+            z-index: 10;
+        "></div>
+        
+        <!-- Center circle -->
+        <div style="
+            position: absolute;
+            bottom: -4px;
+            left: 42px;
+            width: 12px;
+            height: 12px;
+            background: #555;
+            border-radius: 50%;
+            z-index: 11;
+        "></div>
+        
+        <!-- Score display -->
+        <div style="
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            width: 100px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #555;
+        ">{value}</div>
+    </div>
+    """
     
-    fig.update_layout(
-        height=100,
-        width=100,
-        font={'color': "#555555"},
-        margin=dict(l=5, r=5, t=5, b=5),
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        showlegend=False
-    )
-    
-    return fig
+    return dial_html
 
 def render():
     """Render the About tab for GUARDIAN system."""
@@ -249,29 +286,29 @@ def render():
     # AI Cybersecurity progression with side-by-side dial and explanation
     col1, col2 = st.columns([1, 4])
     with col1:
-        fig1 = create_dial_gauge(15)
-        st.plotly_chart(fig1, use_container_width=True)
+        dial1 = create_dial_gauge(15)
+        st.markdown(dial1, unsafe_allow_html=True)
     with col2:
         st.markdown("**0-25**: Basic awareness, minimal AI security measures")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        fig2 = create_dial_gauge(37)
-        st.plotly_chart(fig2, use_container_width=True)
+        dial2 = create_dial_gauge(37)
+        st.markdown(dial2, unsafe_allow_html=True)
     with col2:
         st.markdown("**26-50**: Developing capabilities, some AI-specific protections")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        fig3 = create_dial_gauge(62)
-        st.plotly_chart(fig3, use_container_width=True)
+        dial3 = create_dial_gauge(62)
+        st.markdown(dial3, unsafe_allow_html=True)
     with col2:
         st.markdown("**51-75**: Comprehensive AI security framework with most controls")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        fig4 = create_dial_gauge(85)
-        st.plotly_chart(fig4, use_container_width=True)
+        dial4 = create_dial_gauge(85)
+        st.markdown(dial4, unsafe_allow_html=True)
     with col2:
         st.markdown("**76-100**: Advanced AI cybersecurity with cutting-edge protections")
     
@@ -320,29 +357,29 @@ def render():
     # AI Ethics progression with side-by-side dial and explanation
     col1, col2 = st.columns([1, 4])
     with col1:
-        fig1 = create_dial_gauge(18)
-        st.plotly_chart(fig1, use_container_width=True)
+        dial1 = create_dial_gauge(18)
+        st.markdown(dial1, unsafe_allow_html=True)
     with col2:
         st.markdown("**0-25**: Limited ethical considerations, reactive approach")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        fig2 = create_dial_gauge(40)
-        st.plotly_chart(fig2, use_container_width=True)
+        dial2 = create_dial_gauge(40)
+        st.markdown(dial2, unsafe_allow_html=True)
     with col2:
         st.markdown("**26-50**: Basic ethical frameworks, some accountability measures")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        fig3 = create_dial_gauge(65)
-        st.plotly_chart(fig3, use_container_width=True)
+        dial3 = create_dial_gauge(65)
+        st.markdown(dial3, unsafe_allow_html=True)
     with col2:
         st.markdown("**51-75**: Comprehensive ethical AI practices with regular assessment")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        fig4 = create_dial_gauge(88)
-        st.plotly_chart(fig4, use_container_width=True)
+        dial4 = create_dial_gauge(88)
+        st.markdown(dial4, unsafe_allow_html=True)
     with col2:
         st.markdown("**76-100**: Leading-edge ethical AI with proactive governance")
     
@@ -389,29 +426,29 @@ def render():
     # Quantum Ethics progression with side-by-side dial and explanation
     col1, col2 = st.columns([1, 4])
     with col1:
-        fig1 = create_dial_gauge(20)
-        st.plotly_chart(fig1, use_container_width=True)
+        dial1 = create_dial_gauge(20)
+        st.markdown(dial1, unsafe_allow_html=True)
     with col2:
         st.markdown("**0-25**: Minimal quantum ethics awareness, basic compliance only")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        fig2 = create_dial_gauge(42)
-        st.plotly_chart(fig2, use_container_width=True)
+        dial2 = create_dial_gauge(42)
+        st.markdown(dial2, unsafe_allow_html=True)
     with col2:
         st.markdown("**26-50**: Developing quantum ethics frameworks and policies")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        fig3 = create_dial_gauge(68)
-        st.plotly_chart(fig3, use_container_width=True)
+        dial3 = create_dial_gauge(68)
+        st.markdown(dial3, unsafe_allow_html=True)
     with col2:
         st.markdown("**51-75**: Comprehensive quantum ethics integration with monitoring")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        fig4 = create_dial_gauge(90)
-        st.plotly_chart(fig4, use_container_width=True)
+        dial4 = create_dial_gauge(90)
+        st.markdown(dial4, unsafe_allow_html=True)
     with col2:
         st.markdown("**76-100**: Advanced quantum ethics leadership with innovation")
     
