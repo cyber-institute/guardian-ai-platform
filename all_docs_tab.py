@@ -55,6 +55,10 @@ def render():
                     st.error(f"Error updating documents: {e}")
     
     try:
+        # Clear any potential caching to ensure fresh data
+        if 'documents_cache' in st.session_state:
+            del st.session_state['documents_cache']
+        
         all_docs = fetch_documents()
         if not all_docs:
             st.info("No documents found in the database. Please upload some documents first.")
