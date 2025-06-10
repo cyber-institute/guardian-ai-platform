@@ -352,7 +352,49 @@ def main():
         url_input = st.text_input("Enter URL:", placeholder="https://example.com/document")
         if st.button("Submit URL", use_container_width=True):
             if url_input:
-                st.info(f"Processing URL: {url_input}")
+                with st.spinner(f"Fetching content from {url_input}..."):
+                    try:
+                        import trafilatura
+                        from utils.db import save_document
+                        from utils.document_analyzer import analyze_document_metadata
+                        from utils.comprehensive_scoring import comprehensive_document_scoring
+                        
+                        # Fetch content from URL
+                        downloaded = trafilatura.fetch_url(url_input)
+                        if not downloaded:
+                            st.error("Could not fetch content from URL. Please check the URL and try again.")
+                        else:
+                            text_content = trafilatura.extract(downloaded)
+                            if not text_content:
+                                st.error("No text content found on the webpage.")
+                            else:
+                                # Extract metadata using AI
+                                metadata = analyze_document_metadata(text_content, url_input)
+                                
+                                # Generate comprehensive scores
+                                scores = comprehensive_document_scoring(text_content, metadata.get('title', 'URL Document'))
+                                
+                                # Prepare document for database
+                                document_data = {
+                                    'title': metadata.get('title', f"Document from {url_input}"),
+                                    'content': text_content[:500] + "..." if len(text_content) > 500 else text_content,
+                                    'text_content': text_content,
+                                    'document_type': metadata.get('document_type', 'Unknown'),
+                                    'source': f"URL: {url_input}",
+                                    'quantum_score': scores.get('quantum_cybersecurity', 0) or 0,
+                                    'analyzed_metadata': metadata,
+                                    'comprehensive_scores': scores
+                                }
+                                
+                                # Save to database
+                                if save_document(document_data):
+                                    st.success(f"Successfully processed and saved: {metadata.get('title', 'URL Document')}")
+                                    st.info("Document has been analyzed and added to your collection. Check the All Documents tab to view it.")
+                                else:
+                                    st.error("Failed to save document to database.")
+                                    
+                    except Exception as e:
+                        st.error(f"Error processing URL: {str(e)}")
             else:
                 st.error("Please enter a valid URL")
         
