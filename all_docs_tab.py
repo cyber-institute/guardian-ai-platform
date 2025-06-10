@@ -385,20 +385,20 @@ def render_card_view(docs):
     cols = st.columns(2)
     for i, doc in enumerate(docs):
         with cols[i % 2]:
-            content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
+            # Get raw content first
+            raw_content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
             
-            # Section 1: Clean metadata extraction (no scoring involved)
-            clean_meta = extract_clean_metadata(content, doc.get('title', ''))
-            title = clean_meta.get('clean_title', 'Untitled Document')
-            content_preview = clean_meta.get('clean_preview', 'No preview available')
+            # ISOLATED STEP 1: Generate completely clean preview without any scoring interaction
+            clean_preview_text = generate_clean_preview(raw_content)
             
-            # Section 2: Additional metadata from isolated extractor
-            metadata = extract_document_metadata(content, doc.get('title', ''))
+            # ISOLATED STEP 2: Extract metadata separately  
+            metadata = extract_document_metadata(raw_content, doc.get('title', ''))
+            title = metadata.get('title', 'Untitled Document') or 'Untitled Document'
             author_org = metadata.get('author_organization', 'Unknown') or 'Unknown'
             pub_date = metadata.get('publish_date', 'Unknown') or 'Unknown'
             doc_type = metadata.get('document_type', 'Unknown') or 'Unknown'
             
-            # Display metadata first (completely isolated from scoring)
+            # Display metadata card (no scoring involved)
             st.markdown(f"""
                 <div style='border:1px solid #ddd;padding:16px;border-radius:12px;margin:8px;
                 background:white;box-shadow:0 4px 6px rgba(0,0,0,0.1);
@@ -412,11 +412,11 @@ def render_card_view(docs):
                 </div>
             """, unsafe_allow_html=True)
             
-            # Section 3: Calculate and display scores AFTER metadata (separate processing)
+            # ISOLATED STEP 3: Calculate scores separately (after metadata display)
             try:
-                scores = comprehensive_document_scoring(content, str(title))
+                scores = comprehensive_document_scoring(raw_content, str(title))
                 
-                # Display scores in separate section
+                # Display scores in completely separate section
                 st.markdown(f"""
                     <div style='margin:8px;padding:8px;background:#f8f9fa;border-radius:6px'>
                         <div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px'>
@@ -429,37 +429,15 @@ def render_card_view(docs):
                 """, unsafe_allow_html=True)
             except Exception as e:
                 st.error(f"Scoring error: {e}")
-                scores = {'ai_cybersecurity': None, 'quantum_cybersecurity': None, 'ai_ethics': None, 'quantum_ethics': None}
             
+            # ISOLATED STEP 4: Display clean content preview (completely separate from scoring)
             with st.expander("Intelligent Content Preview"):
-                # Emergency HTML cleaning for display
-                emergency_clean = re.sub(r'<[^>]*>', '', content_preview)
-                emergency_clean = re.sub(r'</[^>]*>', '', emergency_clean) 
-                emergency_clean = re.sub(r'&[a-zA-Z0-9#]+;', ' ', emergency_clean)
-                emergency_clean = re.sub(r'[<>{}]', '', emergency_clean)
-                emergency_clean = re.sub(r'\s+', ' ', emergency_clean).strip()
-                
-                if emergency_clean and len(emergency_clean) > 20:
-                    st.write(emergency_clean)
+                # Use the pre-generated clean preview (no HTML interaction)
+                if clean_preview_text and len(clean_preview_text.strip()) > 5:
+                    # Final safety cleaning before display
+                    final_clean = re.sub(r'[<>]', '', clean_preview_text)
+                    final_clean = re.sub(r'&[a-zA-Z0-9#]+;', ' ', final_clean)
+                    final_clean = re.sub(r'\s+', ' ', final_clean).strip()
+                    st.write(final_clean)
                 else:
-                    # Generate clean content directly from raw content
-                    direct_clean = re.sub(r'<[^>]*>', '', content)
-                    direct_clean = re.sub(r'[<>{}]', '', direct_clean)
-                    direct_clean = re.sub(r'&[a-zA-Z0-9#]+;', ' ', direct_clean)
-                    direct_clean = re.sub(r'\s+', ' ', direct_clean).strip()
-                    
-                    # Extract meaningful sentences
-                    sentences = direct_clean.split('.')
-                    clean_text = []
-                    for sentence in sentences[:3]:
-                        sentence = sentence.strip()
-                        if len(sentence) > 15 and any(c.isalpha() for c in sentence):
-                            clean_text.append(sentence)
-                    
-                    if clean_text:
-                        final_preview = '. '.join(clean_text) + '.'
-                        if len(final_preview) > 300:
-                            final_preview = final_preview[:297] + '...'
-                        st.write(final_preview)
-                    else:
-                        st.write("Content preview not available")
+                    st.write("Content preview not available")
