@@ -56,10 +56,13 @@ def extract_title_fallback(content: str, source: str) -> str:
         r'<h1[^>]*>([^<]+)</h1>',
         r'<h2[^>]*>([^<]+)</h2>',
         
-        # NIST Special Publications (formal format) - prioritize these
-        r'(NIST\s+Special\s+Publication\s+\d+(?:-\d+)*\s+[^.\n]{1,60})',
-        r'(Special\s+Publication\s+\d+(?:-\d+)*\s+[^.\n]{1,60})',
-        r'(NIST\s+SP\s+\d+(?:-\d+)*\s+[^.\n]{1,60})',
+        # NIST AI RMF and Special Publications (formal format) - prioritize these
+        r'(Artificial\s+Intelligence\s+Risk\s+Management\s+Framework\s*(?:\(AI\s+RMF\s+[\d\.]+\))?)',
+        r'(AI\s+RMF\s+[\d\.]+\s*[-:]?\s*Artificial\s+Intelligence\s+Risk\s+Management\s+Framework)',
+        r'(NIST\s+AI\s+Risk\s+Management\s+Framework)',
+        r'(NIST\s+Special\s+Publication\s+\d+(?:-\d+)*\s+[^.\n]{1,80})',
+        r'(Special\s+Publication\s+\d+(?:-\d+)*\s+[^.\n]{1,80})',
+        r'(NIST\s+SP\s+\d+(?:-\d+)*\s+[^.\n]{1,80})',
         
         # Government document formal titles
         r'\b(CISA\s+(?:Publication|Document|Advisory|Guidelines?)\s+[^.\n]*)\b',

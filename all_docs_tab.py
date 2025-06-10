@@ -344,7 +344,7 @@ def render_table_view(docs):
             'Quantum Cybersecurity Maturity': format_score_display(scores['quantum_cybersecurity'], 'quantum_cybersecurity'),
             'AI Ethics': format_score_display(scores['ai_ethics'], 'ai_ethics'),
             'Q Ethics': format_score_display(scores['quantum_ethics'], 'quantum_ethics'),
-            'Date': pub_date
+            'Date': str(pub_date) if pub_date else 'N/A'
         })
     
     df = pd.DataFrame(table_data)
