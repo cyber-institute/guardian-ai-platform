@@ -488,20 +488,24 @@ def main():
             st.code("2025-06-07 21:08:56.927833")
     
     # Create main navigation with hamburger menu structure
-    main_tab1, main_tab2, main_tab3, main_tab4 = st.tabs(["All Documents", "Patent Technology", "Repository Admin", "About"])
+    main_tab1, main_tab2, main_tab3 = st.tabs(["All Documents", "Repository Admin", "About"])
     
     with main_tab1:
         render()
     
     with main_tab2:
-        render_patent_technology_section()
-    
-    with main_tab3:
         render_repository_admin_section()
     
-    with main_tab4:
-        from about_tab import render as render_about
-        render_about()
+    with main_tab3:
+        # About tab with Patent Technology as subtab
+        about_subtab1, about_subtab2 = st.tabs(["About GUARDIAN", "Patent Technology"])
+        
+        with about_subtab1:
+            from about_tab import render as render_about
+            render_about()
+        
+        with about_subtab2:
+            render_patent_technology_section()
     
     # Render hamburger menu instead of sidebar chatbot
     from components.hamburger_menu import render_simple_hamburger_menu
