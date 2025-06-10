@@ -38,11 +38,9 @@ def render():
     col1, col2 = st.columns([1, 4])
     with col1:
         if st.button("🔄 Refresh Analysis", help="Regenerate document metadata with latest algorithms"):
-            # Clear all cached metadata
-            for key in list(st.session_state.keys()):
-                if isinstance(key, str) and ('metadata' in key.lower() or 'analyzed' in key.lower()):
-                    del st.session_state[key]
-            st.success("Metadata cache cleared - documents will be reanalyzed")
+            # Clear ALL session state to force complete refresh
+            st.session_state.clear()
+            st.success("Complete cache cleared - reloading...")
             st.rerun()
     
     try:
@@ -388,18 +386,18 @@ def render_card_view(docs):
         with cols[i % 2]:
             content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
             
-            # Get or generate intelligent metadata
-            if not doc.get('analyzed_metadata'):
-                metadata = extract_document_metadata(content, doc.get('title', ''))
-                doc['analyzed_metadata'] = metadata
-            else:
-                metadata = doc['analyzed_metadata']
+            # Always regenerate metadata to ensure clean processing
+            metadata = extract_document_metadata(content, doc.get('title', ''))
             
             title = metadata.get('title', 'Untitled Document') or 'Untitled Document'
             author_org = metadata.get('author_organization', 'Unknown') or 'Unknown'
             pub_date = metadata.get('publish_date', 'Unknown') or 'Unknown'
             doc_type = metadata.get('document_type', 'Unknown') or 'Unknown'
             content_preview = metadata.get('content_preview', 'No preview available') or 'No preview available'
+            
+            # Force clean content preview one more time
+            from utils.content_cleaner import clean_html_content
+            content_preview = clean_html_content(content_preview)
             
             # Calculate comprehensive scores
             scores = comprehensive_document_scoring(content, str(title))
@@ -426,4 +424,12 @@ def render_card_view(docs):
             """, unsafe_allow_html=True)
             
             with st.expander("Intelligent Content Preview"):
+                # Temporary debug trace
+                st.write("**Debug Trace:**")
+                st.code(f"Original content sample: {repr(content[:100])}")
+                st.code(f"Content preview sample: {repr(content_preview[:100])}")
+                st.code(f"Contains HTML: {'<' in content_preview or 'style=' in content_preview}")
+                
+                # Show the actual preview
+                st.write("**Content Preview:**")
                 st.write(content_preview)
