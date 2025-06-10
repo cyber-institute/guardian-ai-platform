@@ -324,7 +324,7 @@ def render_compact_cards(docs):
                 box-shadow:0 1px 3px rgba(0,0,0,0.1);height:240px;overflow:hidden'>
                     <div style='display:flex;align-items:flex-start;gap:8px;margin-bottom:6px'>
                         <div style='flex-shrink:0'>
-                            {thumbnail_html.replace('width:40px;height:50px', 'width:30px;height:38px')}
+                            {thumbnail_html.replace('width:120px;height:150px', 'width:60px;height:75px')}
                         </div>
                         <div style='flex:1;min-width:0'>
                             <div style='font-weight:bold;font-size:12px;margin-bottom:4px;line-height:1.2'>{title[:32]}{'...' if len(title) > 32 else ''}</div>
