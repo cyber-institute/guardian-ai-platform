@@ -174,16 +174,37 @@ def render():
     # Help section
     with st.expander("What do these scores mean?"):
         st.markdown("""
-        **Quantum Maturity Scores**
-        - **Quantum Maturity**: Readiness for quantum threats (e.g., crypto-agility, PQC controls)
-        - **Implementation**: Evidence of actual deployment or migration planning
-        - **Standards**: Compliance with NIST and other quantum-safe standards
-        - **Risk Assessment**: Evaluation of quantum computing threats
+        **AI Cybersecurity Maturity (0-100 Scale)**
+        - **Encryption Standards**: AI system data protection and secure communication protocols
+        - **Authentication Mechanisms**: Identity verification and access control for AI systems
+        - **Threat Monitoring**: Real-time detection and response to AI-specific security threats
+        - **Incident Response**: Structured response procedures for AI security breaches
+        
+        **Quantum Cybersecurity Maturity (1-5 Scale)**
+        - **Level 1**: Basic awareness of quantum threats with minimal preparation
+        - **Level 2**: Foundational quantum-safe measures and initial planning
+        - **Level 3**: Scalable quantum security solutions with active implementation
+        - **Level 4**: Comprehensive quantum security integration across systems
+        - **Level 5**: Dynamic quantum security with continuous adaptability
+        
+        **AI Ethics (0-100 Scale)**
+        - **Fairness & Bias**: Mitigation of algorithmic bias and discriminatory outcomes
+        - **Transparency**: Explainability and interpretability of AI decision-making
+        - **Accountability**: Clear responsibility structures and governance mechanisms
+        - **Privacy Protection**: Data protection and user privacy safeguards
+        
+        **Quantum Ethics (0-100 Scale)**
+        - **Quantum Advantage Ethics**: Responsible use of quantum computational power
+        - **Quantum Privacy**: Protection of quantum information and communication
+        - **Quantum Security Standards**: Ethical implementation of quantum security measures
+        - **Equitable Access**: Fair distribution of quantum technology benefits
 
-        **Scoring Scale:**
-        - 80-100: Quantum-Ready (Green)
-        - 50-79: Developing (Orange) 
-        - 0-49: Initial (Red)
+        **Scoring Interpretation:**
+        - **80-100**: Advanced/Excellent implementation
+        - **60-79**: Good implementation with room for improvement
+        - **40-59**: Developing capabilities requiring attention
+        - **20-39**: Basic implementation with significant gaps
+        - **0-19**: Minimal or no implementation
         """)
 
     # Document display based on selected mode
@@ -249,10 +270,10 @@ def render_compact_cards(docs):
                     <div style='font-weight:bold;font-size:13px;margin-bottom:4px'>{title[:35]}{'...' if len(title) > 35 else ''}</div>
                     <div style='font-size:10px;color:#666;margin-bottom:6px'>{doc_type} • {author_org}</div>
                     <div style='font-size:9px;line-height:1.3;margin-bottom:6px'>
-                        <div>AI Cyber: {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity')}</div>
-                        <div>Q Cyber: {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity')}</div>
+                        <div>AI Cybersecurity Maturity: {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity')}</div>
+                        <div>Quantum Cybersecurity Maturity: {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity')}</div>
                         <div>AI Ethics: {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics')}</div>
-                        <div>Q Ethics: {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics')}</div>
+                        <div>Quantum Ethics: {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics')}</div>
                     </div>
                     <div style='font-size:9px;color:#888'>{pub_date}</div>
                 </div>
@@ -323,8 +344,8 @@ def render_table_view(docs):
             'Title': title[:45],
             'Author/Org': author_org[:25],
             'Type': doc_type,
-            'AI Cyber': format_score_display(scores['ai_cybersecurity'], 'ai_cybersecurity'),
-            'Q Cyber': format_score_display(scores['quantum_cybersecurity'], 'quantum_cybersecurity'),
+            'AI Cybersecurity Maturity': format_score_display(scores['ai_cybersecurity'], 'ai_cybersecurity'),
+            'Quantum Cybersecurity Maturity': format_score_display(scores['quantum_cybersecurity'], 'quantum_cybersecurity'),
             'AI Ethics': format_score_display(scores['ai_ethics'], 'ai_ethics'),
             'Q Ethics': format_score_display(scores['quantum_ethics'], 'quantum_ethics'),
             'Date': pub_date
@@ -420,8 +441,8 @@ def render_card_view(docs):
                 st.markdown(f"""
                     <div style='margin:8px;padding:8px;background:#f8f9fa;border-radius:6px'>
                         <div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px'>
-                            <div><strong>AI Cybersecurity:</strong> {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity')}</div>
-                            <div><strong>Quantum Cybersecurity:</strong> {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity')}</div>
+                            <div><strong>AI Cybersecurity Maturity:</strong> {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity')}</div>
+                            <div><strong>Quantum Cybersecurity Maturity:</strong> {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity')}</div>
                             <div><strong>AI Ethics:</strong> {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics')}</div>
                             <div><strong>Quantum Ethics:</strong> {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics')}</div>
                         </div>
