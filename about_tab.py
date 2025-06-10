@@ -6,101 +6,117 @@ import io
 import base64
 
 def create_speedometer_dial(value, max_value=100):
-    """Create a speedometer dial gauge using matplotlib with consistent size and appearance."""
+    """Create a full circular speedometer dial gauge using matplotlib."""
     
-    # Use consistent parameters for all gauges
+    # Set consistent parameters
     plt.rcParams.update({
-        'font.size': 13,
+        'font.size': 10,
         'font.weight': 'bold',
         'font.family': 'sans-serif'
     })
     
-    # Create figure with exact specifications
-    fig, ax = plt.subplots(figsize=(2.4, 1.8), facecolor='white', dpi=75)
+    # Create square figure for circular gauge
+    fig, ax = plt.subplots(figsize=(2.2, 2.2), facecolor='white', dpi=75)
     ax.set_xlim(-1.3, 1.3)
-    ax.set_ylim(-0.3, 1.1)
+    ax.set_ylim(-1.3, 1.3)
     ax.set_aspect('equal')
     ax.axis('off')
     
-    # Define consistent color segments (red on left)
-    colors = ['#FF4444', '#FF8800', '#FFCC00', '#88DD00', '#44BB44', '#22AA22']
+    # Define color segments for full circle (starting from top, clockwise)
+    colors = ['#FF4444', '#FF6633', '#FF8800', '#FFAA00', '#FFCC00', '#CCDD00', 
+              '#99DD00', '#66DD00', '#44BB44', '#33AA33', '#22AA22', '#119911']
     
-    # Create precise color segments using wedges
-    segment_angles = np.linspace(np.pi, 0, 7)
+    # Create 12 segments for smooth color transition around full circle
+    num_segments = len(colors)
+    angle_per_segment = 360 / num_segments
     
-    for i in range(6):
+    # Start from top (90 degrees) and go clockwise
+    for i in range(num_segments):
+        start_angle = 90 - (i * angle_per_segment)
+        end_angle = 90 - ((i + 1) * angle_per_segment)
+        
         wedge = patches.Wedge(
             center=(0, 0), 
             r=1.0, 
-            theta1=np.degrees(segment_angles[i+1]), 
-            theta2=np.degrees(segment_angles[i]),
-            width=0.25, 
+            theta1=end_angle, 
+            theta2=start_angle,
+            width=0.3, 
             facecolor=colors[i], 
-            edgecolor='#555555', 
-            linewidth=0.8
+            edgecolor='#444444', 
+            linewidth=0.5
         )
         ax.add_patch(wedge)
     
-    # Add consistent outer border
-    outer_border = patches.Wedge((0, 0), 1.0, 0, 180, width=0.03, facecolor='#555555')
-    ax.add_patch(outer_border)
+    # Add outer dark border ring
+    outer_ring = patches.Circle((0, 0), 1.0, fill=False, 
+                               edgecolor='#2a2a2a', linewidth=3)
+    ax.add_patch(outer_ring)
     
-    # Add inner white background for consistency
-    inner_bg = patches.Wedge((0, 0), 0.75, 0, 180, facecolor='white', edgecolor='none')
-    ax.add_patch(inner_bg)
+    # Add inner gray background circle
+    inner_circle = patches.Circle((0, 0), 0.7, facecolor='#e8e8e8', 
+                                 edgecolor='#666666', linewidth=1, zorder=5)
+    ax.add_patch(inner_circle)
     
-    # Calculate needle position (flipped: red on left)
-    needle_angle = np.pi - (value / max_value) * np.pi
-    needle_length = 0.65
-    needle_x = needle_length * np.cos(needle_angle)
-    needle_y = needle_length * np.sin(needle_angle)
+    # Calculate needle angle (0 = poor/red at top, clockwise to good/green)
+    # Map value from 0-100 to full 360 degrees
+    needle_angle_deg = 90 - (value / max_value) * 360
+    needle_angle_rad = np.radians(needle_angle_deg)
     
-    # Draw needle shaft with consistent styling
+    # Draw needle
+    needle_length = 0.6
+    needle_x = needle_length * np.cos(needle_angle_rad)
+    needle_y = needle_length * np.sin(needle_angle_rad)
+    
+    # Needle shaft
     ax.plot([0, needle_x], [0, needle_y], 
-            color='#333333', linewidth=2.5, solid_capstyle='round', zorder=10)
+            color='#2a2a2a', linewidth=3, solid_capstyle='round', zorder=10)
     
-    # Create arrow tip with precise geometry
-    arrow_size = 0.06
-    arrow_spread = 0.5
+    # Create arrow tip
+    arrow_size = 0.08
+    arrow_spread = 0.6
     
-    # Calculate arrow triangle points
-    perp_angle = needle_angle + np.pi/2
+    perp_angle = needle_angle_rad + np.pi/2
     tip_x, tip_y = needle_x, needle_y
-    base_x = tip_x - arrow_size * np.cos(needle_angle)
-    base_y = tip_y - arrow_size * np.sin(needle_angle)
+    base_x = tip_x - arrow_size * np.cos(needle_angle_rad)
+    base_y = tip_y - arrow_size * np.sin(needle_angle_rad)
     
     wing1_x = base_x + arrow_size * arrow_spread * np.cos(perp_angle)
     wing1_y = base_y + arrow_size * arrow_spread * np.sin(perp_angle)
     wing2_x = base_x - arrow_size * arrow_spread * np.cos(perp_angle)
     wing2_y = base_y - arrow_size * arrow_spread * np.sin(perp_angle)
     
-    # Draw arrow triangle
     arrow = patches.Polygon(
         [(tip_x, tip_y), (wing1_x, wing1_y), (wing2_x, wing2_y)], 
-        facecolor='#333333', edgecolor='#111111', linewidth=0.5, zorder=11
+        facecolor='#2a2a2a', edgecolor='#000000', linewidth=0.5, zorder=11
     )
     ax.add_patch(arrow)
     
-    # Add center hub
-    center_hub = patches.Circle((0, 0), 0.04, facecolor='#333333', 
-                               edgecolor='#111111', linewidth=0.5, zorder=12)
+    # Center hub
+    center_hub = patches.Circle((0, 0), 0.06, facecolor='#2a2a2a', 
+                               edgecolor='#000000', linewidth=1, zorder=12)
     ax.add_patch(center_hub)
     
-    # Add score text with consistent positioning
+    # Score text in center
     ax.text(0, -0.25, str(value), ha='center', va='center', 
-            fontsize=13, fontweight='bold', color='#444444')
+            fontsize=12, fontweight='bold', color='#2a2a2a', zorder=13)
     
-    # Save with exact settings for consistency
+    # Add "POOR" and "GOOD" labels
+    ax.text(0, 0.85, 'POOR', ha='center', va='center', 
+            fontsize=8, fontweight='bold', color='#666666')
+    ax.text(0, -0.85, 'GOOD', ha='center', va='center', 
+            fontsize=8, fontweight='bold', color='#666666')
+    
+    # Save with consistent settings
     buffer = io.BytesIO()
     plt.savefig(buffer, format='png', bbox_inches='tight', 
                 pad_inches=0.05, facecolor='white', dpi=75, 
                 edgecolor='none', transparent=False)
     buffer.seek(0)
     image_base64 = base64.b64encode(buffer.getvalue()).decode()
-    plt.close(fig)  # Explicitly close figure
+    plt.close(fig)
     
-    # Return with fixed pixel dimensions
-    return f'<img src="data:image/png;base64,{image_base64}" style="width: 90px; height: 68px; display: block; margin: 0 auto; object-fit: contain;">'
+    # Return with fixed dimensions (square for circular gauge)
+    return f'<img src="data:image/png;base64,{image_base64}" style="width: 90px; height: 90px; display: block; margin: 0 auto; object-fit: contain;">'
 
 def render():
     """Render the About tab for GUARDIAN system."""
