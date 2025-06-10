@@ -195,6 +195,14 @@ class GuardianChatbot:
                 "confidence": 0.9
             }
         
+        # Document upload help - matches your Dialogflow CX intents
+        elif any(term in text_lower for term in ["upload", "submit", "add document", "upload policy", "compliance draft", "new regulation", "can i upload"]):
+            return {
+                "response_text": "I can help you upload documents to GUARDIAN!\n\n📤 Upload Process:\n1. Navigate to the 'Repository Admin' tab\n2. Find the 'Document Management' section\n3. Use drag-and-drop or click 'Browse files'\n4. Select your document (PDF, TXT, DOCX supported)\n\n🔍 What happens next:\n• Automatic metadata extraction (title, organization, date)\n• AI-powered content analysis\n• Comprehensive scoring across 4 frameworks:\n  - AI Cybersecurity Maturity (0-100)\n  - Quantum Cybersecurity Maturity (1-5)\n  - AI Ethics (0-100)\n  - Quantum Ethics (0-100)\n\n📋 Document Types Supported:\n• Policy documents\n• Compliance frameworks\n• Security standards\n• Regulatory guidelines\n• Technical specifications\n\nReady to upload your document?",
+                "intent": "document_upload_help",
+                "confidence": 0.95
+            }
+        
         # Filter help
         elif any(term in text_lower for term in ["filter", "display mode", "how to use"]):
             filters = self.knowledge_base['filters_help']

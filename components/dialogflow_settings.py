@@ -37,13 +37,15 @@ def render_dialogflow_settings():
             project_id = st.text_input(
                 "Google Cloud Project ID",
                 value=current_project if current_project != 'Not configured' else '',
-                help="Your Google Cloud project ID where Dialogflow CX is enabled"
+                help="Your Google Cloud project ID where Dialogflow CX is enabled",
+                placeholder="e.g., guardian-vide"
             )
             
             agent_id = st.text_input(
                 "Dialogflow CX Agent ID", 
                 value=current_agent if current_agent != 'Not configured' else '',
-                help="The ID of your GUARDIAN chatbot agent in Dialogflow CX"
+                help="The ID of your GUARDIAN chatbot agent in Dialogflow CX",
+                placeholder="e.g., GUARDIANAgent"
             )
             
             location = st.selectbox(
@@ -66,11 +68,28 @@ def render_dialogflow_settings():
                 help="Download this from Google Cloud Console > IAM & Admin > Service Accounts"
             )
             
+            st.markdown("**Webhook Configuration:**")
+            webhook_info = st.info("""
+            Based on your screenshots, your webhook URL should be:
+            `https://7cf4-71-10-72-118.ngrok-free.app/webhook`
+            
+            Add this webhook URL to your Dialogflow CX agent to enable two-way communication.
+            """)
+            
             if st.form_submit_button("Save Configuration", type="primary"):
                 if project_id and agent_id:
                     # Would save to environment/secrets in real implementation
                     st.success("Configuration saved! Restart the application to apply changes.")
                     st.info("Note: In production, these would be saved to secure environment variables.")
+                    
+                    # Show next steps
+                    st.markdown("**Next Steps:**")
+                    st.markdown("""
+                    1. Copy your webhook URL to Dialogflow CX
+                    2. Test the agent in Dialogflow CX console
+                    3. Try document upload phrases like "I want to upload a policy"
+                    4. Verify responses match GUARDIAN's capabilities
+                    """)
                 else:
                     st.error("Please provide both Project ID and Agent ID")
         
