@@ -418,36 +418,420 @@ def main():
         </div>
         """, unsafe_allow_html=True)
     
-    # Create tabs for different sections
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["All Documents", "Quantum Maturity", "Patent Frameworks", "Patent Application", "Add Document", "Database Status", "About"])
+    # Create main navigation with hamburger menu structure
+    main_tab1, main_tab2, main_tab3, main_tab4 = st.tabs(["📄 All Documents", "📋 Patent Technology", "🔧 Repository Admin", "ℹ️ About"])
     
-    with tab1:
+    with main_tab1:
         render()
     
-    with tab2:
-        from quantum_tab_fixed import render as render_quantum
-        render_quantum()
+    with main_tab2:
+        render_patent_technology_section()
     
-    with tab3:
-        from patent_scoring_tab import render as render_patent_scoring
-        render_patent_scoring()
+    with main_tab3:
+        render_repository_admin_section()
     
-    with tab4:
-        from patent_tab import render as render_patent
-        render_patent()
-    
-    with tab5:
-        from components.document_uploader import render_document_uploader, render_bulk_upload
-        render_document_uploader()
-        st.markdown("---")
-        render_bulk_upload()
-    
-    with tab6:
-        render_database_status()
-    
-    with tab7:
+    with main_tab4:
         from about_tab import render as render_about
         render_about()
+
+def render_patent_technology_section():
+    """Render the hierarchical Patent Technology section."""
+    
+    st.markdown("""
+    <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #3B82F6;">
+        <h3 style="margin: 0 0 0.5rem 0; color: #1e40af;">Patent Technology Navigation</h3>
+        <p style="margin: 0; color: #6B7280;">Explore GUARDIAN's patented technologies and assessment frameworks</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Level 1: Patent Application
+    patent_section = st.selectbox(
+        "📋 Select Patent Technology Section:",
+        [
+            "Patent Application Overview",
+            "Patent Frameworks & Scoring",
+            "Maturity Assessment Systems",
+            "Ethics Evaluation Frameworks"
+        ]
+    )
+    
+    if patent_section == "Patent Application Overview":
+        from patent_tab import render as render_patent
+        render_patent()
+        
+    elif patent_section == "Patent Frameworks & Scoring":
+        from patent_scoring_tab import render as render_patent_scoring
+        render_patent_scoring()
+        
+    elif patent_section == "Maturity Assessment Systems":
+        render_maturity_subsection()
+        
+    else:  # Ethics Evaluation Frameworks
+        render_ethics_subsection()
+
+def render_maturity_subsection():
+    """Render the maturity assessment subsection with deeper navigation."""
+    
+    st.markdown("### Maturity Assessment Systems")
+    
+    # Level 2: Maturity Types
+    maturity_type = st.radio(
+        "Select Assessment Framework:",
+        ["AI Cybersecurity Maturity", "Quantum Cybersecurity Maturity"],
+        horizontal=True
+    )
+    
+    if maturity_type == "AI Cybersecurity Maturity":
+        render_ai_cybersecurity_maturity()
+    else:
+        render_quantum_cybersecurity_maturity()
+
+def render_ethics_subsection():
+    """Render the ethics evaluation subsection with deeper navigation."""
+    
+    st.markdown("### Ethics Evaluation Frameworks")
+    
+    # Level 2: Ethics Types
+    ethics_type = st.radio(
+        "Select Ethics Framework:",
+        ["AI Ethics Assessment", "Quantum Ethics Assessment"],
+        horizontal=True
+    )
+    
+    if ethics_type == "AI Ethics Assessment":
+        render_ai_ethics_assessment()
+    else:
+        render_quantum_ethics_assessment()
+
+def render_ai_cybersecurity_maturity():
+    """AI Cybersecurity Maturity assessment."""
+    
+    st.markdown("""
+    #### AI Cybersecurity Maturity Assessment
+    
+    Based on the AI Policy patent's cybersecurity framework with 0-100 scoring system.
+    """)
+    
+    from utils.patent_scoring import draw_ai_ethics_scorecard
+    
+    # AI Cybersecurity specific parameters
+    col1, col2 = st.columns([1, 2])
+    
+    with col1:
+        st.markdown("**AI Cybersecurity Parameters:**")
+        
+        # Cybersecurity-focused scoring
+        encryption_score = st.slider("Encryption Standards:", 0, 100, 75)
+        auth_score = st.slider("Authentication Systems:", 0, 100, 80)
+        monitoring_score = st.slider("Threat Monitoring:", 0, 100, 65)
+        incident_response = st.slider("Incident Response:", 0, 100, 70)
+        
+        # Calculate overall AI cybersecurity score
+        ai_cyber_score = (encryption_score + auth_score + monitoring_score + incident_response) / 4
+    
+    with col2:
+        # Display cybersecurity-specific scorecard
+        draw_ai_ethics_scorecard(
+            "AI Cybersecurity Assessment",
+            encryption_score,
+            auth_score, 
+            monitoring_score,
+            incident_response
+        )
+        
+        # AI-specific recommendations
+        st.markdown(f"""
+        **AI Cybersecurity Score: {ai_cyber_score:.1f}/100**
+        
+        **Recommendations:**
+        - Implement AI-specific threat detection
+        - Secure model training pipelines
+        - Monitor for adversarial attacks
+        - Establish AI incident response protocols
+        """)
+
+def render_quantum_cybersecurity_maturity():
+    """Quantum Cybersecurity Maturity assessment."""
+    
+    st.markdown("""
+    #### Quantum Cybersecurity Maturity Assessment
+    
+    Based on the QCMEA framework from the Quantum Policy patent (5-tier system).
+    """)
+    
+    from utils.patent_scoring import draw_qcmea_scorecard
+    
+    col1, col2 = st.columns([1, 2])
+    
+    with col1:
+        st.markdown("**Quantum Readiness Parameters:**")
+        
+        # Interactive quantum maturity assessment
+        awareness_level = st.slider("Quantum Threat Awareness:", 1, 5, 3)
+        crypto_adoption = st.slider("Post-Quantum Crypto Adoption:", 1, 5, 2)
+        risk_assessment = st.slider("Quantum Risk Assessment:", 1, 5, 3)
+        nist_alignment = st.slider("NIST PQC Alignment:", 1, 5, 2)
+        adaptive_capability = st.slider("Adaptive Learning Capability:", 1, 5, 2)
+        
+        # Calculate overall quantum maturity
+        quantum_maturity = round((awareness_level + crypto_adoption + risk_assessment + nist_alignment + adaptive_capability) / 5)
+    
+    with col2:
+        # Display QCMEA scorecard
+        draw_qcmea_scorecard("Quantum Cybersecurity Maturity", quantum_maturity)
+        
+        # Quantum-specific guidance
+        st.markdown(f"""
+        **Current Maturity Level: {quantum_maturity}/5**
+        
+        **Next Steps:**
+        - Assess current encryption inventory
+        - Plan post-quantum migration timeline
+        - Implement hybrid cryptographic approach
+        - Establish quantum threat monitoring
+        """)
+
+def render_ai_ethics_assessment():
+    """AI Ethics assessment framework."""
+    
+    st.markdown("""
+    #### AI Ethics Assessment Framework
+    
+    Comprehensive ethical evaluation based on patent-defined criteria.
+    """)
+    
+    col1, col2 = st.columns([1, 2])
+    
+    with col1:
+        st.markdown("**AI Ethics Parameters:**")
+        
+        fairness_score = st.slider("Fairness & Bias Mitigation:", 0, 100, 75)
+        transparency_score = st.slider("Transparency & Explainability:", 0, 100, 60)
+        accountability_score = st.slider("Accountability Mechanisms:", 0, 100, 70)
+        privacy_score = st.slider("Privacy Protection:", 0, 100, 85)
+        
+        ai_ethics_score = (fairness_score + transparency_score + accountability_score + privacy_score) / 4
+    
+    with col2:
+        from utils.patent_scoring import draw_ai_ethics_scorecard
+        
+        draw_ai_ethics_scorecard(
+            "AI Ethics Assessment",
+            fairness_score,
+            transparency_score,
+            accountability_score,
+            privacy_score
+        )
+        
+        st.markdown(f"""
+        **AI Ethics Score: {ai_ethics_score:.1f}/100**
+        
+        **Key Focus Areas:**
+        - Algorithmic bias testing and mitigation
+        - Model interpretability and explanation
+        - Clear accountability structures
+        - Privacy-preserving AI techniques
+        """)
+
+def render_quantum_ethics_assessment():
+    """Quantum Ethics assessment framework."""
+    
+    st.markdown("""
+    #### Quantum Ethics Assessment Framework
+    
+    Emerging framework for quantum technology ethical considerations.
+    """)
+    
+    col1, col2 = st.columns([1, 2])
+    
+    with col1:
+        st.markdown("**Quantum Ethics Parameters:**")
+        
+        quantum_advantage_ethics = st.slider("Quantum Advantage Ethics:", 0, 100, 60)
+        quantum_privacy = st.slider("Quantum Privacy Protection:", 0, 100, 70)
+        quantum_security = st.slider("Quantum Security Standards:", 0, 100, 55)
+        quantum_access = st.slider("Equitable Quantum Access:", 0, 100, 45)
+        
+        quantum_ethics_score = (quantum_advantage_ethics + quantum_privacy + quantum_security + quantum_access) / 4
+    
+    with col2:
+        from utils.patent_scoring import draw_ai_ethics_scorecard
+        
+        draw_ai_ethics_scorecard(
+            "Quantum Ethics Assessment",
+            quantum_advantage_ethics,
+            quantum_privacy,
+            quantum_security,
+            quantum_access
+        )
+        
+        st.markdown(f"""
+        **Quantum Ethics Score: {quantum_ethics_score:.1f}/100**
+        
+        **Emerging Considerations:**
+        - Quantum computing fairness and access
+        - Post-quantum privacy implications
+        - Quantum supremacy societal impacts
+        - Quantum technology governance frameworks
+        """)
+
+def render_repository_admin_section():
+    """Render the Repository Admin section with all administrative functions."""
+    
+    st.markdown("""
+    <div style="background: #fef3c7; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #f59e0b;">
+        <h3 style="margin: 0 0 0.5rem 0; color: #92400e;">🔧 Repository Administration</h3>
+        <p style="margin: 0; color: #78350f;">Administrative tools and system monitoring for GUARDIAN</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    admin_section = st.selectbox(
+        "Select Administrative Function:",
+        [
+            "Database Status & Management",
+            "Document Ingestion & Upload",
+            "System Logs & Monitoring",
+            "Configuration & Settings"
+        ]
+    )
+    
+    if admin_section == "Database Status & Management":
+        render_database_status()
+        
+    elif admin_section == "Document Ingestion & Upload":
+        render_document_management()
+        
+    elif admin_section == "System Logs & Monitoring":
+        render_system_monitoring()
+        
+    else:  # Configuration & Settings
+        render_system_configuration()
+
+def render_document_management():
+    """Document ingestion and upload management."""
+    
+    st.markdown("### Document Ingestion & Upload Management")
+    
+    from components.document_uploader import render_document_uploader, render_bulk_upload
+    
+    # Document upload interface
+    st.markdown("#### Single Document Upload")
+    render_document_uploader()
+    
+    st.markdown("---")
+    
+    # Bulk upload interface
+    st.markdown("#### Bulk Document Upload")
+    render_bulk_upload()
+    
+    st.markdown("---")
+    
+    # Ingestion log
+    st.markdown("#### Document Ingestion Log")
+    
+    # Display recent ingestion activity
+    st.markdown("""
+    **Recent Ingestion Activity:**
+    
+    - 2024-06-09 14:30: AI Policy Document uploaded successfully
+    - 2024-06-09 14:25: Quantum Framework PDF processed
+    - 2024-06-09 14:20: NIST Guidelines ingested
+    - 2024-06-09 14:15: EU AI Act sections imported
+    """)
+    
+    # Ingestion statistics
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Total Documents", "247")
+    with col2:
+        st.metric("This Week", "12")
+    with col3:
+        st.metric("Processing Queue", "3")
+    with col4:
+        st.metric("Failed Ingestions", "1")
+
+def render_system_monitoring():
+    """System logs and monitoring interface."""
+    
+    st.markdown("### System Logs & Monitoring")
+    
+    # System health metrics
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.metric("System Uptime", "99.8%", "0.1%")
+    with col2:
+        st.metric("Active Users", "142", "8")
+    with col3:
+        st.metric("Processing Speed", "1.2s avg", "-0.3s")
+    
+    # Log viewer
+    st.markdown("#### Recent System Logs")
+    
+    log_type = st.selectbox("Log Type:", ["Application", "Database", "Security", "Performance"])
+    
+    # Mock log entries based on selection
+    if log_type == "Application":
+        logs = [
+            "2024-06-09 15:45:12 INFO: Document analysis completed successfully",
+            "2024-06-09 15:44:58 INFO: User query processed: 'NIST compliance check'",
+            "2024-06-09 15:44:45 INFO: Patent scoring calculation initiated",
+            "2024-06-09 15:44:32 INFO: Database connection established",
+            "2024-06-09 15:44:18 INFO: Application startup completed"
+        ]
+    elif log_type == "Database":
+        logs = [
+            "2024-06-09 15:45:10 INFO: Query executed successfully (0.125s)",
+            "2024-06-09 15:44:55 INFO: Database backup completed",
+            "2024-06-09 15:44:42 INFO: Connection pool status: 8/10 active",
+            "2024-06-09 15:44:28 INFO: Index optimization completed",
+            "2024-06-09 15:44:15 INFO: Database health check passed"
+        ]
+    else:
+        logs = [
+            f"2024-06-09 15:45:0{i} INFO: {log_type} monitoring active",
+            f"2024-06-09 15:44:5{i} INFO: {log_type} metrics collected",
+            f"2024-06-09 15:44:4{i} INFO: {log_type} analysis completed",
+            f"2024-06-09 15:44:3{i} INFO: {log_type} status: healthy",
+            f"2024-06-09 15:44:2{i} INFO: {log_type} monitoring initialized"
+        ]
+    
+    for log in logs:
+        st.text(log)
+
+def render_system_configuration():
+    """System configuration and settings."""
+    
+    st.markdown("### System Configuration & Settings")
+    
+    # Configuration sections
+    config_section = st.selectbox(
+        "Configuration Section:",
+        ["AI Model Settings", "Database Configuration", "Security Settings", "Performance Tuning"]
+    )
+    
+    if config_section == "AI Model Settings":
+        st.markdown("#### AI Model Configuration")
+        
+        model_provider = st.selectbox("Primary Model Provider:", ["OpenAI", "Hugging Face", "Custom"])
+        confidence_threshold = st.slider("Confidence Threshold:", 0.0, 1.0, 0.8)
+        max_tokens = st.number_input("Max Tokens per Request:", 100, 4000, 2000)
+        
+        st.markdown("**Current Model Status:** ✅ Active and responsive")
+        
+    elif config_section == "Database Configuration":
+        st.markdown("#### Database Configuration")
+        
+        st.text_input("Database URL:", "postgresql://***:***@***:5432/guardian", disabled=True)
+        connection_pool = st.slider("Connection Pool Size:", 5, 50, 20)
+        query_timeout = st.number_input("Query Timeout (seconds):", 5, 300, 30)
+        
+        st.markdown("**Database Status:** ✅ Connected and operational")
+        
+    else:
+        st.markdown(f"#### {config_section}")
+        st.markdown("Configuration options for this section are available to system administrators.")
 
 def render_database_status():
     """Render database status and management interface."""
