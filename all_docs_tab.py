@@ -46,8 +46,8 @@ def is_probably_quantum(content):
 
 def render():
     
-    # Enhanced refresh button with retroactive updates
-    col1, col2 = st.columns([1, 4])
+    # Enhanced refresh button with display style controls
+    col1, col2, col3 = st.columns([2, 2, 6])
     with col1:
         if st.button("🔄 Refresh Analysis", help="Update all documents with improved metadata extraction"):
             with st.spinner("Updating all documents with improved analysis..."):
@@ -63,6 +63,23 @@ def render():
                     st.rerun()
                 except Exception as e:
                     st.error(f"Error updating documents: {e}")
+    
+    with col2:
+        # Display mode selection moved up here
+        display_mode = st.session_state.get("display_mode", "cards")
+        display_mode = st.selectbox(
+            "Display Style", 
+            ["cards", "compact", "table", "grid", "minimal"],
+            index=["cards", "compact", "table", "grid", "minimal"].index(display_mode),
+            format_func=lambda x: {
+                "cards": "Card View",
+                "compact": "Compact Cards", 
+                "table": "Table View",
+                "grid": "Grid Layout",
+                "minimal": "Minimal List"
+            }[x]
+        )
+        st.session_state["display_mode"] = display_mode
     
     try:
         # Clear any potential caching to ensure fresh data
@@ -131,67 +148,54 @@ def render():
             "selected_regions": []
         }
 
-    # Enhanced filter controls with checkboxes
+    # Compact filter controls with dropdown-style multiselect
     st.markdown("""
-    <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #e2e8f0;">
-    <h4 style="margin: 0 0 0.5rem 0; color: #1e293b; font-size: 1.1rem;">📋 Filter Documents</h4>
+    <div style="background: #f8fafc; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; border: 1px solid #e2e8f0;">
+    <h4 style="margin: 0 0 0.5rem 0; color: #1e293b; font-size: 1rem;">📋 Filter Documents</h4>
     </div>
     """, unsafe_allow_html=True)
     
-    # Create filter columns
-    filter_col1, filter_col2, filter_col3, filter_col4, filter_col5 = st.columns([2, 2, 2, 2, 2])
+    # Create compact filter row
+    filter_col1, filter_col2, filter_col3, filter_col4, filter_col5 = st.columns([2, 2, 1.5, 1.5, 1])
     
     with filter_col1:
-        st.markdown("**Document Type:**")
-        for doc_type in doc_types:
-            if st.checkbox(doc_type, key=f"type_{doc_type}", 
-                          value=doc_type in st.session_state["filters"]["selected_types"]):
-                if doc_type not in st.session_state["filters"]["selected_types"]:
-                    st.session_state["filters"]["selected_types"].append(doc_type)
-            else:
-                if doc_type in st.session_state["filters"]["selected_types"]:
-                    st.session_state["filters"]["selected_types"].remove(doc_type)
+        st.session_state["filters"]["selected_types"] = st.multiselect(
+            "Document Type", 
+            doc_types,
+            default=st.session_state["filters"]["selected_types"],
+            key="type_multiselect"
+        )
     
     with filter_col2:
-        st.markdown("**Author/Organization:**")
         # Show top organizations only to avoid clutter
-        top_orgs = organizations[:8] if len(organizations) > 8 else organizations
-        for org in top_orgs:
-            if st.checkbox(org[:20] + "..." if len(org) > 20 else org, 
-                          key=f"org_{org}", 
-                          value=org in st.session_state["filters"]["selected_orgs"]):
-                if org not in st.session_state["filters"]["selected_orgs"]:
-                    st.session_state["filters"]["selected_orgs"].append(org)
-            else:
-                if org in st.session_state["filters"]["selected_orgs"]:
-                    st.session_state["filters"]["selected_orgs"].remove(org)
+        top_orgs = organizations[:12] if len(organizations) > 12 else organizations
+        st.session_state["filters"]["selected_orgs"] = st.multiselect(
+            "Author/Organization", 
+            top_orgs,
+            default=st.session_state["filters"]["selected_orgs"],
+            key="org_multiselect",
+            format_func=lambda x: x[:25] + "..." if len(x) > 25 else x
+        )
     
     with filter_col3:
-        st.markdown("**Year:**")
-        for year in years[:8]:  # Show recent years
-            if st.checkbox(year, key=f"year_{year}", 
-                          value=year in st.session_state["filters"]["selected_years"]):
-                if year not in st.session_state["filters"]["selected_years"]:
-                    st.session_state["filters"]["selected_years"].append(year)
-            else:
-                if year in st.session_state["filters"]["selected_years"]:
-                    st.session_state["filters"]["selected_years"].remove(year)
+        st.session_state["filters"]["selected_years"] = st.multiselect(
+            "Year", 
+            years,
+            default=st.session_state["filters"]["selected_years"],
+            key="year_multiselect"
+        )
     
     with filter_col4:
-        st.markdown("**Region:**")
-        for region in regions:
-            if st.checkbox(region, key=f"region_{region}", 
-                          value=region in st.session_state["filters"]["selected_regions"]):
-                if region not in st.session_state["filters"]["selected_regions"]:
-                    st.session_state["filters"]["selected_regions"].append(region)
-            else:
-                if region in st.session_state["filters"]["selected_regions"]:
-                    st.session_state["filters"]["selected_regions"].remove(region)
+        st.session_state["filters"]["selected_regions"] = st.multiselect(
+            "Region", 
+            regions,
+            default=st.session_state["filters"]["selected_regions"],
+            key="region_multiselect"
+        )
     
     with filter_col5:
-        st.markdown("**Actions:**")
-        st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("🗑️ Clear All", key="clear_filters", help="Reset all filters"):
+        st.markdown("<br>", unsafe_allow_html=True)  # Spacing
+        if st.button("🗑️ Clear", key="clear_filters", help="Reset all filters"):
             st.session_state["filters"] = {
                 "selected_types": [],
                 "selected_orgs": [],
@@ -207,7 +211,7 @@ def render():
                          len(st.session_state["filters"]["selected_regions"]))
         
         if active_filters > 0:
-            st.markdown(f"<small style='color: #059669;'>✓ {active_filters} filters active</small>", unsafe_allow_html=True)
+            st.markdown(f"<small style='color: #059669; font-size: 0.8rem;'>✓ {active_filters} active</small>", unsafe_allow_html=True)
 
     # Apply filters
     f = st.session_state["filters"]
@@ -229,23 +233,8 @@ def render():
     if f["selected_regions"]:
         docs = [d for d in docs if detect_region(d.get("organization", "Unknown")) in f["selected_regions"]]
 
-    # Display mode selection
+    # Get display mode from session state (set in top controls)
     display_mode = st.session_state.get("display_mode", "cards")
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        display_mode = st.selectbox(
-            "Display Style", 
-            ["cards", "compact", "table", "grid", "minimal"],
-            index=["cards", "compact", "table", "grid", "minimal"].index(display_mode),
-            format_func=lambda x: {
-                "cards": "Card View",
-                "compact": "Compact Cards", 
-                "table": "Table View",
-                "grid": "Grid Layout",
-                "minimal": "Minimal List"
-            }[x]
-        )
-    st.session_state["display_mode"] = display_mode
 
     # Pagination
     per_page = 10
