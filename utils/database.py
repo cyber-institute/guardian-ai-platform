@@ -33,13 +33,12 @@ class DatabaseManager:
             return None
         
         try:
-            with self.engine.connect() as conn:
+            with self.engine.begin() as conn:  # Use begin() for auto-commit transaction
                 result = conn.execute(text(query), params or {})
                 if result.returns_rows:
                     rows = result.fetchall()
                     return [dict(row._mapping) for row in rows]
                 else:
-                    conn.commit()
                     return result.rowcount
         except SQLAlchemyError as e:
             logger.error(f"Query execution failed: {e}")

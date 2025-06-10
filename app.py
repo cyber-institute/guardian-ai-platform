@@ -358,7 +358,7 @@ def main():
                         import requests
                         import io
                         from urllib.parse import urlparse
-                        from utils.db import save_document
+                        from utils.direct_db import save_document_direct
                         from utils.document_analyzer import analyze_document_metadata
                         from utils.comprehensive_scoring import comprehensive_document_scoring
                         
@@ -431,7 +431,7 @@ def main():
                             }
                             
                             # Save to database
-                            if save_document(document_data):
+                            if save_document_direct(document_data):
                                 st.success(f"Successfully processed and saved: {metadata.get('title', document_title)}")
                                 st.info("Document has been analyzed and added to your collection. Check the All Documents tab to view it.")
                                 # Clear the URL input
