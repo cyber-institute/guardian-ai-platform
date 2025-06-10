@@ -355,18 +355,12 @@ def render_minimal_list(docs):
     for idx, doc in enumerate(docs):
         content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
         
-        # Get or generate intelligent metadata
-        if not doc.get('analyzed_metadata'):
-            metadata = extract_document_metadata(content, doc.get('title', ''))
-            doc['analyzed_metadata'] = metadata
-        else:
-            metadata = doc['analyzed_metadata']
-        
-        title = metadata.get('title', 'Untitled Document') or 'Untitled Document'
-        author_org = metadata.get('author_organization', 'Unknown') or 'Unknown'
-        pub_date = metadata.get('publish_date') or 'No date'
-        doc_type = metadata.get('document_type', 'Unknown') or 'Unknown'
-        content_preview = metadata.get('content_preview', 'No preview available') or 'No preview available'
+        # Use database metadata directly (already corrected)
+        title = doc.get('title', 'Untitled Document') or 'Untitled Document'
+        author_org = doc.get('author_organization', 'Unknown') or 'Unknown'
+        pub_date = doc.get('publish_date') or 'No date'
+        doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
+        content_preview = doc.get('content_preview', 'No preview available') or 'No preview available'
         
         # Calculate comprehensive scores
         scores = comprehensive_document_scoring(content, str(title))
@@ -402,18 +396,15 @@ def render_card_view(docs):
     cols = st.columns(2)
     for i, doc in enumerate(docs):
         with cols[i % 2]:
-            # Get raw content first
+            # Get raw content for scoring
             raw_content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
             
-            # ISOLATED STEP 1: Generate completely clean preview without any scoring interaction
-            clean_preview_text = generate_clean_preview(raw_content)
-            
-            # ISOLATED STEP 2: Extract metadata separately  
-            metadata = extract_document_metadata(raw_content, doc.get('title', ''))
-            title = metadata.get('title', 'Untitled Document') or 'Untitled Document'
-            author_org = metadata.get('author_organization', 'Unknown') or 'Unknown'
-            pub_date = metadata.get('publish_date', 'Unknown') or 'Unknown'
-            doc_type = metadata.get('document_type', 'Unknown') or 'Unknown'
+            # Use database metadata directly (already corrected)
+            title = doc.get('title', 'Untitled Document') or 'Untitled Document'
+            author_org = doc.get('author_organization', 'Unknown') or 'Unknown'
+            pub_date = doc.get('publish_date', 'Unknown') or 'Unknown'
+            doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
+            content_preview = doc.get('content_preview', 'No preview available') or 'No preview available'
             
             # Display metadata card (no scoring involved)
             st.markdown(f"""
