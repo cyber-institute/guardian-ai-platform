@@ -91,58 +91,60 @@ def extract_title(content: str, filename: str = "") -> str:
     return 'Untitled Document'
 
 def extract_organization(content: str) -> str:
-    """Extract author organization using pattern matching."""
+    """Extract author organization using enhanced pattern matching."""
     
-    # Government agencies and organizations
+    # Enhanced NIST detection patterns - check multiple locations in document
+    nist_indicators = [
+        r'(?i)\bnist\b',
+        r'(?i)national\s+institute\s+of\s+standards',
+        r'(?i)commerce\.gov',
+        r'(?i)nvlpubs\.nist\.gov',
+        r'(?i)csrc\.nist\.gov',
+        r'(?i)nist\.gov',
+        r'(?i)sp\s*800-',  # NIST Special Publication format
+        r'(?i)special\s+publication\s+800',
+        r'(?i)cybersecurity\s+framework',
+        r'(?i)gaithersburg,?\s+md',
+        r'(?i)boulder,?\s+co',
+        r'(?i)nist\s+(sp|special\s+publication|cybersecurity)',
+        r'(?i)(quantum|post-quantum|cryptographic)\s+(standard|implementation|guide)',
+    ]
+    
+    # Check entire document for NIST indicators with higher priority
+    for pattern in nist_indicators:
+        if re.search(pattern, content[:3000]):  # Check first 3000 chars
+            return 'NIST'
+    
+    # Government agencies and organizations with enhanced patterns
     org_patterns = [
-        r'(?i)\b(National Institute of Standards and Technology|NIST)\b',
-        r'(?i)\b(National Security Agency|NSA)\b',
-        r'(?i)\b(Department of Defense|DoD|DOD)\b',
-        r'(?i)\b(Department of Homeland Security|DHS)\b',
-        r'(?i)\b(Cybersecurity and Infrastructure Security Agency|CISA)\b',
-        r'(?i)\b(National Aeronautics and Space Administration|NASA)\b',
-        r'(?i)\b(Federal Bureau of Investigation|FBI)\b',
-        r'(?i)\b(Central Intelligence Agency|CIA)\b',
-        r'(?i)\b(White House|Executive Office)\b',
-        r'(?i)\b(European Union|EU|European Commission)\b',
-        r'(?i)\b(International Organization for Standardization|ISO)\b',
-        r'(?i)\b(Institute of Electrical and Electronics Engineers|IEEE)\b',
-        r'(?i)\b(Internet Engineering Task Force|IETF)\b',
-        r'(?i)\b(World Wide Web Consortium|W3C)\b',
-        r'(?i)\b(MITRE Corporation|MITRE)\b',
-        r'(?i)\b(RAND Corporation|RAND)\b',
-        r'(?i)\b(Carnegie Mellon University|CMU)\b',
-        r'(?i)\b(Massachusetts Institute of Technology|MIT)\b',
-        r'(?i)\b(Stanford University)\b',
-        r'(?i)\b(University of [A-Z][a-z]+)\b',
+        (r'(?i)\b(National Security Agency|NSA)\b', 'NSA'),
+        (r'(?i)\b(Department of Defense|DoD|DOD)\b', 'Department of Defense'),
+        (r'(?i)\b(Department of Homeland Security|DHS)\b', 'DHS'),
+        (r'(?i)\b(Cybersecurity and Infrastructure Security Agency|CISA)\b', 'CISA'),
+        (r'(?i)\b(National Aeronautics and Space Administration|NASA)\b', 'NASA'),
+        (r'(?i)\b(Federal Bureau of Investigation|FBI)\b', 'FBI'),
+        (r'(?i)\b(Central Intelligence Agency|CIA)\b', 'CIA'),
+        (r'(?i)\b(White House|Executive Office)\b', 'White House'),
+        (r'(?i)\b(European Union|EU|European Commission)\b', 'European Union'),
+        (r'(?i)\b(International Organization for Standardization|ISO)\b', 'ISO'),
+        (r'(?i)\b(Institute of Electrical and Electronics Engineers|IEEE)\b', 'IEEE'),
+        (r'(?i)\b(Internet Engineering Task Force|IETF)\b', 'IETF'),
+        (r'(?i)\b(World Wide Web Consortium|W3C)\b', 'W3C'),
+        (r'(?i)\b(MITRE Corporation|MITRE)\b', 'MITRE'),
+        (r'(?i)\b(RAND Corporation|RAND)\b', 'RAND'),
+        (r'(?i)\b(Carnegie Mellon University|CMU)\b', 'Carnegie Mellon'),
+        (r'(?i)\b(Massachusetts Institute of Technology|MIT)\b', 'MIT'),
+        (r'(?i)\b(Stanford University)\b', 'Stanford University'),
+        (r'(?i)\b(University of [A-Z][a-z]+)\b', None),  # Will use matched text
     ]
     
     # Check first 2000 characters for organization mentions
     search_text = content[:2000]
     
-    for pattern in org_patterns:
+    for pattern, standardized_name in org_patterns:
         match = re.search(pattern, search_text)
         if match:
-            org = match.group(1)
-            # Standardize common abbreviations
-            if 'NIST' in org.upper() or 'National Institute of Standards' in org:
-                return 'NIST'
-            elif 'NSA' in org.upper() or 'National Security Agency' in org:
-                return 'NSA'
-            elif 'NASA' in org.upper() or 'National Aeronautics' in org:
-                return 'NASA'
-            elif 'White House' in org or 'Executive Office' in org:
-                return 'White House'
-            elif 'European' in org:
-                return 'European Union'
-            elif 'DoD' in org.upper() or 'Department of Defense' in org:
-                return 'Department of Defense'
-            elif 'DHS' in org.upper() or 'Department of Homeland Security' in org:
-                return 'DHS'
-            elif 'CISA' in org.upper():
-                return 'CISA'
-            else:
-                return org
+            return standardized_name if standardized_name else match.group(1)
     
     # Look for "prepared by", "published by", "author" patterns
     author_patterns = [
