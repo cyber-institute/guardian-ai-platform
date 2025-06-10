@@ -2,86 +2,75 @@ import streamlit as st
 import plotly.graph_objects as go
 
 def create_dial_gauge(value, max_value=100):
-    """Create a speedometer-style dial gauge using HTML/CSS to avoid Plotly issues."""
+    """Create a speedometer-style dial gauge using HTML/CSS matching the reference image."""
     
-    # Calculate needle rotation (0-180 degrees for half circle)
-    rotation = (value / max_value) * 180
+    # Calculate needle rotation (-90 to +90 degrees for semicircle, mapped from 0-100 value)
+    rotation = -90 + (value / max_value) * 180
     
-    # Create HTML dial gauge
+    # Create SVG-based dial gauge for better precision
     dial_html = f"""
-    <div style="position: relative; width: 100px; height: 50px; margin: 0 auto;">
-        <!-- Gauge background -->
-        <div style="
-            width: 100px;
-            height: 50px;
-            border: 4px solid #666;
-            border-bottom: none;
-            border-radius: 100px 100px 0 0;
-            background: conic-gradient(
-                from 180deg,
-                #FF4444 0deg,
-                #FF4444 30deg,
-                #FF8800 30deg,
-                #FF8800 60deg,
-                #FFCC00 60deg,
-                #FFCC00 90deg,
-                #88DD00 90deg,
-                #88DD00 120deg,
-                #44BB44 120deg,
-                #44BB44 150deg,
-                #22AA22 150deg,
-                #22AA22 180deg
-            );
-            position: relative;
-        ">
-        </div>
-        
-        <!-- Inner white circle -->
-        <div style="
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            width: 80px;
-            height: 40px;
-            background: white;
-            border-radius: 80px 80px 0 0;
-        "></div>
-        
-        <!-- Needle -->
-        <div style="
-            position: absolute;
-            bottom: 0px;
-            left: 48px;
-            width: 2px;
-            height: 35px;
-            background: #555;
-            transform-origin: bottom center;
-            transform: rotate({rotation - 90}deg);
-            z-index: 10;
-        "></div>
-        
-        <!-- Center circle -->
-        <div style="
-            position: absolute;
-            bottom: -4px;
-            left: 42px;
-            width: 12px;
-            height: 12px;
-            background: #555;
-            border-radius: 50%;
-            z-index: 11;
-        "></div>
+    <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
+        <svg width="100" height="80" viewBox="0 0 100 80" style="overflow: visible;">
+            <!-- Outer border circle -->
+            <path d="M 10 70 A 40 40 0 0 1 90 70" 
+                  fill="none" 
+                  stroke="#666666" 
+                  stroke-width="4"/>
+            
+            <!-- Red segment -->
+            <path d="M 10 70 A 40 40 0 0 1 25 35" 
+                  fill="none" 
+                  stroke="#FF4444" 
+                  stroke-width="8"/>
+            
+            <!-- Orange segment -->
+            <path d="M 25 35 A 40 40 0 0 1 40 20" 
+                  fill="none" 
+                  stroke="#FF8800" 
+                  stroke-width="8"/>
+            
+            <!-- Yellow segment -->
+            <path d="M 40 20 A 40 40 0 0 1 60 20" 
+                  fill="none" 
+                  stroke="#FFCC00" 
+                  stroke-width="8"/>
+            
+            <!-- Yellow-green segment -->
+            <path d="M 60 20 A 40 40 0 0 1 75 35" 
+                  fill="none" 
+                  stroke="#88DD00" 
+                  stroke-width="8"/>
+            
+            <!-- Light green segment -->
+            <path d="M 75 35 A 40 40 0 0 1 85 50" 
+                  fill="none" 
+                  stroke="#44BB44" 
+                  stroke-width="8"/>
+            
+            <!-- Green segment -->
+            <path d="M 85 50 A 40 40 0 0 1 90 70" 
+                  fill="none" 
+                  stroke="#22AA22" 
+                  stroke-width="8"/>
+            
+            <!-- Needle -->
+            <line x1="50" y1="70" 
+                  x2="{50 + 30 * (value/max_value * 2 - 1)}" 
+                  y2="{70 - 30 * abs((value/max_value) - 0.5) * 2}" 
+                  stroke="#555555" 
+                  stroke-width="2" 
+                  stroke-linecap="round"/>
+            
+            <!-- Center circle -->
+            <circle cx="50" cy="70" r="4" fill="#555555"/>
+        </svg>
         
         <!-- Score display -->
         <div style="
-            position: absolute;
-            bottom: -25px;
-            left: 0;
-            width: 100px;
-            text-align: center;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
-            color: #555;
+            color: #555555;
+            margin-top: -5px;
         ">{value}</div>
     </div>
     """
