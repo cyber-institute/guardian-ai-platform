@@ -242,15 +242,15 @@ def render():
     total_pages = max(1, len(docs) // per_page + (1 if len(docs) % per_page else 0))
 
     if len(docs) > per_page:
-        col1, col2, col3 = st.columns((1, 2, 1))
-        with col1:
-            if st.button("Previous") and page > 0:
+        col1, col2, col3, col4, col5 = st.columns((1, 0.3, 2, 0.3, 1))
+        with col2:
+            if st.button("◀", key="prev_page", help="Previous page") and page > 0:
                 st.session_state["doc_page"] = page - 1
                 st.rerun()
-        with col2:
-            st.write(f"Page {page + 1} of {total_pages}")
         with col3:
-            if st.button("Next") and page < total_pages - 1:
+            st.markdown(f"<div style='text-align: center; padding-top: 0.3rem;'>Page {page + 1} of {total_pages}</div>", unsafe_allow_html=True)
+        with col4:
+            if st.button("▶", key="next_page", help="Next page") and page < total_pages - 1:
                 st.session_state["doc_page"] = page + 1
                 st.rerun()
 
@@ -258,41 +258,7 @@ def render():
     end = start + per_page
     page_docs = docs[start:end]
 
-    # Help section
-    with st.expander("What do these scores mean?"):
-        st.markdown("""
-        **AI Cybersecurity Maturity (0-100 Scale)**
-        - **Encryption Standards**: AI system data protection and secure communication protocols
-        - **Authentication Mechanisms**: Identity verification and access control for AI systems
-        - **Threat Monitoring**: Real-time detection and response to AI-specific security threats
-        - **Incident Response**: Structured response procedures for AI security breaches
-        
-        **Quantum Cybersecurity Maturity (1-5 Scale)**
-        - **Level 1**: Basic awareness of quantum threats with minimal preparation
-        - **Level 2**: Foundational quantum-safe measures and initial planning
-        - **Level 3**: Scalable quantum security solutions with active implementation
-        - **Level 4**: Comprehensive quantum security integration across systems
-        - **Level 5**: Dynamic quantum security with continuous adaptability
-        
-        **AI Ethics (0-100 Scale)**
-        - **Fairness & Bias**: Mitigation of algorithmic bias and discriminatory outcomes
-        - **Transparency**: Explainability and interpretability of AI decision-making
-        - **Accountability**: Clear responsibility structures and governance mechanisms
-        - **Privacy Protection**: Data protection and user privacy safeguards
-        
-        **Quantum Ethics (0-100 Scale)**
-        - **Quantum Advantage Ethics**: Responsible use of quantum computational power
-        - **Quantum Privacy**: Protection of quantum information and communication
-        - **Quantum Security Standards**: Ethical implementation of quantum security measures
-        - **Equitable Access**: Fair distribution of quantum technology benefits
 
-        **Scoring Interpretation:**
-        - **80-100**: Advanced/Excellent implementation
-        - **60-79**: Good implementation with room for improvement
-        - **40-59**: Developing capabilities requiring attention
-        - **20-39**: Basic implementation with significant gaps
-        - **0-19**: Minimal or no implementation
-        """)
 
     # Document display based on selected mode
     if not page_docs:

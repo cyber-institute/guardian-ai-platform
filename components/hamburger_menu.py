@@ -334,6 +334,42 @@ def render_simple_hamburger_menu():
                 if st.button("Interface Help", key="menu_help"):
                     handle_menu_message("How do I use the filters?")
             
+            # Scoring explanation section
+            with st.expander("What do these scores mean?"):
+                st.markdown("""
+                **AI Cybersecurity Maturity (0-100 Scale)**
+                - **Encryption Standards**: AI system data protection and secure communication protocols
+                - **Authentication Mechanisms**: Identity verification and access control for AI systems
+                - **Threat Monitoring**: Real-time detection and response to AI-specific security threats
+                - **Incident Response**: Structured response procedures for AI security breaches
+                
+                **Quantum Cybersecurity Maturity (1-5 Scale)**
+                - **Level 1**: Basic awareness of quantum threats with minimal preparation
+                - **Level 2**: Foundational quantum-safe measures and initial planning
+                - **Level 3**: Scalable quantum security solutions with active implementation
+                - **Level 4**: Comprehensive quantum security integration across systems
+                - **Level 5**: Dynamic quantum security with continuous adaptability
+                
+                **AI Ethics (0-100 Scale)**
+                - **Fairness & Bias**: Mitigation of algorithmic bias and discriminatory outcomes
+                - **Transparency**: Explainability and interpretability of AI decision-making
+                - **Accountability**: Clear responsibility structures and governance mechanisms
+                - **Privacy Protection**: Data protection and user privacy safeguards
+                
+                **Quantum Ethics (0-100 Scale)**
+                - **Quantum Advantage Ethics**: Responsible use of quantum computational power
+                - **Quantum Privacy**: Protection of quantum information and communication
+                - **Quantum Security Standards**: Ethical implementation of quantum security measures
+                - **Equitable Access**: Fair distribution of quantum technology benefits
+
+                **Scoring Interpretation:**
+                - **80-100**: Advanced/Excellent implementation
+                - **60-79**: Good implementation with room for improvement
+                - **40-59**: Developing capabilities requiring attention
+                - **20-39**: Basic implementation with significant gaps
+                - **0-19**: Minimal or no implementation
+                """)
+            
             st.markdown("---")
             
             # Chat Interface
