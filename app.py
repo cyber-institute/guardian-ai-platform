@@ -302,7 +302,7 @@ def main():
             font-weight: bold;
             font-family: Arial, sans-serif;
             letter-spacing: -0.02em;
-            color: #B91C2C;
+            color: #1e40af;
         ">GUARDIAN</h1>
     </div>
     """, unsafe_allow_html=True)
