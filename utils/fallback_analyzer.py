@@ -247,9 +247,10 @@ def extract_organization_fallback(content: str) -> str:
     
     # Enhanced organization patterns for government and industry documents
     org_patterns = [
-        # Extract organization from title patterns like "ITI's AI Security Policy"
-        r"([A-Z]{2,6})'s\s+AI\s+Security\s+Policy",
-        r"([A-Z]{2,6})'s\s+AI\s+[^.\n]*(?:Principles?|Guidelines?|Framework|Policy)",
+        # Extract organization from title patterns like "ITI's AI Security Policy" - must be at start
+        r"^([A-Z]{2,6})'s\s+AI\s+Security\s+Policy",
+        r"^([A-Z]{2,6})'s\s+AI\s+[^.\n]*(?:Principles?|Guidelines?|Framework|Policy)",
+        r"\n([A-Z]{2,6})'s\s+AI\s+[^.\n]*(?:Principles?|Guidelines?|Framework|Policy)",
         
         # Multi-agency collaboration patterns
         r'(National Security Agency[^.\n]*(?:CISA|Cybersecurity)[^.\n]*)',
@@ -273,11 +274,17 @@ def extract_organization_fallback(content: str) -> str:
     
     for pattern in org_patterns:
         try:
-            match = re.search(pattern, content[:1000], re.IGNORECASE)
+            match = re.search(pattern, content[:1000], re.IGNORECASE | re.MULTILINE)
             if match:
                 org = match.group(1).strip()
-                if len(org) > 5 and not org.isdigit():
-                    return org[:50]
+                # Special validation for organization names
+                if len(org) >= 2 and not org.isdigit():
+                    # For short acronyms like ITI, allow them through
+                    if len(org) <= 6 and org.isupper():
+                        return org
+                    # For longer names, require minimum length
+                    elif len(org) > 5:
+                        return org[:50]
         except (IndexError, AttributeError):
             continue
     
