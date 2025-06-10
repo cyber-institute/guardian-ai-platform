@@ -84,76 +84,150 @@ def render():
         st.error(f"Error fetching documents: {e}")
         return
 
-    # Extract document types and organizations for filtering
+    # Extract filter options from documents
     doc_types = sorted(set(doc.get("document_type", "Unknown") for doc in all_docs))
     organizations = sorted(set(doc.get("organization", "Unknown")[:30] for doc in all_docs if doc.get("organization")))
+    
+    # Extract years from dates
+    years = set()
+    for doc in all_docs:
+        date_str = doc.get("date", "")
+        if date_str:
+            try:
+                # Try to extract year from various date formats
+                import re
+                year_match = re.search(r'\b(19|20)\d{2}\b', str(date_str))
+                if year_match:
+                    years.add(year_match.group())
+            except:
+                pass
+    years = sorted(list(years), reverse=True)
+    
+    # Define regions based on common organizations/sources
+    def detect_region(org_name):
+        org_lower = org_name.lower()
+        if any(term in org_lower for term in ['nist', 'dhs', 'usa', 'united states', 'us ', 'federal', 'dod', 'nasa']):
+            return 'US'
+        elif any(term in org_lower for term in ['eu', 'european', 'gdpr', 'enisa', 'europa']):
+            return 'EU'
+        elif any(term in org_lower for term in ['uk', 'britain', 'british', 'ncsc']):
+            return 'UK'
+        elif any(term in org_lower for term in ['iso', 'itu', 'oecd', 'un ', 'united nations']):
+            return 'International'
+        elif any(term in org_lower for term in ['china', 'japan', 'korea', 'singapore', 'asia']):
+            return 'Asia'
+        elif any(term in org_lower for term in ['canada', 'australia', 'new zealand']):
+            return 'Other'
+        return 'Unknown'
+    
+    regions = sorted(set(detect_region(org) for org in organizations if org != "Unknown"))
 
     # Initialize filters in session state
     if "filters" not in st.session_state:
         st.session_state["filters"] = {
-            "doc_type": "All",
-            "org_multi": []
+            "selected_types": [],
+            "selected_orgs": [],
+            "selected_years": [],
+            "selected_regions": []
         }
 
-    # Filter controls
-    col1, col2, col3 = st.columns([3, 3, 4])
-    with col1:
-        available_types = ["All"] + doc_types
-        current_selection = st.session_state["filters"]["doc_type"]
-        if current_selection not in available_types:
-            current_selection = "All"
-        st.session_state["filters"]["doc_type"] = st.selectbox(
-            "Document Type", 
-            available_types, 
-            index=available_types.index(current_selection)
-        )
+    # Enhanced filter controls with checkboxes
+    st.markdown("""
+    <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #e2e8f0;">
+    <h4 style="margin: 0 0 0.5rem 0; color: #1e293b; font-size: 1.1rem;">📋 Filter Documents</h4>
+    </div>
+    """, unsafe_allow_html=True)
     
-    with col2:
-        st.markdown("""
-        <style>
-        .clear-filters-btn {
-            background: linear-gradient(145deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 0.5rem 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.875rem;
-            margin-top: 1.5rem;
-            width: 100%;
-        }
-        .clear-filters-btn:hover {
-            background: linear-gradient(145deg, #dc2626 0%, #b91c1c 100%);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-        }
-        </style>
-        """, unsafe_allow_html=True)
-        
-        if st.button("🗑️ Clear Filters", key="clear_filters", help="Reset all filters to default values"):
+    # Create filter columns
+    filter_col1, filter_col2, filter_col3, filter_col4, filter_col5 = st.columns([2, 2, 2, 2, 2])
+    
+    with filter_col1:
+        st.markdown("**Document Type:**")
+        for doc_type in doc_types:
+            if st.checkbox(doc_type, key=f"type_{doc_type}", 
+                          value=doc_type in st.session_state["filters"]["selected_types"]):
+                if doc_type not in st.session_state["filters"]["selected_types"]:
+                    st.session_state["filters"]["selected_types"].append(doc_type)
+            else:
+                if doc_type in st.session_state["filters"]["selected_types"]:
+                    st.session_state["filters"]["selected_types"].remove(doc_type)
+    
+    with filter_col2:
+        st.markdown("**Author/Organization:**")
+        # Show top organizations only to avoid clutter
+        top_orgs = organizations[:8] if len(organizations) > 8 else organizations
+        for org in top_orgs:
+            if st.checkbox(org[:20] + "..." if len(org) > 20 else org, 
+                          key=f"org_{org}", 
+                          value=org in st.session_state["filters"]["selected_orgs"]):
+                if org not in st.session_state["filters"]["selected_orgs"]:
+                    st.session_state["filters"]["selected_orgs"].append(org)
+            else:
+                if org in st.session_state["filters"]["selected_orgs"]:
+                    st.session_state["filters"]["selected_orgs"].remove(org)
+    
+    with filter_col3:
+        st.markdown("**Year:**")
+        for year in years[:8]:  # Show recent years
+            if st.checkbox(year, key=f"year_{year}", 
+                          value=year in st.session_state["filters"]["selected_years"]):
+                if year not in st.session_state["filters"]["selected_years"]:
+                    st.session_state["filters"]["selected_years"].append(year)
+            else:
+                if year in st.session_state["filters"]["selected_years"]:
+                    st.session_state["filters"]["selected_years"].remove(year)
+    
+    with filter_col4:
+        st.markdown("**Region:**")
+        for region in regions:
+            if st.checkbox(region, key=f"region_{region}", 
+                          value=region in st.session_state["filters"]["selected_regions"]):
+                if region not in st.session_state["filters"]["selected_regions"]:
+                    st.session_state["filters"]["selected_regions"].append(region)
+            else:
+                if region in st.session_state["filters"]["selected_regions"]:
+                    st.session_state["filters"]["selected_regions"].remove(region)
+    
+    with filter_col5:
+        st.markdown("**Actions:**")
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("🗑️ Clear All", key="clear_filters", help="Reset all filters"):
             st.session_state["filters"] = {
-                "doc_type": "All",
-                "org_multi": []
+                "selected_types": [],
+                "selected_orgs": [],
+                "selected_years": [],
+                "selected_regions": []
             }
             st.rerun()
-    
-    with col3:
-        st.session_state["filters"]["org_multi"] = st.multiselect(
-            "Filter by Author/Org", 
-            organizations, 
-            default=st.session_state["filters"]["org_multi"]
-        )
+        
+        # Show active filter count
+        active_filters = (len(st.session_state["filters"]["selected_types"]) + 
+                         len(st.session_state["filters"]["selected_orgs"]) + 
+                         len(st.session_state["filters"]["selected_years"]) + 
+                         len(st.session_state["filters"]["selected_regions"]))
+        
+        if active_filters > 0:
+            st.markdown(f"<small style='color: #059669;'>✓ {active_filters} filters active</small>", unsafe_allow_html=True)
 
     # Apply filters
     f = st.session_state["filters"]
     docs = all_docs
-    if f["doc_type"] != "All":
-        docs = [d for d in docs if d.get("document_type") == f["doc_type"]]
-    if f["org_multi"]:
-        docs = [d for d in docs if any(d.get("organization", "").startswith(s) for s in f["org_multi"])]
+    
+    # Filter by document type
+    if f["selected_types"]:
+        docs = [d for d in docs if d.get("document_type", "Unknown") in f["selected_types"]]
+    
+    # Filter by organization
+    if f["selected_orgs"]:
+        docs = [d for d in docs if d.get("organization", "Unknown") in f["selected_orgs"]]
+    
+    # Filter by year
+    if f["selected_years"]:
+        docs = [d for d in docs if any(year in str(d.get("date", "")) for year in f["selected_years"])]
+    
+    # Filter by region
+    if f["selected_regions"]:
+        docs = [d for d in docs if detect_region(d.get("organization", "Unknown")) in f["selected_regions"]]
 
     # Display mode selection
     display_mode = st.session_state.get("display_mode", "cards")
