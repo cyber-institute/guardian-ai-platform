@@ -52,83 +52,105 @@ def render():
 def render_system_overview():
     """Render the system overview section."""
     
+    # Compact overview section
     st.markdown("""
-    ## System Overview
+    <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
+    <h4 style="color: #B91C2C; margin-bottom: 0.5rem;">Patent System Overview</h4>
+    <p style="font-size: 0.95rem; line-height: 1.5; color: #374151; margin: 0;">
+    AI-driven governance technology providing real-time assessment and mitigation of complex risks across cybersecurity, ethics, and policy domains.
+    </p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    GUARDIAN represents a breakthrough in AI-driven governance technology, providing real-time assessment
-    and mitigation of complex risks across cybersecurity, ethics, and policy domains.
-    """)
-    
-    # Key features
-    col1, col2 = st.columns(2)
+    # Three-column layout for patent capabilities
+    col1, col2, col3 = st.columns(3)
     
     with col1:
         st.markdown("""
-        ### Core Capabilities
-        - **Real-time Risk Assessment**: Continuous monitoring and evaluation
-        - **Multi-modal Analysis**: Text, policy, and regulatory content processing
-        - **Adaptive Learning**: Self-improving assessment algorithms
-        - **Cross-domain Integration**: Unified cybersecurity and ethics evaluation
-        """)
+        <div style="background: #fef2f2; padding: 1rem; border-radius: 6px; height: 280px;">
+        <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Core Capabilities</h5>
+        <div style="font-size: 0.85rem; line-height: 1.4;">
+        <strong>Real-time Risk Assessment</strong><br>
+        Continuous monitoring and evaluation<br><br>
+        <strong>Multi-modal Analysis</strong><br>
+        Text, policy, regulatory content processing<br><br>
+        <strong>Adaptive Learning</strong><br>
+        Self-improving assessment algorithms<br><br>
+        <strong>Cross-domain Integration</strong><br>
+        Unified cybersecurity and ethics evaluation
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col2:
         st.markdown("""
-        ### Technical Innovation
-        - **Patent-based Scoring**: Proprietary assessment frameworks
-        - **LLM Integration**: Advanced natural language understanding
-        - **Dynamic Governance**: Adaptive policy recommendations
-        - **Scalable Architecture**: Cloud-native deployment ready
-        """)
+        <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; height: 280px;">
+        <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Technical Innovation</h5>
+        <div style="font-size: 0.85rem; line-height: 1.4;">
+        <strong>Patent-based Scoring</strong><br>
+        Proprietary assessment frameworks<br><br>
+        <strong>LLM Integration</strong><br>
+        Advanced natural language understanding<br><br>
+        <strong>Dynamic Governance</strong><br>
+        Adaptive policy recommendations<br><br>
+        <strong>Scalable Architecture</strong><br>
+        Cloud-native deployment ready
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with col3:
+        st.markdown("""
+        <div style="background: #f0fdf4; padding: 1rem; border-radius: 6px; height: 280px;">
+        <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Patent Features</h5>
+        <div style="font-size: 0.85rem; line-height: 1.4;">
+        <strong>Conversational AI Interface</strong><br>
+        Natural language processing capabilities<br><br>
+        <strong>Policy Repository Integration</strong><br>
+        UN, NIST, OECD framework alignment<br><br>
+        <strong>Scoring Engines</strong><br>
+        Dual-modality risk evaluation<br><br>
+        <strong>Feedback Integration</strong><br>
+        Real-time recommendation generation
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
     
-    # Interactive architecture diagram
-    st.markdown("#### Interactive System Flow")
+    st.markdown("<br>", unsafe_allow_html=True)
     
-    # Create system flow diagram using matplotlib
-    fig, ax = plt.subplots(figsize=(12, 3), facecolor='white')
+    # Compact system flow section
+    st.markdown("""
+    <div style="background: #fffbeb; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+    <h5 style="color: #B91C2C; margin-bottom: 0.8rem; text-align: center;">Patent System Flow</h5>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # Add nodes
-    nodes = [
-        ("User Query", 1, 2, "#3B82F6"),
-        ("NLP Engine", 3, 2, "#10B981"),
-        ("Policy Repository", 5, 2, "#F59E0B"),
-        ("AI Scoring", 7, 2, "#EF4444"),
-        ("Risk Evaluation", 9, 2, "#8B5CF6"),
-        ("Recommendations", 11, 2, "#059669")
-    ]
-    
-    # Draw nodes
-    for name, x, y, color in nodes:
-        circle = patches.Circle((x, y), 0.4, facecolor=color, edgecolor='white', linewidth=2)
-        ax.add_patch(circle)
-        ax.text(x, y, name, ha='center', va='center', fontsize=8, fontweight='bold', 
-                color='white')
-    
-    # Draw arrows between nodes
-    for i in range(len(nodes)-1):
-        x1, y1 = nodes[i][1], nodes[i][2]
-        x2, y2 = nodes[i+1][1], nodes[i+1][2]
-        arrow = patches.FancyArrowPatch((x1+0.4, y1), (x2-0.4, y2),
-                                       arrowstyle='->', mutation_scale=15,
-                                       color='#6B7280', linewidth=2)
-        ax.add_patch(arrow)
-    
-    ax.set_xlim(0, 12)
-    ax.set_ylim(1, 3)
-    ax.set_aspect('equal')
-    ax.axis('off')
-    ax.set_title("Patent Figure 1: GUARDIAN System Architecture", fontsize=12, fontweight='bold')
-    
-    # Convert to base64 for embedding
-    buffer = io.BytesIO()
-    plt.savefig(buffer, format='png', bbox_inches='tight', 
-                pad_inches=0.2, facecolor='white', dpi=100)
-    buffer.seek(0)
-    image_base64 = base64.b64encode(buffer.getvalue()).decode()
-    plt.close(fig)
-    
-    # Display the chart
-    st.markdown(f'<img src="data:image/png;base64,{image_base64}" style="width: 100%; height: auto;">', 
-                unsafe_allow_html=True)
+    # Compact flow visualization using HTML cards
+    st.markdown("""
+    <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; margin: 0.5rem 0;">
+        <div style="background: #3B82F6; color: white; padding: 0.8rem; border-radius: 6px; text-align: center; font-size: 0.8rem; font-weight: 600;">
+            User Query
+        </div>
+        <div style="background: #10B981; color: white; padding: 0.8rem; border-radius: 6px; text-align: center; font-size: 0.8rem; font-weight: 600;">
+            NLP Engine
+        </div>
+        <div style="background: #F59E0B; color: white; padding: 0.8rem; border-radius: 6px; text-align: center; font-size: 0.8rem; font-weight: 600;">
+            Policy Repository
+        </div>
+        <div style="background: #EF4444; color: white; padding: 0.8rem; border-radius: 6px; text-align: center; font-size: 0.8rem; font-weight: 600;">
+            AI Scoring
+        </div>
+        <div style="background: #8B5CF6; color: white; padding: 0.8rem; border-radius: 6px; text-align: center; font-size: 0.8rem; font-weight: 600;">
+            Risk Evaluation
+        </div>
+        <div style="background: #059669; color: white; padding: 0.8rem; border-radius: 6px; text-align: center; font-size: 0.8rem; font-weight: 600;">
+            Recommendations
+        </div>
+    </div>
+    <div style="text-align: center; margin: 0.5rem 0; font-size: 0.8rem; color: #666;">
+        Patent Figure 1: GUARDIAN System Architecture Flow
+    </div>
+    """, unsafe_allow_html=True)
 
 def render_mathematical_formulations():
     """Render the mathematical formulations from the patent."""
