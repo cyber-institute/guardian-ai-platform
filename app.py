@@ -383,7 +383,7 @@ def main():
             st.code("2025-06-07 21:08:56.927833")
     
     # Create main navigation with hamburger menu structure
-    main_tab1, main_tab2, main_tab3, main_tab4 = st.tabs(["All Documents", "Patent Technology", "Repository Admin", "About"])
+    main_tab1, main_tab2, main_tab3, main_tab4 = st.tabs(["Document Ingest", "Patent Technology", "Repository Admin", "About"])
     
     with main_tab1:
         render()
