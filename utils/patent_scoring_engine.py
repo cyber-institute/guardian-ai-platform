@@ -884,4 +884,4 @@ class ComprehensivePatentScoringEngine:
         }
 
 # Global instance for use across the application
-patent_scoring_engine = PatentScoringEngine()
+patent_scoring_engine = ComprehensivePatentScoringEngine()

@@ -81,16 +81,16 @@ def render():
     with col1:
         st.markdown("""
         <div style="background: #f9fafb; padding: 1rem; border-radius: 6px; height: 280px;">
-        <h4 style="color: #B91C2C; margin-bottom: 0.8rem;">Core Capabilities</h4>
+        <h4 style="color: #B91C2C; margin-bottom: 0.8rem;">Patent-Based Frameworks</h4>
         <div style="font-size: 0.9rem; line-height: 1.4;">
-        <strong>AI Policy Analysis</strong><br>
-        Document parsing, sentiment analysis, compliance scoring<br><br>
-        <strong>AI Cybersecurity Evaluation</strong><br>
-        AI system encryption, authentication, threat monitoring<br><br>
-        <strong>Quantum Readiness</strong><br>
-        QCMEA 5-tier evaluation, post-quantum crypto assessment<br><br>
-        <strong>AI & Quantum Ethics Evaluation</strong><br>
-        Fairness assessment, quantum advantage ethics, privacy protection
+        <strong>AI Cybersecurity (0-100)</strong><br>
+        Authentication, encryption, monitoring, incident response<br><br>
+        <strong>Quantum Cybersecurity (1-5 QCMEA)</strong><br>
+        Five-tier quantum readiness: awareness → adaptation<br><br>
+        <strong>AI Ethics (0-100)</strong><br>
+        Fairness, transparency, accountability, privacy<br><br>
+        <strong>Quantum Ethics (0-100)</strong><br>
+        Advantage equity, privacy protection, access fairness
         </div>
         </div>
         """, unsafe_allow_html=True)
@@ -98,16 +98,16 @@ def render():
     with col2:
         st.markdown("""
         <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; height: 280px;">
-        <h4 style="color: #B91C2C; margin-bottom: 0.8rem;">Key Features</h4>
-        <div style="font-size: 0.9rem; line-height: 1.4;">
-        <strong>Real-Time Scoring</strong><br>
-        Dynamic assessment across 4 frameworks<br><br>
-        <strong>Document Repository</strong><br>
-        Standards, policies, guidelines, frameworks<br><br>
-        <strong>Interactive Analysis</strong><br>
-        Filtering, comparison, detailed breakdowns<br><br>
-        <strong>Intelligent Chatbot</strong><br>
-        Contextual help and guidance system
+        <h4 style="color: #B91C2C; margin-bottom: 0.8rem;">Mathematical Formulations</h4>
+        <div style="font-size: 0.85rem; line-height: 1.3;">
+        <strong>Patent 1 - AI Ethics Risk</strong><br>
+        Ethics_Score = Σ(wi × Di × Ri)<br><br>
+        <strong>Patent 2 - QCMEA Quantum</strong><br>
+        QCMEA_Level = max{L | Σ(Qi × Wi) ≥ Threshold_L}<br><br>
+        <strong>Patent 3 - Cybersecurity Risk</strong><br>
+        Risk_Cyber = Σ(Wi × Vi × Ci × Ii)<br><br>
+        <strong>Bayesian Dynamic Updates</strong><br>
+        P(M|D) = P(D|M) × P(M) / P(D)
         </div>
         </div>
         """, unsafe_allow_html=True)
@@ -179,9 +179,97 @@ def render():
     
     st.markdown("<br>", unsafe_allow_html=True)
     
+    # System Architecture Section
+    st.markdown("""
+    <div style="background: #fefefe; padding: 1.5rem; border-radius: 8px; border: 1px solid #e5e5e5; margin-bottom: 1.5rem;">
+    <h4 style="color: #B91C2C; margin-bottom: 1rem;">System Architecture & Implementation</h4>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    arch_col1, arch_col2 = st.columns(2)
+    
+    with arch_col1:
+        st.markdown("""
+        <div style="background: #f8fafc; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+        <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Patent Formula Implementation</h5>
+        <div style="font-size: 0.85rem; line-height: 1.4;">
+        <strong>✓ AI Ethics Risk Assessment</strong><br>
+        Ethics_Score = Σ(wi × Di × Ri) - Weighted dimensional analysis<br><br>
+        <strong>✓ Quantum Cybersecurity (QCMEA)</strong><br>
+        QCMEA_Level = max{L | Σ(Qi × Wi) ≥ Threshold_L} - 5-tier maturity<br><br>
+        <strong>✓ AI Cybersecurity Risk</strong><br>
+        Risk_Cyber = Σ(Wi × Vi × Ci × Ii) - Multi-factor vulnerability analysis<br><br>
+        <strong>✓ Bayesian Dynamic Updates</strong><br>
+        P(M|D) = P(D|M) × P(M) / P(D) - Continuous learning adaptation
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with arch_col2:
+        st.markdown("""
+        <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+        <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Technology Stack</h5>
+        <div style="font-size: 0.85rem; line-height: 1.4;">
+        <strong>Backend Processing</strong><br>
+        PostgreSQL database, Python scoring engines, content analysis<br><br>
+        <strong>Interactive Frontend</strong><br>
+        Streamlit web interface, real-time visualizations, dynamic filtering<br><br>
+        <strong>Document Intelligence</strong><br>
+        PDF parsing, metadata extraction, thumbnail generation<br><br>
+        <strong>AI Integration</strong><br>
+        Google Dialogflow CX chatbot, intelligent content scoring
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Comprehensive scoring statistics
+    try:
+        from utils.comprehensive_patent_scoring import get_document_scores_summary
+        stats = get_document_scores_summary()
+        
+        if stats:
+            st.markdown("""
+            <div style="background: #f0fdf4; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+            <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Live Scoring Statistics</h5>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4)
+            
+            with stat_col1:
+                st.metric(
+                    "Documents Analyzed", 
+                    stats['total_documents'],
+                    help="Total documents with patent-based scoring applied"
+                )
+            
+            with stat_col2:
+                st.metric(
+                    "AI Cybersecurity Avg", 
+                    f"{stats['average_scores']['ai_cybersecurity']}",
+                    help="Average AI Cybersecurity score (0-100 scale)"
+                )
+            
+            with stat_col3:
+                st.metric(
+                    "Quantum QCMEA Avg", 
+                    f"{stats['average_scores']['quantum_cybersecurity']}",
+                    help="Average Quantum Cybersecurity maturity (1-5 QCMEA scale)"
+                )
+            
+            with stat_col4:
+                st.metric(
+                    "AI Ethics Avg", 
+                    f"{stats['average_scores']['ai_ethics']}",
+                    help="Average AI Ethics score (0-100 scale)"
+                )
+                
+    except Exception as e:
+        st.info("Patent scoring statistics will appear here once the system is fully initialized.")
+    
     # Compact contact and development info
     st.markdown("""
-    <div style="background: #f8fafc; padding: 1rem; border-radius: 6px; text-align: center;">
+    <div style="background: #f8fafc; padding: 1rem; border-radius: 6px; text-align: center; margin-top: 1rem;">
     <h5 style="color: #B91C2C; margin-bottom: 0.5rem;">Development Team</h5>
     <p style="margin: 0.2rem 0; font-size: 0.9rem;">Dr. Andrew Vance & Dr. Taylor Rodriguez-Vance</p>
     <p style="margin: 0.2rem 0; font-size: 0.8rem; color: #666;">Cyber Institute | New York, NY</p>
