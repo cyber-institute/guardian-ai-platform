@@ -331,10 +331,15 @@ def render_compact_cards(docs):
             
             doc_type = ultra_clean_metadata(doc.get('document_type', 'Unknown'))
             
-            # Generate realistic PDF page thumbnail
+            # Generate thumbnail - prioritize ingested PDF thumbnails
             doc_id = doc.get('id')
+            from utils.pdf_ingestion_thumbnails import get_ingested_thumbnail_html
             from utils.realistic_pdf_thumbnail import get_pdf_page_thumbnail_html
-            thumbnail_html = get_pdf_page_thumbnail_html(doc_id, title, content, doc_type, author_org)
+            
+            # Try ingested thumbnail first, fallback to realistic PDF page
+            thumbnail_html = get_ingested_thumbnail_html(doc_id)
+            if not thumbnail_html:
+                thumbnail_html = get_pdf_page_thumbnail_html(doc_id, title, content, doc_type, author_org)
             
             # Calculate comprehensive scores
             scores = comprehensive_document_scoring(content, str(title))

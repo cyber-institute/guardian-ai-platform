@@ -4,9 +4,16 @@ from utils.hf_ai_scoring import evaluate_quantum_maturity_hf
 import datetime
 
 def render_document_uploader():
-    """Render the document upload interface."""
+    """Render the document upload interface with PDF support and thumbnail extraction."""
     
     st.markdown("### 📄 Add New Document")
+    
+    # File upload option
+    uploaded_file = st.file_uploader(
+        "Upload PDF Document (Optional)",
+        type=['pdf'],
+        help="Upload a PDF file to automatically extract content and generate thumbnail"
+    )
     
     with st.form("document_upload_form"):
         col1, col2 = st.columns(2)
@@ -26,9 +33,14 @@ def render_document_uploader():
             )
             auto_analyze = st.checkbox("Auto-analyze with AI", value=True)
         
+        # Content input - auto-populate if PDF uploaded
+        content_placeholder = "Paste the full text content of your document here..."
+        if uploaded_file:
+            content_placeholder = "Content will be automatically extracted from uploaded PDF..."
+            
         content = st.text_area(
             "Document Content*",
-            placeholder="Paste the full text content of your document here...",
+            placeholder=content_placeholder,
             height=200
         )
         
@@ -40,19 +52,50 @@ def render_document_uploader():
         submitted = st.form_submit_button("Add Document", type="primary")
         
         if submitted:
-            if not title or not content:
-                st.error("Please provide both title and content.")
+            # Handle PDF upload with thumbnail extraction
+            pdf_content = None
+            pdf_thumbnail_extracted = False
+            
+            if uploaded_file:
+                with st.spinner("Processing PDF and extracting thumbnail..."):
+                    from utils.pdf_ingestion_thumbnails import process_uploaded_pdf_with_thumbnail
+                    import time
+                    
+                    # Generate temporary doc_id for processing
+                    temp_doc_id = int(time.time() * 1000) % 1000000
+                    
+                    pdf_result = process_uploaded_pdf_with_thumbnail(uploaded_file, temp_doc_id)
+                    
+                    if pdf_result['text_content']:
+                        pdf_content = pdf_result['text_content']
+                        pdf_thumbnail_extracted = pdf_result['thumbnail_data'] is not None
+                        
+                        if pdf_thumbnail_extracted:
+                            st.success("PDF processed successfully! Thumbnail extracted from first page.")
+                        else:
+                            st.warning("PDF processed but thumbnail extraction failed. Using fallback thumbnail.")
+                        
+                        # Auto-fill title if not provided
+                        if not title and 'filename' in pdf_result:
+                            title = pdf_result['filename'].replace('.pdf', '').replace('_', ' ').title()
+            
+            # Use PDF content if available, otherwise require manual content input
+            final_content = pdf_content if pdf_content else content
+            
+            if not title or not final_content:
+                st.error("Please provide both title and content (or upload a PDF file).")
                 return
             
             with st.spinner("Processing document..."):
                 # Prepare document data
                 document_data = {
                     'title': title,
-                    'content': summary if summary else content[:200] + "...",
-                    'text': content,
+                    'content': summary if summary else final_content[:200] + "...",
+                    'text': final_content,
                     'document_type': document_type,
                     'source': source,
-                    'quantum_q': 0  # Will be updated by AI analysis if enabled
+                    'quantum_q': 0,  # Will be updated by AI analysis if enabled
+                    'has_thumbnail': pdf_thumbnail_extracted
                 }
                 
                 # Perform AI analysis if requested
@@ -84,15 +127,15 @@ def render_document_uploader():
                     st.error(f"Database error: {e}")
 
 def render_bulk_upload():
-    """Render bulk document upload interface."""
+    """Render bulk document upload interface with PDF support."""
     
     st.markdown("### 📚 Bulk Document Upload")
     
     uploaded_files = st.file_uploader(
         "Upload multiple documents",
-        type=['txt', 'md', 'csv'],
+        type=['txt', 'md', 'csv', 'pdf'],
         accept_multiple_files=True,
-        help="Upload text files, markdown files, or CSV files containing document data"
+        help="Upload text files, markdown files, CSV files, or PDF documents with automatic thumbnail extraction"
     )
     
     if uploaded_files:
@@ -109,13 +152,27 @@ def render_bulk_upload():
                 status_text.text(f"Processing {uploaded_file.name}...")
                 
                 try:
-                    # Read file content
-                    content = uploaded_file.read().decode('utf-8')
+                    # Handle PDF files with thumbnail extraction
+                    if uploaded_file.name.lower().endswith('.pdf'):
+                        from utils.pdf_ingestion_thumbnails import process_uploaded_pdf_with_thumbnail
+                        import time
+                        
+                        # Generate doc_id for PDF processing
+                        doc_id = int(time.time() * 1000) % 1000000 + i
+                        
+                        pdf_result = process_uploaded_pdf_with_thumbnail(uploaded_file, doc_id)
+                        content = pdf_result['text_content']
+                        file_title = uploaded_file.name.replace('.pdf', '').replace('_', ' ').title()
+                        has_thumbnail = pdf_result['thumbnail_data'] is not None
+                        
+                    else:
+                        # Handle text files
+                        content = uploaded_file.read().decode('utf-8')
+                        file_title = uploaded_file.name.replace('.txt', '').replace('.md', '').replace('.csv', '')
+                        has_thumbnail = False
                     
                     # Detect document type intelligently
                     from utils.document_classifier import detect_document_type
-                    
-                    file_title = uploaded_file.name.replace('.txt', '').replace('.md', '').replace('.csv', '')
                     detected_type = detect_document_type(file_title, content)
                     
                     # Prepare document
@@ -125,7 +182,8 @@ def render_bulk_upload():
                         'text': content,
                         'document_type': detected_type,
                         'source': 'file_upload',
-                        'quantum_q': 0
+                        'quantum_q': 0,
+                        'has_thumbnail': has_thumbnail
                     }
                     
                     # AI analysis
