@@ -8,6 +8,7 @@ from utils.content_cleaner import clean_document_content
 from utils.clean_preview_generator import generate_clean_preview, extract_clean_metadata
 from utils.simple_updater import update_document_metadata
 from components.chatbot_widget import create_tooltip, render_help_tooltip
+from utils.thumbnail_generator import get_thumbnail_html
 
 def get_comprehensive_badge(score, framework):
     """Create badge for comprehensive scoring system with intelligent tooltips."""
@@ -311,22 +312,32 @@ def render_compact_cards(docs):
             
             doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
             
+            # Generate thumbnail
+            thumbnail_html = get_thumbnail_html(title, doc_type, author_org)
+            
             # Calculate comprehensive scores
             scores = comprehensive_document_scoring(content, str(title))
             
             st.markdown(f"""
                 <div style='border:1px solid #e0e0e0;padding:12px;border-radius:8px;margin:4px;
                 background:linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-                box-shadow:0 1px 3px rgba(0,0,0,0.1);height:220px;overflow:hidden'>
-                    <div style='font-weight:bold;font-size:13px;margin-bottom:4px'>{title[:35]}{'...' if len(title) > 35 else ''}</div>
-                    <div style='font-size:10px;color:#666;margin-bottom:6px'>{doc_type} • {author_org}</div>
-                    <div style='font-size:9px;line-height:1.3;margin-bottom:6px'>
-                        <div>AI Cybersecurity Maturity: {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity')}</div>
-                        <div>Quantum Cybersecurity Maturity: {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity')}</div>
-                        <div>AI Ethics: {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics')}</div>
-                        <div>Quantum Ethics: {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics')}</div>
+                box-shadow:0 1px 3px rgba(0,0,0,0.1);height:240px;overflow:hidden'>
+                    <div style='display:flex;align-items:flex-start;gap:8px;margin-bottom:6px'>
+                        <div style='flex-shrink:0'>
+                            {thumbnail_html.replace('width:40px;height:50px', 'width:30px;height:38px')}
+                        </div>
+                        <div style='flex:1;min-width:0'>
+                            <div style='font-weight:bold;font-size:12px;margin-bottom:4px;line-height:1.2'>{title[:32]}{'...' if len(title) > 32 else ''}</div>
+                            <div style='font-size:9px;color:#666;margin-bottom:6px'>{doc_type} • {author_org[:15]}{'...' if len(author_org) > 15 else ''}</div>
+                        </div>
                     </div>
-                    <div style='font-size:9px;color:#888'>{pub_date}</div>
+                    <div style='font-size:8px;line-height:1.3;margin-bottom:6px'>
+                        <div>AI Cyber: {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity')}</div>
+                        <div>Q Cyber: {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity')}</div>
+                        <div>AI Ethics: {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics')}</div>
+                        <div>Q Ethics: {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics')}</div>
+                    </div>
+                    <div style='font-size:8px;color:#888'>{pub_date}</div>
                 </div>
             """, unsafe_allow_html=True)
 
@@ -482,16 +493,24 @@ def render_card_view(docs):
             doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
             content_preview = doc.get('content_preview', 'No preview available') or 'No preview available'
             
-            # Display metadata card (no scoring involved)
+            # Generate thumbnail
+            thumbnail_html = get_thumbnail_html(title, doc_type, author_org)
+            
+            # Display metadata card with thumbnail
             st.markdown(f"""
                 <div style='border:1px solid #ddd;padding:16px;border-radius:12px;margin:8px;
                 background:white;box-shadow:0 4px 6px rgba(0,0,0,0.1);
                 transition:transform 0.2s ease;border-left:5px solid #3B82F6'>
-                    <h3 style='margin:0 0 8px 0;color:#333'>{title}</h3>
+                    <div style='display:flex;align-items:flex-start;gap:12px;margin-bottom:8px'>
+                        {thumbnail_html}
+                        <div style='flex:1'>
+                            <h3 style='margin:0 0 8px 0;color:#333'>{title}</h3>
+                        </div>
+                    </div>
                     <div style='margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap'>
                         <span style='background:#f0f0f0;padding:2px 8px;border-radius:12px;font-size:12px'>{doc_type}</span>
                         <span style='background:#e0f2fe;padding:2px 8px;border-radius:12px;font-size:12px;color:#0277bd'>{author_org}</span>
-                        {f"<span style='background:#f3e5f5;padding:2px 8px;border-radius:12px;font-size:12px;color:#7b1fa2'>{pub_date}</span>" if pub_date and pub_date != 'Unknown' else ""}
+                        {f"<span style='background:#f3e5f5;padding:2px 8px;border-radius:12px;font-size:12px;color:#7b1fa2'>{pub_date}</span>" if pub_date and pub_date != 'Date not available' else ""}
                     </div>
                 </div>
             """, unsafe_allow_html=True)
