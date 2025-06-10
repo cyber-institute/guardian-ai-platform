@@ -14,27 +14,21 @@ import base64
 def render():
     """Render the interactive patent web application."""
     
-    # Patent header
+    # Updated patent header with technical narrative
     st.markdown("""
-    <div style="
-        background: linear-gradient(135deg, #1e3a8a 0%, #312e81 50%, #1e40af 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 12px;
-        margin-bottom: 2rem;
-        text-align: center;
-        box-shadow: 0 8px 32px rgba(30, 58, 138, 0.15);
-    ">
-        <h1 style="margin: 0 0 0.5rem 0; font-size: 2.2rem; font-weight: 600;">
-            📋 GUARDIAN Patent Application
-        </h1>
-        <h2 style="margin: 0 0 1rem 0; font-size: 1.4rem; font-weight: 400; opacity: 0.9;">
-            System for Real-Time Dynamic Governance of Emerging Technologies
-        </h2>
-        <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 1rem;">
-            <div><strong>Inventors:</strong> Andrew Vance, PhD & Taylor Rodriguez Vance, PhD</div>
-            <div><strong>Assignee:</strong> Cyber Institute</div>
-        </div>
+    <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #B91C2C;">
+        <h2 style="color: #B91C2C; margin-bottom: 0.8rem; font-size: 1.6rem;">GUARDIAN's Patent Pending Technologies</h2>
+        <p style="font-size: 1rem; line-height: 1.6; color: #374151; margin-bottom: 1rem;">
+            GUARDIAN represents a cloud-based AI LLM-driven emerging technology governance platform that integrates multiple cutting-edge technologies. 
+            The system leverages Hugging Face transformers and OpenAI GPT models for intelligent document analysis, running on AWS infrastructure 
+            with RDS PostgreSQL for repository management and EC2 Ubuntu instances for backend processing.
+        </p>
+        <p style="font-size: 0.9rem; line-height: 1.5; color: #4b5563; margin: 0;">
+            <strong>Technology Stack:</strong> Python backend with Streamlit web UI, Google Dialogflow CX chatbot integration, 
+            patent-pending scoring engines utilizing Anthropic Claude, OpenAI GPT-4, pandas for data processing, 
+            matplotlib/plotly for visualizations, SQLAlchemy for database operations, and trafilatura for web scraping. 
+            The platform implements real-time dynamic governance through four proprietary assessment frameworks.
+        </p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -69,57 +63,78 @@ def render():
 def render_system_overview():
     """Render the system overview section."""
     
+    # Compact overview section
     st.markdown("""
-    ### System Architecture Overview
+    <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
+    <h4 style="color: #B91C2C; margin-bottom: 0.5rem;">System Architecture Overview</h4>
+    <p style="font-size: 0.95rem; line-height: 1.5; color: #374151; margin: 0;">
+    Cloud-native, real-time governance platform implementing patented algorithms for emerging technology risk assessment and compliance monitoring.
+    </p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    **GUARDIAN** (Governance Using AI for Risk Detection, Integration, Analysis, and Notification) is a cloud-native, 
-    real-time governance platform for emerging technology risk and compliance.
-    """)
-    
-    col1, col2 = st.columns(2)
+    # Three-column layout for patent components
+    col1, col2, col3 = st.columns(3)
     
     with col1:
         st.markdown("""
-        #### Core Components (Patent FIG. 1)
-        
-        **1. Conversational AI Interface (104)**
-        - Multilingual natural language processing
-        - Web portals, APIs, and mobile access
-        - Real-time user interaction capability
-        
-        **2. NLP Components (106)**
-        - Intent detection and named entity recognition
-        - Sentiment classification and entity extraction
-        - Query interpretation pipeline
-        
-        **3. Policy Repository (108)**
-        - UN, NIST, OECD framework integration
-        - Quantum encryption and ethics policies
-        - Vectorized similarity engine for cross-comparison
-        """)
+        <div style="background: #fef2f2; padding: 1rem; border-radius: 6px; height: 320px;">
+        <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Interface Layer</h5>
+        <div style="font-size: 0.85rem; line-height: 1.4;">
+        <strong>Conversational AI (104)</strong><br>
+        Multilingual NLP, web portals, mobile access<br><br>
+        <strong>NLP Components (106)</strong><br>
+        Intent detection, entity recognition, sentiment analysis<br><br>
+        <strong>Query Pipeline</strong><br>
+        Real-time interpretation and routing
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col2:
         st.markdown("""
-        #### AI/ML Decision Layer (110)
+        <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; height: 320px;">
+        <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Processing Core</h5>
+        <div style="font-size: 0.85rem; line-height: 1.4;">
+        <strong>Scoring Engines (112)</strong><br>
+        Cybersecurity risk, ethics alignment assessment<br><br>
+        <strong>AI/ML Decision Layer (110)</strong><br>
+        Dual-modality risk framework, pattern recognition<br><br>
+        <strong>Adaptive Learning</strong><br>
+        Semantic drift detection, Q-learning optimization
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
         
-        **4. Scoring Engines (112)**
-        - Cybersecurity risk evaluation
-        - Ethics alignment assessment
-        - Dual-modality risk framework
-        
-        **5. Summary Module (114)**
-        - Policy synthesis and harmonization
-        - Recommendation generation
-        - Real-time feedback integration
-        
-        **6. Adaptive Learning**
-        - Semantic drift detection
-        - Reinforcement learning (Q-learning)
-        - Model retraining triggers
-        """)
+    with col3:
+        st.markdown("""
+        <div style="background: #f0fdf4; padding: 1rem; border-radius: 6px; height: 320px;">
+        <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Repository & Output</h5>
+        <div style="font-size: 0.85rem; line-height: 1.4;">
+        <strong>Policy Repository (108)</strong><br>
+        UN, NIST, OECD frameworks, quantum policies<br><br>
+        <strong>Summary Module (114)</strong><br>
+        Policy synthesis, recommendation generation<br><br>
+        <strong>Vectorized Engine</strong><br>
+        Cross-comparison, similarity matching
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
     
-    # Interactive architecture diagram
-    st.markdown("#### Interactive System Flow")
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Patent claims summary
+    st.markdown("""
+    <div style="background: #fffbeb; padding: 1rem; border-radius: 6px;">
+    <h5 style="color: #B91C2C; margin-bottom: 0.8rem; text-align: center;">Key Patent Claims</h5>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
+        <div><strong>Real-Time Processing:</strong> Dynamic policy evaluation with sub-second response times</div>
+        <div><strong>Multi-Modal Assessment:</strong> Simultaneous cybersecurity and ethics scoring</div>
+        <div><strong>Adaptive Learning:</strong> Self-improving algorithms with reinforcement learning</div>
+        <div><strong>Cross-Framework Analysis:</strong> Harmonization across international standards</div>
+    </div>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Create a flow diagram using plotly
     fig, ax = plt.subplots(figsize=(12, 3), facecolor='white')
@@ -604,72 +619,114 @@ def render_claims():
 def render_innovation_summary():
     """Innovation summary and commercial applications."""
     
+    # Compact innovation overview
     st.markdown("""
-    ### Innovation Summary & Commercial Applications
+    <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
+    <h4 style="color: #B91C2C; margin-bottom: 0.5rem;">Innovation Summary & Commercial Applications</h4>
+    <p style="font-size: 0.95rem; line-height: 1.5; color: #374151; margin: 0;">
+    Patent-pending technologies addressing the $2.8B AI governance market through cloud-native, real-time compliance solutions.
+    </p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    #### Key Technical Innovations
-    """)
+    # Four-column layout for key innovations
+    col1, col2, col3, col4 = st.columns(4)
     
-    innovations = [
-        {
-            "title": "Real-Time Governance Platform",
-            "description": "First cloud-native system providing real-time AI governance through conversational interface",
-            "market_impact": "Addresses $2.8B AI governance market with scalable, accessible solution"
-        },
-        {
-            "title": "Dual-Modality Risk Assessment", 
-            "description": "Simultaneous evaluation of cybersecurity and ethics risks with mathematical foundations",
-            "market_impact": "Reduces compliance costs by 60% through automated assessment"
-        },
-        {
-            "title": "Semantic Drift Detection",
-            "description": "Automatic model retraining based on performance degradation detection",
-            "market_impact": "Maintains 95%+ accuracy in dynamic regulatory environments"
-        },
-        {
-            "title": "Transnational Harmonization",
-            "description": "Cross-jurisdictional policy comparison and alignment capabilities",
-            "market_impact": "Enables global deployment for multinational organizations"
-        }
-    ]
-    
-    for innovation in innovations:
-        st.markdown(f"""
-        <div style='background: #f8fafc; padding: 1.5rem; border-radius: 8px; margin: 1rem 0; border-left: 4px solid #3B82F6;'>
-            <h4 style='color: #1e40af; margin: 0 0 0.5rem 0;'>{innovation['title']}</h4>
-            <p style='margin: 0 0 0.5rem 0; color: #374151;'><strong>Innovation:</strong> {innovation['description']}</p>
-            <p style='margin: 0; color: #6B7280;'><strong>Market Impact:</strong> {innovation['market_impact']}</p>
+    with col1:
+        st.markdown("""
+        <div style="background: #fef2f2; padding: 1rem; border-radius: 6px; height: 200px;">
+        <h6 style="color: #B91C2C; margin-bottom: 0.5rem;">Real-Time Platform</h6>
+        <div style="font-size: 0.8rem; line-height: 1.3;">
+        First cloud-native system for real-time AI governance through conversational interface<br><br>
+        <strong>Impact:</strong> Scalable solution for $2.8B market
+        </div>
         </div>
         """, unsafe_allow_html=True)
     
-    # Commercial applications
+    with col2:
+        st.markdown("""
+        <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; height: 200px;">
+        <h6 style="color: #B91C2C; margin-bottom: 0.5rem;">Dual-Modality Assessment</h6>
+        <div style="font-size: 0.8rem; line-height: 1.3;">
+        Simultaneous cybersecurity and ethics risk evaluation with mathematical foundations<br><br>
+        <strong>Impact:</strong> 60% compliance cost reduction
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with col3:
+        st.markdown("""
+        <div style="background: #f0fdf4; padding: 1rem; border-radius: 6px; height: 200px;">
+        <h6 style="color: #B91C2C; margin-bottom: 0.5rem;">Semantic Drift Detection</h6>
+        <div style="font-size: 0.8rem; line-height: 1.3;">
+        Automatic model retraining based on performance degradation detection<br><br>
+        <strong>Impact:</strong> Maintains 95%+ accuracy
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with col4:
+        st.markdown("""
+        <div style="background: #fffbeb; padding: 1rem; border-radius: 6px; height: 200px;">
+        <h6 style="color: #B91C2C; margin-bottom: 0.5rem;">Global Harmonization</h6>
+        <div style="font-size: 0.8rem; line-height: 1.3;">
+        Cross-jurisdictional policy comparison and alignment capabilities<br><br>
+        <strong>Impact:</strong> Global multinational deployment
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Commercial applications in three columns
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("""
+        <div style="background: #f9fafb; padding: 1rem; border-radius: 6px; height: 180px;">
+        <h6 style="color: #B91C2C; margin-bottom: 0.8rem;">Government Sector</h6>
+        <div style="font-size: 0.85rem; line-height: 1.4;">
+        • Federal agency AI compliance monitoring<br>
+        • Regulatory framework development<br>
+        • Cross-agency policy harmonization<br>
+        • Policy simulation and testing
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; height: 180px;">
+        <h6 style="color: #B91C2C; margin-bottom: 0.8rem;">Enterprise Sector</h6>
+        <div style="font-size: 0.85rem; line-height: 1.4;">
+        • Corporate AI governance and risk management<br>
+        • Regulatory compliance automation<br>
+        • Due diligence for AI acquisitions<br>
+        • Multi-jurisdictional compliance
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with col3:
+        st.markdown("""
+        <div style="background: #f0fdf4; padding: 1rem; border-radius: 6px; height: 180px;">
+        <h6 style="color: #B91C2C; margin-bottom: 0.8rem;">Research & Education</h6>
+        <div style="font-size: 0.85rem; line-height: 1.4;">
+        • Academic policy analysis and research<br>
+        • Educational governance training tools<br>
+        • Policy stress testing environments<br>
+        • Comparative framework studies
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Patent strategy summary
     st.markdown("""
-    #### Commercial Applications
-    
-    **Government Sector:**
-    - Federal agency AI compliance monitoring
-    - Regulatory framework development and testing
-    - Cross-agency policy harmonization
-    
-    **Enterprise Sector:**
-    - Corporate AI governance and risk management
-    - Regulatory compliance automation
-    - Due diligence for AI acquisitions
-    
-    **Research & Education:**
-    - Academic policy analysis and research
-    - Educational tools for governance training
-    - Policy simulation and stress testing
-    """)
-    
-    # Patent portfolio strategy
-    st.markdown("""
-    #### Patent Portfolio Strategy
-    
-    This patent builds upon and extends two parent applications while introducing novel elements:
-    
-    - **Continuation-in-part strategy** protects core innovations while expanding scope
-    - **Mathematical formulations** provide strong technical foundation for claims
-    - **Cross-reference structure** creates comprehensive IP protection
-    - **Emerging technology focus** ensures relevance for quantum and AI governance markets
-    """)
+    <div style="background: #f8fafc; padding: 1rem; border-radius: 6px; text-align: center;">
+    <h6 style="color: #B91C2C; margin-bottom: 0.5rem;">Patent Portfolio Strategy</h6>
+    <p style="margin: 0.2rem 0; font-size: 0.85rem;">Continuation-in-part strategy with mathematical formulations for strong technical claims</p>
+    <p style="margin: 0.2rem 0; font-size: 0.85rem;">Cross-reference structure creating comprehensive IP protection for emerging technology governance</p>
+    </div>
+    """, unsafe_allow_html=True)
