@@ -115,8 +115,9 @@ def extract_organization(content: str) -> str:
         if re.search(pattern, content[:3000]):  # Check first 3000 chars
             return 'NIST'
     
-    # Government agencies and organizations with enhanced patterns
+    # Comprehensive organization patterns - government, academic, industry, standards
     org_patterns = [
+        # Government agencies
         (r'(?i)\b(National Security Agency|NSA)\b', 'NSA'),
         (r'(?i)\b(Department of Defense|DoD|DOD)\b', 'Department of Defense'),
         (r'(?i)\b(Department of Homeland Security|DHS)\b', 'DHS'),
@@ -125,17 +126,61 @@ def extract_organization(content: str) -> str:
         (r'(?i)\b(Federal Bureau of Investigation|FBI)\b', 'FBI'),
         (r'(?i)\b(Central Intelligence Agency|CIA)\b', 'CIA'),
         (r'(?i)\b(White House|Executive Office)\b', 'White House'),
+        (r'(?i)\b(Government Accountability Office|GAO)\b', 'GAO'),
+        
+        # International organizations
         (r'(?i)\b(European Union|EU|European Commission)\b', 'European Union'),
+        (r'(?i)\b(United Nations|UN)\b', 'United Nations'),
+        (r'(?i)\b(World Bank)\b', 'World Bank'),
+        (r'(?i)\b(International Monetary Fund|IMF)\b', 'IMF'),
+        
+        # Standards bodies
         (r'(?i)\b(International Organization for Standardization|ISO)\b', 'ISO'),
         (r'(?i)\b(Institute of Electrical and Electronics Engineers|IEEE)\b', 'IEEE'),
         (r'(?i)\b(Internet Engineering Task Force|IETF)\b', 'IETF'),
         (r'(?i)\b(World Wide Web Consortium|W3C)\b', 'W3C'),
+        (r'(?i)\b(Object Management Group|OMG)\b', 'OMG'),
+        (r'(?i)\b(International Telecommunication Union|ITU)\b', 'ITU'),
+        
+        # Research institutions & think tanks
         (r'(?i)\b(MITRE Corporation|MITRE)\b', 'MITRE'),
         (r'(?i)\b(RAND Corporation|RAND)\b', 'RAND'),
-        (r'(?i)\b(Carnegie Mellon University|CMU)\b', 'Carnegie Mellon'),
+        (r'(?i)\b(Brookings Institution|Brookings)\b', 'Brookings Institution'),
+        (r'(?i)\b(Center for Strategic and International Studies|CSIS)\b', 'CSIS'),
+        (r'(?i)\b(Atlantic Council)\b', 'Atlantic Council'),
+        (r'(?i)\b(Pew Research)\b', 'Pew Research'),
+        
+        # Major universities
         (r'(?i)\b(Massachusetts Institute of Technology|MIT)\b', 'MIT'),
         (r'(?i)\b(Stanford University)\b', 'Stanford University'),
-        (r'(?i)\b(University of [A-Z][a-z]+)\b', None),  # Will use matched text
+        (r'(?i)\b(Harvard University|Harvard)\b', 'Harvard University'),
+        (r'(?i)\b(Carnegie Mellon University|CMU)\b', 'Carnegie Mellon'),
+        (r'(?i)\b(University of California[,\s]+(Berkeley|UCLA|San Diego|Davis))\b', None),
+        (r'(?i)\b(Georgia Institute of Technology|Georgia Tech)\b', 'Georgia Tech'),
+        (r'(?i)\b(Princeton University|Princeton)\b', 'Princeton University'),
+        (r'(?i)\b(Yale University|Yale)\b', 'Yale University'),
+        (r'(?i)\b(University of [A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b', None),
+        
+        # Tech companies
+        (r'(?i)\b(Microsoft Corporation|Microsoft)\b', 'Microsoft'),
+        (r'(?i)\b(Google LLC|Google Inc|Google)\b', 'Google'),
+        (r'(?i)\b(Amazon Web Services|AWS|Amazon)\b', 'Amazon'),
+        (r'(?i)\b(International Business Machines|IBM)\b', 'IBM'),
+        (r'(?i)\b(Apple Inc|Apple)\b', 'Apple'),
+        (r'(?i)\b(Meta Platforms|Facebook|Meta)\b', 'Meta'),
+        (r'(?i)\b(Tesla Inc|Tesla)\b', 'Tesla'),
+        (r'(?i)\b(NVIDIA Corporation|NVIDIA)\b', 'NVIDIA'),
+        (r'(?i)\b(Intel Corporation|Intel)\b', 'Intel'),
+        (r'(?i)\b(Cisco Systems|Cisco)\b', 'Cisco'),
+        
+        # Consulting firms
+        (r'(?i)\b(McKinsey & Company|McKinsey)\b', 'McKinsey'),
+        (r'(?i)\b(Boston Consulting Group|BCG)\b', 'BCG'),
+        (r'(?i)\b(Deloitte)\b', 'Deloitte'),
+        (r'(?i)\b(PricewaterhouseCoopers|PwC)\b', 'PwC'),
+        (r'(?i)\b(Ernst & Young|EY)\b', 'EY'),
+        (r'(?i)\b(KPMG)\b', 'KPMG'),
+        (r'(?i)\b(Accenture)\b', 'Accenture'),
     ]
     
     # Check first 2000 characters for organization mentions
@@ -148,43 +193,153 @@ def extract_organization(content: str) -> str:
     
     # Look for "prepared by", "published by", "author" patterns
     author_patterns = [
-        r'(?i)(?:prepared|published|authored|developed)\s+by:?\s*([^.\n]{5,50})',
-        r'(?i)author[s]?:?\s*([^.\n]{5,50})',
-        r'(?i)organization:?\s*([^.\n]{5,50})',
+        r'(?i)(?:prepared|published|authored|developed)\s+by:?\s*([^.\n]{5,80})',
+        r'(?i)author[s]?:?\s*([^.\n]{5,80})',
+        r'(?i)organization:?\s*([^.\n]{5,80})',
+        r'(?i)affiliation:?\s*([^.\n]{5,80})',
+        r'(?i)institution:?\s*([^.\n]{5,80})',
+        r'(?i)company:?\s*([^.\n]{5,80})',
     ]
     
     for pattern in author_patterns:
         match = re.search(pattern, search_text)
         if match:
-            return clean_organization_name(match.group(1))
+            org_name = clean_organization_name(match.group(1))
+            if org_name != 'Unknown':
+                return org_name
+    
+    # Look for email domains to infer organizations
+    email_patterns = [
+        r'@([a-zA-Z0-9.-]+\.(edu|gov|org|com))',
+        r'([a-zA-Z0-9.-]+\.(edu|gov|org))',  # Educational and government domains
+    ]
+    
+    for pattern in email_patterns:
+        matches = re.findall(pattern, search_text)
+        for match in matches:
+            domain = match[0] if isinstance(match, tuple) else match
+            org_from_domain = extract_org_from_domain(domain)
+            if org_from_domain:
+                return org_from_domain
+    
+    # Look for copyright and footer information
+    footer_patterns = [
+        r'(?i)©\s*\d{4}\s+([^.\n]{5,50})',
+        r'(?i)copyright\s+\d{4}\s+([^.\n]{5,50})',
+        r'(?i)all\s+rights\s+reserved[.,]\s*([^.\n]{5,50})',
+    ]
+    
+    # Check both header and footer for copyright info
+    full_search = content[:1500] + content[-1000:] if len(content) > 1500 else content
+    
+    for pattern in footer_patterns:
+        match = re.search(pattern, full_search)
+        if match:
+            org_name = clean_organization_name(match.group(1))
+            if org_name != 'Unknown':
+                return org_name
     
     return 'Unknown'
 
-def extract_date(content: str) -> Optional[str]:
-    """Extract publication date using pattern matching."""
+def extract_org_from_domain(domain: str) -> Optional[str]:
+    """Extract organization name from email domain."""
+    domain = domain.lower()
     
-    # Date patterns in order of preference
-    date_patterns = [
-        r'(?i)(?:published|publication date|date):?\s*([A-Za-z]+ \d{1,2},? \d{4})',
-        r'(?i)(?:published|publication date|date):?\s*(\d{1,2}/\d{1,2}/\d{4})',
-        r'(?i)(?:published|publication date|date):?\s*(\d{4}-\d{2}-\d{2})',
-        r'(?i)(?:published|publication date|date):?\s*([A-Za-z]+ \d{4})',
-        r'(?i)(?:revision|version):?\s*([A-Za-z]+ \d{4})',
-        r'\b(\d{4}-\d{2}-\d{2})\b',  # ISO date format
-        r'\b([A-Za-z]+ \d{1,2}, \d{4})\b',  # Month day, year
-        r'\b([A-Za-z]+ \d{4})\b',  # Month year
-    ]
+    # Known domain mappings
+    domain_mappings = {
+        'nist.gov': 'NIST',
+        'mit.edu': 'MIT',
+        'stanford.edu': 'Stanford University', 
+        'harvard.edu': 'Harvard University',
+        'cmu.edu': 'Carnegie Mellon',
+        'berkeley.edu': 'UC Berkeley',
+        'ucla.edu': 'UCLA',
+        'microsoft.com': 'Microsoft',
+        'google.com': 'Google',
+        'ibm.com': 'IBM',
+        'amazon.com': 'Amazon',
+        'apple.com': 'Apple',
+        'cisco.com': 'Cisco',
+        'intel.com': 'Intel',
+        'nvidia.com': 'NVIDIA',
+        'mitre.org': 'MITRE',
+        'rand.org': 'RAND Corporation',
+        'ieee.org': 'IEEE',
+    }
     
-    search_text = content[:1500]  # Focus on document header
+    if domain in domain_mappings:
+        return domain_mappings[domain]
     
-    for pattern in date_patterns:
-        matches = re.findall(pattern, search_text)
-        for match in matches:
-            normalized_date = normalize_date(match)
-            if normalized_date:
-                return normalized_date
+    # Extract organization from domain structure
+    if domain.endswith('.edu'):
+        # University domain
+        parts = domain.split('.')
+        if len(parts) >= 2:
+            university_name = parts[0].replace('-', ' ').title()
+            return f"{university_name} University"
+    
+    elif domain.endswith('.gov'):
+        # Government domain
+        parts = domain.split('.')
+        if len(parts) >= 2:
+            return parts[0].upper()
     
     return None
+
+def extract_date(content: str) -> Optional[str]:
+    """Extract publication date using comprehensive pattern matching."""
+    
+    # Enhanced date patterns for various document formats
+    date_patterns = [
+        # Explicit date labels
+        r'(?i)(?:published|publication\s+date|date\s+published|issued|release\s+date):?\s*([A-Za-z]+ \d{1,2},? \d{4})',
+        r'(?i)(?:published|publication\s+date|date\s+published|issued|release\s+date):?\s*(\d{1,2}/\d{1,2}/\d{4})',
+        r'(?i)(?:published|publication\s+date|date\s+published|issued|release\s+date):?\s*(\d{4}-\d{2}-\d{2})',
+        r'(?i)(?:published|publication\s+date|date\s+published|issued|release\s+date):?\s*([A-Za-z]+ \d{4})',
+        r'(?i)(?:updated|revised|modified|version):?\s*([A-Za-z]+ \d{1,2},? \d{4})',
+        r'(?i)(?:updated|revised|modified|version):?\s*(\d{4}-\d{2}-\d{2})',
+        r'(?i)(?:updated|revised|modified|version):?\s*([A-Za-z]+ \d{4})',
+        
+        # Document metadata patterns
+        r'(?i)(?:copyright|©)\s*(\d{4})',
+        r'(?i)(?:final|draft|version).*?(\d{4})',
+        r'(?i)(?:sp|special\s+publication).*?(\d{4})',  # NIST SP format
+        
+        # Common date formats in document headers
+        r'\b(\d{1,2}\s+[A-Za-z]+\s+\d{4})\b',  # 15 March 2024
+        r'\b([A-Za-z]+\s+\d{1,2},?\s+\d{4})\b',  # March 15, 2024
+        r'\b(\d{4}-\d{2}-\d{2})\b',  # 2024-03-15
+        r'\b(\d{2}/\d{2}/\d{4})\b',  # 03/15/2024
+        r'\b(\d{1,2}/\d{1,2}/\d{4})\b',  # 3/15/2024
+        r'\b([A-Za-z]+\s+\d{4})\b',  # March 2024
+        
+        # Year-only patterns as last resort
+        r'(?i)(?:published|issued|released).*?(\d{4})',
+        r'\b(20[12]\d)\b',  # Years 2010-2029
+    ]
+    
+    # Search both header and footer areas where dates are commonly found
+    header_text = content[:2000]
+    footer_text = content[-1000:] if len(content) > 1000 else content
+    search_areas = [header_text, footer_text]
+    
+    for search_text in search_areas:
+        for pattern in date_patterns:
+            matches = re.findall(pattern, search_text)
+            for match in matches:
+                normalized_date = normalize_date(match)
+                if normalized_date and is_valid_year(normalized_date):
+                    return normalized_date
+    
+    return None
+
+def is_valid_year(date_str: str) -> bool:
+    """Check if extracted date contains a reasonable year."""
+    year_match = re.search(r'(20[0-2]\d)', date_str)
+    if year_match:
+        year = int(year_match.group(1))
+        return 2000 <= year <= 2030  # Reasonable range for documents
+    return False
 
 def classify_document_type(content: str, filename: str = "") -> str:
     """Classify document type based on content analysis."""
