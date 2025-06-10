@@ -2,7 +2,7 @@ import streamlit as st
 from utils.db import fetch_documents
 from utils.hf_ai_scoring import evaluate_quantum_maturity_hf
 from utils.comprehensive_scoring import comprehensive_document_scoring, format_score_display, get_score_badge_color
-from utils.document_analyzer import analyze_document_metadata, extract_document_summary
+from utils.document_metadata_extractor import extract_document_metadata
 
 def get_comprehensive_badge(score, framework):
     """Create badge for comprehensive scoring system."""
@@ -206,28 +206,36 @@ def render_compact_cards(docs):
     cols = st.columns(3)
     for i, doc in enumerate(docs):
         with cols[i % 3]:
-            title = doc.get('title', 'Untitled Document')
-            doc_type = doc.get('document_type', 'Unknown')
             content = doc.get('content', '') or doc.get('text_content', '')
             
+            # Get or generate intelligent metadata
+            if not doc.get('analyzed_metadata'):
+                metadata = extract_document_metadata(content, doc.get('title', ''))
+                doc['analyzed_metadata'] = metadata
+            else:
+                metadata = doc['analyzed_metadata']
+            
+            title = metadata.get('title', 'Untitled Document') or 'Untitled Document'
+            author_org = metadata.get('author_organization', 'Unknown') or 'Unknown'
+            pub_date = metadata.get('publish_date') or 'No date'
+            doc_type = metadata.get('document_type', 'Unknown') or 'Unknown'
+            
             # Calculate comprehensive scores
-            scores = comprehensive_document_scoring(content, title)
+            scores = comprehensive_document_scoring(content, str(title))
             
             st.markdown(f"""
                 <div style='border:1px solid #e0e0e0;padding:12px;border-radius:8px;margin:4px;
                 background:linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-                box-shadow:0 1px 3px rgba(0,0,0,0.1);height:200px;overflow:hidden'>
-                    <div style='font-weight:bold;font-size:14px;margin-bottom:6px'>{title[:30]}{'...' if len(title) > 30 else ''}</div>
-                    <div style='font-size:11px;color:#666;margin-bottom:8px'>{doc_type}</div>
-                    <div style='font-size:10px;line-height:1.3;margin-bottom:8px'>
-                        <div><strong>AI Cyber:</strong> {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity')}</div>
-                        <div><strong>Q Cyber:</strong> {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity')}</div>
-                        <div><strong>AI Ethics:</strong> {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics')}</div>
-                        <div><strong>Q Ethics:</strong> {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics')}</div>
+                box-shadow:0 1px 3px rgba(0,0,0,0.1);height:220px;overflow:hidden'>
+                    <div style='font-weight:bold;font-size:13px;margin-bottom:4px'>{title[:35]}{'...' if len(title) > 35 else ''}</div>
+                    <div style='font-size:10px;color:#666;margin-bottom:6px'>{doc_type} • {author_org}</div>
+                    <div style='font-size:9px;line-height:1.3;margin-bottom:6px'>
+                        <div>AI Cyber: {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity')}</div>
+                        <div>Q Cyber: {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity')}</div>
+                        <div>AI Ethics: {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics')}</div>
+                        <div>Q Ethics: {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics')}</div>
                     </div>
-                    <div style='font-size:10px;color:#888'>
-                        {str(doc.get('created_at', ''))[:10] if doc.get('created_at') else 'No date'}
-                    </div>
+                    <div style='font-size:9px;color:#888'>{pub_date}</div>
                 </div>
             """, unsafe_allow_html=True)
 
@@ -236,25 +244,37 @@ def render_grid_view(docs):
     cols = st.columns(2)
     for i, doc in enumerate(docs):
         with cols[i % 2]:
-            title = doc.get('title', 'Untitled Document')
             content = doc.get('content', '') or doc.get('text_content', '')
-            content_preview = content[:100]
+            
+            # Get or generate intelligent metadata
+            if not doc.get('analyzed_metadata'):
+                metadata = extract_document_metadata(content, doc.get('title', ''))
+                doc['analyzed_metadata'] = metadata
+            else:
+                metadata = doc['analyzed_metadata']
+            
+            title = metadata.get('title', 'Untitled Document') or 'Untitled Document'
+            author_org = metadata.get('author_organization', 'Unknown') or 'Unknown'
+            pub_date = metadata.get('publish_date') or 'No date'
+            doc_type = metadata.get('document_type', 'Unknown') or 'Unknown'
+            content_preview = metadata.get('content_preview', 'No preview available') or 'No preview available'
             
             # Calculate comprehensive scores
-            scores = comprehensive_document_scoring(content, title)
+            scores = comprehensive_document_scoring(content, str(title))
             
             st.markdown(f"""
                 <div style='border:2px solid #f0f0f0;padding:12px;border-radius:8px;margin:6px;
                 background:white;box-shadow:0 2px 4px rgba(0,0,0,0.08);
                 border-left:4px solid #3B82F6'>
-                    <h4 style='margin:0 0 8px 0;font-size:16px'>{title[:35]}{'...' if len(title) > 35 else ''}</h4>
-                    <div style='display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px;font-size:11px'>
+                    <h4 style='margin:0 0 6px 0;font-size:15px'>{title[:40]}{'...' if len(title) > 40 else ''}</h4>
+                    <div style='font-size:10px;color:#666;margin-bottom:8px'>{doc_type} • {author_org} • {pub_date}</div>
+                    <div style='display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px;font-size:10px'>
                         <div>AI Cyber: {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity')}</div>
                         <div>Q Cyber: {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity')}</div>
                         <div>AI Ethics: {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics')}</div>
                         <div>Q Ethics: {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics')}</div>
                     </div>
-                    <p style='font-size:12px;color:#666;margin:0'>{content_preview}{'...' if len(content_preview) >= 100 else ''}</p>
+                    <p style='font-size:11px;color:#666;margin:0'>{content_preview[:120]}{'...' if len(content_preview) > 120 else ''}</p>
                 </div>
             """, unsafe_allow_html=True)
 
@@ -265,16 +285,30 @@ def render_table_view(docs):
     table_data = []
     for doc in docs:
         content = doc.get('content', '') or doc.get('text_content', '')
-        scores = comprehensive_document_scoring(content, doc.get('title', 'Untitled'))
+        
+        # Get or generate intelligent metadata
+        if not doc.get('analyzed_metadata'):
+            metadata = extract_document_metadata(content, doc.get('title', ''))
+            doc['analyzed_metadata'] = metadata
+        else:
+            metadata = doc['analyzed_metadata']
+        
+        title = metadata.get('title', 'Untitled Document') or 'Untitled Document'
+        author_org = metadata.get('author_organization', 'Unknown') or 'Unknown'
+        pub_date = metadata.get('publish_date') or 'N/A'
+        doc_type = metadata.get('document_type', 'Unknown') or 'Unknown'
+        
+        scores = comprehensive_document_scoring(content, str(title))
         
         table_data.append({
-            'Title': doc.get('title', 'Untitled')[:40],
-            'Type': doc.get('document_type', 'Unknown'),
+            'Title': title[:45],
+            'Author/Org': author_org[:25],
+            'Type': doc_type,
             'AI Cyber': format_score_display(scores['ai_cybersecurity'], 'ai_cybersecurity'),
             'Q Cyber': format_score_display(scores['quantum_cybersecurity'], 'quantum_cybersecurity'),
             'AI Ethics': format_score_display(scores['ai_ethics'], 'ai_ethics'),
             'Q Ethics': format_score_display(scores['quantum_ethics'], 'quantum_ethics'),
-            'Date': str(doc.get('created_at', ''))[:10] if doc.get('created_at') else 'N/A'
+            'Date': pub_date
         })
     
     df = pd.DataFrame(table_data)
@@ -283,17 +317,28 @@ def render_table_view(docs):
 def render_minimal_list(docs):
     """Render documents in minimal list format."""
     for idx, doc in enumerate(docs):
-        title = doc.get('title', 'Untitled Document')
-        doc_type = doc.get('document_type', 'Unknown')
         content = doc.get('content', '') or doc.get('text_content', '')
         
+        # Get or generate intelligent metadata
+        if not doc.get('analyzed_metadata'):
+            metadata = extract_document_metadata(content, doc.get('title', ''))
+            doc['analyzed_metadata'] = metadata
+        else:
+            metadata = doc['analyzed_metadata']
+        
+        title = metadata.get('title', 'Untitled Document') or 'Untitled Document'
+        author_org = metadata.get('author_organization', 'Unknown') or 'Unknown'
+        pub_date = metadata.get('publish_date') or 'No date'
+        doc_type = metadata.get('document_type', 'Unknown') or 'Unknown'
+        content_preview = metadata.get('content_preview', 'No preview available') or 'No preview available'
+        
         # Calculate comprehensive scores
-        scores = comprehensive_document_scoring(content, title)
+        scores = comprehensive_document_scoring(content, str(title))
         
         col1, col2 = st.columns([3, 2])
         with col1:
             st.markdown(f"**{title}**")
-            st.caption(f"{doc_type} • {str(doc.get('created_at', ''))[:10] if doc.get('created_at') else 'No date'}")
+            st.caption(f"{doc_type} • {author_org} • {pub_date}")
         with col2:
             # Display all four scores in compact format
             st.markdown(f"""
@@ -307,6 +352,9 @@ def render_minimal_list(docs):
         
         if st.button("View Details", key=f"view_{idx}"):
             with st.expander("Document Details", expanded=True):
+                st.write("**Intelligent Preview:**")
+                st.write(content_preview)
+                st.write("**Raw Content:**")
                 st.write(content[:500] + "..." if len(content) > 500 else content)
 
 def render_card_view(docs):
@@ -318,19 +366,19 @@ def render_card_view(docs):
             
             # Get or generate intelligent metadata
             if not doc.get('analyzed_metadata'):
-                metadata = analyze_document_metadata(content, doc.get('title', ''))
+                metadata = extract_document_metadata(content, doc.get('title', ''))
                 doc['analyzed_metadata'] = metadata
             else:
                 metadata = doc['analyzed_metadata']
             
-            title = metadata.get('title', 'Untitled Document')
-            author_org = metadata.get('author_organization', 'Unknown')
-            pub_date = metadata.get('publish_date', 'Unknown')
-            doc_type = metadata.get('document_type', 'Unknown')
-            content_preview = metadata.get('content_preview', 'No preview available')
+            title = metadata.get('title', 'Untitled Document') or 'Untitled Document'
+            author_org = metadata.get('author_organization', 'Unknown') or 'Unknown'
+            pub_date = metadata.get('publish_date', 'Unknown') or 'Unknown'
+            doc_type = metadata.get('document_type', 'Unknown') or 'Unknown'
+            content_preview = metadata.get('content_preview', 'No preview available') or 'No preview available'
             
             # Calculate comprehensive scores
-            scores = comprehensive_document_scoring(content, title)
+            scores = comprehensive_document_scoring(content, str(title))
             
             st.markdown(f"""
                 <div style='border:1px solid #ddd;padding:16px;border-radius:12px;margin:8px;
