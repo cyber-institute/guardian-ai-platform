@@ -68,7 +68,7 @@ def render():
         # Display mode selection moved up here
         display_mode = st.session_state.get("display_mode", "cards")
         display_mode = st.selectbox(
-            "Display Style", 
+            "", 
             ["cards", "compact", "table", "grid", "minimal"],
             index=["cards", "compact", "table", "grid", "minimal"].index(display_mode),
             format_func=lambda x: {
@@ -149,11 +149,6 @@ def render():
         }
 
     # Compact filter controls with dropdown-style multiselect
-    st.markdown("""
-    <div style="background: #f8fafc; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; border: 1px solid #e2e8f0;">
-    <h4 style="margin: 0 0 0.5rem 0; color: #1e293b; font-size: 1rem;">📋 Filter Documents</h4>
-    </div>
-    """, unsafe_allow_html=True)
     
     # Create compact filter row
     filter_col1, filter_col2, filter_col3, filter_col4, filter_col5 = st.columns([2, 2, 1.5, 1.5, 1])
