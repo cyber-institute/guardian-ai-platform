@@ -47,17 +47,26 @@ def extract_title_fallback(content: str, source: str) -> str:
     
     # Enhanced title patterns for government and AI content
     title_patterns = [
+        # Joint guidance and multi-line titles - capture full title
+        r'JOINT GUIDANCE\s*\n\s*(DEPLOYING AI SYSTEMS SECURELY:\s*(?:\n[^.\n]+)*?)(?:\n\n|\nDeploying|\nThe)',
+        r'(DEPLOYING AI SYSTEMS SECURELY:\s*Best Security Practices[^.\n]*(?:\n[^.\n]*)*?)(?:\n\n|\nDeploying|\nThe)',
+        r'(Best Security Practices\s*For Deploying[^.\n]*(?:\n[^.\n]*)*?)(?:\n\n|\nDeploying|\nThe)',
+        
+        # Multi-line title patterns for government documents
+        r'([A-Z][A-Z\s]{10,}:\s*[^.\n]+(?:\n[^.\n]+)*?)(?:\n\n|\nThe|\n[A-Z][a-z])',
+        
         # AI/Cybersecurity specific patterns
         r'(AI\s+(?:Cybersecurity|Security|Framework|Guidelines?)[^.\n]{0,50})',
-        r'(Artificial Intelligence\s+(?:Cybersecurity|Security)[^.\n]{0,50})',
+        r'(Artificial Intelligence\s+(?:Cybersecurity|Security|Guidelines?)[^.\n]{0,50})',
         r'(Cybersecurity\s+(?:AI|Artificial Intelligence)[^.\n]{0,50})',
         r'(Machine Learning\s+Security[^.\n]{0,30})',
+        r'(Deploying\s+(?:AI|Artificial Intelligence)[^.\n]{0,50})',
+        r'(Secure\s+(?:AI|Artificial Intelligence)[^.\n]{0,50})',
         
         # Government document patterns
         r'<title[^>]*>([^<]+)</title>',  # HTML title tag
         r'<h1[^>]*>([^<]+)</h1>',  # H1 tag
-        r'(CISA\s+[^.\n]{10,60})',  # CISA documents
-        r'(NIST\s+[^.\n]{10,60})',  # NIST documents
+        r'((?:CISA|NIST|NSA)\s+[^.\n]{10,60})',  # Government agency documents
         
         # General title patterns
         r'^([A-Z][^.\n]{15,80})\n',  # First substantial line
@@ -66,7 +75,7 @@ def extract_title_fallback(content: str, source: str) -> str:
         r'TITLE:\s*(.+)',  # TITLE: format
         
         # Content-based title extraction
-        r'([A-Z][^.\n]{20,80}(?:Guidelines?|Framework|Strategy|Policy|Report))',
+        r'([A-Z][^.\n]{20,80}(?:Guidelines?|Framework|Strategy|Policy|Report|Practices))',
     ]
     
     for pattern in title_patterns:
@@ -159,8 +168,20 @@ def classify_document_type_fallback(content: str) -> str:
 def extract_organization_fallback(content: str) -> str:
     """Extract organization/author information."""
     
-    # Common organization patterns
+    # Enhanced organization patterns for government documents
     org_patterns = [
+        # Multi-agency collaboration patterns
+        r'(National Security Agency[^.\n]*(?:CISA|Cybersecurity)[^.\n]*)',
+        r'(NSA[^.\n]*(?:CISA|along with)[^.\n]*)',
+        r'(CISA[^.\n]*(?:NSA|National Security)[^.\n]*)',
+        
+        # Specific agency patterns
+        r'(National Security Agency\'s?\s+[A-Z][^.\n]{0,30})',
+        r'(Cybersecurity and Infrastructure Security Agency)',
+        r'(National Institute of Standards and Technology)',
+        r'(CISA|NSA|NIST|DHS)',
+        
+        # General patterns
         r'(?:published by|by|author:|from)\s*([A-Z][^.\n]{5,50})',
         r'((?:National|Federal|Department|Ministry|Institute|Agency|Bureau|Office)[^.\n]{5,40})',
         r'([A-Z]{2,10})\s*(?:Report|Document|Publication)',
@@ -182,28 +203,86 @@ def extract_organization_fallback(content: str) -> str:
 def extract_date_fallback(content: str) -> Optional[str]:
     """Extract publication date using pattern matching."""
     
-    # Date patterns
+    # Enhanced date patterns for government documents
     date_patterns = [
+        # Standard formats
         r'(\d{4}-\d{2}-\d{2})',  # YYYY-MM-DD
-        r'(?:published|date|updated):\s*(\d{4}-\d{2}-\d{2})',
-        r'(?:published|date|updated):\s*(\w+ \d{1,2}, \d{4})',
+        r'(?:published|date|updated|issued):\s*(\d{4}-\d{2}-\d{2})',
+        r'(?:published|date|updated|issued):\s*(\w+ \d{1,2}, \d{4})',
+        r'(?:published|date|updated|issued):\s*(\d{1,2}/\d{1,2}/\d{4})',
+        
+        # Government document patterns
+        r'(?:published|issued):\s*(\w+ \d{4})',  # "Published: April 2024"
+        r'(?:published|issued)\s+(\w+ \d{4})',  # "Published March 2024"
+        r'(\w+ \d{1,2}, \d{4})',  # "March 15, 2024"
         r'(\d{1,2}/\d{1,2}/\d{4})',  # MM/DD/YYYY
-        r'(\w+ \d{4})',  # Month Year
+        r'(\d{4})',  # Just year - common in government docs
+        
+        # Version and revision dates
+        r'(?:version|revision|updated)\s+(\w+ \d{4})',
+        r'(?:v\d+\.\d+\s+)?(\w+ \d{4})',  # "v1.0 March 2024"
+        
+        # Copyright and footer dates
+        r'©\s*(\d{4})',
+        r'copyright\s+(\d{4})',
     ]
     
     for pattern in date_patterns:
         try:
-            match = re.search(pattern, content[:1000], re.IGNORECASE)
+            match = re.search(pattern, content[:2000], re.IGNORECASE)
             if match:
                 date_str = match.group(1)
+                
                 # Try to normalize to YYYY-MM-DD format
                 if re.match(r'\d{4}-\d{2}-\d{2}', date_str):
                     return date_str
-                # For other formats, just return current year if we can't parse
-                current_year = datetime.now().year
-                if str(current_year) in date_str or str(current_year-1) in date_str:
-                    return f"{current_year}-01-01"
-        except (IndexError, AttributeError):
+                
+                # Handle month/year formats
+                month_year_pattern = r'(\w+)\s+(\d{4})'
+                month_match = re.match(month_year_pattern, date_str)
+                if month_match:
+                    month_name, year = month_match.groups()
+                    month_map = {
+                        'january': '01', 'february': '02', 'march': '03', 'april': '04',
+                        'may': '05', 'june': '06', 'july': '07', 'august': '08',
+                        'september': '09', 'october': '10', 'november': '11', 'december': '12',
+                        'jan': '01', 'feb': '02', 'mar': '03', 'apr': '04',
+                        'jun': '06', 'jul': '07', 'aug': '08', 'sep': '09',
+                        'oct': '10', 'nov': '11', 'dec': '12'
+                    }
+                    month_num = month_map.get(month_name.lower())
+                    if month_num:
+                        return f"{year}-{month_num}-01"
+                
+                # Handle MM/DD/YYYY format
+                if re.match(r'\d{1,2}/\d{1,2}/\d{4}', date_str):
+                    parts = date_str.split('/')
+                    if len(parts) == 3:
+                        month, day, year = parts
+                        return f"{year}-{month.zfill(2)}-{day.zfill(2)}"
+                
+                # Handle full date formats like "March 15, 2024"
+                full_date_pattern = r'(\w+)\s+(\d{1,2}),\s+(\d{4})'
+                full_match = re.match(full_date_pattern, date_str)
+                if full_match:
+                    month_name, day, year = full_match.groups()
+                    month_map = {
+                        'january': '01', 'february': '02', 'march': '03', 'april': '04',
+                        'may': '05', 'june': '06', 'july': '07', 'august': '08',
+                        'september': '09', 'october': '10', 'november': '11', 'december': '12'
+                    }
+                    month_num = month_map.get(month_name.lower())
+                    if month_num:
+                        return f"{year}-{month_num}-{day.zfill(2)}"
+                
+                # Just year - check if it's recent
+                if re.match(r'\d{4}', date_str):
+                    year = int(date_str)
+                    current_year = datetime.now().year
+                    if 2020 <= year <= current_year:
+                        return f"{year}-01-01"
+                        
+        except (IndexError, AttributeError, ValueError):
             continue
     
     return None
