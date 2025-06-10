@@ -155,68 +155,85 @@ def render_system_overview():
 def render_mathematical_formulations():
     """Render the mathematical formulations from the patent."""
     
+    # Compact overview section
     st.markdown("""
-    ## Mathematical Formulations
+    <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
+    <h4 style="color: #B91C2C; margin-bottom: 0.5rem;">Mathematical Formulations</h4>
+    <p style="font-size: 0.95rem; line-height: 1.5; color: #374151; margin: 0;">
+    Sophisticated mathematical models for multi-dimensional risk assessment and policy evaluation across AI and quantum domains.
+    </p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    The GUARDIAN system employs sophisticated mathematical models for risk assessment and policy evaluation.
-    """)
-    
-    # Risk assessment formula
+    # Primary risk formula section
     st.markdown("""
-    ### Primary Risk Assessment Formula
-    
-    The core risk calculation integrates multiple assessment dimensions:
-    """)
+    <div style="background: #fef2f2; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+    <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Primary Risk Assessment Formula</h5>
+    <p style="font-size: 0.9rem; margin: 0; color: #374151;">Core risk calculation integrating multiple assessment dimensions:</p>
+    </div>
+    """, unsafe_allow_html=True)
     
     st.latex(r'''
     R_{total} = \sum_{i=1}^{n} w_i \cdot \frac{V_i \cdot C_i \cdot P_i}{T_i}
     ''')
     
+    # Variable definitions in compact grid
     st.markdown("""
-    Where:
-    - $R_{total}$ = Total risk score
-    - $w_i$ = Weight factor for risk category $i$
-    - $V_i$ = Vulnerability score for category $i$
-    - $C_i$ = Criticality factor for category $i$
-    - $P_i$ = Probability of occurrence for category $i$
-    - $T_i$ = Time sensitivity factor for category $i$
-    """)
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 1rem 0; font-size: 0.85rem;">
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>R<sub>total</sub></strong> = Total risk score</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>w<sub>i</sub></strong> = Weight factor</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>V<sub>i</sub></strong> = Vulnerability score</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>C<sub>i</sub></strong> = Criticality factor</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>P<sub>i</sub></strong> = Probability of occurrence</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>T<sub>i</sub></strong> = Time sensitivity factor</div>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # Scoring frameworks
+    # Framework integration header
     st.markdown("""
-    ### Multi-Framework Scoring Integration
+    <div style="background: #fffbeb; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+    <h5 style="color: #B91C2C; margin-bottom: 0.5rem; text-align: center;">Multi-Framework Scoring Integration</h5>
+    <p style="font-size: 0.9rem; margin: 0; color: #374151; text-align: center;">Four distinct patent-based scoring frameworks</p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    GUARDIAN integrates four distinct scoring frameworks:
-    """)
-    
+    # Two-column formula layout
     col1, col2 = st.columns(2)
     
     with col1:
         st.markdown("""
-        **AI Cybersecurity Maturity (0-100 scale):**
-        """)
+        <div style="background: #fef2f2; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+        <h6 style="color: #B91C2C; margin-bottom: 0.5rem;">AI Cybersecurity Maturity (0-100 scale)</h6>
+        </div>
+        """, unsafe_allow_html=True)
         st.latex(r'''
         S_{AI-Cyber} = \alpha \cdot E + \beta \cdot A + \gamma \cdot T + \delta \cdot I
         ''')
         
         st.markdown("""
-        **Quantum Cybersecurity Maturity (1-5 scale):**
-        """)
+        <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+        <h6 style="color: #B91C2C; margin-bottom: 0.5rem;">Quantum Cybersecurity Maturity (1-5 scale)</h6>
+        </div>
+        """, unsafe_allow_html=True)
         st.latex(r'''
         S_{Q-Cyber} = \lceil \frac{Q_{awareness} + Q_{implementation} + Q_{integration}}{3} \rceil
         ''')
     
     with col2:
         st.markdown("""
-        **AI Ethics Assessment (0-100 scale):**
-        """)
+        <div style="background: #f0fdf4; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+        <h6 style="color: #B91C2C; margin-bottom: 0.5rem;">AI Ethics Assessment (0-100 scale)</h6>
+        </div>
+        """, unsafe_allow_html=True)
         st.latex(r'''
         S_{AI-Ethics} = \sum_{j=1}^{4} \omega_j \cdot F_j
         ''')
         
         st.markdown("""
-        **Quantum Ethics Assessment (0-100 scale):**
-        """)
+        <div style="background: #fffbeb; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+        <h6 style="color: #B91C2C; margin-bottom: 0.5rem;">Quantum Ethics Assessment (0-100 scale)</h6>
+        </div>
+        """, unsafe_allow_html=True)
         st.latex(r'''
         S_{Q-Ethics} = \frac{\sum_{k=1}^{m} \phi_k \cdot E_k}{\sum_{k=1}^{m} \phi_k} \cdot 100
         ''')
@@ -446,37 +463,84 @@ def render_process_flow():
 def render_claims():
     """Patent claims and technical features."""
     
+    # Compact overview section
     st.markdown("""
-    ## Patent Claims & Technical Features
+    <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
+    <h4 style="color: #B91C2C; margin-bottom: 0.5rem;">Patent Claims & Technical Features</h4>
+    <p style="font-size: 0.95rem; line-height: 1.5; color: #374151; margin: 0;">
+    Key technical innovations and claims from the GUARDIAN patent application demonstrating novel governance methodologies.
+    </p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    Key technical innovations and claims from the GUARDIAN patent application.
-    """)
+    # Three-column claims layout
+    col1, col2, col3 = st.columns(3)
     
-    # Main claims
+    with col1:
+        st.markdown("""
+        <div style="background: #fef2f2; padding: 1rem; border-radius: 6px; height: 320px;">
+        <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Primary Claim 1</h5>
+        <h6 style="color: #374151; margin-bottom: 0.5rem;">Real-time Dynamic Risk Assessment</h6>
+        <div style="font-size: 0.85rem; line-height: 1.4;">
+        <strong>• Continuous Monitoring</strong><br>
+        AI and quantum technology evaluation<br><br>
+        <strong>• Adaptive Algorithms</strong><br>
+        Machine learning-enhanced scoring<br><br>
+        <strong>• Multi-modal Processing</strong><br>
+        Text, policy, technical specifications<br><br>
+        <strong>• Real-time Updates</strong><br>
+        Dynamic assessment capabilities
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; height: 320px;">
+        <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Primary Claim 2</h5>
+        <h6 style="color: #374151; margin-bottom: 0.5rem;">Integrated Scoring Framework</h6>
+        <div style="font-size: 0.85rem; line-height: 1.4;">
+        <strong>• Four Assessment Dimensions</strong><br>
+        Patent-protected algorithms<br><br>
+        <strong>• Cross-domain Correlation</strong><br>
+        Risk aggregation methodology<br><br>
+        <strong>• Scalable Architecture</strong><br>
+        Enterprise deployment ready<br><br>
+        <strong>• Unified Evaluation</strong><br>
+        Comprehensive risk assessment
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with col3:
+        st.markdown("""
+        <div style="background: #f0fdf4; padding: 1rem; border-radius: 6px; height: 320px;">
+        <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Primary Claim 3</h5>
+        <h6 style="color: #374151; margin-bottom: 0.5rem;">Automated Governance Recommendations</h6>
+        <div style="font-size: 0.85rem; line-height: 1.4;">
+        <strong>• Policy Gap Identification</strong><br>
+        Automated remediation suggestions<br><br>
+        <strong>• Compliance Monitoring</strong><br>
+        Regulatory reporting capabilities<br><br>
+        <strong>• Strategy Generation</strong><br>
+        Risk mitigation recommendations<br><br>
+        <strong>• Decision Support</strong><br>
+        Actionable governance insights
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Technical innovations header
     st.markdown("""
-    ### Primary Patent Claims
+    <div style="background: #fffbeb; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+    <h5 style="color: #B91C2C; margin-bottom: 0.5rem; text-align: center;">Technical Innovations</h5>
+    <p style="font-size: 0.9rem; margin: 0; color: #374151; text-align: center;">Patent-protected technical advances in AI governance</p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    1. **Real-time Dynamic Risk Assessment System**
-       - Continuous monitoring and evaluation of AI and quantum technologies
-       - Adaptive scoring algorithms that improve through machine learning
-       - Multi-modal input processing (text, policy documents, technical specifications)
-    
-    2. **Integrated Scoring Framework**
-       - Four distinct assessment dimensions with patent-protected algorithms
-       - Cross-domain risk correlation and aggregation
-       - Scalable scoring architecture for enterprise deployment
-    
-    3. **Automated Governance Recommendations**
-       - Policy gap identification and remediation suggestions
-       - Regulatory compliance monitoring and reporting
-       - Risk mitigation strategy generation
-    """)
-    
-    # Technical innovations
-    st.markdown("""
-    ### Technical Innovations
-    """)
-    
+    # Compact innovations grid
     innovations = [
         ("Natural Language Processing Engine", "Advanced NLP with domain-specific training for policy and technical document analysis"),
         ("Multi-dimensional Risk Modeling", "Sophisticated mathematical models for risk assessment across cybersecurity and ethics domains"),
@@ -485,72 +549,138 @@ def render_claims():
         ("Real-time Processing Pipeline", "High-performance architecture for continuous risk monitoring and assessment")
     ]
     
-    for innovation, description in innovations:
-        with st.expander(innovation):
-            st.markdown(description)
+    # Display innovations in compact cards
+    cols = st.columns(2)
+    for i, (innovation, description) in enumerate(innovations):
+        with cols[i % 2]:
+            st.markdown(f"""
+            <div style="background: #f9fafb; padding: 0.8rem; border-radius: 4px; margin-bottom: 0.5rem; border-left: 3px solid #B91C2C;">
+            <h6 style="color: #B91C2C; margin-bottom: 0.3rem; font-size: 0.9rem;">{innovation}</h6>
+            <p style="font-size: 0.8rem; line-height: 1.3; color: #374151; margin: 0;">{description}</p>
+            </div>
+            """, unsafe_allow_html=True)
 
 def render_innovation_summary():
     """Innovation summary and commercial applications."""
     
+    # Compact overview section
     st.markdown("""
-    ## Innovation Summary & Commercial Applications
+    <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
+    <h4 style="color: #B91C2C; margin-bottom: 0.5rem;">Innovation Summary & Commercial Applications</h4>
+    <p style="font-size: 0.95rem; line-height: 1.5; color: #374151; margin: 0;">
+    Significant advancement in AI governance technology with broad commercial applications across government, enterprise, and research sectors.
+    </p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    GUARDIAN represents a significant advancement in AI governance technology with broad commercial applications.
-    """)
-    
-    # Market applications
+    # Four-column market applications layout
     st.markdown("""
-    ### Market Applications
-    """)
+    <div style="background: #fffbeb; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+    <h5 style="color: #B91C2C; margin-bottom: 0.8rem; text-align: center;">Market Applications</h5>
+    </div>
+    """, unsafe_allow_html=True)
     
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.markdown("""
+        <div style="background: #fef2f2; padding: 1rem; border-radius: 6px; height: 240px;">
+        <h6 style="color: #B91C2C; margin-bottom: 0.8rem;">Government & Regulatory</h6>
+        <div style="font-size: 0.85rem; line-height: 1.4;">
+        <strong>• Federal AI Compliance</strong><br>
+        Agency monitoring systems<br><br>
+        <strong>• Framework Development</strong><br>
+        Regulatory testing platforms<br><br>
+        <strong>• Policy Harmonization</strong><br>
+        Cross-agency coordination<br><br>
+        <strong>• Standards Implementation</strong><br>
+        Compliance automation
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; height: 240px;">
+        <h6 style="color: #B91C2C; margin-bottom: 0.8rem;">Enterprise</h6>
+        <div style="font-size: 0.85rem; line-height: 1.4;">
+        <strong>• Risk Governance</strong><br>
+        Corporate AI management<br><br>
+        <strong>• Compliance Automation</strong><br>
+        Regulatory adherence tools<br><br>
+        <strong>• Due Diligence</strong><br>
+        Risk assessment platforms<br><br>
+        <strong>• Strategic Planning</strong><br>
+        Technology governance
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with col3:
+        st.markdown("""
+        <div style="background: #f0fdf4; padding: 1rem; border-radius: 6px; height: 240px;">
+        <h6 style="color: #B91C2C; margin-bottom: 0.8rem;">Academic & Research</h6>
+        <div style="font-size: 0.85rem; line-height: 1.4;">
+        <strong>• Policy Analysis</strong><br>
+        Academic research tools<br><br>
+        <strong>• Educational Platforms</strong><br>
+        Governance training systems<br><br>
+        <strong>• Simulation Testing</strong><br>
+        Policy stress testing<br><br>
+        <strong>• Research Support</strong><br>
+        Analysis frameworks
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with col4:
+        st.markdown("""
+        <div style="background: #faf5ff; padding: 1rem; border-radius: 6px; height: 240px;">
+        <h6 style="color: #B91C2C; margin-bottom: 0.8rem;">Consulting & Advisory</h6>
+        <div style="font-size: 0.85rem; line-height: 1.4;">
+        <strong>• Risk Assessment Services</strong><br>
+        Professional evaluation tools<br><br>
+        <strong>• Compliance Consulting</strong><br>
+        Automated advisory systems<br><br>
+        <strong>• Policy Development</strong><br>
+        Strategic support platforms<br><br>
+        <strong>• Implementation Support</strong><br>
+        Deployment assistance
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Competitive advantages in two columns
     col1, col2 = st.columns(2)
     
     with col1:
         st.markdown("""
-        **Government & Regulatory:**
-        - Federal agency AI compliance monitoring
-        - Regulatory framework development and testing
-        - Cross-agency policy harmonization
+        <div style="background: #fef2f2; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+        <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Competitive Advantages</h5>
+        <div style="font-size: 0.9rem; line-height: 1.4;">
+        <strong>First-to-Market Innovation</strong><br>
+        Novel AI and quantum risk integration<br><br>
+        <strong>Comprehensive Patent Protection</strong><br>
+        Core algorithms and methods coverage<br><br>
+        <strong>Scalable Cloud Architecture</strong><br>
+        Enterprise-ready deployment design
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
         
-        **Enterprise:**
-        - Corporate AI risk governance and management
-        - Regulatory compliance automation
-        - Due diligence and risk assessment
-        """)
-    
     with col2:
         st.markdown("""
-        **Academic & Research:**
-        - Academic policy analysis and research
-        - Educational tools for governance training
-        - Policy simulation and stress testing
-        
-        **Consulting & Advisory:**
-        - Risk assessment services
-        - Compliance consulting automation
-        - Policy development support
-        """)
-    
-    # Competitive advantages
-    st.markdown("""
-    ### Competitive Advantages
-    
-    This patent builds upon and extends two parent applications, introducing breakthrough capabilities:
-    
-    - **First-to-Market**: Novel integration of AI and quantum risk assessment in a unified platform
-    - **Patent Protection**: Comprehensive intellectual property coverage for core algorithms and methods
-    - **Scalable Architecture**: Cloud-native design supporting enterprise-scale deployments
-    - **Regulatory Alignment**: Built-in compliance with emerging AI governance frameworks
-    - **Continuous Innovation**: Adaptive learning capabilities that improve system performance over time
-    """)
-    
-    # Technical differentiators
-    st.markdown("""
-    ### Technical Differentiators
-    
-    - **Advanced NLP**: State-of-the-art language models fine-tuned for policy and technical content
-    - **Multi-framework Scoring**: Integration of four distinct assessment methodologies
-    - **Real-time Processing**: High-performance pipeline for continuous risk monitoring
-    - **Cross-domain Analysis**: Unified evaluation of cybersecurity and ethics dimensions
-    - **Adaptive Algorithms**: Machine learning-powered improvement of assessment accuracy
-    """)
+        <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+        <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Technical Differentiators</h5>
+        <div style="font-size: 0.9rem; line-height: 1.4;">
+        <strong>Advanced NLP Processing</strong><br>
+        Policy-tuned language models<br><br>
+        <strong>Multi-framework Integration</strong><br>
+        Four distinct assessment methods<br><br>
+        <strong>Real-time Analysis Pipeline</strong><br>
+        Continuous monitoring capabilities
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
