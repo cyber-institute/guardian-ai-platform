@@ -331,9 +331,10 @@ def render_compact_cards(docs):
             
             doc_type = ultra_clean_metadata(doc.get('document_type', 'Unknown'))
             
-            # Generate thumbnail with document ID
+            # Generate content-based thumbnail
             doc_id = doc.get('id')
-            thumbnail_html = get_thumbnail_html(title, doc_type, author_org, doc_id)
+            from utils.content_thumbnail_generator import get_content_thumbnail_html
+            thumbnail_html = get_content_thumbnail_html(doc_id, title, content, doc_type, author_org)
             
             # Calculate comprehensive scores
             scores = comprehensive_document_scoring(content, str(title))
