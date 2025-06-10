@@ -226,7 +226,7 @@ def render_compact_cards(docs):
     cols = st.columns(3)
     for i, doc in enumerate(docs):
         with cols[i % 3]:
-            content = doc.get('content', '') or doc.get('text_content', '')
+            content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
             
             # Get or generate intelligent metadata
             if not doc.get('analyzed_metadata'):
@@ -264,7 +264,7 @@ def render_grid_view(docs):
     cols = st.columns(2)
     for i, doc in enumerate(docs):
         with cols[i % 2]:
-            content = doc.get('content', '') or doc.get('text_content', '')
+            content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
             
             # Get or generate intelligent metadata
             if not doc.get('analyzed_metadata'):
@@ -304,7 +304,7 @@ def render_table_view(docs):
     
     table_data = []
     for doc in docs:
-        content = doc.get('content', '') or doc.get('text_content', '')
+        content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
         
         # Get or generate intelligent metadata
         if not doc.get('analyzed_metadata'):
@@ -337,7 +337,7 @@ def render_table_view(docs):
 def render_minimal_list(docs):
     """Render documents in minimal list format."""
     for idx, doc in enumerate(docs):
-        content = doc.get('content', '') or doc.get('text_content', '')
+        content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
         
         # Get or generate intelligent metadata
         if not doc.get('analyzed_metadata'):
@@ -386,7 +386,7 @@ def render_card_view(docs):
     cols = st.columns(2)
     for i, doc in enumerate(docs):
         with cols[i % 2]:
-            content = doc.get('content', '') or doc.get('text_content', '')
+            content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
             
             # Get or generate intelligent metadata
             if not doc.get('analyzed_metadata'):
