@@ -352,41 +352,58 @@ def find_pdf_in_assets(doc_title, organization):
     if not pdf_files:
         return None
     
-    # Try to match by title keywords or organization
+    # Clean and prepare matching strings
     title_lower = doc_title.lower() if doc_title else ""
     org_lower = organization.lower() if organization else ""
+    
+    print(f"Debug: Looking for PDF match - Title: '{title_lower}', Org: '{org_lower}'")
+    print(f"Debug: Available PDFs: {pdf_files}")
     
     for pdf_file in pdf_files:
         pdf_lower = pdf_file.lower()
         
-        # Check for NIST documents
-        if ('nist' in org_lower or 'nist' in title_lower or 'ai risk management framework' in title_lower) and 'nist' in pdf_lower:
+        # Check for NIST documents with broader matching
+        if ('nist' in org_lower or 'nist' in title_lower or 'ai risk management framework' in title_lower or 'national institute of standards' in title_lower) and 'nist' in pdf_lower:
+            print(f"Debug: Found NIST match: {pdf_file}")
             return os.path.join(assets_dir, pdf_file)
             
-        # Check for EU documents  
-        if ('european' in org_lower or 'europa.eu' in org_lower or 'eur-lex' in org_lower) and 'eu' in pdf_lower:
+        # Check for EU documents with broader matching  
+        if ('european' in org_lower or 'europa.eu' in org_lower or 'eur-lex' in org_lower or 'regulation (eu)' in title_lower or 'webpage from eur-lex.europa.eu' in title_lower) and ('eu' in pdf_lower or 'europa' in pdf_lower):
+            print(f"Debug: Found EU match: {pdf_file}")
             return os.path.join(assets_dir, pdf_file)
             
-        # Check for NASA documents
-        if ('nasa' in org_lower or 'ntrs.nasa.gov' in org_lower) and 'nasa' in pdf_lower:
+        # Check for NASA documents with broader matching
+        if ('nasa' in org_lower or 'ntrs.nasa.gov' in org_lower or 'pdf document from ntrs.nasa.gov' in title_lower) and 'nasa' in pdf_lower:
+            print(f"Debug: Found NASA match: {pdf_file}")
             return os.path.join(assets_dir, pdf_file)
             
         # Check for AI-related documents
         if 'ai' in title_lower and 'ai' in pdf_lower:
+            print(f"Debug: Found AI match: {pdf_file}")
             return os.path.join(assets_dir, pdf_file)
             
         # Check for direct filename matches (remove common suffixes)
         title_clean = re.sub(r'[^\w\s]', '', title_lower).strip()
         if title_clean and any(word in pdf_lower for word in title_clean.split() if len(word) > 3):
+            print(f"Debug: Found keyword match: {pdf_file}")
             return os.path.join(assets_dir, pdf_file)
+    
+    # Enhanced fallback matching - match any available PDF for web-scraped documents
+    if any(indicator in title_lower for indicator in ['webpage from', 'pdf document from', 'document from']):
+        # For web-scraped documents, use the first available PDF as they're likely related
+        if pdf_files:
+            print(f"Debug: Using fallback PDF for web document: {pdf_files[0]}")
+            return os.path.join(assets_dir, pdf_files[0])
     
     # If no specific match found, try to find any PDF that might be related
     # by checking if the title contains document-like keywords
     for pdf_file in pdf_files:
         # Return the first available PDF for documents that seem policy-related
         if any(keyword in title_lower for keyword in ['policy', 'framework', 'guideline', 'standard', 'regulation']):
+            print(f"Debug: Found policy-related fallback: {pdf_file}")
             return os.path.join(assets_dir, pdf_file)
     
+    print(f"Debug: No PDF match found")
     return None
 
 def get_real_pdf_thumbnail(doc_id, file_path=None, pdf_bytes=None):
