@@ -8,7 +8,7 @@ def main():
         page_title="GUARDIAN - AI Risk Analysis Navigator",
         page_icon="🔐",
         layout="wide",
-        initial_sidebar_state="collapsed"
+        initial_sidebar_state="expanded"
     )
     
     # Custom CSS styling - Government/Nonprofit Theme

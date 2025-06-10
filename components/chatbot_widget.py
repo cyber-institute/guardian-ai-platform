@@ -8,7 +8,7 @@ import uuid
 from utils.dialogflow_chatbot import chatbot
 
 def render_chatbot_widget():
-    """Render floating chatbot widget with Dialogflow CX integration."""
+    """Render chatbot widget with Dialogflow CX integration."""
     
     # Initialize chat session
     if 'chat_session_id' not in st.session_state:
@@ -17,8 +17,46 @@ def render_chatbot_widget():
     if 'chat_messages' not in st.session_state:
         st.session_state.chat_messages = []
     
-    if 'chat_open' not in st.session_state:
-        st.session_state.chat_open = False
+    # Always show chatbot in sidebar
+    with st.sidebar:
+        st.markdown("### 🤖 GUARDIAN Assistant")
+        
+        # Quick help buttons
+        st.markdown("**Quick Help:**")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("AI Security", key="quick_ai_cyber", help="Learn about AI Cybersecurity"):
+                handle_quick_question("What is AI Cybersecurity Maturity?")
+            if st.button("Document Upload", key="quick_upload", help="How to upload documents"):
+                handle_quick_question("How do I upload a document?")
+        with col2:
+            if st.button("Quantum Security", key="quick_quantum", help="Learn about Quantum Cybersecurity"):
+                handle_quick_question("Explain Quantum Cybersecurity")
+            if st.button("Interface Help", key="quick_interface", help="Navigation assistance"):
+                handle_quick_question("How do I use the filters?")
+        
+        # Chat input
+        user_input = st.text_input("Ask me anything about GUARDIAN:", key="chat_input", placeholder="e.g., 'How do I upload a policy?'")
+        
+        if st.button("Send", key="send_message", use_container_width=True) and user_input:
+            handle_user_message(user_input)
+        
+        # Display recent chat messages
+        if st.session_state.chat_messages:
+            st.markdown("---")
+            st.markdown("**Recent Conversation:**")
+            # Show last 2 exchanges
+            recent_messages = st.session_state.chat_messages[-4:] if len(st.session_state.chat_messages) > 4 else st.session_state.chat_messages
+            for message in recent_messages:
+                if message['role'] == 'user':
+                    st.markdown(f"**You:** {message['content']}")
+                else:
+                    st.markdown(f"**Assistant:** {message['content'][:200]}{'...' if len(message['content']) > 200 else ''}")
+        
+        # Clear chat button
+        if st.session_state.chat_messages and st.button("Clear Chat", key="clear_chat"):
+            st.session_state.chat_messages = []
+            st.rerun()
     
     # CSS for floating chatbot
     st.markdown("""
