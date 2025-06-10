@@ -110,15 +110,18 @@ def extract_organization_fallback(content: str) -> str:
         r'(?:published by|by|author:|from)\s*([A-Z][^.\n]{5,50})',
         r'((?:National|Federal|Department|Ministry|Institute|Agency|Bureau|Office)[^.\n]{5,40})',
         r'([A-Z]{2,10})\s*(?:Report|Document|Publication)',
-        r'©\s*(\d{4})\s*([^.\n]{5,40})',
+        r'©\s*\d{4}\s*([^.\n]{5,40})',
     ]
     
     for pattern in org_patterns:
-        match = re.search(pattern, content[:1000], re.IGNORECASE)
-        if match:
-            org = match.group(-1).strip()
-            if len(org) > 5 and not org.isdigit():
-                return org[:50]
+        try:
+            match = re.search(pattern, content[:1000], re.IGNORECASE)
+            if match:
+                org = match.group(1).strip()
+                if len(org) > 5 and not org.isdigit():
+                    return org[:50]
+        except (IndexError, AttributeError):
+            continue
     
     return 'Unknown'
 
@@ -135,16 +138,19 @@ def extract_date_fallback(content: str) -> Optional[str]:
     ]
     
     for pattern in date_patterns:
-        match = re.search(pattern, content[:1000], re.IGNORECASE)
-        if match:
-            date_str = match.group(1)
-            # Try to normalize to YYYY-MM-DD format
-            if re.match(r'\d{4}-\d{2}-\d{2}', date_str):
-                return date_str
-            # For other formats, just return current year if we can't parse
-            current_year = datetime.now().year
-            if str(current_year) in date_str or str(current_year-1) in date_str:
-                return f"{current_year}-01-01"
+        try:
+            match = re.search(pattern, content[:1000], re.IGNORECASE)
+            if match:
+                date_str = match.group(1)
+                # Try to normalize to YYYY-MM-DD format
+                if re.match(r'\d{4}-\d{2}-\d{2}', date_str):
+                    return date_str
+                # For other formats, just return current year if we can't parse
+                current_year = datetime.now().year
+                if str(current_year) in date_str or str(current_year-1) in date_str:
+                    return f"{current_year}-01-01"
+        except (IndexError, AttributeError):
+            continue
     
     return None
 
