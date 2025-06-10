@@ -15,16 +15,16 @@ def create_speedometer_dial(value, max_value=100):
     ax.set_aspect('equal')
     ax.axis('off')
     
-    # Color segments for the speedometer
+    # Color segments for the speedometer (flipped: red on left)
     colors = ['#FF4444', '#FF8800', '#FFCC00', '#88DD00', '#44BB44', '#22AA22']
     
-    # Create color segments (semicircle from 0 to 180 degrees)
-    angles = np.linspace(0, np.pi, 7)  # 6 segments
+    # Create color segments (semicircle from 180 to 0 degrees, flipped)
+    angles = np.linspace(np.pi, 0, 7)  # 6 segments, reversed
     
     for i in range(6):
         # Create wedge for each color segment
         wedge = patches.Wedge((0, 0), 1, 
-                            np.degrees(angles[i]), np.degrees(angles[i+1]), 
+                            np.degrees(angles[i+1]), np.degrees(angles[i]), 
                             width=0.3, facecolor=colors[i], edgecolor='#666666', linewidth=1)
         ax.add_patch(wedge)
     
@@ -33,13 +33,30 @@ def create_speedometer_dial(value, max_value=100):
                                width=0.05, facecolor='#666666')
     ax.add_patch(outer_circle)
     
-    # Calculate needle angle (0 to 180 degrees)
-    needle_angle = (value / max_value) * np.pi
+    # Calculate needle angle (180 to 0 degrees, flipped)
+    needle_angle = np.pi - (value / max_value) * np.pi
     
-    # Draw needle
+    # Draw needle with arrow tip
     needle_x = 0.7 * np.cos(needle_angle)
     needle_y = 0.7 * np.sin(needle_angle)
     ax.plot([0, needle_x], [0, needle_y], color='#444444', linewidth=3, solid_capstyle='round')
+    
+    # Add arrow tip to needle
+    arrow_size = 0.08
+    arrow_angle1 = needle_angle + 2.8  # Arrow wing angle
+    arrow_angle2 = needle_angle - 2.8  # Arrow wing angle
+    
+    # Arrow tip points
+    tip_x, tip_y = needle_x, needle_y
+    wing1_x = tip_x - arrow_size * np.cos(arrow_angle1)
+    wing1_y = tip_y - arrow_size * np.sin(arrow_angle1)
+    wing2_x = tip_x - arrow_size * np.cos(arrow_angle2)
+    wing2_y = tip_y - arrow_size * np.sin(arrow_angle2)
+    
+    # Draw arrow triangle
+    arrow = patches.Polygon([(tip_x, tip_y), (wing1_x, wing1_y), (wing2_x, wing2_y)], 
+                          facecolor='#444444', edgecolor='#222222', linewidth=1)
+    ax.add_patch(arrow)
     
     # Center circle
     center_circle = patches.Circle((0, 0), 0.05, facecolor='#444444')
