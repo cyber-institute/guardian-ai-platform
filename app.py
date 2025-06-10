@@ -405,8 +405,14 @@ def main():
                         if not text_content or len(text_content.strip()) < 50:
                             st.error("Could not extract meaningful text content from the URL. The document may be empty, password-protected, or in an unsupported format.")
                         else:
-                            # Extract metadata using AI
-                            metadata = analyze_document_metadata(text_content, document_title or url_input)
+                            # Extract metadata - try AI first, fallback to pattern matching
+                            try:
+                                metadata = analyze_document_metadata(text_content, document_title or url_input)
+                            except Exception as ai_error:
+                                # Use fallback analysis when AI fails
+                                from utils.fallback_analyzer import extract_metadata_fallback
+                                metadata = extract_metadata_fallback(text_content, url_input)
+                                st.info("Document processed using pattern-based analysis due to API limitations.")
                             
                             # Generate comprehensive scores
                             final_title = metadata.get('title') or document_title or "URL Document"

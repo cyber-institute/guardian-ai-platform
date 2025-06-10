@@ -267,12 +267,94 @@ def comprehensive_document_scoring(text: str, title: str) -> Dict[str, Optional[
     Returns:
         Dict with scores for each framework or None if not applicable
     """
-    return {
-        'ai_cybersecurity': score_ai_cybersecurity_maturity(text, title),
-        'quantum_cybersecurity': score_quantum_cybersecurity_maturity(text, title),
-        'ai_ethics': score_ai_ethics(text, title),
-        'quantum_ethics': score_quantum_ethics(text, title)
-    }
+    try:
+        return {
+            'ai_cybersecurity': score_ai_cybersecurity_maturity(text, title),
+            'quantum_cybersecurity': score_quantum_cybersecurity_maturity(text, title),
+            'ai_ethics': score_ai_ethics(text, title),
+            'quantum_ethics': score_quantum_ethics(text, title)
+        }
+    except Exception:
+        # Fallback to pattern-based scoring when API fails
+        return fallback_scoring(text, title)
+
+def fallback_scoring(text: str, title: str) -> Dict[str, Optional[int]]:
+    """
+    Pattern-based scoring when AI analysis is unavailable.
+    """
+    text_lower = text.lower()
+    title_lower = title.lower()
+    
+    # Check applicability using existing logic
+    applicability = analyze_document_applicability(text, title)
+    
+    scores = {}
+    
+    # AI Cybersecurity scoring (0-100)
+    if applicability['ai_cybersecurity']:
+        score = 0
+        # Basic keyword scoring
+        ai_security_keywords = ['encryption', 'authentication', 'ai security', 'model protection', 'threat detection']
+        score += min(40, sum(10 for kw in ai_security_keywords if kw in text_lower))
+        
+        # Advanced concepts
+        advanced_keywords = ['federated learning', 'differential privacy', 'adversarial', 'secure computation']
+        score += min(30, sum(15 for kw in advanced_keywords if kw in text_lower))
+        
+        # Implementation indicators
+        impl_keywords = ['implementation', 'deployed', 'operational', 'monitoring']
+        score += min(30, sum(10 for kw in impl_keywords if kw in text_lower))
+        
+        scores['ai_cybersecurity'] = min(100, score)
+    else:
+        scores['ai_cybersecurity'] = None
+    
+    # Quantum Cybersecurity scoring (1-5)
+    if applicability['quantum_cybersecurity']:
+        score = 1  # Base level
+        
+        # Level indicators
+        if any(kw in text_lower for kw in ['post-quantum', 'pqc', 'quantum-safe']):
+            score = max(score, 3)
+        if any(kw in text_lower for kw in ['implementation', 'deployment', 'migration']):
+            score = max(score, 4)
+        if any(kw in text_lower for kw in ['integrated', 'enterprise-wide', 'systematic']):
+            score = max(score, 5)
+            
+        scores['quantum_cybersecurity'] = score
+    else:
+        scores['quantum_cybersecurity'] = None
+    
+    # AI Ethics scoring (0-100)
+    if applicability['ai_ethics']:
+        score = 0
+        ethics_keywords = ['fairness', 'bias', 'transparency', 'accountability', 'explainable']
+        score += min(50, sum(10 for kw in ethics_keywords if kw in text_lower))
+        
+        advanced_ethics = ['algorithmic auditing', 'ethical AI', 'responsible AI', 'human oversight']
+        score += min(30, sum(15 for kw in advanced_ethics if kw in text_lower))
+        
+        governance_keywords = ['governance', 'oversight', 'compliance', 'monitoring']
+        score += min(20, sum(10 for kw in governance_keywords if kw in text_lower))
+        
+        scores['ai_ethics'] = min(100, score)
+    else:
+        scores['ai_ethics'] = None
+    
+    # Quantum Ethics scoring (0-100)
+    if applicability['quantum_ethics']:
+        score = 0
+        quantum_ethics_keywords = ['quantum ethics', 'quantum access', 'quantum equity', 'quantum governance']
+        score += min(60, sum(20 for kw in quantum_ethics_keywords if kw in text_lower))
+        
+        general_ethics = ['ethical', 'responsible', 'equitable', 'fair access']
+        score += min(40, sum(10 for kw in general_ethics if kw in text_lower))
+        
+        scores['quantum_ethics'] = min(100, score)
+    else:
+        scores['quantum_ethics'] = None
+    
+    return scores
 
 def format_score_display(score: Optional[int], framework: str) -> str:
     """
