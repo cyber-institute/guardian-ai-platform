@@ -6,70 +6,101 @@ import io
 import base64
 
 def create_speedometer_dial(value, max_value=100):
-    """Create a speedometer dial gauge using jQuery and SVG for consistent appearance."""
-    import uuid
+    """Create a speedometer dial gauge using matplotlib with consistent size and appearance."""
     
-    # Generate unique ID for this gauge
-    gauge_id = f"gauge_{uuid.uuid4().hex[:8]}"
+    # Use consistent parameters for all gauges
+    plt.rcParams.update({
+        'font.size': 13,
+        'font.weight': 'bold',
+        'font.family': 'sans-serif'
+    })
     
-    # Calculate needle angle (180 to 0 degrees, red on left)
-    angle = 180 - (value / max_value) * 180
+    # Create figure with exact specifications
+    fig, ax = plt.subplots(figsize=(2.4, 1.8), facecolor='white', dpi=75)
+    ax.set_xlim(-1.3, 1.3)
+    ax.set_ylim(-0.3, 1.1)
+    ax.set_aspect('equal')
+    ax.axis('off')
     
-    # Create SVG-based speedometer with jQuery animation
-    svg_gauge = f"""
-    <div style="width: 90px; height: 68px; display: block; margin: 0 auto; position: relative;">
-        <svg width="90" height="68" viewBox="0 0 90 68" style="overflow: visible;">
-            <!-- Color segments -->
-            <defs>
-                <mask id="semicircle">
-                    <rect width="90" height="34" fill="white"/>
-                </mask>
-            </defs>
-            
-            <!-- Background semicircle segments -->
-            <path d="M 15 34 A 30 30 0 0 1 75 34" fill="none" stroke="#FF4444" stroke-width="8"/>
-            <path d="M 21 22 A 30 30 0 0 1 45 10" fill="none" stroke="#FF8800" stroke-width="8"/>
-            <path d="M 32 15 A 30 30 0 0 1 58 15" fill="none" stroke="#FFCC00" stroke-width="8"/>
-            <path d="M 45 10 A 30 30 0 0 1 69 22" fill="none" stroke="#88DD00" stroke-width="8"/>
-            <path d="M 58 15 A 30 30 0 0 1 75 34" fill="none" stroke="#44BB44" stroke-width="8"/>
-            <path d="M 69 22 A 30 30 0 0 1 75 34" fill="none" stroke="#22AA22" stroke-width="8"/>
-            
-            <!-- Outer border -->
-            <path d="M 15 34 A 30 30 0 0 1 75 34" fill="none" stroke="#555555" stroke-width="2"/>
-            
-            <!-- Needle -->
-            <g id="{gauge_id}_needle" style="transform-origin: 45px 34px; transform: rotate({angle}deg);">
-                <line x1="45" y1="34" x2="45" y2="14" stroke="#333333" stroke-width="2" stroke-linecap="round"/>
-                <!-- Arrow tip -->
-                <polygon points="45,14 42,18 48,18" fill="#333333" stroke="#111111" stroke-width="0.5"/>
-            </g>
-            
-            <!-- Center hub -->
-            <circle cx="45" cy="34" r="3" fill="#333333" stroke="#111111" stroke-width="0.5"/>
-            
-            <!-- Score text -->
-            <text x="45" y="55" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#444444">
-                {value}
-            </text>
-        </svg>
-    </div>
+    # Define consistent color segments (red on left)
+    colors = ['#FF4444', '#FF8800', '#FFCC00', '#88DD00', '#44BB44', '#22AA22']
     
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-    $(document).ready(function() {{
-        // Animate needle on load
-        $('#{gauge_id}_needle').css('transform', 'rotate(180deg)');
-        setTimeout(function() {{
-            $('#{gauge_id}_needle').css({{
-                'transform': 'rotate({angle}deg)',
-                'transition': 'transform 1.2s ease-out'
-            }});
-        }}, 100);
-    }});
-    </script>
-    """
+    # Create precise color segments using wedges
+    segment_angles = np.linspace(np.pi, 0, 7)
     
-    return svg_gauge
+    for i in range(6):
+        wedge = patches.Wedge(
+            center=(0, 0), 
+            r=1.0, 
+            theta1=np.degrees(segment_angles[i+1]), 
+            theta2=np.degrees(segment_angles[i]),
+            width=0.25, 
+            facecolor=colors[i], 
+            edgecolor='#555555', 
+            linewidth=0.8
+        )
+        ax.add_patch(wedge)
+    
+    # Add consistent outer border
+    outer_border = patches.Wedge((0, 0), 1.0, 0, 180, width=0.03, facecolor='#555555')
+    ax.add_patch(outer_border)
+    
+    # Add inner white background for consistency
+    inner_bg = patches.Wedge((0, 0), 0.75, 0, 180, facecolor='white', edgecolor='none')
+    ax.add_patch(inner_bg)
+    
+    # Calculate needle position (flipped: red on left)
+    needle_angle = np.pi - (value / max_value) * np.pi
+    needle_length = 0.65
+    needle_x = needle_length * np.cos(needle_angle)
+    needle_y = needle_length * np.sin(needle_angle)
+    
+    # Draw needle shaft with consistent styling
+    ax.plot([0, needle_x], [0, needle_y], 
+            color='#333333', linewidth=2.5, solid_capstyle='round', zorder=10)
+    
+    # Create arrow tip with precise geometry
+    arrow_size = 0.06
+    arrow_spread = 0.5
+    
+    # Calculate arrow triangle points
+    perp_angle = needle_angle + np.pi/2
+    tip_x, tip_y = needle_x, needle_y
+    base_x = tip_x - arrow_size * np.cos(needle_angle)
+    base_y = tip_y - arrow_size * np.sin(needle_angle)
+    
+    wing1_x = base_x + arrow_size * arrow_spread * np.cos(perp_angle)
+    wing1_y = base_y + arrow_size * arrow_spread * np.sin(perp_angle)
+    wing2_x = base_x - arrow_size * arrow_spread * np.cos(perp_angle)
+    wing2_y = base_y - arrow_size * arrow_spread * np.sin(perp_angle)
+    
+    # Draw arrow triangle
+    arrow = patches.Polygon(
+        [(tip_x, tip_y), (wing1_x, wing1_y), (wing2_x, wing2_y)], 
+        facecolor='#333333', edgecolor='#111111', linewidth=0.5, zorder=11
+    )
+    ax.add_patch(arrow)
+    
+    # Add center hub
+    center_hub = patches.Circle((0, 0), 0.04, facecolor='#333333', 
+                               edgecolor='#111111', linewidth=0.5, zorder=12)
+    ax.add_patch(center_hub)
+    
+    # Add score text with consistent positioning
+    ax.text(0, -0.25, str(value), ha='center', va='center', 
+            fontsize=13, fontweight='bold', color='#444444')
+    
+    # Save with exact settings for consistency
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png', bbox_inches='tight', 
+                pad_inches=0.05, facecolor='white', dpi=75, 
+                edgecolor='none', transparent=False)
+    buffer.seek(0)
+    image_base64 = base64.b64encode(buffer.getvalue()).decode()
+    plt.close(fig)  # Explicitly close figure
+    
+    # Return with fixed pixel dimensions
+    return f'<img src="data:image/png;base64,{image_base64}" style="width: 90px; height: 68px; display: block; margin: 0 auto; object-fit: contain;">'
 
 def render():
     """Render the About tab for GUARDIAN system."""
