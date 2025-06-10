@@ -2,6 +2,7 @@ import streamlit as st
 from utils.db import fetch_documents
 from utils.hf_ai_scoring import evaluate_quantum_maturity_hf
 from utils.comprehensive_scoring import comprehensive_document_scoring, format_score_display, get_score_badge_color
+from utils.document_analyzer import analyze_document_metadata, extract_document_summary
 
 def get_comprehensive_badge(score, framework):
     """Create badge for comprehensive scoring system."""
@@ -313,9 +314,20 @@ def render_card_view(docs):
     cols = st.columns(2)
     for i, doc in enumerate(docs):
         with cols[i % 2]:
-            title = doc.get('title', 'Untitled Document')
-            doc_type = doc.get('document_type', 'Unknown')
             content = doc.get('content', '') or doc.get('text_content', '')
+            
+            # Get or generate intelligent metadata
+            if not doc.get('analyzed_metadata'):
+                metadata = analyze_document_metadata(content, doc.get('title', ''))
+                doc['analyzed_metadata'] = metadata
+            else:
+                metadata = doc['analyzed_metadata']
+            
+            title = metadata.get('title', 'Untitled Document')
+            author_org = metadata.get('author_organization', 'Unknown')
+            pub_date = metadata.get('publish_date', 'Unknown')
+            doc_type = metadata.get('document_type', 'Unknown')
+            content_preview = metadata.get('content_preview', 'No preview available')
             
             # Calculate comprehensive scores
             scores = comprehensive_document_scoring(content, title)
@@ -325,8 +337,10 @@ def render_card_view(docs):
                 background:white;box-shadow:0 4px 6px rgba(0,0,0,0.1);
                 transition:transform 0.2s ease;border-left:5px solid #3B82F6'>
                     <h3 style='margin:0 0 8px 0;color:#333'>{title}</h3>
-                    <div style='margin-bottom:10px'>
+                    <div style='margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap'>
                         <span style='background:#f0f0f0;padding:2px 8px;border-radius:12px;font-size:12px'>{doc_type}</span>
+                        <span style='background:#e0f2fe;padding:2px 8px;border-radius:12px;font-size:12px;color:#0277bd'>{author_org}</span>
+                        {f"<span style='background:#f3e5f5;padding:2px 8px;border-radius:12px;font-size:12px;color:#7b1fa2'>{pub_date}</span>" if pub_date and pub_date != 'Unknown' else ""}
                     </div>
                     <div style='margin-bottom:12px'>
                         <div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px'>
@@ -339,6 +353,5 @@ def render_card_view(docs):
                 </div>
             """, unsafe_allow_html=True)
             
-            if content:
-                with st.expander("Content Preview"):
-                    st.write(content[:300] + "..." if len(content) > 300 else content)
+            with st.expander("Intelligent Content Preview"):
+                st.write(content_preview)

@@ -11,6 +11,7 @@ dependencies = [
     "plotly",
     "anthropic>=0.53.0",
     "numpy>=2.3.0",
+    "openai>=1.85.0",
 ]
 
 [[tool.uv.index]]
