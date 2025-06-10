@@ -16,10 +16,21 @@ class DatabaseManager:
         self._connect()
     
     def _connect(self):
-        """Initialize database connection."""
+        """Initialize database connection with SSL and connection pooling."""
         try:
             if self.database_url:
-                self.engine = create_engine(self.database_url)
+                # Add SSL and connection pool settings for stability
+                engine_args = {
+                    'pool_size': 5,
+                    'max_overflow': 10,
+                    'pool_pre_ping': True,
+                    'pool_recycle': 3600,
+                    'connect_args': {
+                        'sslmode': 'require',
+                        'connect_timeout': 10
+                    }
+                }
+                self.engine = create_engine(self.database_url, **engine_args)
                 logger.info("Connected to PostgreSQL database")
             else:
                 logger.warning("No DATABASE_URL found, database operations will fail")
@@ -28,21 +39,28 @@ class DatabaseManager:
             self.engine = None
     
     def execute_query(self, query, params=None):
-        """Execute a query and return results."""
+        """Execute a query and return results with connection retry logic."""
         if not self.engine:
             return None
         
-        try:
-            with self.engine.begin() as conn:  # Use begin() for auto-commit transaction
-                result = conn.execute(text(query), params or {})
-                if result.returns_rows:
-                    rows = result.fetchall()
-                    return [dict(row._mapping) for row in rows]
-                else:
-                    return result.rowcount
-        except SQLAlchemyError as e:
-            logger.error(f"Query execution failed: {e}")
-            return []
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                with self.engine.begin() as conn:
+                    result = conn.execute(text(query), params or {})
+                    if result.returns_rows:
+                        rows = result.fetchall()
+                        return [dict(row._mapping) for row in rows]
+                    else:
+                        return result.rowcount
+            except SQLAlchemyError as e:
+                logger.error(f"Query execution failed (attempt {attempt + 1}): {e}")
+                if attempt < max_retries - 1:
+                    # Reconnect on connection errors
+                    if "connection" in str(e).lower() or "ssl" in str(e).lower():
+                        self._connect()
+                    continue
+                return []
     
     def fetch_documents(self):
         """Fetch all documents from the database."""
