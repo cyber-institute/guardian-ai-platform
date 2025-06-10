@@ -15,8 +15,7 @@ def create_dial_gauge(value, max_value=100):
             'font': {'size': 32, 'color': '#4A4A4A', 'family': "Arial Black"}, 
             'valueformat': '.0f',
             'suffix': '',
-            'prefix': '',
-            'y': 0.25  # Position number at bottom like reference
+            'prefix': ''
         },
         gauge = {
             'shape': "angular",
