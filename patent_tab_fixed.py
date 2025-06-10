@@ -14,25 +14,12 @@ import base64
 def render():
     """Render the interactive patent web application."""
     
-    # Patent header
+    # Patent header - clean version without blue background or icons
     st.markdown("""
-    <div style="
-        background: linear-gradient(135deg, #1e3a8a 0%, #312e81 50%, #1e40af 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 12px;
-        margin-bottom: 2rem;
-        text-align: center;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-    ">
-        <h1 style="margin: 0; font-size: 2.5rem; font-weight: 700;">
-            🛡️ GUARDIAN Patent Technology
-        </h1>
-        <h2 style="margin: 0.5rem 0 0 0; font-size: 1.2rem; opacity: 0.9;">
-            System for Real-Time Dynamic Governance of Emerging Technologies
-        </h2>
-        <p style="margin: 1rem 0 0 0; opacity: 0.8;">
-            Nonprovisional Utility Patent Application • Advanced AI Risk Assessment Framework
+    <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #B91C2C;">
+        <h2 style="color: #B91C2C; margin-bottom: 0.8rem; font-size: 1.6rem;">GUARDIAN Patent Application Overview</h2>
+        <p style="font-size: 1rem; line-height: 1.5; color: #374151; margin: 0;">
+            System for Real-Time Dynamic Governance of Emerging Technologies - Nonprovisional Utility Patent Application for Advanced AI Risk Assessment Framework
         </p>
     </div>
     """, unsafe_allow_html=True)
