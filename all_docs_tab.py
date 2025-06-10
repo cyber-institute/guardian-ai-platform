@@ -45,7 +45,6 @@ def is_probably_quantum(content):
     return any(kw in content.lower() for kw in keywords)
 
 def render():
-    st.markdown("<h2 style='text-align:center;'>All Uploaded Documents</h2>", unsafe_allow_html=True)
     
     # Enhanced refresh button with retroactive updates
     col1, col2 = st.columns([1, 4])
