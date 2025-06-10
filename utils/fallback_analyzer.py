@@ -56,10 +56,10 @@ def extract_title_fallback(content: str, source: str) -> str:
         r'<h1[^>]*>([^<]+)</h1>',
         r'<h2[^>]*>([^<]+)</h2>',
         
-        # NIST Special Publications (formal format)
-        r'\b(NIST\s+Special\s+Publication\s+\d+(?:-\d+)*[^.\n]*(?:Guidelines?|Framework|Standard)?[^.\n]*)\b',
-        r'\b(NIST\s+SP\s+\d+(?:-\d+)*[^.\n]*)\b',
-        r'\b(Special\s+Publication\s+\d+(?:-\d+)*[^.\n]*(?:Guidelines?|Framework)?[^.\n]*)\b',
+        # NIST Special Publications (formal format) - prioritize these
+        r'(NIST\s+Special\s+Publication\s+\d+(?:-\d+)*\s+[^.\n]{1,60})',
+        r'(Special\s+Publication\s+\d+(?:-\d+)*\s+[^.\n]{1,60})',
+        r'(NIST\s+SP\s+\d+(?:-\d+)*\s+[^.\n]{1,60})',
         
         # Government document formal titles
         r'\b(CISA\s+(?:Publication|Document|Advisory|Guidelines?)\s+[^.\n]*)\b',
@@ -72,11 +72,13 @@ def extract_title_fallback(content: str, source: str) -> str:
         # Formal document title patterns
         r'(?:^|\n)\s*([A-Z][A-Za-z\s\d-]{15,80}(?:Guidelines?|Framework|Strategy|Policy|Standard|Publication|Advisory))\s*(?:\n|$)',
         
-        # AI/Cybersecurity formal document titles
-        r'\b(AI\s+Security\s+Playbook(?:\s+for\s+[^.!?\n]+)?)\b',
-        r'\b(Artificial\s+Intelligence\s+Cybersecurity\s+Guidelines?)\b',
-        r'\b(AI\s+Systems?\s+Security\s+(?:Framework|Guidelines?|Standard))\b',
-        r'\b(Cybersecurity\s+(?:Framework|Guidelines?|Standard)\s+for\s+AI)\b',
+        # AI/Cybersecurity formal document titles - prioritize these over org names
+        r'(?:^|\n)\s*(AI\s+Security\s+Playbook(?:\s+for\s+[^.!?\n]+)?)\s*(?:\n|$)',
+        r'(?:^|\n)\s*(CISA\s+AI\s+Security\s+Playbook)\s*(?:\n|$)',
+        r'(?:^|\n)\s*(Artificial\s+Intelligence\s+Cybersecurity\s+Guidelines?)\s*(?:\n|$)',
+        r'(?:^|\n)\s*(AI\s+Systems?\s+Security\s+(?:Framework|Guidelines?|Standard))\s*(?:\n|$)',
+        r'(?:^|\n)\s*(Cybersecurity\s+(?:Framework|Guidelines?|Standard)\s+for\s+AI)\s*(?:\n|$)',
+        r'(?:^|\n)\s*(Deploying\s+AI\s+Systems\s+Securely[^.\n]*)\s*(?:\n|$)',
     ]
     
     for pattern in title_patterns:
