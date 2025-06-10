@@ -16,9 +16,17 @@ def save_document(document):
     Save a document to the PostgreSQL database.
     """
     try:
-        return db_manager.save_document(document)
+        print(f"Attempting to save document: {document.get('title', 'Unknown')}")
+        result = db_manager.save_document(document)
+        if result:
+            print(f"Successfully saved document: {document.get('title', 'Unknown')}")
+        else:
+            print(f"Failed to save document: {document.get('title', 'Unknown')}")
+        return result
     except Exception as e:
         print(f"Error saving document: {e}")
+        import traceback
+        traceback.print_exc()
         return False
 
 def save_assessment(document_id, assessment_data):

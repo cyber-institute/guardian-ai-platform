@@ -88,8 +88,8 @@ class DatabaseManager:
         params = {
             'title': document.get('title', 'Untitled'),
             'content': document.get('content', ''),
-            'text_content': document.get('text', ''),
-            'quantum_score': document.get('quantum_q', 0),
+            'text_content': document.get('text_content', '') or document.get('text', ''),
+            'quantum_score': document.get('quantum_score', 0) or document.get('quantum_q', 0),
             'document_type': document.get('document_type', 'unknown'),
             'source': document.get('source', 'manual')
         }
