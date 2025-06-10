@@ -23,7 +23,7 @@ def create_dial_gauge(value, max_value=100):
             'axis': {
                 'range': [0, max_value],
                 'tickwidth': 0,
-                'tickcolor': "transparent",
+                'tickcolor': "white",
                 'visible': False
             },
             'bar': {
