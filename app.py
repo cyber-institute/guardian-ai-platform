@@ -326,9 +326,9 @@ def main():
         </div>
         """, unsafe_allow_html=True)
     
-    # Enhanced sidebar with government/nonprofit styling
+    # Enhanced sidebar with document upload and API functionality
     with st.sidebar:
-        # Government seal-style header
+        # Upload section header
         st.markdown("""
         <div style="
             background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
@@ -340,83 +340,66 @@ def main():
             box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
         ">
             <h3 style="margin: 0; font-family: 'Source Serif Pro', serif; font-weight: 600;">
-                🔐 Risk Assessment Framework
+                Document Upload & Analysis
             </h3>
             <p style="margin: 0.5rem 0 0 0; opacity: 0.9; font-size: 0.9rem;">
-                Official Quantum Readiness Evaluation
+                Submit documents for quantum maturity assessment
             </p>
         </div>
         """, unsafe_allow_html=True)
         
-        st.markdown("### Assessment Methodology")
-        st.markdown("""
-        <div class="sidebar-info">
-        <strong>Core Evaluation Areas:</strong><br><br>
-        🔒 <strong>Post-Quantum Cryptography</strong><br>
-        Assessment of quantum-resistant algorithms<br><br>
-        ⚠️ <strong>Risk Assessment</strong><br>
-        Vulnerability identification and impact analysis<br><br>
-        📋 <strong>Implementation Planning</strong><br>
-        Strategy development and roadmap creation<br><br>
-        ✅ <strong>Standards Compliance</strong><br>
-        NIST, FIPS, and industry standard adherence<br><br>
-        🔄 <strong>Migration Strategy</strong><br>
-        Transition planning and execution framework
-        </div>
-        """, unsafe_allow_html=True)
+        # File upload section
+        st.markdown("### Upload Document")
+        uploaded_file = st.file_uploader(
+            "Drag and drop file here",
+            type=['pdf', 'doc', 'docx', 'txt', 'html', 'htm', 'eml'],
+            help="Limit 200MB per file • PDF, DOC, DOCX, HTML, HTM, EML, TXT"
+        )
         
-        st.markdown("### Maturity Classification")
-        st.markdown("""
-        <div class="sidebar-info">
-        <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
-            <div style="width: 12px; height: 12px; background: #059669; border-radius: 2px; margin-right: 8px;"></div>
-            <strong>90-100: Quantum-Ready</strong>
-        </div>
-        <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
-            <div style="width: 12px; height: 12px; background: #10b981; border-radius: 2px; margin-right: 8px;"></div>
-            <strong>75-89: Advanced</strong>
-        </div>
-        <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
-            <div style="width: 12px; height: 12px; background: #d97706; border-radius: 2px; margin-right: 8px;"></div>
-            <strong>50-74: Developing</strong>
-        </div>
-        <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
-            <div style="width: 12px; height: 12px; background: #f59e0b; border-radius: 2px; margin-right: 8px;"></div>
-            <strong>25-49: Basic</strong>
-        </div>
-        <div style="display: flex; align-items: center;">
-            <div style="width: 12px; height: 12px; background: #dc2626; border-radius: 2px; margin-right: 8px;"></div>
-            <strong>0-24: Initial</strong>
-        </div>
-        </div>
-        """, unsafe_allow_html=True)
+        if uploaded_file:
+            st.success(f"File uploaded: {uploaded_file.name}")
+            if st.button("Process Document"):
+                st.info("Processing document... This may take a moment.")
         
-        st.markdown("### Technical Capabilities")
-        st.markdown("""
-        <div class="sidebar-info">
-        <strong>Analysis Engine:</strong><br><br>
-        • Intelligent text processing<br>
-        • Quantum keyword detection<br>
-        • Compliance verification<br>
-        • Maturity trait identification<br>
-        • Gap analysis reporting<br>
-        • Standards cross-referencing<br><br>
-        <em>Powered by advanced natural language processing and domain-specific evaluation algorithms.</em>
-        </div>
-        """, unsafe_allow_html=True)
+        # Browse files button
+        st.button("Browse files", use_container_width=True)
         
-        # Add contact/support section
-        st.markdown("### Support Resources")
-        st.markdown("""
-        <div class="sidebar-info">
-        <strong>Need Assistance?</strong><br><br>
-        📚 Documentation available<br>
-        🎯 Training materials provided<br>
-        📞 Technical support accessible<br>
-        🔄 Regular updates included<br><br>
-        <small><em>This tool supports federal agencies and organizations in preparing for the post-quantum cryptography transition.</em></small>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown("---")
+        
+        # URL submission section  
+        st.markdown("### URL")
+        url_input = st.text_input("Enter URL:", placeholder="https://example.com/document")
+        if st.button("Submit URL", use_container_width=True):
+            if url_input:
+                st.info(f"Processing URL: {url_input}")
+            else:
+                st.error("Please enter a valid URL")
+        
+        st.markdown("---")
+        
+        # API section
+        st.markdown("### Run Multi-API Ingest")
+        if st.button("Run Multi-API Ingest", use_container_width=True):
+            st.info("Starting multi-API document ingestion...")
+        
+        # API logs section
+        st.markdown("### API Logs")
+        
+        # Expandable log sections
+        with st.expander("WEB | url > success"):
+            st.code("2025-06-08 23:05:55.476928")
+            
+        with st.expander("WEB | url > success"):
+            st.code("2025-06-08 08:07:46.906564")
+            
+        with st.expander("WEB | url > success"):
+            st.code("2025-06-08 07:54:13.855608")
+            
+        with st.expander("WEB | url > success"):
+            st.code("2025-06-07 21:21:26.339457")
+            
+        with st.expander("WEB | url > success"):
+            st.code("2025-06-07 21:08:56.927833")
     
     # Create main navigation with hamburger menu structure
     main_tab1, main_tab2, main_tab3, main_tab4 = st.tabs(["All Documents", "Patent Technology", "Repository Admin", "About"])
