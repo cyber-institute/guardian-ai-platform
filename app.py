@@ -504,6 +504,7 @@ def main():
         render_about()
     
     # Inject chatbot CSS and render widget
+    from components.chatbot_widget import inject_chatbot_css, render_chatbot_widget
     inject_chatbot_css()
     render_chatbot_widget()
 
