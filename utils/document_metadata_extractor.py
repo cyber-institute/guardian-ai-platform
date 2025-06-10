@@ -224,44 +224,52 @@ def classify_document_type(content: str, filename: str = "") -> str:
 def generate_content_preview(content: str) -> str:
     """Generate intelligent content preview."""
     
-    # Remove common document headers and footers
+    # Clean HTML and XML tags
+    content = re.sub(r'<[^>]+>', '', content)
+    
+    # Clean up common document artifacts
     content = re.sub(r'(?i)^.*?(?:table of contents|abstract|executive summary)', '', content, flags=re.DOTALL)
     content = re.sub(r'(?i)(?:page \d+|draft|confidential|proprietary).*$', '', content, flags=re.MULTILINE)
     
-    # Find the most substantive paragraph
-    paragraphs = [p.strip() for p in content.split('\n\n') if len(p.strip()) > 100]
+    # Remove excessive whitespace and normalize
+    content = re.sub(r'\s+', ' ', content).strip()
     
-    if not paragraphs:
-        # Fallback to sentences
-        sentences = re.split(r'[.!?]\s+', content)
-        meaningful_sentences = [s.strip() for s in sentences if len(s.strip()) > 50 and len(s.strip()) < 300]
-        if meaningful_sentences:
-            return ' '.join(meaningful_sentences[:2]) + '.'
-        return content[:200] + '...' if len(content) > 200 else content
+    # Remove style attributes and HTML artifacts
+    content = re.sub(r"style='[^']*'", '', content)
+    content = re.sub(r'style="[^"]*"', '', content)
+    content = re.sub(r'</?div[^>]*>', '', content)
+    content = re.sub(r'&\w+;', ' ', content)  # HTML entities
     
-    # Select best paragraph (avoid lists, headers, etc.)
-    best_paragraph = None
-    for para in paragraphs[:5]:  # Check first 5 paragraphs
-        if not re.search(r'^[•\-\*]|^\d+\.|\s{4,}', para):  # Not a list item
-            if not re.search(r'(?i)^(figure|table|appendix|section)', para):  # Not a header
-                best_paragraph = para
+    # Find meaningful sentences
+    sentences = re.split(r'[.!?]\s+', content)
+    meaningful_sentences = []
+    
+    for sentence in sentences:
+        sentence = sentence.strip()
+        # Skip very short, very long, or technical markup sentences
+        if (len(sentence) > 30 and len(sentence) < 400 and 
+            not re.search(r'^\d+\s*$|^[A-Z]\s*$|margin-|padding-|background-|color:', sentence) and
+            not sentence.startswith('font-') and
+            sentence.count(' ') > 3):  # At least 4 words
+            meaningful_sentences.append(sentence)
+            if len(meaningful_sentences) >= 2:
                 break
     
-    if not best_paragraph:
-        best_paragraph = paragraphs[0]
+    if meaningful_sentences:
+        preview = '. '.join(meaningful_sentences) + '.'
+        # Final cleanup
+        preview = re.sub(r'\s+', ' ', preview).strip()
+        if len(preview) > 300:
+            preview = preview[:297] + '...'
+        return preview
     
-    # Truncate to reasonable length
-    if len(best_paragraph) > 300:
-        sentences = re.split(r'[.!?]\s+', best_paragraph)
-        preview = sentences[0]
-        for sentence in sentences[1:]:
-            if len(preview + ' ' + sentence) <= 300:
-                preview += ' ' + sentence
-            else:
-                break
-        return preview + '.'
+    # Fallback: clean first part of content
+    clean_content = re.sub(r'[<>{}]', '', content)
+    clean_content = re.sub(r'\s+', ' ', clean_content).strip()
     
-    return best_paragraph
+    if len(clean_content) > 200:
+        return clean_content[:197] + '...'
+    return clean_content if clean_content else 'No meaningful content available'
 
 def is_valid_title(text: str) -> bool:
     """Check if extracted text is a valid title."""

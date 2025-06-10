@@ -1,4 +1,5 @@
 import streamlit as st
+import re
 from utils.db import fetch_documents
 from utils.hf_ai_scoring import evaluate_quantum_maturity_hf
 from utils.comprehensive_scoring import comprehensive_document_scoring, format_score_display, get_score_badge_color
@@ -32,11 +33,23 @@ def is_probably_quantum(content):
 def render():
     st.markdown("<h2 style='text-align:center;'>All Uploaded Documents</h2>", unsafe_allow_html=True)
     
+    # Clear metadata cache button
+    if st.button("🔄 Refresh Analysis", help="Regenerate document metadata with latest algorithms"):
+        if 'doc_metadata_cache' in st.session_state:
+            del st.session_state['doc_metadata_cache']
+        st.rerun()
+    
     try:
         all_docs = fetch_documents()
         if not all_docs:
             st.info("No documents found in the database. Please upload some documents first.")
             return
+            
+        # Clear any cached metadata to force fresh processing with improved HTML cleaning
+        for doc in all_docs:
+            if 'analyzed_metadata' in doc:
+                del doc['analyzed_metadata']
+                
     except Exception as e:
         st.error(f"Error fetching documents: {e}")
         return
@@ -355,7 +368,11 @@ def render_minimal_list(docs):
                 st.write("**Intelligent Preview:**")
                 st.write(content_preview)
                 st.write("**Raw Content:**")
-                st.write(content[:500] + "..." if len(content) > 500 else content)
+                # Clean the raw content for display
+                clean_content = re.sub(r'<[^>]+>', '', content)  # Remove HTML tags
+                clean_content = re.sub(r"style='[^']*'", '', clean_content)  # Remove style attributes
+                clean_content = re.sub(r'\s+', ' ', clean_content).strip()  # Normalize whitespace
+                st.write(clean_content[:500] + "..." if len(clean_content) > 500 else clean_content)
 
 def render_card_view(docs):
     """Render documents in full card format."""
@@ -403,3 +420,9 @@ def render_card_view(docs):
             
             with st.expander("Intelligent Content Preview"):
                 st.write(content_preview)
+                st.write("**Raw Content (Cleaned):**")
+                # Clean the raw content for display
+                clean_content = re.sub(r'<[^>]+>', '', content)  # Remove HTML tags
+                clean_content = re.sub(r"style='[^']*'", '', clean_content)  # Remove style attributes
+                clean_content = re.sub(r'\s+', ' ', clean_content).strip()  # Normalize whitespace
+                st.write(clean_content[:400] + "..." if len(clean_content) > 400 else clean_content)
