@@ -262,17 +262,11 @@ def render_compact_cards(docs):
         with cols[i % 3]:
             content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
             
-            # Get or generate intelligent metadata
-            if not doc.get('analyzed_metadata'):
-                metadata = extract_document_metadata(content, doc.get('title', ''))
-                doc['analyzed_metadata'] = metadata
-            else:
-                metadata = doc['analyzed_metadata']
-            
-            title = metadata.get('title', 'Untitled Document') or 'Untitled Document'
-            author_org = metadata.get('author_organization', 'Unknown') or 'Unknown'
-            pub_date = metadata.get('publish_date') or 'No date'
-            doc_type = metadata.get('document_type', 'Unknown') or 'Unknown'
+            # Use database metadata directly (already corrected)
+            title = doc.get('title', 'Untitled Document') or 'Untitled Document'
+            author_org = doc.get('author_organization', 'Unknown') or 'Unknown'
+            pub_date = doc.get('publish_date') or 'No date'
+            doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
             
             # Calculate comprehensive scores
             scores = comprehensive_document_scoring(content, str(title))
@@ -300,18 +294,12 @@ def render_grid_view(docs):
         with cols[i % 2]:
             content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
             
-            # Get or generate intelligent metadata
-            if not doc.get('analyzed_metadata'):
-                metadata = extract_document_metadata(content, doc.get('title', ''))
-                doc['analyzed_metadata'] = metadata
-            else:
-                metadata = doc['analyzed_metadata']
-            
-            title = metadata.get('title', 'Untitled Document') or 'Untitled Document'
-            author_org = metadata.get('author_organization', 'Unknown') or 'Unknown'
-            pub_date = metadata.get('publish_date') or 'No date'
-            doc_type = metadata.get('document_type', 'Unknown') or 'Unknown'
-            content_preview = metadata.get('content_preview', 'No preview available') or 'No preview available'
+            # Use database metadata directly (already corrected)
+            title = doc.get('title', 'Untitled Document') or 'Untitled Document'
+            author_org = doc.get('author_organization', 'Unknown') or 'Unknown'
+            pub_date = doc.get('publish_date') or 'No date'
+            doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
+            content_preview = doc.get('content_preview', 'No preview available') or 'No preview available'
             
             # Calculate comprehensive scores
             scores = comprehensive_document_scoring(content, str(title))
@@ -340,17 +328,11 @@ def render_table_view(docs):
     for doc in docs:
         content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
         
-        # Get or generate intelligent metadata
-        if not doc.get('analyzed_metadata'):
-            metadata = extract_document_metadata(content, doc.get('title', ''))
-            doc['analyzed_metadata'] = metadata
-        else:
-            metadata = doc['analyzed_metadata']
-        
-        title = metadata.get('title', 'Untitled Document') or 'Untitled Document'
-        author_org = metadata.get('author_organization', 'Unknown') or 'Unknown'
-        pub_date = metadata.get('publish_date') or 'N/A'
-        doc_type = metadata.get('document_type', 'Unknown') or 'Unknown'
+        # Use database metadata directly (already corrected)
+        title = doc.get('title', 'Untitled Document') or 'Untitled Document'
+        author_org = doc.get('author_organization', 'Unknown') or 'Unknown'
+        pub_date = doc.get('publish_date') or 'N/A'
+        doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
         
         scores = comprehensive_document_scoring(content, str(title))
         

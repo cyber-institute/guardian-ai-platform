@@ -66,9 +66,10 @@ class DatabaseManager:
         """Fetch all documents from the database."""
         query = """
         SELECT id, title, content, text_content as text, quantum_score as quantum_q,
-               document_type, source, created_at, updated_at
+               document_type, source, author_organization, publish_date, content_preview,
+               created_at, updated_at
         FROM documents 
-        ORDER BY created_at DESC
+        ORDER BY updated_at DESC, created_at DESC
         """
         
         results = self.execute_query(query)
@@ -81,12 +82,15 @@ class DatabaseManager:
             for row in results:
                 doc = {
                     'id': row['id'],
-                    'title': row['title'],
+                    'title': row['title'] or 'Untitled Document',
                     'content': row['content'],
                     'text': row['text'],
                     'quantum_q': float(row['quantum_q']) if row['quantum_q'] else 0,
-                    'document_type': row['document_type'],
-                    'source': row['source'],
+                    'document_type': row['document_type'] or 'Report',
+                    'source': row['source'] or '',
+                    'author_organization': row.get('author_organization', 'Unknown'),
+                    'publish_date': row.get('publish_date'),
+                    'content_preview': row.get('content_preview', 'No preview available'),
                     'created_at': row['created_at'],
                     'updated_at': row['updated_at']
                 }
