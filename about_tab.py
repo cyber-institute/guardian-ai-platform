@@ -106,16 +106,14 @@ def create_speedometer_dial(value, max_value=100):
     ax.text(0, -0.85, 'GOOD', ha='center', va='center', 
             fontsize=8, fontweight='bold', color='#666666', zorder=15)
     
-    # Save with consistent settings - force new render
+    # Save with consistent settings
     buffer = io.BytesIO()
-    plt.savefig(buffer, format='png', bbox_inches='tight', 
+    fig.savefig(buffer, format='png', bbox_inches='tight', 
                 pad_inches=0.05, facecolor='white', dpi=75, 
                 edgecolor='none', transparent=False)
-    plt.tight_layout()
     buffer.seek(0)
     image_base64 = base64.b64encode(buffer.getvalue()).decode()
     plt.close(fig)
-    plt.clf()  # Clear figure
     
     # Return with fixed dimensions (square for circular gauge)
     return f'<img src="data:image/png;base64,{image_base64}" style="width: 90px; height: 90px; display: block; margin: 0 auto; object-fit: contain;">'
