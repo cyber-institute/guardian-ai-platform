@@ -432,12 +432,26 @@ def render_card_view(docs):
             
             # ISOLATED STEP 4: Display clean content preview (completely separate from scoring)
             with st.expander("Intelligent Content Preview"):
-                # Use the pre-generated clean preview (no HTML interaction)
-                if clean_preview_text and len(clean_preview_text.strip()) > 5:
-                    # Final safety cleaning before display
-                    final_clean = re.sub(r'[<>]', '', clean_preview_text)
-                    final_clean = re.sub(r'&[a-zA-Z0-9#]+;', ' ', final_clean)
-                    final_clean = re.sub(r'\s+', ' ', final_clean).strip()
-                    st.write(final_clean)
+                # Emergency bypass: Generate completely clean text directly from raw content
+                bypass_content = re.sub(r'<[^>]*>', '', raw_content)  # Remove all tags
+                bypass_content = re.sub(r'</[^>]*>', '', bypass_content)  # Remove closing tags
+                bypass_content = re.sub(r'[<>/]', '', bypass_content)  # Remove brackets/slashes
+                bypass_content = re.sub(r'&[a-zA-Z0-9#]+;?', ' ', bypass_content)  # Remove entities
+                bypass_content = re.sub(r'\bdiv\b|\bspan\b', '', bypass_content, flags=re.IGNORECASE)  # Remove div/span words
+                bypass_content = re.sub(r'\s+', ' ', bypass_content).strip()  # Normalize spaces
+                
+                # Extract first meaningful sentences directly
+                sentences = bypass_content.split('.')[:3]
+                clean_sentences = []
+                for sentence in sentences:
+                    sentence = sentence.strip()
+                    if len(sentence) > 20 and any(c.isalpha() for c in sentence):
+                        clean_sentences.append(sentence)
+                
+                if clean_sentences:
+                    final_text = '. '.join(clean_sentences) + '.'
+                    if len(final_text) > 200:
+                        final_text = final_text[:197] + '...'
+                    st.text(final_text)  # Use st.text() instead of st.write() to avoid HTML processing
                 else:
-                    st.write("Content preview not available")
+                    st.text("Content preview not available")
