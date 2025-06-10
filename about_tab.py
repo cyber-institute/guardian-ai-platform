@@ -85,12 +85,12 @@ def render():
         <div style="font-size: 0.9rem; line-height: 1.4;">
         <strong>AI Policy Analysis</strong><br>
         Document parsing, sentiment analysis, compliance scoring<br><br>
-        <strong>Cybersecurity Assessment</strong><br>
-        NIST framework alignment, vulnerability detection<br><br>
+        <strong>AI Cybersecurity Evaluation</strong><br>
+        AI system encryption, authentication, threat monitoring<br><br>
         <strong>Quantum Readiness</strong><br>
         QCMEA 5-tier evaluation, post-quantum crypto assessment<br><br>
-        <strong>Ethics Compliance</strong><br>
-        Bias detection, transparency scoring, accountability tracking
+        <strong>AI & Quantum Ethics Evaluation</strong><br>
+        Fairness assessment, quantum advantage ethics, privacy protection
         </div>
         </div>
         """, unsafe_allow_html=True)
