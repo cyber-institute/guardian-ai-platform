@@ -279,17 +279,40 @@ def create_government_thumbnail(title, doc_type):
     return svg_to_base64(svg)
 
 def create_generic_thumbnail(title, doc_type):
-    """Create generic document thumbnail"""
+    """Create generic document thumbnail with unique color variations"""
+    # Generate unique colors based on title hash
+    title_hash = abs(hash(title)) % 6
+    colors = [
+        {"bg": "#059669", "accent": "#10b981", "text": "POLICY"},  # Green
+        {"bg": "#dc2626", "accent": "#ef4444", "text": "GUIDE"},   # Red
+        {"bg": "#7c3aed", "accent": "#8b5cf6", "text": "FRAME"},  # Purple
+        {"bg": "#ea580c", "accent": "#f97316", "text": "TECH"},   # Orange
+        {"bg": "#0891b2", "accent": "#06b6d4", "text": "CYBER"},  # Cyan
+        {"bg": "#be185d", "accent": "#ec4899", "text": "AI"}      # Pink
+    ]
+    
+    color_scheme = colors[title_hash]
+    
     svg = f"""
     <svg width="80" height="100" xmlns="http://www.w3.org/2000/svg">
-        <rect width="80" height="100" fill="#6b7280" rx="4"/>
+        <defs>
+            <linearGradient id="grad{title_hash}" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:{color_scheme['bg']};stop-opacity:1" />
+                <stop offset="100%" style="stop-color:{color_scheme['accent']};stop-opacity:1" />
+            </linearGradient>
+        </defs>
+        <rect width="80" height="100" fill="url(#grad{title_hash})" rx="4"/>
         <rect x="8" y="8" width="64" height="84" fill="white" rx="2"/>
-        <rect x="15" y="20" width="50" height="2" fill="#d1d5db"/>
-        <rect x="15" y="30" width="45" height="2" fill="#d1d5db"/>
-        <rect x="15" y="40" width="40" height="2" fill="#d1d5db"/>
-        <rect x="15" y="50" width="35" height="2" fill="#d1d5db"/>
-        <text x="40" y="70" text-anchor="middle" font-family="Arial" font-size="5" fill="#374151">Document</text>
-        <text x="40" y="85" text-anchor="middle" font-family="Arial" font-size="4" fill="#6b7280">{doc_type}</text>
+        <rect x="12" y="12" width="56" height="12" fill="{color_scheme['bg']}" rx="2"/>
+        <text x="40" y="22" text-anchor="middle" font-family="Arial" font-size="6" font-weight="bold" fill="white">{color_scheme['text']}</text>
+        
+        <rect x="15" y="30" width="{20 + (title_hash * 5)}" height="3" fill="{color_scheme['accent']}" rx="1"/>
+        <rect x="15" y="38" width="{30 + (title_hash * 3)}" height="3" fill="#e5e7eb" rx="1"/>
+        <rect x="15" y="46" width="{25 + (title_hash * 4)}" height="3" fill="#e5e7eb" rx="1"/>
+        <rect x="15" y="54" width="{35 + (title_hash * 2)}" height="3" fill="#e5e7eb" rx="1"/>
+        
+        <circle cx="{20 + title_hash * 8}" cy="70" r="3" fill="{color_scheme['accent']}"/>
+        <text x="40" y="85" text-anchor="middle" font-family="Arial" font-size="4" fill="#374151">{doc_type[:10]}</text>
     </svg>
     """
     return svg_to_base64(svg)
@@ -320,28 +343,23 @@ def svg_to_base64(svg_content):
     return f"data:image/svg+xml;base64,{svg_b64}"
 
 def get_thumbnail_html(doc_title, doc_type, organization, doc_id=None, file_path=None):
-    """Get HTML img tag for document thumbnail"""
+    """Get HTML img tag for document thumbnail with unique designs per document"""
     thumbnail_data = None
     
-    # First try to load cached thumbnail if doc_id exists
-    if doc_id:
+    # Special case: Use real PDF thumbnail only for NIST document (ID 18)
+    if doc_id == 18 and organization and 'NIST' in organization.upper():
         thumbnail_cache_path = f"thumbnails/thumb_{doc_id}.png"
         if os.path.exists(thumbnail_cache_path):
             with open(thumbnail_cache_path, 'rb') as f:
                 img_data = f.read()
                 thumbnail_data = image_to_base64(img_data)
+        else:
+            # Generate PDF thumbnail for NIST document
+            pdf_path = find_pdf_in_assets(doc_title, organization)
+            if pdf_path:
+                thumbnail_data = generate_pdf_thumbnail(pdf_path, doc_id)
     
-    # If no cached thumbnail, try to find PDF file in attached_assets directory
-    if not thumbnail_data:
-        pdf_path = find_pdf_in_assets(doc_title, organization)
-        
-        # Try to generate real PDF thumbnail first
-        if pdf_path:
-            thumbnail_data = generate_pdf_thumbnail(pdf_path, doc_id or hash(doc_title))
-        elif doc_id and file_path:
-            thumbnail_data = generate_pdf_thumbnail(file_path, doc_id)
-    
-    # Fallback to SVG if PDF thumbnail fails
+    # For all other documents, generate unique SVG thumbnails
     if not thumbnail_data:
         thumbnail_data = generate_thumbnail_svg(doc_title, doc_type, organization)
     
