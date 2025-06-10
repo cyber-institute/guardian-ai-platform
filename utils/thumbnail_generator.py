@@ -323,14 +323,23 @@ def get_thumbnail_html(doc_title, doc_type, organization, doc_id=None, file_path
     """Get HTML img tag for document thumbnail"""
     thumbnail_data = None
     
-    # Try to find PDF file in attached_assets directory
-    pdf_path = find_pdf_in_assets(doc_title, organization)
+    # First try to load cached thumbnail if doc_id exists
+    if doc_id:
+        thumbnail_cache_path = f"thumbnails/thumb_{doc_id}.png"
+        if os.path.exists(thumbnail_cache_path):
+            with open(thumbnail_cache_path, 'rb') as f:
+                img_data = f.read()
+                thumbnail_data = image_to_base64(img_data)
     
-    # Try to generate real PDF thumbnail first
-    if pdf_path:
-        thumbnail_data = generate_pdf_thumbnail(pdf_path, doc_id or hash(doc_title))
-    elif doc_id and file_path:
-        thumbnail_data = generate_pdf_thumbnail(file_path, doc_id)
+    # If no cached thumbnail, try to find PDF file in attached_assets directory
+    if not thumbnail_data:
+        pdf_path = find_pdf_in_assets(doc_title, organization)
+        
+        # Try to generate real PDF thumbnail first
+        if pdf_path:
+            thumbnail_data = generate_pdf_thumbnail(pdf_path, doc_id or hash(doc_title))
+        elif doc_id and file_path:
+            thumbnail_data = generate_pdf_thumbnail(file_path, doc_id)
     
     # Fallback to SVG if PDF thumbnail fails
     if not thumbnail_data:
