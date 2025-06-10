@@ -1,8 +1,20 @@
 import streamlit as st
 from utils.db import fetch_documents
 from utils.hf_ai_scoring import evaluate_quantum_maturity_hf
+from utils.comprehensive_scoring import comprehensive_document_scoring, format_score_display, get_score_badge_color
+
+def get_comprehensive_badge(score, framework):
+    """Create badge for comprehensive scoring system."""
+    if score is None:
+        return f"<span style='background: #9CA3AF;color:white;padding:4px 8px;border-radius:6px;font-weight:500;font-family:Inter,sans-serif;'>N/A</span>"
+    
+    color = get_score_badge_color(score, framework)
+    display_score = format_score_display(score, framework)
+    
+    return f"<span style='background: {color};color:white;padding:4px 8px;border-radius:6px;font-weight:600;font-family:Inter,sans-serif;box-shadow:0 2px 4px rgba(0,0,0,0.1)'>{display_score}</span>"
 
 def get_badge(score):
+    """Legacy badge function for backward compatibility."""
     if score >= 80:
         return f"<span style='background: linear-gradient(135deg, #059669 0%, #10b981 100%);color:white;padding:4px 12px;border-radius:8px;font-weight:600;font-family:Inter,sans-serif;box-shadow:0 2px 4px rgba(5,150,105,0.2)'>{score}</span>"
     elif score >= 50:
@@ -190,21 +202,27 @@ def render():
 
 def render_compact_cards(docs):
     """Render documents in compact card format."""
-    cols = st.columns(4)
+    cols = st.columns(3)
     for i, doc in enumerate(docs):
-        with cols[i % 4]:
+        with cols[i % 3]:
             title = doc.get('title', 'Untitled Document')
             doc_type = doc.get('document_type', 'Unknown')
-            quantum_score = doc.get("quantum_score", 0)
+            content = doc.get('content', '') or doc.get('text_content', '')
+            
+            # Calculate comprehensive scores
+            scores = comprehensive_document_scoring(content, title)
             
             st.markdown(f"""
-                <div style='border:1px solid #e0e0e0;padding:8px;border-radius:6px;margin:4px;
+                <div style='border:1px solid #e0e0e0;padding:12px;border-radius:8px;margin:4px;
                 background:linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-                box-shadow:0 1px 3px rgba(0,0,0,0.1);height:140px;overflow:hidden'>
-                    <div style='font-weight:bold;font-size:14px;margin-bottom:4px'>{title[:35]}{'...' if len(title) > 35 else ''}</div>
-                    <div style='font-size:11px;color:#666;margin-bottom:6px'>{doc_type}</div>
-                    <div style='margin-bottom:6px'>
-                        Quantum Score: {get_badge(int(quantum_score))}
+                box-shadow:0 1px 3px rgba(0,0,0,0.1);height:200px;overflow:hidden'>
+                    <div style='font-weight:bold;font-size:14px;margin-bottom:6px'>{title[:30]}{'...' if len(title) > 30 else ''}</div>
+                    <div style='font-size:11px;color:#666;margin-bottom:8px'>{doc_type}</div>
+                    <div style='font-size:10px;line-height:1.3;margin-bottom:8px'>
+                        <div><strong>AI Cyber:</strong> {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity')}</div>
+                        <div><strong>Q Cyber:</strong> {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity')}</div>
+                        <div><strong>AI Ethics:</strong> {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics')}</div>
+                        <div><strong>Q Ethics:</strong> {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics')}</div>
                     </div>
                     <div style='font-size:10px;color:#888'>
                         {str(doc.get('created_at', ''))[:10] if doc.get('created_at') else 'No date'}
@@ -214,20 +232,28 @@ def render_compact_cards(docs):
 
 def render_grid_view(docs):
     """Render documents in grid layout."""
-    cols = st.columns(3)
+    cols = st.columns(2)
     for i, doc in enumerate(docs):
-        with cols[i % 3]:
+        with cols[i % 2]:
             title = doc.get('title', 'Untitled Document')
-            quantum_score = doc.get("quantum_score", 0)
-            content = doc.get('content', '')[:100]
+            content = doc.get('content', '') or doc.get('text_content', '')
+            content_preview = content[:100]
+            
+            # Calculate comprehensive scores
+            scores = comprehensive_document_scoring(content, title)
             
             st.markdown(f"""
                 <div style='border:2px solid #f0f0f0;padding:12px;border-radius:8px;margin:6px;
                 background:white;box-shadow:0 2px 4px rgba(0,0,0,0.08);
-                border-left:4px solid {"#2eb875" if quantum_score >= 80 else "#ff6b27" if quantum_score >= 50 else "#dc3545"}'>
-                    <h4 style='margin:0 0 8px 0;font-size:16px'>{title[:40]}{'...' if len(title) > 40 else ''}</h4>
-                    <div style='margin-bottom:8px'>{get_badge(int(quantum_score))}</div>
-                    <p style='font-size:12px;color:#666;margin:0'>{content}{'...' if len(content) >= 100 else ''}</p>
+                border-left:4px solid #3B82F6'>
+                    <h4 style='margin:0 0 8px 0;font-size:16px'>{title[:35]}{'...' if len(title) > 35 else ''}</h4>
+                    <div style='display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px;font-size:11px'>
+                        <div>AI Cyber: {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity')}</div>
+                        <div>Q Cyber: {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity')}</div>
+                        <div>AI Ethics: {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics')}</div>
+                        <div>Q Ethics: {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics')}</div>
+                    </div>
+                    <p style='font-size:12px;color:#666;margin:0'>{content_preview}{'...' if len(content_preview) >= 100 else ''}</p>
                 </div>
             """, unsafe_allow_html=True)
 
@@ -237,12 +263,17 @@ def render_table_view(docs):
     
     table_data = []
     for doc in docs:
+        content = doc.get('content', '') or doc.get('text_content', '')
+        scores = comprehensive_document_scoring(content, doc.get('title', 'Untitled'))
+        
         table_data.append({
-            'Title': doc.get('title', 'Untitled')[:50],
+            'Title': doc.get('title', 'Untitled')[:40],
             'Type': doc.get('document_type', 'Unknown'),
-            'Quantum Score': int(doc.get('quantum_score', 0)),
-            'Date': str(doc.get('created_at', ''))[:10] if doc.get('created_at') else 'N/A',
-            'Source': doc.get('source', 'Unknown')[:30] if doc.get('source') else 'N/A'
+            'AI Cyber': format_score_display(scores['ai_cybersecurity'], 'ai_cybersecurity'),
+            'Q Cyber': format_score_display(scores['quantum_cybersecurity'], 'quantum_cybersecurity'),
+            'AI Ethics': format_score_display(scores['ai_ethics'], 'ai_ethics'),
+            'Q Ethics': format_score_display(scores['quantum_ethics'], 'quantum_ethics'),
+            'Date': str(doc.get('created_at', ''))[:10] if doc.get('created_at') else 'N/A'
         })
     
     df = pd.DataFrame(table_data)
@@ -252,19 +283,30 @@ def render_minimal_list(docs):
     """Render documents in minimal list format."""
     for idx, doc in enumerate(docs):
         title = doc.get('title', 'Untitled Document')
-        quantum_score = doc.get("quantum_score", 0)
         doc_type = doc.get('document_type', 'Unknown')
+        content = doc.get('content', '') or doc.get('text_content', '')
         
-        col1, col2, col3 = st.columns([4, 1, 1])
+        # Calculate comprehensive scores
+        scores = comprehensive_document_scoring(content, title)
+        
+        col1, col2 = st.columns([3, 2])
         with col1:
             st.markdown(f"**{title}**")
             st.caption(f"{doc_type} • {str(doc.get('created_at', ''))[:10] if doc.get('created_at') else 'No date'}")
         with col2:
-            st.markdown(get_badge(int(quantum_score)), unsafe_allow_html=True)
-        with col3:
-            if st.button("View", key=f"view_{idx}"):
-                with st.expander("Document Details", expanded=True):
-                    st.write(doc.get('content', 'No content')[:500])
+            # Display all four scores in compact format
+            st.markdown(f"""
+            <div style='display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end'>
+                <small>AI Cyber:</small> {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity')}
+                <small>Q Cyber:</small> {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity')}
+                <small>AI Ethics:</small> {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics')}
+                <small>Q Ethics:</small> {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics')}
+            </div>
+            """, unsafe_allow_html=True)
+        
+        if st.button("View Details", key=f"view_{idx}"):
+            with st.expander("Document Details", expanded=True):
+                st.write(content[:500] + "..." if len(content) > 500 else content)
 
 def render_card_view(docs):
     """Render documents in full card format."""
@@ -273,19 +315,26 @@ def render_card_view(docs):
         with cols[i % 2]:
             title = doc.get('title', 'Untitled Document')
             doc_type = doc.get('document_type', 'Unknown')
-            quantum_score = doc.get("quantum_score", 0)
-            content = doc.get('content', '')
+            content = doc.get('content', '') or doc.get('text_content', '')
+            
+            # Calculate comprehensive scores
+            scores = comprehensive_document_scoring(content, title)
             
             st.markdown(f"""
                 <div style='border:1px solid #ddd;padding:16px;border-radius:12px;margin:8px;
                 background:white;box-shadow:0 4px 6px rgba(0,0,0,0.1);
-                transition:transform 0.2s ease;border-left:5px solid {"#2eb875" if quantum_score >= 80 else "#ff6b27" if quantum_score >= 50 else "#dc3545"}'>
+                transition:transform 0.2s ease;border-left:5px solid #3B82F6'>
                     <h3 style='margin:0 0 8px 0;color:#333'>{title}</h3>
                     <div style='margin-bottom:10px'>
                         <span style='background:#f0f0f0;padding:2px 8px;border-radius:12px;font-size:12px'>{doc_type}</span>
                     </div>
                     <div style='margin-bottom:12px'>
-                        Quantum Maturity: {get_badge(int(quantum_score))}
+                        <div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px'>
+                            <div><strong>AI Cybersecurity:</strong> {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity')}</div>
+                            <div><strong>Quantum Cybersecurity:</strong> {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity')}</div>
+                            <div><strong>AI Ethics:</strong> {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics')}</div>
+                            <div><strong>Quantum Ethics:</strong> {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics')}</div>
+                        </div>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
