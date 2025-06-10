@@ -386,7 +386,19 @@ def find_pdf_in_assets(doc_title, organization):
     
     # Enhanced fallback matching - match any available PDF for web-scraped documents
     if any(indicator in title_lower for indicator in ['webpage from', 'pdf document from', 'document from']):
-        # For web-scraped documents, use the first available PDF as they're likely related
+        # For web-scraped documents, try to match by domain first, then use first available
+        if 'eur-lex.europa.eu' in title_lower:
+            # Look for EU-related PDFs
+            for pdf_file in pdf_files:
+                if any(eu_indicator in pdf_file.lower() for eu_indicator in ['eu', 'europa', 'regulation']):
+                    return os.path.join(assets_dir, pdf_file)
+        elif 'ntrs.nasa.gov' in title_lower:
+            # Look for NASA-related PDFs
+            for pdf_file in pdf_files:
+                if 'nasa' in pdf_file.lower():
+                    return os.path.join(assets_dir, pdf_file)
+        
+        # If no domain-specific match, use the first available PDF
         if pdf_files:
             return os.path.join(assets_dir, pdf_files[0])
     

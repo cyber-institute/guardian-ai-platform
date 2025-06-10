@@ -37,19 +37,16 @@ def ultra_clean_metadata(field_value):
 def get_comprehensive_badge(score, framework):
     """Create badge for comprehensive scoring system with intelligent tooltips."""
     
-    # Define tooltip explanations for each framework
-    tooltips = {
-        'ai_cybersecurity': 'AI Cybersecurity Maturity (0-100): Evaluates security preparedness for AI systems including encryption standards, authentication mechanisms, threat monitoring, and incident response capabilities.',
-        'quantum_cybersecurity': 'Quantum Cybersecurity Maturity (1-5 QCMEA): Assesses quantum threat preparedness from basic awareness (1) to dynamic adaptability (5) using patent-based framework.',
-        'ai_ethics': 'AI Ethics (0-100): Measures responsible AI practices including fairness, transparency, accountability, and privacy protection mechanisms.',
-        'quantum_ethics': 'Quantum Ethics (0-100): Evaluates ethical considerations in quantum computing including equitable access, privacy implications, and responsible implementation.'
-    }
-    
     if score is None:
         return "N/A"
     
+    # Get clean score display and remove any HTML artifacts
     display_score = format_score_display(score, framework)
-    return f"{display_score}"
+    
+    # Ultra-clean any HTML that might have leaked through
+    clean_score = ultra_clean_metadata(str(display_score))
+    
+    return clean_score
 
 def get_badge(score):
     """Legacy badge function for backward compatibility."""
