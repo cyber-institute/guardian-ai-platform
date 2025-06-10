@@ -7,7 +7,7 @@ def main():
         page_title="GUARDIAN - AI Risk Analysis Navigator",
         page_icon="🔐",
         layout="wide",
-        initial_sidebar_state="expanded"
+        initial_sidebar_state="collapsed"
     )
     
     # Custom CSS styling - Government/Nonprofit Theme
@@ -328,25 +328,6 @@ def main():
     
     # Enhanced sidebar with document upload and API functionality
     with st.sidebar:
-        # Upload section header
-        st.markdown("""
-        <div style="
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            text-align: center;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
-        ">
-            <h3 style="margin: 0; font-family: 'Source Serif Pro', serif; font-weight: 600;">
-                Document Upload & Analysis
-            </h3>
-            <p style="margin: 0.5rem 0 0 0; opacity: 0.9; font-size: 0.9rem;">
-                Submit documents for quantum maturity assessment
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
         
         # File upload section
         st.markdown("### Upload Document")
