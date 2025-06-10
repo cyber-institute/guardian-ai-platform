@@ -49,26 +49,34 @@ def extract_title_fallback(content: str, source: str) -> str:
     clean_content = content.replace('\n', ' ').replace('\r', ' ')
     clean_content = re.sub(r'\s+', ' ', clean_content)
     
-    # Look for specific title patterns that are likely to be actual document titles
+    # Look for specific title patterns that capture formal document publication names
     title_patterns = [
         # HTML title and heading tags (most reliable)
         r'<title[^>]*>([^<]+)</title>',
         r'<h1[^>]*>([^<]+)</h1>',
         r'<h2[^>]*>([^<]+)</h2>',
         
-        # Joint guidance patterns
-        r'JOINT GUIDANCE\s+([A-Z][^.!?]+(?:Guidelines?|Framework|Playbook|Advisory))',
+        # NIST Special Publications (formal format)
+        r'\b(NIST\s+Special\s+Publication\s+\d+(?:-\d+)*[^.\n]*(?:Guidelines?|Framework|Standard)?[^.\n]*)\b',
+        r'\b(NIST\s+SP\s+\d+(?:-\d+)*[^.\n]*)\b',
+        r'\b(Special\s+Publication\s+\d+(?:-\d+)*[^.\n]*(?:Guidelines?|Framework)?[^.\n]*)\b',
         
-        # Specific document type patterns (standalone)
-        r'\b(AI\s+Security\s+Playbook(?:\s+for\s+[^.!?]+)?)\b',
-        r'\b(AI\s+Development\s+Security\s+Guidelines?)\b',
+        # Government document formal titles
+        r'\b(CISA\s+(?:Publication|Document|Advisory|Guidelines?)\s+[^.\n]*)\b',
+        r'\b(Joint\s+(?:Guidance|Advisory|Publication)[^.\n]*)\b',
+        r'\b(Cybersecurity\s+and\s+Infrastructure\s+Security\s+Agency[^.\n]*)\b',
+        
+        # Document publication patterns with numbers/codes
+        r'\b([A-Z]{2,6}\s+\d+(?:-\d+)*[^.\n]*(?:Guidelines?|Framework|Standard|Policy)[^.\n]*)\b',
+        
+        # Formal document title patterns
+        r'(?:^|\n)\s*([A-Z][A-Za-z\s\d-]{15,80}(?:Guidelines?|Framework|Strategy|Policy|Standard|Publication|Advisory))\s*(?:\n|$)',
+        
+        # AI/Cybersecurity formal document titles
+        r'\b(AI\s+Security\s+Playbook(?:\s+for\s+[^.!?\n]+)?)\b',
         r'\b(Artificial\s+Intelligence\s+Cybersecurity\s+Guidelines?)\b',
-        r'\b(AI\s+Systems?\s+Security\s+(?:Framework|Guidelines?|Guidance))\b',
-        r'\b(Cybersecurity\s+(?:Framework|Guidelines?|Advisory)\s+for\s+AI)\b',
-        r'\b(Joint\s+Cybersecurity\s+Advisory)\b',
-        
-        # Document format patterns
-        r'(?:^|\n)\s*([A-Z][A-Za-z\s]{10,60}(?:Guidelines?|Framework|Strategy|Policy|Report|Playbook|Advisory))\s*(?:\n|$)',
+        r'\b(AI\s+Systems?\s+Security\s+(?:Framework|Guidelines?|Standard))\b',
+        r'\b(Cybersecurity\s+(?:Framework|Guidelines?|Standard)\s+for\s+AI)\b',
     ]
     
     for pattern in title_patterns:
@@ -184,8 +192,18 @@ def classify_document_type_fallback(content: str) -> str:
         else:
             return 'Guideline'
     
-    # Government document indicators
-    if any(word in content_lower for word in ['cisa', 'nist', 'federal', 'government']):
+    # Government document indicators with specific NIST handling
+    if 'nist' in content_lower:
+        # NIST publications are typically standards
+        if any(word in content_lower for word in ['special publication', 'sp ', 'nist sp', '800-']):
+            return 'Standard'
+        elif 'framework' in content_lower:
+            return 'Framework'
+        elif 'guideline' in content_lower or 'guidance' in content_lower:
+            return 'Standard'  # NIST guidelines are typically standards
+        else:
+            return 'Standard'
+    elif any(word in content_lower for word in ['cisa', 'federal', 'government']):
         if 'framework' in content_lower:
             return 'Framework'
         elif 'guideline' in content_lower or 'guidance' in content_lower:
