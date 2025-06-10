@@ -808,6 +808,7 @@ def render_repository_admin_section():
         [
             "Database Status & Management",
             "Document Ingestion & Upload",
+            "Patent Scoring System Management",
             "System Logs & Monitoring",
             "Configuration & Settings"
         ]
@@ -818,6 +819,9 @@ def render_repository_admin_section():
         
     elif admin_section == "Document Ingestion & Upload":
         render_document_management()
+        
+    elif admin_section == "Patent Scoring System Management":
+        render_patent_scoring_management()
         
     elif admin_section == "System Logs & Monitoring":
         render_system_monitoring()
@@ -1014,6 +1018,137 @@ def render_database_status():
                 st.write(doc['document_type'])
     else:
         st.info("No documents found")
+
+def render_patent_scoring_management():
+    """Patent Scoring System Management interface."""
+    
+    st.markdown("### Patent-Based Scoring System Management")
+    
+    # Import scoring system functions
+    try:
+        from utils.comprehensive_patent_scoring import apply_comprehensive_patent_scoring, get_document_scores_summary
+        
+        # Get current scoring statistics
+        stats = get_document_scores_summary()
+        
+        if stats:
+            st.markdown("#### Current Scoring Statistics")
+            
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric(
+                    "Total Documents", 
+                    stats['total_documents'],
+                    help="Documents available for scoring"
+                )
+            
+            with col2:
+                st.metric(
+                    "AI Cybersecurity Avg", 
+                    f"{stats['average_scores']['ai_cybersecurity']}",
+                    help="Average AI Cybersecurity score (0-100)"
+                )
+            
+            with col3:
+                st.metric(
+                    "Quantum QCMEA Avg", 
+                    f"{stats['average_scores']['quantum_cybersecurity']}",
+                    help="Average Quantum Cybersecurity (1-5 QCMEA)"
+                )
+            
+            with col4:
+                st.metric(
+                    "AI Ethics Avg", 
+                    f"{stats['average_scores']['ai_ethics']}",
+                    help="Average AI Ethics score (0-100)"
+                )
+                
+            # Coverage statistics
+            st.markdown("#### Scoring Coverage by Framework")
+            
+            coverage_col1, coverage_col2 = st.columns(2)
+            
+            with coverage_col1:
+                st.markdown(f"""
+                **AI Frameworks:**
+                - AI Cybersecurity: {stats['scoring_coverage']['ai_cybersecurity']} documents
+                - AI Ethics: {stats['scoring_coverage']['ai_ethics']} documents
+                """)
+                
+            with coverage_col2:
+                st.markdown(f"""
+                **Quantum Frameworks:**
+                - Quantum Cybersecurity: {stats['scoring_coverage']['quantum_cybersecurity']} documents  
+                - Quantum Ethics: {stats['scoring_coverage']['quantum_ethics']} documents
+                """)
+        
+        # Scoring management actions
+        st.markdown("#### Scoring System Actions")
+        
+        action_col1, action_col2 = st.columns(2)
+        
+        with action_col1:
+            if st.button("🔄 Re-apply Patent Scoring to All Documents", type="primary"):
+                with st.spinner("Applying comprehensive patent-based scoring..."):
+                    try:
+                        processed = apply_comprehensive_patent_scoring()
+                        st.success(f"Successfully applied patent scoring to {processed} documents")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Error during scoring: {e}")
+        
+        with action_col2:
+            if st.button("📊 Refresh Statistics", type="secondary"):
+                st.rerun()
+        
+        # Patent formulas information
+        st.markdown("#### Implemented Patent Formulas")
+        
+        formula_col1, formula_col2 = st.columns(2)
+        
+        with formula_col1:
+            st.markdown("""
+            **Patent 1 - AI Ethics Risk Assessment:**
+            ```
+            Ethics_Score = Σ(wi × Di × Ri)
+            ```
+            - wi: dimension weight
+            - Di: dimension assessment (0-1)  
+            - Ri: risk factor (0-1)
+            
+            **Patent 2 - Quantum Cybersecurity (QCMEA):**
+            ```
+            QCMEA_Level = max{L | Σ(Qi × Wi) ≥ Threshold_L}
+            ```
+            - Qi: quantum readiness indicator
+            - Wi: indicator weight
+            - L: maturity level (1-5)
+            """)
+        
+        with formula_col2:
+            st.markdown("""
+            **Patent 3 - AI Cybersecurity Risk:**
+            ```
+            Risk_Cyber = Σ(Wi × Vi × Ci × Ii)
+            ```
+            - Wi: vulnerability weight
+            - Vi: vulnerability likelihood (0-1)
+            - Ci: consequence severity (0-1)
+            - Ii: implementation maturity (0-1)
+            
+            **Bayesian Dynamic Updates:**
+            ```
+            P(M|D) = P(D|M) × P(M) / P(D)
+            ```
+            - P(M|D): updated maturity probability
+            - P(D|M): likelihood of data given maturity
+            - P(M): prior maturity probability
+            """)
+            
+    except Exception as e:
+        st.error(f"Error loading patent scoring system: {e}")
+        st.info("Patent scoring system is initializing. Please try again in a moment.")
     
     st.markdown("---")
     
