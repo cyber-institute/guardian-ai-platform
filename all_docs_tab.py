@@ -33,6 +33,27 @@ def is_probably_quantum(content):
     return any(kw in content.lower() for kw in keywords)
 
 def render():
+    # Document Ingest banner
+    st.markdown("""
+    <div style="
+        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+        color: white;
+        padding: 1.5rem 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    ">
+        <h2 style="margin: 0; font-size: 2rem; font-weight: 600;">
+            📄 Document Ingest
+        </h2>
+        <p style="margin: 0.5rem 0 0 0; font-size: 1.1rem; opacity: 0.9;">
+            Intelligent document analysis and comprehensive maturity scoring
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
     st.markdown("<h2 style='text-align:center;'>All Uploaded Documents</h2>", unsafe_allow_html=True)
     
     # Clear metadata cache button
