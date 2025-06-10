@@ -426,10 +426,18 @@ def render_card_view(docs):
             """, unsafe_allow_html=True)
             
             with st.expander("Intelligent Content Preview"):
-                st.write(content_preview)
+                # Debug: Show what's actually in content_preview
+                st.write("**Content Preview Debug:**")
+                st.code(f"Preview type: {type(content_preview)}")
+                st.code(f"Preview length: {len(content_preview) if content_preview else 0}")
+                st.code(f"Preview sample: {repr(content_preview[:100]) if content_preview else 'None'}")
+                
+                # Force clean the content preview
+                from utils.content_cleaner import clean_html_content
+                cleaned_preview = clean_html_content(content_preview) if content_preview else "No preview available"
+                st.write("**Cleaned Preview:**")
+                st.write(cleaned_preview)
+                
                 st.write("**Raw Content (Cleaned):**")
-                # Clean the raw content for display
-                clean_content = re.sub(r'<[^>]+>', '', content)  # Remove HTML tags
-                clean_content = re.sub(r"style='[^']*'", '', clean_content)  # Remove style attributes
-                clean_content = re.sub(r'\s+', ' ', clean_content).strip()  # Normalize whitespace
+                clean_content = clean_html_content(content) if content else "No content"
                 st.write(clean_content[:400] + "..." if len(clean_content) > 400 else clean_content)
