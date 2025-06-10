@@ -387,20 +387,18 @@ def render_card_view(docs):
         with cols[i % 2]:
             content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
             
-            # Use completely isolated clean preview system
+            # Section 1: Clean metadata extraction (no scoring involved)
             clean_meta = extract_clean_metadata(content, doc.get('title', ''))
-            content_preview = generate_clean_preview(content)
+            title = clean_meta.get('clean_title', 'Untitled Document')
+            content_preview = clean_meta.get('clean_preview', 'No preview available')
             
-            # Extract metadata separately from clean content
+            # Section 2: Additional metadata from isolated extractor
             metadata = extract_document_metadata(content, doc.get('title', ''))
-            title = metadata.get('title', 'Untitled Document') or 'Untitled Document'
             author_org = metadata.get('author_organization', 'Unknown') or 'Unknown'
             pub_date = metadata.get('publish_date', 'Unknown') or 'Unknown'
             doc_type = metadata.get('document_type', 'Unknown') or 'Unknown'
             
-            # Calculate scores separately to prevent HTML contamination
-            scores = comprehensive_document_scoring(content, str(title))
-            
+            # Display metadata first (completely isolated from scoring)
             st.markdown(f"""
                 <div style='border:1px solid #ddd;padding:16px;border-radius:12px;margin:8px;
                 background:white;box-shadow:0 4px 6px rgba(0,0,0,0.1);
@@ -411,16 +409,27 @@ def render_card_view(docs):
                         <span style='background:#e0f2fe;padding:2px 8px;border-radius:12px;font-size:12px;color:#0277bd'>{author_org}</span>
                         {f"<span style='background:#f3e5f5;padding:2px 8px;border-radius:12px;font-size:12px;color:#7b1fa2'>{pub_date}</span>" if pub_date and pub_date != 'Unknown' else ""}
                     </div>
-                    <div style='margin-bottom:12px'>
-                        <div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px'>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            # Section 3: Calculate and display scores AFTER metadata (separate processing)
+            try:
+                scores = comprehensive_document_scoring(content, str(title))
+                
+                # Display scores in separate section
+                st.markdown(f"""
+                    <div style='margin:8px;padding:8px;background:#f8f9fa;border-radius:6px'>
+                        <div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px'>
                             <div><strong>AI Cybersecurity:</strong> {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity')}</div>
                             <div><strong>Quantum Cybersecurity:</strong> {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity')}</div>
                             <div><strong>AI Ethics:</strong> {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics')}</div>
                             <div><strong>Quantum Ethics:</strong> {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics')}</div>
                         </div>
                     </div>
-                </div>
-            """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
+            except Exception as e:
+                st.error(f"Scoring error: {e}")
+                scores = {'ai_cybersecurity': None, 'quantum_cybersecurity': None, 'ai_ethics': None, 'quantum_ethics': None}
             
             with st.expander("Intelligent Content Preview"):
                 # Temporary debug trace
