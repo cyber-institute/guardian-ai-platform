@@ -453,6 +453,21 @@ def main():
         if st.button("Run Multi-API Ingest", use_container_width=True):
             st.info("Starting multi-API document ingestion...")
         
+        # Chatbot Configuration section
+        from components.dialogflow_settings import render_dialogflow_settings, render_chatbot_status, show_chatbot_capabilities
+        
+        st.markdown("---")
+        render_dialogflow_settings()
+        
+        st.markdown("---")
+        st.markdown("### 🤖 Chatbot System Status")
+        render_chatbot_status()
+        
+        st.markdown("---")
+        show_chatbot_capabilities()
+        
+        st.markdown("---")
+        
         # API logs section
         st.markdown("### API Logs")
         

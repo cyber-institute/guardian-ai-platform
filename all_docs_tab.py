@@ -25,8 +25,9 @@ def get_comprehensive_badge(score, framework):
     
     color = get_score_badge_color(score, framework)
     display_score = format_score_display(score, framework)
+    tooltip_text = tooltips.get(framework, 'Assessment score')
     
-    return f"<span style='background: {color};color:white;padding:4px 8px;border-radius:6px;font-weight:600;font-family:Inter,sans-serif;box-shadow:0 2px 4px rgba(0,0,0,0.1)'>{display_score}</span>"
+    return f"<span class='score-badge' data-explanation='{tooltip_text}' style='background: {color};color:white;padding:4px 8px;border-radius:6px;font-weight:600;font-family:Inter,sans-serif;box-shadow:0 2px 4px rgba(0,0,0,0.1);cursor:help;'>{display_score}</span>"
 
 def get_badge(score):
     """Legacy badge function for backward compatibility."""

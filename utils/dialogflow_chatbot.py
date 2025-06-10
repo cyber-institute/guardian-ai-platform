@@ -38,13 +38,15 @@ class GuardianChatbot:
     def initialize_client(self):
         """Initialize Dialogflow CX session client."""
         try:
-            if DIALOGFLOW_AVAILABLE and all([self.project_id, self.agent_id]):
+            if DIALOGFLOW_AVAILABLE and dialogflow_cx and all([self.project_id, self.agent_id]):
                 self.session_client = dialogflow_cx.SessionsClient()
                 logger.info("Dialogflow CX client initialized successfully")
             else:
                 logger.info("Using local chatbot processing - Dialogflow CX credentials not configured")
+                self.session_client = None
         except Exception as e:
             logger.error(f"Failed to initialize Dialogflow CX client: {e}")
+            self.session_client = None
     
     def _load_guardian_knowledge(self) -> Dict:
         """Load GUARDIAN-specific knowledge base for intelligent responses."""
@@ -118,17 +120,20 @@ class GuardianChatbot:
             )
             
             # Create text input
-            text_input = dialogflow_cx.TextInput(text=text)
-            query_input = dialogflow_cx.QueryInput(
-                text=text_input,
-                language_code=self.language_code
-            )
-            
-            # Send request
-            request = dialogflow_cx.DetectIntentRequest(
-                session=session_path,
-                query_input=query_input
-            )
+            if dialogflow_cx:
+                text_input = dialogflow_cx.TextInput(text=text)
+                query_input = dialogflow_cx.QueryInput(
+                    text=text_input,
+                    language_code=self.language_code
+                )
+                
+                # Send request
+                request = dialogflow_cx.DetectIntentRequest(
+                    session=session_path,
+                    query_input=query_input
+                )
+            else:
+                return self._get_local_response(text)
             
             response = self.session_client.detect_intent(request=request)
             
