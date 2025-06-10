@@ -65,19 +65,19 @@ def draw_qcmea_scorecard(title, score):
         level_def = level_definitions[i]
         if i <= maturity_level:
             badges_html += f"""
-            <div style='display: inline-block; margin: 0 0.3rem; width: 45px; height: 45px; 
+            <div style='display: inline-flex; margin: 0 0.3rem; width: 45px; height: 45px; 
                         background: {level_def["color"]}; color: white; border-radius: 50%;
                         font-weight: 700; font-size: 1rem; box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-                        display: flex; align-items: center; justify-content: center;
+                        align-items: center; justify-content: center;
                         border: 3px solid {level_def["color"]};'>
                 {i}
             </div>"""
         else:
             badges_html += f"""
-            <div style='display: inline-block; margin: 0 0.3rem; width: 45px; height: 45px; 
+            <div style='display: inline-flex; margin: 0 0.3rem; width: 45px; height: 45px; 
                         background: #f3f4f6; color: #9ca3af; border-radius: 50%; 
                         font-weight: 600; font-size: 1rem; border: 3px dashed #d1d5db;
-                        display: flex; align-items: center; justify-content: center;'>
+                        align-items: center; justify-content: center;'>
                 {i}
             </div>"""
     
