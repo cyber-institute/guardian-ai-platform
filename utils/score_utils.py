@@ -7,7 +7,8 @@ except ImportError:
 
 def draw_scorecard(title, score):
     """
-    Draw a visual scorecard for quantum maturity scores (1-5 scale).
+    Draw a visual scorecard using patent-defined QCMEA framework (1-5 scale).
+    Based on "Quantum Cybersecurity Framework for Policy Assessment and Maturity Evaluation"
     """
     # Convert score to 1-5 scale if it's on 0-100 scale
     if score > 5:
@@ -15,28 +16,24 @@ def draw_scorecard(title, score):
     else:
         maturity_level = min(5, max(1, round(score)))
     
-    # Level definitions with color progression
-    level_names = {1: "Initial", 2: "Basic", 3: "Developing", 4: "Advanced", 5: "Expert"}
+    # Patent-defined QCMEA maturity levels (sections 5-9)
+    level_names = {1: "Initial", 2: "Basic", 3: "Intermediate", 4: "Advanced", 5: "Dynamic"}
     level_colors = {
-        1: "#dc2626",  # Red
-        2: "#f97316",  # Orange
-        3: "#eab308",  # Yellow
-        4: "#22c55e",  # Green
-        5: "#8b5cf6"   # Purple
+        1: "#DC2626",  # Red - Initial Maturity
+        2: "#EA580C",  # Orange - Basic Maturity
+        3: "#D97706",  # Amber - Intermediate Maturity
+        4: "#059669",  # Green - Advanced Maturity
+        5: "#7C3AED"   # Purple - Dynamic Maturity
     }
     level_text_colors = {
-        1: "#ffffff",  # White text
-        2: "#ffffff",  # White text
-        3: "#374151",  # Dark text on yellow
-        4: "#ffffff",  # White text
-        5: "#ffffff"   # White text
+        1: "#ffffff", 2: "#ffffff", 3: "#ffffff", 4: "#ffffff", 5: "#ffffff"
     }
     level_descriptions = {
-        1: "Minimal quantum awareness",
-        2: "Basic understanding of quantum risks", 
-        3: "Developing quantum readiness strategies",
-        4: "Advanced quantum security implementation",
-        5: "Expert-level quantum maturity"
+        1: "Basic awareness of quantum computing risks but lack structured mitigation strategies",
+        2: "Adopting foundational quantum-resistant measures, hybrid cryptographic methods", 
+        3: "Deploying scalable quantum-safe solutions and conducting regular risk assessments",
+        4: "Comprehensive integration of quantum-safe technologies across all domains",
+        5: "Continuous adaptability to emerging quantum threats using machine learning"
     }
     
     # Create circular level badges

@@ -419,7 +419,7 @@ def main():
         """, unsafe_allow_html=True)
     
     # Create tabs for different sections
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["All Documents", "Quantum Maturity", "Add Document", "Database Status", "About"])
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["All Documents", "Quantum Maturity", "Patent Frameworks", "Add Document", "Database Status", "About"])
     
     with tab1:
         render()
@@ -429,15 +429,19 @@ def main():
         render_quantum()
     
     with tab3:
+        from patent_scoring_tab import render as render_patent_scoring
+        render_patent_scoring()
+    
+    with tab4:
         from components.document_uploader import render_document_uploader, render_bulk_upload
         render_document_uploader()
         st.markdown("---")
         render_bulk_upload()
     
-    with tab4:
+    with tab5:
         render_database_status()
     
-    with tab5:
+    with tab6:
         from about_tab import render as render_about
         render_about()
 
