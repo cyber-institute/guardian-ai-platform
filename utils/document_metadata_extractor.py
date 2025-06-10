@@ -49,11 +49,11 @@ def extract_title(content: str, filename: str = "") -> str:
     title_patterns = [
         r'(?i)title:\s*(.+?)(?:\n|$)',
         r'(?i)document title:\s*(.+?)(?:\n|$)',
-        r'(?i)^(.+?)\s*\n\s*(?:abstract|executive summary|introduction)',
-        r'(?i)^([A-Z][^.\n]{10,100})\s*\n',  # First line if title-like
         r'(?i)<title[^>]*>([^<]+)</title>',
         r'(?i)^# (.+?)$',  # Markdown heading
-        r'(?i)^(.{10,100}?)\s*(?:\n\s*-{3,}|\n\s*={3,})',  # Underlined titles
+        r'(?i)^(.{15,100}?)\s*(?:\n\s*-{3,}|\n\s*={3,})',  # Underlined titles
+        r'(?i)^([A-Z][A-Za-z\s-]{10,80})\s*\n\s*(?:[A-Z][a-z])',  # Title followed by organization
+        r'(?i)^([A-Z][^.\n]{15,80}?(?:Guide|Framework|Standard|Report|Study|Analysis))\s*\n',  # Document type indicators
     ]
     
     for pattern in title_patterns:

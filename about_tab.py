@@ -120,7 +120,7 @@ def render():
     st.markdown("---")
     
     st.markdown("""
-    ### **Quantum Maturity Scoring**
+    ### **Quantum Cybersecurity Maturity Scoring**
     
     Our five-tier scoring system provides clear, actionable insights:
     """)
@@ -152,6 +152,145 @@ def render():
             </div>
         </div>
         """, unsafe_allow_html=True)
+    
+    # AI Cybersecurity Maturity Scoring section
+    st.markdown("---")
+    
+    st.markdown("""
+    ### **AI Cybersecurity Maturity Scoring (0-100 Scale)**
+    
+    This framework evaluates AI-specific cybersecurity implementations across four critical domains:
+    """)
+    
+    ai_cyber_criteria = [
+        ("**AI Data Security (25 points)**", [
+            "Training data encryption and access controls (0-6 points)",
+            "Model versioning and integrity verification (0-6 points)", 
+            "Secure data pipelines and preprocessing (0-7 points)",
+            "Privacy-preserving techniques (differential privacy, federated learning) (0-6 points)"
+        ]),
+        ("**AI Model Protection (25 points)**", [
+            "Model extraction and inversion attack prevention (0-8 points)",
+            "Adversarial robustness testing and hardening (0-8 points)",
+            "Secure model deployment and serving infrastructure (0-9 points)"
+        ]),
+        ("**AI Authentication & Access Control (25 points)**", [
+            "Multi-factor authentication for AI systems (0-8 points)",
+            "Role-based access control for model management (0-8 points)",
+            "API security and rate limiting for AI services (0-9 points)"
+        ]),
+        ("**AI Incident Response & Monitoring (25 points)**", [
+            "Real-time AI system monitoring and anomaly detection (0-8 points)",
+            "AI-specific incident response procedures (0-8 points)",
+            "Threat intelligence integration for AI vulnerabilities (0-9 points)"
+        ])
+    ]
+    
+    for category, criteria in ai_cyber_criteria:
+        st.markdown(f"**{category}**")
+        for criterion in criteria:
+            st.markdown(f"- {criterion}")
+        st.markdown("")
+    
+    st.markdown("""
+    **Score Progression:**
+    - **0-25**: Basic awareness, minimal AI security measures
+    - **26-50**: Developing capabilities, some AI-specific protections
+    - **51-75**: Comprehensive AI security framework with most controls
+    - **76-100**: Advanced AI cybersecurity with cutting-edge protections
+    """)
+    
+    # AI Ethics Scoring section
+    st.markdown("---")
+    
+    st.markdown("""
+    ### **AI Ethics Scoring (0-100 Scale)**
+    
+    This framework assesses ethical AI implementation across fairness, transparency, accountability, and privacy:
+    """)
+    
+    ai_ethics_criteria = [
+        ("**Fairness & Bias Mitigation (25 points)**", [
+            "Bias detection and testing methodologies (0-8 points)",
+            "Diverse training data and representative datasets (0-8 points)",
+            "Algorithmic fairness metrics and monitoring (0-9 points)"
+        ]),
+        ("**Transparency & Explainability (25 points)**", [
+            "Model interpretability and explanation capabilities (0-8 points)",
+            "Decision audit trails and reasoning documentation (0-8 points)",
+            "Clear AI disclosure to end users (0-9 points)"
+        ]),
+        ("**Accountability & Governance (25 points)**", [
+            "AI ethics review boards and oversight committees (0-8 points)",
+            "Responsibility frameworks for AI decisions (0-8 points)",
+            "Compliance with ethical AI guidelines and standards (0-9 points)"
+        ]),
+        ("**Privacy & Human Rights (25 points)**", [
+            "Data minimization and purpose limitation (0-8 points)",
+            "Consent management and user control mechanisms (0-8 points)",
+            "Human oversight and intervention capabilities (0-9 points)"
+        ])
+    ]
+    
+    for category, criteria in ai_ethics_criteria:
+        st.markdown(f"**{category}**")
+        for criterion in criteria:
+            st.markdown(f"- {criterion}")
+        st.markdown("")
+    
+    st.markdown("""
+    **Score Progression:**
+    - **0-25**: Limited ethical considerations, reactive approach
+    - **26-50**: Basic ethical frameworks, some accountability measures
+    - **51-75**: Comprehensive ethical AI practices with regular assessment
+    - **76-100**: Leading-edge ethical AI with proactive governance
+    """)
+    
+    # Quantum Ethics Scoring section
+    st.markdown("---")
+    
+    st.markdown("""
+    ### **Quantum Ethics Scoring (0-100 Scale)**
+    
+    This emerging framework evaluates ethical considerations specific to quantum computing technologies:
+    """)
+    
+    quantum_ethics_criteria = [
+        ("**Quantum Advantage Ethics (25 points)**", [
+            "Responsible use of quantum computational advantages (0-8 points)",
+            "Prevention of quantum supremacy abuse and monopolization (0-8 points)",
+            "Equitable access to quantum computational resources (0-9 points)"
+        ]),
+        ("**Quantum Privacy & Security (25 points)**", [
+            "Quantum-safe privacy protection measures (0-8 points)",
+            "Ethical quantum cryptography implementation (0-8 points)",
+            "Protection against quantum-enabled surveillance (0-9 points)"
+        ]),
+        ("**Quantum Research Ethics (25 points)**", [
+            "Responsible quantum research practices and disclosure (0-8 points)",
+            "International cooperation and knowledge sharing (0-8 points)",
+            "Quantum technology dual-use considerations (0-9 points)"
+        ]),
+        ("**Societal Impact & Accessibility (25 points)**", [
+            "Quantum technology impact assessment and mitigation (0-8 points)",
+            "Educational initiatives and workforce development (0-8 points)",
+            "Bridging quantum digital divide and ensuring inclusion (0-9 points)"
+        ])
+    ]
+    
+    for category, criteria in quantum_ethics_criteria:
+        st.markdown(f"**{category}**")
+        for criterion in criteria:
+            st.markdown(f"- {criterion}")
+        st.markdown("")
+    
+    st.markdown("""
+    **Score Progression:**
+    - **0-25**: Minimal quantum ethics awareness, basic compliance only
+    - **26-50**: Developing quantum ethics frameworks and policies
+    - **51-75**: Comprehensive quantum ethics integration with monitoring
+    - **76-100**: Advanced quantum ethics leadership with innovation
+    """)
     
     # Research foundation section
     st.markdown("---")
