@@ -1,4 +1,74 @@
 import streamlit as st
+import plotly.graph_objects as go
+
+def create_scoring_gauge(title, value, max_value=100, color_scheme="cybersecurity"):
+    """Create an interactive gauge for scoring visualization."""
+    
+    # Define color schemes
+    color_schemes = {
+        "cybersecurity": {
+            "low": "#DC2626",      # Red
+            "medium": "#EA580C",   # Orange  
+            "good": "#059669",     # Green
+            "excellent": "#047857" # Dark Green
+        },
+        "ethics": {
+            "low": "#DC2626",      # Red
+            "medium": "#D97706",   # Amber
+            "good": "#065F46",     # Emerald
+            "excellent": "#064E3B" # Dark Emerald
+        }
+    }
+    
+    colors = color_schemes.get(color_scheme, color_schemes["cybersecurity"])
+    
+    # Determine color based on value
+    if value <= 25:
+        needle_color = colors["low"]
+        performance = "Needs Improvement"
+    elif value <= 50:
+        needle_color = colors["medium"] 
+        performance = "Developing"
+    elif value <= 75:
+        needle_color = colors["good"]
+        performance = "Good"
+    else:
+        needle_color = colors["excellent"]
+        performance = "Excellent"
+    
+    fig = go.Figure(go.Indicator(
+        mode = "gauge+number+delta",
+        value = value,
+        domain = {'x': [0, 1], 'y': [0, 1]},
+        title = {'text': f"<b>{title}</b><br><span style='font-size:0.8em;color:gray'>{performance}</span>"},
+        delta = {'reference': 50},
+        gauge = {
+            'axis': {'range': [None, max_value], 'tickwidth': 1, 'tickcolor': "darkblue"},
+            'bar': {'color': needle_color, 'thickness': 0.3},
+            'bgcolor': "white",
+            'borderwidth': 2,
+            'bordercolor': "gray",
+            'steps': [
+                {'range': [0, 25], 'color': '#FEE2E2'},      # Light red
+                {'range': [25, 50], 'color': '#FED7AA'},     # Light orange
+                {'range': [50, 75], 'color': '#D1FAE5'},     # Light green
+                {'range': [75, max_value], 'color': '#A7F3D0'}  # Lighter green
+            ],
+            'threshold': {
+                'line': {'color': "red", 'width': 4},
+                'thickness': 0.75,
+                'value': 90
+            }
+        }
+    ))
+    
+    fig.update_layout(
+        height=200,
+        font={'color': "darkblue", 'family': "Arial"},
+        margin=dict(l=20, r=20, t=40, b=20)
+    )
+    
+    return fig
 
 def render():
     """Render the About tab for GUARDIAN system."""
@@ -193,13 +263,30 @@ def render():
             st.markdown(f"- {criterion}")
         st.markdown("")
     
-    st.markdown("""
-    **Score Progression:**
-    - **0-25**: Basic awareness, minimal AI security measures
-    - **26-50**: Developing capabilities, some AI-specific protections
-    - **51-75**: Comprehensive AI security framework with most controls
-    - **76-100**: Advanced AI cybersecurity with cutting-edge protections
-    """)
+    st.markdown("**Score Progression:**")
+    
+    # Create interactive gauges for AI Cybersecurity scoring
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        fig1 = create_scoring_gauge("Basic Level", 15, color_scheme="cybersecurity")
+        st.plotly_chart(fig1, use_container_width=True)
+        st.markdown("**0-25**: Basic awareness, minimal AI security measures")
+    
+    with col2:
+        fig2 = create_scoring_gauge("Developing", 37, color_scheme="cybersecurity")
+        st.plotly_chart(fig2, use_container_width=True)
+        st.markdown("**26-50**: Developing capabilities, some AI-specific protections")
+    
+    with col3:
+        fig3 = create_scoring_gauge("Comprehensive", 62, color_scheme="cybersecurity")
+        st.plotly_chart(fig3, use_container_width=True)
+        st.markdown("**51-75**: Comprehensive AI security framework with most controls")
+    
+    with col4:
+        fig4 = create_scoring_gauge("Advanced", 85, color_scheme="cybersecurity")
+        st.plotly_chart(fig4, use_container_width=True)
+        st.markdown("**76-100**: Advanced AI cybersecurity with cutting-edge protections")
     
     # AI Ethics Scoring section
     st.markdown("---")
@@ -241,13 +328,30 @@ def render():
             st.markdown(f"- {criterion}")
         st.markdown("")
     
-    st.markdown("""
-    **Score Progression:**
-    - **0-25**: Limited ethical considerations, reactive approach
-    - **26-50**: Basic ethical frameworks, some accountability measures
-    - **51-75**: Comprehensive ethical AI practices with regular assessment
-    - **76-100**: Leading-edge ethical AI with proactive governance
-    """)
+    st.markdown("**Score Progression:**")
+    
+    # Create interactive gauges for AI Ethics scoring
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        fig1 = create_scoring_gauge("Limited", 18, color_scheme="ethics")
+        st.plotly_chart(fig1, use_container_width=True)
+        st.markdown("**0-25**: Limited ethical considerations, reactive approach")
+    
+    with col2:
+        fig2 = create_scoring_gauge("Basic", 40, color_scheme="ethics")
+        st.plotly_chart(fig2, use_container_width=True)
+        st.markdown("**26-50**: Basic ethical frameworks, some accountability measures")
+    
+    with col3:
+        fig3 = create_scoring_gauge("Comprehensive", 65, color_scheme="ethics")
+        st.plotly_chart(fig3, use_container_width=True)
+        st.markdown("**51-75**: Comprehensive ethical AI practices with regular assessment")
+    
+    with col4:
+        fig4 = create_scoring_gauge("Leading-edge", 88, color_scheme="ethics")
+        st.plotly_chart(fig4, use_container_width=True)
+        st.markdown("**76-100**: Leading-edge ethical AI with proactive governance")
     
     # Quantum Ethics Scoring section
     st.markdown("---")
@@ -287,13 +391,30 @@ def render():
             st.markdown(f"- {criterion}")
         st.markdown("")
     
-    st.markdown("""
-    **Score Progression:**
-    - **0-25**: Minimal quantum ethics awareness, basic compliance only
-    - **26-50**: Developing quantum ethics frameworks and policies
-    - **51-75**: Comprehensive quantum ethics integration with monitoring
-    - **76-100**: Advanced quantum ethics leadership with innovation
-    """)
+    st.markdown("**Score Progression:**")
+    
+    # Create interactive gauges for Quantum Ethics scoring
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        fig1 = create_scoring_gauge("Minimal", 20, color_scheme="ethics")
+        st.plotly_chart(fig1, use_container_width=True)
+        st.markdown("**0-25**: Minimal quantum ethics awareness, basic compliance only")
+    
+    with col2:
+        fig2 = create_scoring_gauge("Developing", 42, color_scheme="ethics")
+        st.plotly_chart(fig2, use_container_width=True)
+        st.markdown("**26-50**: Developing quantum ethics frameworks and policies")
+    
+    with col3:
+        fig3 = create_scoring_gauge("Comprehensive", 68, color_scheme="ethics")
+        st.plotly_chart(fig3, use_container_width=True)
+        st.markdown("**51-75**: Comprehensive quantum ethics integration with monitoring")
+    
+    with col4:
+        fig4 = create_scoring_gauge("Leadership", 90, color_scheme="ethics")
+        st.plotly_chart(fig4, use_container_width=True)
+        st.markdown("**76-100**: Advanced quantum ethics leadership with innovation")
     
     # Research foundation section
     st.markdown("---")
