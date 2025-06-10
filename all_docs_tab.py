@@ -51,11 +51,11 @@ def render():
             st.info("No documents found in the database. Please upload some documents first.")
             return
             
-        # Clean all documents and clear cached metadata
+        # Clean all documents and force fresh metadata analysis
         all_docs = [clean_document_content(doc) for doc in all_docs]
+        # Force regeneration of all metadata with enhanced cleaning
         for doc in all_docs:
-            if 'analyzed_metadata' in doc:
-                del doc['analyzed_metadata']
+            doc.pop('analyzed_metadata', None)  # Remove any cached metadata
                 
     except Exception as e:
         st.error(f"Error fetching documents: {e}")
@@ -426,18 +426,4 @@ def render_card_view(docs):
             """, unsafe_allow_html=True)
             
             with st.expander("Intelligent Content Preview"):
-                # Debug: Show what's actually in content_preview
-                st.write("**Content Preview Debug:**")
-                st.code(f"Preview type: {type(content_preview)}")
-                st.code(f"Preview length: {len(content_preview) if content_preview else 0}")
-                st.code(f"Preview sample: {repr(content_preview[:100]) if content_preview else 'None'}")
-                
-                # Force clean the content preview
-                from utils.content_cleaner import clean_html_content
-                cleaned_preview = clean_html_content(content_preview) if content_preview else "No preview available"
-                st.write("**Cleaned Preview:**")
-                st.write(cleaned_preview)
-                
-                st.write("**Raw Content (Cleaned):**")
-                clean_content = clean_html_content(content) if content else "No content"
-                st.write(clean_content[:400] + "..." if len(clean_content) > 400 else clean_content)
+                st.write(content_preview)

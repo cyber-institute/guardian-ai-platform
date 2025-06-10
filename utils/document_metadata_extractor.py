@@ -226,54 +226,79 @@ def classify_document_type(content: str, filename: str = "") -> str:
     return 'Unknown'
 
 def generate_content_preview(content: str) -> str:
-    """Generate intelligent content preview."""
+    """Generate intelligent content preview with comprehensive cleaning."""
     
-    # Clean HTML and XML tags
-    content = re.sub(r'<[^>]+>', '', content)
+    if not content:
+        return 'No meaningful content available'
     
-    # Clean up common document artifacts
-    content = re.sub(r'(?i)^.*?(?:table of contents|abstract|executive summary)', '', content, flags=re.DOTALL)
-    content = re.sub(r'(?i)(?:page \d+|draft|confidential|proprietary).*$', '', content, flags=re.MULTILINE)
+    # Comprehensive HTML and CSS cleaning
+    cleaned = content
     
-    # Remove excessive whitespace and normalize
-    content = re.sub(r'\s+', ' ', content).strip()
+    # Remove all HTML tags and their contents
+    cleaned = re.sub(r'<script[^>]*>.*?</script>', '', cleaned, flags=re.DOTALL | re.IGNORECASE)
+    cleaned = re.sub(r'<style[^>]*>.*?</style>', '', cleaned, flags=re.DOTALL | re.IGNORECASE)
+    cleaned = re.sub(r'<[^>]+>', '', cleaned)  # Remove all HTML tags
     
-    # Remove style attributes and HTML artifacts
-    content = re.sub(r"style='[^']*'", '', content)
-    content = re.sub(r'style="[^"]*"', '', content)
-    content = re.sub(r'</?div[^>]*>', '', content)
-    content = re.sub(r'&\w+;', ' ', content)  # HTML entities
+    # Remove CSS style attributes and properties
+    cleaned = re.sub(r"style\s*=\s*['\"][^'\"]*['\"]", '', cleaned)
+    cleaned = re.sub(r'margin-[a-z-]*:\s*[^;]+;?', '', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'padding-[a-z-]*:\s*[^;]+;?', '', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'background-[a-z-]*:\s*[^;]+;?', '', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'color:\s*[^;]+;?', '', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'font-[a-z-]*:\s*[^;]+;?', '', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'border-[a-z-]*:\s*[^;]+;?', '', cleaned, flags=re.IGNORECASE)
     
-    # Find meaningful sentences
-    sentences = re.split(r'[.!?]\s+', content)
+    # Remove HTML entities
+    cleaned = re.sub(r'&[a-zA-Z][a-zA-Z0-9]*;', ' ', cleaned)
+    cleaned = re.sub(r'&#[0-9]+;', ' ', cleaned)
+    cleaned = re.sub(r'&#x[0-9a-fA-F]+;', ' ', cleaned)
+    
+    # Remove remaining angle brackets and CSS artifacts
+    cleaned = re.sub(r'[<>{}]', ' ', cleaned)
+    cleaned = re.sub(r'display:\s*[^;]+;?', '', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'align-items:\s*[^;]+;?', '', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'justify-content:\s*[^;]+;?', '', cleaned, flags=re.IGNORECASE)
+    
+    # Clean up document artifacts
+    cleaned = re.sub(r'(?i)^.*?(?:table of contents|abstract|executive summary)', '', cleaned, flags=re.DOTALL)
+    cleaned = re.sub(r'(?i)(?:page \d+|draft|confidential|proprietary).*$', '', cleaned, flags=re.MULTILINE)
+    
+    # Normalize whitespace
+    cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+    
+    # Extract meaningful sentences
+    sentences = re.split(r'[.!?]\s+', cleaned)
     meaningful_sentences = []
     
     for sentence in sentences:
         sentence = sentence.strip()
-        # Skip very short, very long, or technical markup sentences
-        if (len(sentence) > 30 and len(sentence) < 400 and 
-            not re.search(r'^\d+\s*$|^[A-Z]\s*$|margin-|padding-|background-|color:', sentence) and
-            not sentence.startswith('font-') and
-            sentence.count(' ') > 3):  # At least 4 words
+        # Filter out technical artifacts and ensure meaningful content
+        if (len(sentence) > 25 and len(sentence) < 500 and 
+            not re.search(r'^\d+\s*$|^[A-Z]\s*$|^[a-z]\s*$', sentence) and
+            not re.search(r'margin|padding|background|color:|font-|border-|display:', sentence, re.IGNORECASE) and
+            sentence.count(' ') > 4 and  # At least 5 words
+            not sentence.startswith(('div', 'span', 'strong', 'AI Cyber', 'Q Cyber', 'AI Ethics', 'Q Ethics'))):
             meaningful_sentences.append(sentence)
             if len(meaningful_sentences) >= 2:
                 break
     
     if meaningful_sentences:
         preview = '. '.join(meaningful_sentences) + '.'
-        # Final cleanup
+        # Final cleanup and truncation
         preview = re.sub(r'\s+', ' ', preview).strip()
         if len(preview) > 300:
             preview = preview[:297] + '...'
         return preview
     
-    # Fallback: clean first part of content
-    clean_content = re.sub(r'[<>{}]', '', content)
-    clean_content = re.sub(r'\s+', ' ', clean_content).strip()
+    # Last resort: extract first meaningful chunk
+    words = cleaned.split()
+    if len(words) > 10:
+        # Take first 30 words that don't look like CSS/HTML artifacts
+        clean_words = [w for w in words[:50] if not re.search(r'margin|padding|color|font|background', w, re.IGNORECASE)]
+        if len(clean_words) > 10:
+            return ' '.join(clean_words[:30]) + '...'
     
-    if len(clean_content) > 200:
-        return clean_content[:197] + '...'
-    return clean_content if clean_content else 'No meaningful content available'
+    return 'Document content requires manual review'
 
 def is_valid_title(text: str) -> bool:
     """Check if extracted text is a valid title."""
