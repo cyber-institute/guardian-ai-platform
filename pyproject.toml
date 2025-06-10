@@ -16,6 +16,9 @@ dependencies = [
     "trafilatura>=2.0.0",
     "pypdf>=5.6.0",
     "requests>=2.32.3",
+    "google-auth>=2.40.3",
+    "google-auth-oauthlib>=1.2.2",
+    "google-cloud-dialogflow-cx>=1.41.0",
 ]
 
 [[tool.uv.index]]

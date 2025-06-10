@@ -7,11 +7,21 @@ from utils.document_metadata_extractor import extract_document_metadata
 from utils.content_cleaner import clean_document_content
 from utils.clean_preview_generator import generate_clean_preview, extract_clean_metadata
 from utils.simple_updater import update_document_metadata
+from components.chatbot_widget import create_tooltip, render_help_tooltip
 
 def get_comprehensive_badge(score, framework):
-    """Create badge for comprehensive scoring system."""
+    """Create badge for comprehensive scoring system with intelligent tooltips."""
+    
+    # Define tooltip explanations for each framework
+    tooltips = {
+        'ai_cybersecurity': 'AI Cybersecurity Maturity (0-100): Evaluates security preparedness for AI systems including encryption standards, authentication mechanisms, threat monitoring, and incident response capabilities.',
+        'quantum_cybersecurity': 'Quantum Cybersecurity Maturity (1-5 QCMEA): Assesses quantum threat preparedness from basic awareness (1) to dynamic adaptability (5) using patent-based framework.',
+        'ai_ethics': 'AI Ethics (0-100): Measures responsible AI practices including fairness, transparency, accountability, and privacy protection mechanisms.',
+        'quantum_ethics': 'Quantum Ethics (0-100): Evaluates ethical considerations in quantum computing including equitable access, privacy implications, and responsible implementation.'
+    }
+    
     if score is None:
-        return f"<span style='background: #9CA3AF;color:white;padding:4px 8px;border-radius:6px;font-weight:500;font-family:Inter,sans-serif;'>N/A</span>"
+        return f"<span class='score-badge' data-explanation='{tooltips.get(framework, 'Score not available')}' style='background: #9CA3AF;color:white;padding:4px 8px;border-radius:6px;font-weight:500;font-family:Inter,sans-serif;cursor:help;'>N/A</span>"
     
     color = get_score_badge_color(score, framework)
     display_score = format_score_display(score, framework)

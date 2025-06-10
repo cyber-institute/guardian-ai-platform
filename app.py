@@ -1,6 +1,7 @@
 import streamlit as st
 from all_docs_tab import render
 from datetime import datetime
+from components.chatbot_widget import render_chatbot_widget, inject_chatbot_css
 
 def main():
     st.set_page_config(
@@ -486,6 +487,10 @@ def main():
     with main_tab4:
         from about_tab import render as render_about
         render_about()
+    
+    # Inject chatbot CSS and render widget
+    inject_chatbot_css()
+    render_chatbot_widget()
 
 def render_patent_technology_section():
     """Render the hierarchical Patent Technology section."""
