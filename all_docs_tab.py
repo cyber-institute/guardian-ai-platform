@@ -4,6 +4,7 @@ from utils.db import fetch_documents
 from utils.hf_ai_scoring import evaluate_quantum_maturity_hf
 from utils.comprehensive_scoring import comprehensive_document_scoring, format_score_display, get_score_badge_color
 from utils.document_metadata_extractor import extract_document_metadata
+from utils.content_cleaner import clean_document_content
 
 def get_comprehensive_badge(score, framework):
     """Create badge for comprehensive scoring system."""
@@ -34,10 +35,15 @@ def render():
     st.markdown("<h2 style='text-align:center;'>All Uploaded Documents</h2>", unsafe_allow_html=True)
     
     # Clear metadata cache button
-    if st.button("🔄 Refresh Analysis", help="Regenerate document metadata with latest algorithms"):
-        if 'doc_metadata_cache' in st.session_state:
-            del st.session_state['doc_metadata_cache']
-        st.rerun()
+    col1, col2 = st.columns([1, 4])
+    with col1:
+        if st.button("🔄 Refresh Analysis", help="Regenerate document metadata with latest algorithms"):
+            # Clear all cached metadata
+            for key in list(st.session_state.keys()):
+                if isinstance(key, str) and ('metadata' in key.lower() or 'analyzed' in key.lower()):
+                    del st.session_state[key]
+            st.success("Metadata cache cleared - documents will be reanalyzed")
+            st.rerun()
     
     try:
         all_docs = fetch_documents()
@@ -45,7 +51,8 @@ def render():
             st.info("No documents found in the database. Please upload some documents first.")
             return
             
-        # Clear any cached metadata to force fresh processing with improved HTML cleaning
+        # Clean all documents and clear cached metadata
+        all_docs = [clean_document_content(doc) for doc in all_docs]
         for doc in all_docs:
             if 'analyzed_metadata' in doc:
                 del doc['analyzed_metadata']

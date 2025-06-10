@@ -27,8 +27,12 @@ def extract_document_metadata(content: str, filename: str = "") -> Dict[str, Opt
             'content_preview': 'Insufficient content for analysis'
         }
     
-    # Clean content for analysis
-    content_clean = re.sub(r'\s+', ' ', content).strip()
+    # Clean content for analysis - remove HTML first
+    content_clean = re.sub(r'<[^>]+>', '', content)  # Remove HTML tags
+    content_clean = re.sub(r"style='[^']*'", '', content_clean)  # Remove style attributes
+    content_clean = re.sub(r'style="[^"]*"', '', content_clean)  # Remove style attributes with double quotes
+    content_clean = re.sub(r'&\w+;', ' ', content_clean)  # Remove HTML entities
+    content_clean = re.sub(r'\s+', ' ', content_clean).strip()  # Normalize whitespace
     
     return {
         'title': extract_title(content_clean, filename),
