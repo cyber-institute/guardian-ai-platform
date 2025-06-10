@@ -12,42 +12,37 @@ def create_dial_gauge(value, max_value=100):
         value = value,
         domain = {'x': [0, 1], 'y': [0, 1]},
         number = {
-            'font': {'size': 32, 'color': '#4A4A4A', 'family': "Arial Black"}, 
-            'valueformat': '.0f',
-            'suffix': '',
-            'prefix': ''
+            'font': {'size': 24, 'color': '#555555'}, 
+            'valueformat': '.0f'
         },
         gauge = {
-            'shape': "angular",
             'axis': {
                 'range': [0, max_value],
                 'tickwidth': 0,
-                'tickcolor': "white",
                 'visible': False
             },
             'bar': {
-                'color': '#4A4A4A',  # Dark gray needle exactly like reference
-                'thickness': 0.02,   # Very thin sharp needle
-                'line': {'color': '#2A2A2A', 'width': 1}
+                'color': '#555555',  # Dark gray needle exactly like reference
+                'thickness': 0.03   # Very thin sharp needle
             },
             'bgcolor': "white",
-            'borderwidth': 6,
-            'bordercolor': "#4A4A4A",  # Dark gray border like reference
+            'borderwidth': 4,
+            'bordercolor': "#666666",  # Dark gray border like reference
             'steps': [
-                {'range': [0, 16.67], 'color': '#FF3333'},    # Red segment
-                {'range': [16.67, 33.33], 'color': '#FF6600'}, # Orange segment
-                {'range': [33.33, 50], 'color': '#FFDD00'},    # Yellow segment
-                {'range': [50, 66.67], 'color': '#AADD00'},    # Yellow-green segment
-                {'range': [66.67, 83.33], 'color': '#66CC33'}, # Light green segment
-                {'range': [83.33, max_value], 'color': '#33AA33'} # Green segment
+                {'range': [0, 16.67], 'color': '#FF4444'},    # Red segment
+                {'range': [16.67, 33.33], 'color': '#FF8800'}, # Orange segment
+                {'range': [33.33, 50], 'color': '#FFCC00'},    # Yellow segment
+                {'range': [50, 66.67], 'color': '#88DD00'},    # Yellow-green segment
+                {'range': [66.67, 83.33], 'color': '#44BB44'}, # Light green segment
+                {'range': [83.33, max_value], 'color': '#22AA22'} # Green segment
             ]
         }
     ))
     
     fig.update_layout(
-        height=120,
-        width=120,
-        font={'color': "#4A4A4A", 'family': "Arial"},
+        height=100,
+        width=100,
+        font={'color': "#555555"},
         margin=dict(l=5, r=5, t=5, b=5),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
