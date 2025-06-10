@@ -4,9 +4,12 @@ Nonprovisional Utility Patent Application: "System for Real-Time Dynamic Governa
 """
 
 import streamlit as st
-import plotly.graph_objects as go
 import numpy as np
 import math
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import io
+import base64
 
 def render():
     """Render the interactive patent web application."""
@@ -119,46 +122,51 @@ def render_system_overview():
     st.markdown("#### Interactive System Flow")
     
     # Create a flow diagram using plotly
-    fig = go.Figure()
+    fig, ax = plt.subplots(figsize=(12, 3), facecolor='white')
     
     # Add nodes
     nodes = [
-        ("User Query", 1, 5, "#3B82F6"),
-        ("NLP Engine", 3, 5, "#10B981"),
-        ("Policy Repository", 5, 5, "#F59E0B"),
-        ("AI Scoring", 7, 5, "#EF4444"),
-        ("Risk Evaluation", 9, 5, "#8B5CF6"),
-        ("Recommendations", 11, 5, "#059669")
+        ("User Query", 1, 2, "#3B82F6"),
+        ("NLP Engine", 3, 2, "#10B981"),
+        ("Policy Repository", 5, 2, "#F59E0B"),
+        ("AI Scoring", 7, 2, "#EF4444"),
+        ("Risk Evaluation", 9, 2, "#8B5CF6"),
+        ("Recommendations", 11, 2, "#059669")
     ]
     
+    # Draw nodes
     for name, x, y, color in nodes:
-        fig.add_trace(go.Scatter(
-            x=[x], y=[y], mode='markers+text',
-            marker=dict(size=40, color=color),
-            text=name, textposition="middle center",
-            textfont=dict(color="white", size=10),
-            showlegend=False
-        ))
+        circle = patches.Circle((x, y), 0.4, facecolor=color, edgecolor='white', linewidth=2)
+        ax.add_patch(circle)
+        ax.text(x, y, name, ha='center', va='center', fontsize=8, fontweight='bold', 
+                color='white')
     
-    # Add arrows
+    # Draw arrows between nodes
     for i in range(len(nodes)-1):
         x1, y1 = nodes[i][1], nodes[i][2]
         x2, y2 = nodes[i+1][1], nodes[i+1][2]
-        fig.add_annotation(
-            x=x2, y=y2, ax=x1, ay=y1,
-            xref="x", yref="y", axref="x", ayref="y",
-            arrowhead=2, arrowsize=1, arrowwidth=2, arrowcolor="#6B7280"
-        )
+        arrow = patches.FancyArrowPatch((x1+0.4, y1), (x2-0.4, y2),
+                                       arrowstyle='->', mutation_scale=15,
+                                       color='#6B7280', linewidth=2)
+        ax.add_patch(arrow)
     
-    fig.update_layout(
-        title="Patent Figure 1: GUARDIAN System Architecture",
-        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-        height=200,
-        margin=dict(l=20, r=20, t=40, b=20)
-    )
+    ax.set_xlim(0, 12)
+    ax.set_ylim(1, 3)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.set_title("Patent Figure 1: GUARDIAN System Architecture", fontsize=12, fontweight='bold')
     
-    st.plotly_chart(fig, use_container_width=True)
+    # Convert to base64 for embedding
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png', bbox_inches='tight', 
+                pad_inches=0.2, facecolor='white', dpi=100)
+    buffer.seek(0)
+    image_base64 = base64.b64encode(buffer.getvalue()).decode()
+    plt.close(fig)
+    
+    # Display the chart
+    st.markdown(f'<img src="data:image/png;base64,{image_base64}" style="width: 100%; height: auto;">', 
+                unsafe_allow_html=True)
 
 def render_mathematical_formulations():
     """Render the mathematical formulations from the patent."""
@@ -282,12 +290,20 @@ def render_cyber_calculator():
         
         st.markdown("**Risk Assessment Results:**")
         
-        # Risk gauge
-        fig = go.Figure(go.Indicator(
-            mode = "gauge+number+delta",
-            value = total_risk,
-            title = {'text': "Cybersecurity Risk Score"},
-            domain = {'x': [0, 1], 'y': [0, 1]},
+        # Risk gauge using speedometer from about_tab
+        from about_tab import create_speedometer_dial
+        risk_percentage = min(100, (total_risk / 5) * 100)
+        risk_dial = create_speedometer_dial(int(risk_percentage))
+        st.markdown("**Cybersecurity Risk Score**")
+        st.markdown(risk_dial, unsafe_allow_html=True)
+        st.markdown(f"**Score:** {total_risk:.2f}/5")
+        
+        # Disabled plotly gauge
+        # fig = go.Figure(go.Indicator(
+        #     mode = "gauge+number+delta",
+        #     value = total_risk,
+        #     title = {'text': "Cybersecurity Risk Score"},
+        #     domain = {'x': [0, 1], 'y': [0, 1]},
             gauge = {
                 'axis': {'range': [None, 5]},
                 'bar': {'color': "#EF4444"},
