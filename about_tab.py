@@ -1,43 +1,77 @@
 import streamlit as st
 import plotly.graph_objects as go
 
-def create_dial_gauge(value, max_value=100):
-    """Create a speedometer-style dial gauge using simple CSS to avoid JS errors."""
+def create_battery_gauge(value, max_value=100):
+    """Create a vertical battery-style gauge like the reference image."""
     
-    # Calculate percentage for progress bar styling
+    # Calculate percentage and fill height
     percentage = (value / max_value) * 100
+    fill_height = (percentage / 100) * 80  # 80px is the battery height
     
-    # Create simple dial-style visualization
-    dial_html = f"""
-    <div style="text-align: center; margin: 15px 0;">
+    # Determine color based on value
+    if value <= 25:
+        fill_color = "#FF4444"  # Red
+    elif value <= 50:
+        fill_color = "#FF8800"  # Orange
+    elif value <= 75:
+        fill_color = "#FFCC00"  # Yellow
+    else:
+        fill_color = "#22AA22"  # Green
+    
+    # Create vertical battery gauge
+    battery_html = f"""
+    <div style="text-align: center; margin: 10px 0;">
         <div style="
-            width: 80px;
-            height: 40px;
-            border: 3px solid #666;
-            border-bottom: none;
-            border-radius: 80px 80px 0 0;
-            background: linear-gradient(to right, 
-                #FF4444 0%, #FF4444 16.67%, 
-                #FF8800 16.67%, #FF8800 33.33%,
-                #FFCC00 33.33%, #FFCC00 50%,
-                #88DD00 50%, #88DD00 66.67%,
-                #44BB44 66.67%, #44BB44 83.33%,
-                #22AA22 83.33%, #22AA22 100%);
+            width: 40px;
+            height: 90px;
+            border: 3px solid #999;
+            border-radius: 8px;
             position: relative;
-            margin: 0 auto 5px auto;
+            margin: 0 auto;
+            background: #f0f0f0;
         ">
+            <!-- Battery tip -->
+            <div style="
+                width: 20px;
+                height: 8px;
+                background: #999;
+                border-radius: 4px 4px 0 0;
+                position: absolute;
+                top: -8px;
+                left: 7px;
+            "></div>
+            
+            <!-- Battery fill with gradient -->
             <div style="
                 position: absolute;
-                bottom: -2px;
-                left: 37px;
-                width: 6px;
-                height: 6px;
-                background: #555;
-                border-radius: 50%;
+                bottom: 3px;
+                left: 3px;
+                width: 34px;
+                height: {fill_height}px;
+                background: linear-gradient(to top,
+                    #FF4444 0%, #FF4444 25%,
+                    #FF8800 25%, #FF8800 50%,
+                    #FFCC00 50%, #FFCC00 75%,
+                    #22AA22 75%, #22AA22 100%);
+                border-radius: 4px 4px 2px 2px;
             "></div>
+            
+            <!-- Percentage text overlay -->
+            <div style="
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 12px;
+                font-weight: bold;
+                color: white;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.7);
+            ">{value}%</div>
         </div>
+        
+        <!-- Score label -->
         <div style="
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             color: #555;
             margin-top: 5px;
@@ -45,7 +79,7 @@ def create_dial_gauge(value, max_value=100):
     </div>
     """
     
-    return dial_html
+    return battery_html
 
 def render():
     """Render the About tab for GUARDIAN system."""
@@ -242,32 +276,32 @@ def render():
     
     st.markdown("**Score Progression:**")
     
-    # AI Cybersecurity progression with side-by-side dial and explanation
+    # AI Cybersecurity progression with side-by-side battery gauge and explanation
     col1, col2 = st.columns([1, 4])
     with col1:
-        dial1 = create_dial_gauge(15)
-        st.markdown(dial1, unsafe_allow_html=True)
+        battery1 = create_battery_gauge(15)
+        st.markdown(battery1, unsafe_allow_html=True)
     with col2:
         st.markdown("**0-25**: Basic awareness, minimal AI security measures")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        dial2 = create_dial_gauge(37)
-        st.markdown(dial2, unsafe_allow_html=True)
+        battery2 = create_battery_gauge(37)
+        st.markdown(battery2, unsafe_allow_html=True)
     with col2:
         st.markdown("**26-50**: Developing capabilities, some AI-specific protections")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        dial3 = create_dial_gauge(62)
-        st.markdown(dial3, unsafe_allow_html=True)
+        battery3 = create_battery_gauge(62)
+        st.markdown(battery3, unsafe_allow_html=True)
     with col2:
         st.markdown("**51-75**: Comprehensive AI security framework with most controls")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        dial4 = create_dial_gauge(85)
-        st.markdown(dial4, unsafe_allow_html=True)
+        battery4 = create_battery_gauge(85)
+        st.markdown(battery4, unsafe_allow_html=True)
     with col2:
         st.markdown("**76-100**: Advanced AI cybersecurity with cutting-edge protections")
     
@@ -313,32 +347,32 @@ def render():
     
     st.markdown("**Score Progression:**")
     
-    # AI Ethics progression with side-by-side dial and explanation
+    # AI Ethics progression with side-by-side battery gauge and explanation
     col1, col2 = st.columns([1, 4])
     with col1:
-        dial1 = create_dial_gauge(18)
-        st.markdown(dial1, unsafe_allow_html=True)
+        battery1 = create_battery_gauge(18)
+        st.markdown(battery1, unsafe_allow_html=True)
     with col2:
         st.markdown("**0-25**: Limited ethical considerations, reactive approach")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        dial2 = create_dial_gauge(40)
-        st.markdown(dial2, unsafe_allow_html=True)
+        battery2 = create_battery_gauge(40)
+        st.markdown(battery2, unsafe_allow_html=True)
     with col2:
         st.markdown("**26-50**: Basic ethical frameworks, some accountability measures")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        dial3 = create_dial_gauge(65)
-        st.markdown(dial3, unsafe_allow_html=True)
+        battery3 = create_battery_gauge(65)
+        st.markdown(battery3, unsafe_allow_html=True)
     with col2:
         st.markdown("**51-75**: Comprehensive ethical AI practices with regular assessment")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        dial4 = create_dial_gauge(88)
-        st.markdown(dial4, unsafe_allow_html=True)
+        battery4 = create_battery_gauge(88)
+        st.markdown(battery4, unsafe_allow_html=True)
     with col2:
         st.markdown("**76-100**: Leading-edge ethical AI with proactive governance")
     
@@ -382,32 +416,32 @@ def render():
     
     st.markdown("**Score Progression:**")
     
-    # Quantum Ethics progression with side-by-side dial and explanation
+    # Quantum Ethics progression with side-by-side battery gauge and explanation
     col1, col2 = st.columns([1, 4])
     with col1:
-        dial1 = create_dial_gauge(20)
-        st.markdown(dial1, unsafe_allow_html=True)
+        battery1 = create_battery_gauge(20)
+        st.markdown(battery1, unsafe_allow_html=True)
     with col2:
         st.markdown("**0-25**: Minimal quantum ethics awareness, basic compliance only")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        dial2 = create_dial_gauge(42)
-        st.markdown(dial2, unsafe_allow_html=True)
+        battery2 = create_battery_gauge(42)
+        st.markdown(battery2, unsafe_allow_html=True)
     with col2:
         st.markdown("**26-50**: Developing quantum ethics frameworks and policies")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        dial3 = create_dial_gauge(68)
-        st.markdown(dial3, unsafe_allow_html=True)
+        battery3 = create_battery_gauge(68)
+        st.markdown(battery3, unsafe_allow_html=True)
     with col2:
         st.markdown("**51-75**: Comprehensive quantum ethics integration with monitoring")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        dial4 = create_dial_gauge(90)
-        st.markdown(dial4, unsafe_allow_html=True)
+        battery4 = create_battery_gauge(90)
+        st.markdown(battery4, unsafe_allow_html=True)
     with col2:
         st.markdown("**76-100**: Advanced quantum ethics leadership with innovation")
     
