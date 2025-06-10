@@ -370,22 +370,20 @@ def render_grid_view(docs):
         with cols[i % 2]:
             content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
             
-            # Use database metadata with HTML cleaning
-            title = doc.get('title', 'Untitled Document') or 'Untitled Document'
-            author_org = doc.get('author_organization', 'Unknown') or 'Unknown'
+            # Use database metadata with comprehensive HTML cleaning
+            title = ultra_clean_metadata(doc.get('title', 'Untitled Document'))
+            author_org = ultra_clean_metadata(doc.get('author_organization', 'Unknown'))
             
-            # Clean date field of HTML artifacts
+            # Clean date field comprehensively
             raw_date = doc.get('publish_date', '') or ''
             if raw_date and raw_date != 'Unknown':
-                # Remove HTML tags and artifacts
-                clean_date = re.sub(r'<[^>]*>', '', str(raw_date))
-                clean_date = re.sub(r'</[^>]*>', '', clean_date)
-                clean_date = clean_date.strip()
-                pub_date = clean_date if clean_date and len(clean_date) > 2 else 'Date not available'
+                pub_date = ultra_clean_metadata(raw_date)
+                if not pub_date or pub_date == 'Unknown' or len(pub_date) < 3:
+                    pub_date = 'Date not available'
             else:
                 pub_date = 'Date not available'
             
-            doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
+            doc_type = ultra_clean_metadata(doc.get('document_type', 'Unknown'))
             content_preview = doc.get('content_preview', 'No preview available') or 'No preview available'
             
             # Calculate comprehensive scores
