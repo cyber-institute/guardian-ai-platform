@@ -1,85 +1,64 @@
 import streamlit as st
-import plotly.graph_objects as go
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import numpy as np
+import io
+import base64
 
-def create_battery_gauge(value, max_value=100):
-    """Create a vertical battery-style gauge like the reference image."""
+def create_speedometer_dial(value, max_value=100):
+    """Create a speedometer dial gauge using matplotlib matching the reference image."""
     
-    # Calculate percentage and fill height
-    percentage = (value / max_value) * 100
-    fill_height = (percentage / 100) * 80  # 80px is the battery height
+    # Create figure and axis
+    fig, ax = plt.subplots(figsize=(2, 1.5), facecolor='white')
+    ax.set_xlim(-1.2, 1.2)
+    ax.set_ylim(-0.2, 1.2)
+    ax.set_aspect('equal')
+    ax.axis('off')
     
-    # Determine color based on value
-    if value <= 25:
-        fill_color = "#FF4444"  # Red
-    elif value <= 50:
-        fill_color = "#FF8800"  # Orange
-    elif value <= 75:
-        fill_color = "#FFCC00"  # Yellow
-    else:
-        fill_color = "#22AA22"  # Green
+    # Color segments for the speedometer
+    colors = ['#FF4444', '#FF8800', '#FFCC00', '#88DD00', '#44BB44', '#22AA22']
     
-    # Create vertical battery gauge
-    battery_html = f"""
-    <div style="text-align: center; margin: 10px 0;">
-        <div style="
-            width: 40px;
-            height: 90px;
-            border: 3px solid #999;
-            border-radius: 8px;
-            position: relative;
-            margin: 0 auto;
-            background: #f0f0f0;
-        ">
-            <!-- Battery tip -->
-            <div style="
-                width: 20px;
-                height: 8px;
-                background: #999;
-                border-radius: 4px 4px 0 0;
-                position: absolute;
-                top: -8px;
-                left: 7px;
-            "></div>
-            
-            <!-- Battery fill with gradient -->
-            <div style="
-                position: absolute;
-                bottom: 3px;
-                left: 3px;
-                width: 34px;
-                height: {fill_height}px;
-                background: linear-gradient(to top,
-                    #FF4444 0%, #FF4444 25%,
-                    #FF8800 25%, #FF8800 50%,
-                    #FFCC00 50%, #FFCC00 75%,
-                    #22AA22 75%, #22AA22 100%);
-                border-radius: 4px 4px 2px 2px;
-            "></div>
-            
-            <!-- Percentage text overlay -->
-            <div style="
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                font-size: 12px;
-                font-weight: bold;
-                color: white;
-                text-shadow: 1px 1px 1px rgba(0,0,0,0.7);
-            ">{value}%</div>
-        </div>
-        
-        <!-- Score label -->
-        <div style="
-            font-size: 14px;
-            font-weight: bold;
-            color: #555;
-            margin-top: 5px;
-        ">{value}</div>
-    </div>
-    """
+    # Create color segments (semicircle from 0 to 180 degrees)
+    angles = np.linspace(0, np.pi, 7)  # 6 segments
     
-    return battery_html
+    for i in range(6):
+        # Create wedge for each color segment
+        wedge = patches.Wedge((0, 0), 1, 
+                            np.degrees(angles[i]), np.degrees(angles[i+1]), 
+                            width=0.3, facecolor=colors[i], edgecolor='#666666', linewidth=1)
+        ax.add_patch(wedge)
+    
+    # Add outer border
+    outer_circle = patches.Wedge((0, 0), 1, 0, 180, 
+                               width=0.05, facecolor='#666666')
+    ax.add_patch(outer_circle)
+    
+    # Calculate needle angle (0 to 180 degrees)
+    needle_angle = (value / max_value) * np.pi
+    
+    # Draw needle
+    needle_x = 0.7 * np.cos(needle_angle)
+    needle_y = 0.7 * np.sin(needle_angle)
+    ax.plot([0, needle_x], [0, needle_y], color='#444444', linewidth=3, solid_capstyle='round')
+    
+    # Center circle
+    center_circle = patches.Circle((0, 0), 0.05, facecolor='#444444')
+    ax.add_patch(center_circle)
+    
+    # Add score text below
+    ax.text(0, -0.15, str(value), ha='center', va='center', 
+            fontsize=14, fontweight='bold', color='#444444')
+    
+    # Save to base64 string for embedding
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png', bbox_inches='tight', 
+                pad_inches=0, facecolor='white', dpi=100)
+    buffer.seek(0)
+    image_base64 = base64.b64encode(buffer.getvalue()).decode()
+    plt.close()
+    
+    # Return HTML with embedded image
+    return f'<img src="data:image/png;base64,{image_base64}" style="width: 100px; height: auto;">'
 
 def render():
     """Render the About tab for GUARDIAN system."""
@@ -276,32 +255,32 @@ def render():
     
     st.markdown("**Score Progression:**")
     
-    # AI Cybersecurity progression with side-by-side battery gauge and explanation
+    # AI Cybersecurity progression with side-by-side speedometer and explanation
     col1, col2 = st.columns([1, 4])
     with col1:
-        battery1 = create_battery_gauge(15)
-        st.markdown(battery1, unsafe_allow_html=True)
+        dial1 = create_speedometer_dial(15)
+        st.markdown(dial1, unsafe_allow_html=True)
     with col2:
         st.markdown("**0-25**: Basic awareness, minimal AI security measures")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        battery2 = create_battery_gauge(37)
-        st.markdown(battery2, unsafe_allow_html=True)
+        dial2 = create_speedometer_dial(37)
+        st.markdown(dial2, unsafe_allow_html=True)
     with col2:
         st.markdown("**26-50**: Developing capabilities, some AI-specific protections")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        battery3 = create_battery_gauge(62)
-        st.markdown(battery3, unsafe_allow_html=True)
+        dial3 = create_speedometer_dial(62)
+        st.markdown(dial3, unsafe_allow_html=True)
     with col2:
         st.markdown("**51-75**: Comprehensive AI security framework with most controls")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        battery4 = create_battery_gauge(85)
-        st.markdown(battery4, unsafe_allow_html=True)
+        dial4 = create_speedometer_dial(85)
+        st.markdown(dial4, unsafe_allow_html=True)
     with col2:
         st.markdown("**76-100**: Advanced AI cybersecurity with cutting-edge protections")
     
@@ -347,32 +326,32 @@ def render():
     
     st.markdown("**Score Progression:**")
     
-    # AI Ethics progression with side-by-side battery gauge and explanation
+    # AI Ethics progression with side-by-side speedometer and explanation
     col1, col2 = st.columns([1, 4])
     with col1:
-        battery1 = create_battery_gauge(18)
-        st.markdown(battery1, unsafe_allow_html=True)
+        dial1 = create_speedometer_dial(18)
+        st.markdown(dial1, unsafe_allow_html=True)
     with col2:
         st.markdown("**0-25**: Limited ethical considerations, reactive approach")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        battery2 = create_battery_gauge(40)
-        st.markdown(battery2, unsafe_allow_html=True)
+        dial2 = create_speedometer_dial(40)
+        st.markdown(dial2, unsafe_allow_html=True)
     with col2:
         st.markdown("**26-50**: Basic ethical frameworks, some accountability measures")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        battery3 = create_battery_gauge(65)
-        st.markdown(battery3, unsafe_allow_html=True)
+        dial3 = create_speedometer_dial(65)
+        st.markdown(dial3, unsafe_allow_html=True)
     with col2:
         st.markdown("**51-75**: Comprehensive ethical AI practices with regular assessment")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        battery4 = create_battery_gauge(88)
-        st.markdown(battery4, unsafe_allow_html=True)
+        dial4 = create_speedometer_dial(88)
+        st.markdown(dial4, unsafe_allow_html=True)
     with col2:
         st.markdown("**76-100**: Leading-edge ethical AI with proactive governance")
     
@@ -416,32 +395,32 @@ def render():
     
     st.markdown("**Score Progression:**")
     
-    # Quantum Ethics progression with side-by-side battery gauge and explanation
+    # Quantum Ethics progression with side-by-side speedometer and explanation
     col1, col2 = st.columns([1, 4])
     with col1:
-        battery1 = create_battery_gauge(20)
-        st.markdown(battery1, unsafe_allow_html=True)
+        dial1 = create_speedometer_dial(20)
+        st.markdown(dial1, unsafe_allow_html=True)
     with col2:
         st.markdown("**0-25**: Minimal quantum ethics awareness, basic compliance only")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        battery2 = create_battery_gauge(42)
-        st.markdown(battery2, unsafe_allow_html=True)
+        dial2 = create_speedometer_dial(42)
+        st.markdown(dial2, unsafe_allow_html=True)
     with col2:
         st.markdown("**26-50**: Developing quantum ethics frameworks and policies")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        battery3 = create_battery_gauge(68)
-        st.markdown(battery3, unsafe_allow_html=True)
+        dial3 = create_speedometer_dial(68)
+        st.markdown(dial3, unsafe_allow_html=True)
     with col2:
         st.markdown("**51-75**: Comprehensive quantum ethics integration with monitoring")
     
     col1, col2 = st.columns([1, 4])
     with col1:
-        battery4 = create_battery_gauge(90)
-        st.markdown(battery4, unsafe_allow_html=True)
+        dial4 = create_speedometer_dial(90)
+        st.markdown(dial4, unsafe_allow_html=True)
     with col2:
         st.markdown("**76-100**: Advanced quantum ethics leadership with innovation")
     
