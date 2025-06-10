@@ -2,53 +2,54 @@ import streamlit as st
 import plotly.graph_objects as go
 
 def create_dial_gauge(value, max_value=100):
-    """Create a speedometer-style dial gauge exactly like the reference image."""
+    """Create a speedometer-style dial gauge exactly matching the reference image."""
     
     fig = go.Figure()
     
-    # Create the dial gauge with proper needle
+    # Create the exact speedometer gauge from the reference
     fig.add_trace(go.Indicator(
         mode = "gauge+number",
         value = value,
         domain = {'x': [0, 1], 'y': [0, 1]},
         number = {
-            'font': {'size': 28, 'color': '#444444', 'family': "Arial Black"}, 
+            'font': {'size': 32, 'color': '#4A4A4A', 'family': "Arial Black"}, 
             'valueformat': '.0f',
-            'suffix': '' if max_value != 100 else '',
-            'prefix': ''
+            'suffix': '',
+            'prefix': '',
+            'y': 0.25  # Position number at bottom like reference
         },
         gauge = {
             'shape': "angular",
             'axis': {
                 'range': [0, max_value],
                 'tickwidth': 0,
-                'tickcolor': "white",
+                'tickcolor': "transparent",
                 'visible': False
             },
             'bar': {
-                'color': '#444444',  # Dark gray needle like reference
-                'thickness': 0.03,   # Very thin needle
-                'line': {'color': '#000000', 'width': 2}
+                'color': '#4A4A4A',  # Dark gray needle exactly like reference
+                'thickness': 0.02,   # Very thin sharp needle
+                'line': {'color': '#2A2A2A', 'width': 1}
             },
             'bgcolor': "white",
-            'borderwidth': 4,
-            'bordercolor': "#555555",
+            'borderwidth': 6,
+            'bordercolor': "#4A4A4A",  # Dark gray border like reference
             'steps': [
-                {'range': [0, 20], 'color': '#FF4444'},       # Red
-                {'range': [20, 35], 'color': '#FF7700'},      # Orange  
-                {'range': [35, 50], 'color': '#FFAA00'},      # Yellow
-                {'range': [50, 65], 'color': '#AADD22'},      # Yellow-Green
-                {'range': [65, 80], 'color': '#77CC33'},      # Light Green
-                {'range': [80, max_value], 'color': '#44AA44'} # Green
+                {'range': [0, 16.67], 'color': '#FF3333'},    # Red segment
+                {'range': [16.67, 33.33], 'color': '#FF6600'}, # Orange segment
+                {'range': [33.33, 50], 'color': '#FFDD00'},    # Yellow segment
+                {'range': [50, 66.67], 'color': '#AADD00'},    # Yellow-green segment
+                {'range': [66.67, 83.33], 'color': '#66CC33'}, # Light green segment
+                {'range': [83.33, max_value], 'color': '#33AA33'} # Green segment
             ]
         }
     ))
     
     fig.update_layout(
-        height=100,
-        width=100,
-        font={'color': "#444444", 'family': "Arial"},
-        margin=dict(l=0, r=0, t=0, b=0),
+        height=120,
+        width=120,
+        font={'color': "#4A4A4A", 'family': "Arial"},
+        margin=dict(l=5, r=5, t=5, b=5),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         showlegend=False
