@@ -52,30 +52,34 @@ def extract_title_fallback(content: str, source: str) -> str:
         r'(DEPLOYING AI SYSTEMS SECURELY:\s*Best Security Practices[^.\n]*(?:\n[^.\n]*)*?)(?:\n\n|\nDeploying|\nThe)',
         r'(Best Security Practices\s*For Deploying[^.\n]*(?:\n[^.\n]*)*?)(?:\n\n|\nDeploying|\nThe)',
         
+        # Specific AI/Cybersecurity title patterns - prioritize these
+        r'(Artificial Intelligence\s+Cybersecurity\s+Guidelines?)',
+        r'(AI\s+Systems?\s+Security)',
+        r'(Deploying\s+AI\s+Systems?\s+Securely)',
+        r'(AI\s+(?:Cybersecurity|Security)\s+(?:Framework|Guidelines?|Guidance))',
+        r'(Artificial Intelligence\s+(?:Security|Cybersecurity)\s+(?:Framework|Guidelines?|Guidance))',
+        r'(Cybersecurity\s+for\s+(?:AI|Artificial Intelligence))',
+        r'(Machine Learning\s+Security\s+(?:Framework|Guidelines?|Guidance))',
+        
+        # HTML title and heading tags
+        r'<title[^>]*>([^<]+)</title>',  # HTML title tag
+        r'<h1[^>]*>([^<]+)</h1>',  # H1 tag
+        r'<h2[^>]*>([^<]+)</h2>',  # H2 tag
+        
         # Multi-line title patterns for government documents
         r'([A-Z][A-Z\s]{10,}:\s*[^.\n]+(?:\n[^.\n]+)*?)(?:\n\n|\nThe|\n[A-Z][a-z])',
         
-        # AI/Cybersecurity specific patterns
-        r'(AI\s+(?:Cybersecurity|Security|Framework|Guidelines?)[^.\n]{0,50})',
-        r'(Artificial Intelligence\s+(?:Cybersecurity|Security|Guidelines?)[^.\n]{0,50})',
-        r'(Cybersecurity\s+(?:AI|Artificial Intelligence)[^.\n]{0,50})',
-        r'(Machine Learning\s+Security[^.\n]{0,30})',
-        r'(Deploying\s+(?:AI|Artificial Intelligence)[^.\n]{0,50})',
-        r'(Secure\s+(?:AI|Artificial Intelligence)[^.\n]{0,50})',
+        # Government agency documents
+        r'((?:CISA|NIST|NSA)\s+[^.\n]{10,60})',
         
-        # Government document patterns
-        r'<title[^>]*>([^<]+)</title>',  # HTML title tag
-        r'<h1[^>]*>([^<]+)</h1>',  # H1 tag
-        r'((?:CISA|NIST|NSA)\s+[^.\n]{10,60})',  # Government agency documents
-        
-        # General title patterns
-        r'^([A-Z][^.\n]{15,80})\n',  # First substantial line
+        # Standalone meaningful titles (not part of lists or descriptions)
+        r'^\s*([A-Z][^.\n]{15,80})\s*$',  # Single line titles
         r'title:\s*(.+)',  # Title: format
         r'Title:\s*(.+)',  # Title: format
         r'TITLE:\s*(.+)',  # TITLE: format
         
-        # Content-based title extraction
-        r'([A-Z][^.\n]{20,80}(?:Guidelines?|Framework|Strategy|Policy|Report|Practices))',
+        # Content-based title extraction with proper boundaries
+        r'([A-Z][^.\n]{15,60}(?:Guidelines?|Framework|Strategy|Policy|Report|Practices|Guidance))',
     ]
     
     for pattern in title_patterns:
@@ -92,28 +96,65 @@ def extract_title_fallback(content: str, source: str) -> str:
                     not title.lower().startswith('http') and
                     not title.lower().startswith('skip to') and
                     not title.lower().startswith('search') and
+                    not title.lower().startswith('webpage') and
+                    not title.lower().startswith('document from') and
+                    not title.lower().startswith('pdf from') and
                     not title.isdigit()):
                     return title[:100]
         except (IndexError, AttributeError):
             continue
     
-    # Enhanced source-based fallback
-    if 'cisa.gov' in source.lower():
-        if 'ai' in content.lower()[:500] or 'artificial intelligence' in content.lower()[:500]:
-            return "CISA AI Cybersecurity Guidance"
-        else:
-            return "CISA Cybersecurity Document"
-    elif 'nist.gov' in source.lower():
-        if 'ai' in content.lower()[:500]:
-            return "NIST AI Security Framework"
-        else:
-            return "NIST Cybersecurity Document"
-    elif 'pdf' in source.lower():
-        return f"PDF Document from {source.split('/')[-2] if '/' in source else 'URL'}"
-    elif source:
-        return f"Document from {source.split('/')[-2] if '/' in source else source}"
+    # Content-based intelligent fallback - extract meaningful titles from content
+    content_words = content.lower()
     
-    return "Untitled Document"
+    # Look for key phrases that could form meaningful titles
+    key_phrases = []
+    
+    if 'ai' in content_words and ('security' in content_words or 'cybersecurity' in content_words):
+        if 'deployment' in content_words or 'deploying' in content_words:
+            key_phrases.append("AI System Deployment Security")
+        elif 'framework' in content_words:
+            key_phrases.append("AI Cybersecurity Framework")
+        elif 'guidance' in content_words or 'guideline' in content_words:
+            key_phrases.append("AI Security Guidance")
+        else:
+            key_phrases.append("AI Cybersecurity")
+    
+    if 'quantum' in content_words and 'security' in content_words:
+        key_phrases.append("Quantum Security")
+    
+    if 'machine learning' in content_words and 'security' in content_words:
+        key_phrases.append("Machine Learning Security")
+    
+    # Try to find the first meaningful sentence or heading
+    sentences = content[:500].split('\n')
+    for sentence in sentences:
+        sentence = sentence.strip()
+        if (len(sentence) > 15 and len(sentence) < 80 and 
+            not sentence.lower().startswith('skip') and
+            not sentence.lower().startswith('search') and
+            not sentence.lower().startswith('menu') and
+            any(word in sentence.lower() for word in ['security', 'cybersecurity', 'ai', 'artificial', 'framework', 'guidance', 'policy'])):
+            return sentence
+    
+    # Use key phrases if found
+    if key_phrases:
+        base_title = key_phrases[0]
+        # Add source context if helpful
+        if 'cisa.gov' in source.lower():
+            return f"CISA {base_title}"
+        elif 'nist.gov' in source.lower():
+            return f"NIST {base_title}"
+        else:
+            return base_title
+    
+    # Final fallback based on source context
+    if 'cisa.gov' in source.lower():
+        return "CISA Cybersecurity Document"
+    elif 'nist.gov' in source.lower():
+        return "NIST Security Document" 
+    
+    return "Cybersecurity Document"
 
 def classify_document_type_fallback(content: str) -> str:
     """Classify document type based on content patterns."""
