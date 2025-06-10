@@ -5,6 +5,7 @@ from utils.hf_ai_scoring import evaluate_quantum_maturity_hf
 from utils.comprehensive_scoring import comprehensive_document_scoring, format_score_display, get_score_badge_color
 from utils.document_metadata_extractor import extract_document_metadata
 from utils.content_cleaner import clean_document_content
+from utils.clean_preview_generator import generate_clean_preview, extract_clean_metadata
 
 def get_comprehensive_badge(score, framework):
     """Create badge for comprehensive scoring system."""
@@ -386,20 +387,18 @@ def render_card_view(docs):
         with cols[i % 2]:
             content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
             
-            # Always regenerate metadata to ensure clean processing
-            metadata = extract_document_metadata(content, doc.get('title', ''))
+            # Use completely isolated clean preview system
+            clean_meta = extract_clean_metadata(content, doc.get('title', ''))
+            content_preview = generate_clean_preview(content)
             
+            # Extract metadata separately from clean content
+            metadata = extract_document_metadata(content, doc.get('title', ''))
             title = metadata.get('title', 'Untitled Document') or 'Untitled Document'
             author_org = metadata.get('author_organization', 'Unknown') or 'Unknown'
             pub_date = metadata.get('publish_date', 'Unknown') or 'Unknown'
             doc_type = metadata.get('document_type', 'Unknown') or 'Unknown'
-            content_preview = metadata.get('content_preview', 'No preview available') or 'No preview available'
             
-            # Force clean content preview one more time
-            from utils.content_cleaner import clean_html_content
-            content_preview = clean_html_content(content_preview)
-            
-            # Calculate comprehensive scores
+            # Calculate scores separately to prevent HTML contamination
             scores = comprehensive_document_scoring(content, str(title))
             
             st.markdown(f"""
