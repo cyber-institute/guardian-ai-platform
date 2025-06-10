@@ -16,7 +16,7 @@ def render():
             What is GUARDIAN?
         </h2>
         <p style="font-size: 1.1rem; line-height: 1.7; color: #374151; margin-bottom: 1rem;">
-            <strong>GUARDIAN</strong> (Global Unified AI Risk Discovery & Impact Analysis Navigator) is a 
+            <strong>GUARDIAN</strong> (Governance Using AI for Risk Detection, Integration, Analysis, and Notification) is a 
             comprehensive AI-powered governance platform that integrates multiple patented technologies for 
             real-time policy evaluation, cybersecurity assessment, and ethical compliance analysis across 
             AI and quantum technology domains.
