@@ -99,20 +99,40 @@ class DatabaseManager:
         return documents
     
     def save_document(self, document):
-        """Save a new document to the database."""
+        """Save a new document to the database with enhanced metadata extraction."""
+        # Extract enhanced metadata during ingestion
+        from utils.fallback_analyzer import extract_metadata_fallback
+        
+        text_content = document.get('text_content', '') or document.get('text', '')
+        source_hint = document.get('source', 'manual')
+        
+        # Extract intelligent metadata
+        enhanced_metadata = extract_metadata_fallback(text_content, source_hint)
+        
+        # Use enhanced metadata, fallback to provided values
+        final_title = enhanced_metadata.get('title') or document.get('title', 'Untitled')
+        final_org = enhanced_metadata.get('author_organization', 'Unknown')
+        final_doc_type = enhanced_metadata.get('document_type') or document.get('document_type', 'unknown')
+        final_preview = enhanced_metadata.get('content_preview', document.get('content', ''))
+        final_date = enhanced_metadata.get('publish_date')
+        
         query = """
-        INSERT INTO documents (title, content, text_content, quantum_score, document_type, source)
-        VALUES (:title, :content, :text_content, :quantum_score, :document_type, :source)
+        INSERT INTO documents (title, content, text_content, quantum_score, document_type, source,
+                             author_organization, publish_date)
+        VALUES (:title, :content, :text_content, :quantum_score, :document_type, :source,
+                :author_organization, :publish_date)
         RETURNING id
         """
         
         params = {
-            'title': document.get('title', 'Untitled'),
-            'content': document.get('content', ''),
-            'text_content': document.get('text_content', '') or document.get('text', ''),
+            'title': final_title,
+            'content': final_preview,
+            'text_content': text_content,
             'quantum_score': document.get('quantum_score', 0) or document.get('quantum_q', 0),
-            'document_type': document.get('document_type', 'unknown'),
-            'source': document.get('source', 'manual')
+            'document_type': final_doc_type,
+            'source': source_hint,
+            'author_organization': final_org,
+            'publish_date': final_date
         }
         
         result = self.execute_query(query, params)

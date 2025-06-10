@@ -15,26 +15,45 @@ def get_db_connection():
     )
 
 def save_document_direct(document):
-    """Save document using direct PostgreSQL connection with explicit commit."""
+    """Save document using direct PostgreSQL connection with enhanced metadata extraction."""
     conn = None
     try:
+        # Extract enhanced metadata during ingestion
+        from utils.fallback_analyzer import extract_metadata_fallback
+        
+        text_content = document.get('text_content', '') or document.get('text', '')
+        source_hint = document.get('source', 'manual')
+        
+        # Extract intelligent metadata
+        enhanced_metadata = extract_metadata_fallback(text_content, source_hint)
+        
+        # Use enhanced metadata, fallback to provided values
+        final_title = enhanced_metadata.get('title') or document.get('title', 'Untitled')
+        final_org = enhanced_metadata.get('author_organization', 'Unknown')
+        final_doc_type = enhanced_metadata.get('document_type') or document.get('document_type', 'Unknown')
+        final_preview = enhanced_metadata.get('content_preview', document.get('content', ''))
+        final_date = enhanced_metadata.get('publish_date')
+        
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Prepare the insert statement
+        # Enhanced insert statement with all metadata fields
         insert_query = """
-        INSERT INTO documents (title, content, text_content, quantum_score, document_type, source)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        INSERT INTO documents (title, content, text_content, quantum_score, document_type, source, 
+                             author_organization, publish_date)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id
         """
         
         values = (
-            document.get('title', 'Untitled'),
-            document.get('content', ''),
-            document.get('text_content', ''),
+            final_title,
+            final_preview,
+            text_content,
             float(document.get('quantum_score', 0)),
-            document.get('document_type', 'Unknown'),
-            document.get('source', 'manual')
+            final_doc_type,
+            source_hint,
+            final_org,
+            final_date
         )
         
         # Execute and commit

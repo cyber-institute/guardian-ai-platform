@@ -341,7 +341,55 @@ def main():
         if uploaded_file:
             st.success(f"File uploaded: {uploaded_file.name}")
             if st.button("Process Document"):
-                st.info("Processing document... This may take a moment.")
+                with st.spinner("Processing document... This may take a moment."):
+                    try:
+                        import time
+                        from utils.direct_db import save_document_direct
+                        
+                        # Generate document ID for processing
+                        temp_doc_id = int(time.time() * 1000) % 1000000
+                        
+                        # Handle PDF files with thumbnail extraction
+                        if uploaded_file.name.lower().endswith('.pdf'):
+                            from utils.pdf_ingestion_thumbnails import process_uploaded_pdf_with_thumbnail
+                            
+                            pdf_result = process_uploaded_pdf_with_thumbnail(uploaded_file, temp_doc_id)
+                            content = pdf_result['text_content']
+                            file_title = uploaded_file.name.replace('.pdf', '').replace('_', ' ').title()
+                            has_thumbnail = pdf_result['thumbnail_data'] is not None
+                            
+                            if has_thumbnail:
+                                st.success("PDF processed successfully! Thumbnail extracted from first page.")
+                            else:
+                                st.warning("PDF processed but thumbnail extraction failed.")
+                                
+                        else:
+                            # Handle other file types
+                            content = uploaded_file.read().decode('utf-8')
+                            file_title = uploaded_file.name.rsplit('.', 1)[0].replace('_', ' ').title()
+                            has_thumbnail = False
+                        
+                        # Prepare document data
+                        document_data = {
+                            'title': file_title,
+                            'content': content[:200] + "..." if len(content) > 200 else content,
+                            'text_content': content,
+                            'document_type': 'Report',
+                            'source': 'file_upload',
+                            'quantum_score': 0,
+                            'has_thumbnail': has_thumbnail
+                        }
+                        
+                        # Save to database with enhanced metadata extraction
+                        if save_document_direct(document_data):
+                            st.success(f"Successfully processed and saved: {file_title}")
+                            st.info("Document has been analyzed and added to your collection. Check the All Documents tab to view it.")
+                            st.rerun()
+                        else:
+                            st.error("Failed to save document to database.")
+                            
+                    except Exception as e:
+                        st.error(f"Error processing document: {str(e)}")
         
         # Browse files button
         st.button("Browse files", use_container_width=True)
