@@ -8,7 +8,7 @@ def main():
         page_title="GUARDIAN - AI Risk Analysis Navigator",
         page_icon="",
         layout="wide",
-        initial_sidebar_state="expanded"
+        initial_sidebar_state="collapsed"
     )
     
     # Custom CSS styling - Government/Nonprofit Theme
@@ -503,10 +503,9 @@ def main():
         from about_tab import render as render_about
         render_about()
     
-    # Inject chatbot CSS and render widget
-    from components.chatbot_widget import inject_chatbot_css, render_chatbot_widget
-    inject_chatbot_css()
-    render_chatbot_widget()
+    # Render hamburger menu instead of sidebar chatbot
+    from components.hamburger_menu import render_simple_hamburger_menu
+    render_simple_hamburger_menu()
 
 def render_patent_technology_section():
     """Render the hierarchical Patent Technology section."""
