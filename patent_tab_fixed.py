@@ -197,46 +197,211 @@ def render_mathematical_formulations():
     </div>
     """, unsafe_allow_html=True)
     
-    # Two-column formula layout
+    # Comprehensive patent formulations organized by category
+    
+    # 1. Bayesian Inference & Dynamic Maturity Updates
+    st.markdown("""
+    <div style="background: #fef2f2; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+    <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Bayesian Inference for Dynamic Maturity Updates</h5>
+    <p style="font-size: 0.9rem; margin: 0; color: #374151;">Dynamically updates maturity levels as new data is received</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.latex(r'''
+    P(M|D) = \frac{P(D|M)P(M)}{P(D)}
+    ''')
+    
+    st.markdown("""
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 1rem 0; font-size: 0.85rem;">
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>M</strong> = Maturity level (Initial, Basic, etc.)</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>D</strong> = Observed data (queries, outcomes, policy adoption rates)</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>P(M|D)</strong> = Posterior probability of maturity given data</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 2. Reinforcement Learning for Policy Optimization
+    st.markdown("""
+    <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+    <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Reinforcement Learning Policy Optimization</h5>
+    <p style="font-size: 0.9rem; margin: 0; color: #374151;">Continuously refines policy recommendations using Q-learning</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("""
-        <div style="background: #fef2f2; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
-        <h6 style="color: #B91C2C; margin-bottom: 0.5rem;">AI Cybersecurity Maturity (0-100 scale)</h6>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown("**Q-Learning Formula:**")
         st.latex(r'''
-        S_{AI-Cyber} = \alpha \cdot E + \beta \cdot A + \gamma \cdot T + \delta \cdot I
+        Q(s,a) = R + \gamma \max Q(s',a')
         ''')
         
-        st.markdown("""
-        <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
-        <h6 style="color: #B91C2C; margin-bottom: 0.5rem;">Quantum Cybersecurity Maturity (1-5 scale)</h6>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown("**Policy Optimization Formula:**")
         st.latex(r'''
-        S_{Q-Cyber} = \lceil \frac{Q_{awareness} + Q_{implementation} + Q_{integration}}{3} \rceil
+        Q(s,a) = Q(s,a) + \alpha[R(s,a) + \gamma \max Q(s',a') - Q(s,a)]
         ''')
     
     with col2:
         st.markdown("""
-        <div style="background: #f0fdf4; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
-        <h6 style="color: #B91C2C; margin-bottom: 0.5rem;">AI Ethics Assessment (0-100 scale)</h6>
+        <div style="display: grid; grid-template-columns: 1fr; gap: 0.3rem; font-size: 0.8rem;">
+            <div style="background: #f9fafb; padding: 0.3rem; border-radius: 3px;"><strong>Q(s,a)</strong> = Value of taking action in state s</div>
+            <div style="background: #f9fafb; padding: 0.3rem; border-radius: 3px;"><strong>R</strong> = Immediate reward (reduced vulnerabilities)</div>
+            <div style="background: #f9fafb; padding: 0.3rem; border-radius: 3px;"><strong>γ</strong> = Discount factor for future rewards</div>
+            <div style="background: #f9fafb; padding: 0.3rem; border-radius: 3px;"><strong>α</strong> = Learning rate</div>
         </div>
         """, unsafe_allow_html=True)
-        st.latex(r'''
-        S_{AI-Ethics} = \sum_{j=1}^{4} \omega_j \cdot F_j
-        ''')
-        
-        st.markdown("""
-        <div style="background: #fffbeb; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
-        <h6 style="color: #B91C2C; margin-bottom: 0.5rem;">Quantum Ethics Assessment (0-100 scale)</h6>
-        </div>
-        """, unsafe_allow_html=True)
-        st.latex(r'''
-        S_{Q-Ethics} = \frac{\sum_{k=1}^{m} \phi_k \cdot E_k}{\sum_{k=1}^{m} \phi_k} \cdot 100
-        ''')
+    
+    # 3. Cybersecurity Risk Assessment
+    st.markdown("""
+    <div style="background: #f0fdf4; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+    <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Cybersecurity Risk Assessment</h5>
+    <p style="font-size: 0.9rem; margin: 0; color: #374151;">Compliance metrics using NIST RMF, ISO 27001, and GDPR frameworks</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.latex(r'''
+    Risk_{cyber} = \sum_{i=1}^{n} (W_i \times V_i \times C_i)
+    ''')
+    
+    st.markdown("""
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 1rem 0; font-size: 0.85rem;">
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>W<sub>i</sub></strong> = Weight for vulnerability type</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>V<sub>i</sub></strong> = Estimated likelihood of exploitability</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>C<sub>i</sub></strong> = Consequence or impact severity</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 4. Ethics Risk Assessment
+    st.markdown("""
+    <div style="background: #fffbeb; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+    <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Ethics Risk Assessment</h5>
+    <p style="font-size: 0.9rem; margin: 0; color: #374151;">Bias, fairness, transparency, and human autonomy evaluation</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.latex(r'''
+    Risk_{ethics} = (1 - T) \times B \times A
+    ''')
+    
+    st.markdown("""
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 1rem 0; font-size: 0.85rem;">
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>T</strong> = Transparency score (0-1)</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>B</strong> = Assessed bias factor</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>A</strong> = Autonomy or control risk index</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 5. Cybersecurity Threat Simulation
+    st.markdown("""
+    <div style="background: #fef2f2; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+    <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Cybersecurity Threat Simulation</h5>
+    <p style="font-size: 0.9rem; margin: 0; color: #374151;">Built-in simulator modeling attack vectors and testing policies</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.latex(r'''
+    Risk_{cyber} = \sum_{i=1}^{n} (W_i \times V_i \times C_i)
+    ''')
+    
+    # 6. Similarity Detection for Model Drift
+    st.markdown("""
+    <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+    <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Similarity Detection for Model Drift</h5>
+    <p style="font-size: 0.9rem; margin: 0; color: #374151;">Cosine similarity for detecting semantic drift in policy vectors</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.latex(r'''
+    Similarity = \frac{A \cdot B}{||A|| ||B||}
+    ''')
+    
+    st.markdown("""
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin: 1rem 0; font-size: 0.85rem;">
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>A, B</strong> = Vectorized user interaction representations</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>||A||, ||B||</strong> = Euclidean norms (magnitudes)</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 7. Gap Score Computation
+    st.markdown("""
+    <div style="background: #f0fdf4; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+    <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Policy Gap Score Computation</h5>
+    <p style="font-size: 0.9rem; margin: 0; color: #374151;">Comprehensive compliance gap analysis and reporting</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.latex(r'''
+    G_{policy} = 1 - \frac{C_{match} + E_{match}}{C_{total} + E_{total}}
+    ''')
+    
+    st.markdown("""
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin: 1rem 0; font-size: 0.85rem;">
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>C<sub>match</sub></strong> = Cybersecurity provisions found</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>E<sub>match</sub></strong> = Ethics provisions found</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>C<sub>total</sub></strong> = Expected cybersecurity provisions</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>E<sub>total</sub></strong> = Expected ethical provisions</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 8. AI Policy Effectiveness Score
+    st.markdown("""
+    <div style="background: #fffbeb; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+    <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">AI Policy Effectiveness Score</h5>
+    <p style="font-size: 0.9rem; margin: 0; color: #374151;">Probabilistic reinforcement learning for policy synthesis</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.latex(r'''
+    E_{policy} = P_{success} \times R_f \times E_c
+    ''')
+    
+    st.markdown("""
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 1rem 0; font-size: 0.85rem;">
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>P<sub>success</sub></strong> = Probability of policy adoption</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>R<sub>f</sub></strong> = Regulatory influence factor</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>E<sub>c</sub></strong> = Ethical compliance coefficient</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 9. Probability-Based Policy Optimization
+    st.markdown("""
+    <div style="background: #fef2f2; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+    <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">Novel Probability-Based Policy Optimization</h5>
+    <p style="font-size: 0.9rem; margin: 0; color: #374151;">Success probability calculation for policy adoption</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.latex(r'''
+    P_{success} = \sum_{i=1}^{n} w_i \times S_i
+    ''')
+    
+    st.markdown("""
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 1rem 0; font-size: 0.85rem;">
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>P<sub>success</sub></strong> = Likelihood of successful adoption</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>S<sub>i</sub></strong> = Success score of each component</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>w<sub>i</sub></strong> = Weight based on constraints</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 10. Stress-Testing Scoring Formula
+    st.markdown("""
+    <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+    <h5 style="color: #B91C2C; margin-bottom: 0.8rem;">AI Policy Sandbox Stress-Testing Score</h5>
+    <p style="font-size: 0.9rem; margin: 0; color: #374151;">Four-criteria assessment: Ethical Compliance, Adaptability, Legal Alignment, Implementation Feasibility</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.latex(r'''
+    S_{final} = \frac{ECS + AS + LAS + IFS}{4}
+    ''')
+    
+    st.markdown("""
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin: 1rem 0; font-size: 0.85rem;">
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>ECS</strong> = Ethical Compliance Score</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>AS</strong> = Adaptability Score</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>LAS</strong> = Legal Alignment Score</div>
+        <div style="background: #f9fafb; padding: 0.5rem; border-radius: 4px;"><strong>IFS</strong> = Implementation Feasibility Score</div>
+    </div>
+    """, unsafe_allow_html=True)
 
 def render_risk_calculator():
     """Interactive risk calculator based on patent formulations."""
