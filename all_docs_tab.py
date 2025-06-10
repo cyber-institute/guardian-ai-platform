@@ -498,19 +498,21 @@ def render_card_view(docs):
             
             # Display metadata card with thumbnail
             st.markdown(f"""
-                <div style='border:1px solid #ddd;padding:16px;border-radius:12px;margin:8px;
+                <div style='border:1px solid #ddd;padding:20px;border-radius:12px;margin:8px;
                 background:white;box-shadow:0 4px 6px rgba(0,0,0,0.1);
-                transition:transform 0.2s ease;border-left:5px solid #3B82F6'>
-                    <div style='display:flex;align-items:flex-start;gap:12px;margin-bottom:8px'>
-                        {thumbnail_html}
-                        <div style='flex:1'>
-                            <h3 style='margin:0 0 8px 0;color:#333'>{title}</h3>
+                transition:transform 0.2s ease;border-left:5px solid #3B82F6;min-height:180px'>
+                    <div style='display:flex;align-items:flex-start;gap:16px;margin-bottom:12px'>
+                        <div style='flex-shrink:0'>
+                            {thumbnail_html}
                         </div>
-                    </div>
-                    <div style='margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap'>
-                        <span style='background:#f0f0f0;padding:2px 8px;border-radius:12px;font-size:12px'>{doc_type}</span>
-                        <span style='background:#e0f2fe;padding:2px 8px;border-radius:12px;font-size:12px;color:#0277bd'>{author_org}</span>
-                        {f"<span style='background:#f3e5f5;padding:2px 8px;border-radius:12px;font-size:12px;color:#7b1fa2'>{pub_date}</span>" if pub_date and pub_date != 'Date not available' else ""}
+                        <div style='flex:1;min-width:0'>
+                            <h3 style='margin:0 0 12px 0;color:#333;line-height:1.3'>{title}</h3>
+                            <div style='margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap'>
+                                <span style='background:#f0f0f0;padding:4px 10px;border-radius:12px;font-size:12px'>{doc_type}</span>
+                                <span style='background:#e0f2fe;padding:4px 10px;border-radius:12px;font-size:12px;color:#0277bd'>{author_org}</span>
+                                {f"<span style='background:#f3e5f5;padding:4px 10px;border-radius:12px;font-size:12px;color:#7b1fa2'>{pub_date}</span>" if pub_date and pub_date != 'Date not available' else ""}
+                            </div>
+                        </div>
                     </div>
                 </div>
             """, unsafe_allow_html=True)

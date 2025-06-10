@@ -1,38 +1,143 @@
 """
 Document Thumbnail Generator
-Creates visual thumbnails for different document types and organizations
+Creates actual thumbnails from PDF files and other documents
 """
 
 import base64
 from io import BytesIO
 import re
+import os
+from pdf2image import convert_from_path, convert_from_bytes
+from PIL import Image
+import tempfile
 
-def generate_thumbnail_svg(doc_title, doc_type, organization):
+def generate_pdf_thumbnail(file_path, doc_id):
     """
-    Generate SVG thumbnail based on document metadata.
+    Generate actual thumbnail from PDF file.
     
     Args:
-        doc_title: Document title
-        doc_type: Type of document (e.g., 'Standard', 'Guideline', 'Report')
-        organization: Source organization
+        file_path: Path to the PDF file
+        doc_id: Document ID for caching
         
     Returns:
-        Base64 encoded SVG thumbnail
+        Base64 encoded thumbnail image or None if failed
     """
+    try:
+        # Check if thumbnail already exists in cache
+        thumbnail_cache_path = f"thumbnails/thumb_{doc_id}.png"
+        
+        if os.path.exists(thumbnail_cache_path):
+            with open(thumbnail_cache_path, 'rb') as f:
+                img_data = f.read()
+                return image_to_base64(img_data)
+        
+        # Create thumbnails directory if it doesn't exist
+        os.makedirs("thumbnails", exist_ok=True)
+        
+        # Convert first page of PDF to image
+        if os.path.exists(file_path):
+            pages = convert_from_path(file_path, first_page=1, last_page=1, dpi=150)
+        else:
+            return None
+            
+        if not pages:
+            return None
+            
+        # Get first page
+        page = pages[0]
+        
+        # Resize to thumbnail size (120x150 - 3x the original 40x50)
+        thumbnail_size = (120, 150)
+        page.thumbnail(thumbnail_size, Image.Resampling.LANCZOS)
+        
+        # Create new image with white background
+        thumbnail = Image.new('RGB', thumbnail_size, 'white')
+        
+        # Calculate position to center the image
+        x = (thumbnail_size[0] - page.width) // 2
+        y = (thumbnail_size[1] - page.height) // 2
+        
+        # Paste the page onto the white background
+        thumbnail.paste(page, (x, y))
+        
+        # Save to cache
+        thumbnail.save(thumbnail_cache_path, 'PNG', optimize=True)
+        
+        # Convert to base64
+        buffer = BytesIO()
+        thumbnail.save(buffer, format='PNG')
+        img_data = buffer.getvalue()
+        
+        return image_to_base64(img_data)
+        
+    except Exception as e:
+        print(f"Error generating PDF thumbnail: {e}")
+        return None
+
+def generate_pdf_thumbnail_from_bytes(pdf_bytes, doc_id):
+    """
+    Generate thumbnail from PDF bytes data.
     
-    # Determine thumbnail style based on organization and type
-    if is_nist_document(organization, doc_title):
-        return create_nist_thumbnail(doc_title, doc_type)
-    elif is_eu_document(organization, doc_title):
-        return create_eu_thumbnail(doc_title, doc_type)
-    elif is_nasa_document(organization, doc_title):
-        return create_nasa_thumbnail(doc_title, doc_type)
-    elif is_academic_document(organization, doc_title):
-        return create_academic_thumbnail(doc_title, doc_type)
-    elif is_government_document(organization, doc_title):
-        return create_government_thumbnail(doc_title, doc_type)
-    else:
-        return create_generic_thumbnail(doc_title, doc_type)
+    Args:
+        pdf_bytes: PDF file as bytes
+        doc_id: Document ID for caching
+        
+    Returns:
+        Base64 encoded thumbnail image or None if failed
+    """
+    try:
+        # Check if thumbnail already exists in cache
+        thumbnail_cache_path = f"thumbnails/thumb_{doc_id}.png"
+        
+        if os.path.exists(thumbnail_cache_path):
+            with open(thumbnail_cache_path, 'rb') as f:
+                img_data = f.read()
+                return image_to_base64(img_data)
+        
+        # Create thumbnails directory if it doesn't exist
+        os.makedirs("thumbnails", exist_ok=True)
+        
+        # Convert first page of PDF to image
+        pages = convert_from_bytes(pdf_bytes, first_page=1, last_page=1, dpi=150)
+            
+        if not pages:
+            return None
+            
+        # Get first page
+        page = pages[0]
+        
+        # Resize to thumbnail size (120x150 - 3x the original 40x50)
+        thumbnail_size = (120, 150)
+        page.thumbnail(thumbnail_size, Image.Resampling.LANCZOS)
+        
+        # Create new image with white background
+        thumbnail = Image.new('RGB', thumbnail_size, 'white')
+        
+        # Calculate position to center the image
+        x = (thumbnail_size[0] - page.width) // 2
+        y = (thumbnail_size[1] - page.height) // 2
+        
+        # Paste the page onto the white background
+        thumbnail.paste(page, (x, y))
+        
+        # Save to cache
+        thumbnail.save(thumbnail_cache_path, 'PNG', optimize=True)
+        
+        # Convert to base64
+        buffer = BytesIO()
+        thumbnail.save(buffer, format='PNG')
+        img_data = buffer.getvalue()
+        
+        return image_to_base64(img_data)
+        
+    except Exception as e:
+        print(f"Error generating PDF thumbnail from bytes: {e}")
+        return None
+
+def image_to_base64(img_data):
+    """Convert image bytes to base64 data URL"""
+    img_b64 = base64.b64encode(img_data).decode('utf-8')
+    return f"data:image/png;base64,{img_b64}"
 
 def is_nist_document(org, title):
     """Check if document is from NIST"""
@@ -214,7 +319,81 @@ def svg_to_base64(svg_content):
     svg_b64 = base64.b64encode(svg_bytes).decode('utf-8')
     return f"data:image/svg+xml;base64,{svg_b64}"
 
-def get_thumbnail_html(doc_title, doc_type, organization):
+def get_thumbnail_html(doc_title, doc_type, organization, doc_id=None, file_path=None):
     """Get HTML img tag for document thumbnail"""
-    thumbnail_data = generate_thumbnail_svg(doc_title, doc_type, organization)
-    return f'<img src="{thumbnail_data}" style="width:40px;height:50px;margin-right:8px;border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.2);" alt="Document thumbnail">'
+    thumbnail_data = None
+    
+    # Try to find PDF file in attached_assets directory
+    pdf_path = find_pdf_in_assets(doc_title, organization)
+    
+    # Try to generate real PDF thumbnail first
+    if pdf_path:
+        thumbnail_data = generate_pdf_thumbnail(pdf_path, doc_id or hash(doc_title))
+    elif doc_id and file_path:
+        thumbnail_data = generate_pdf_thumbnail(file_path, doc_id)
+    
+    # Fallback to SVG if PDF thumbnail fails
+    if not thumbnail_data:
+        thumbnail_data = generate_thumbnail_svg(doc_title, doc_type, organization)
+    
+    # 3x size: 120x150 instead of 40x50
+    return f'<img src="{thumbnail_data}" style="width:120px;height:150px;margin-right:8px;border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.2);" alt="Document thumbnail">'
+
+def find_pdf_in_assets(doc_title, organization):
+    """Find corresponding PDF file in attached_assets directory"""
+    assets_dir = "attached_assets"
+    
+    if not os.path.exists(assets_dir):
+        return None
+        
+    # Get all PDF files in the directory
+    pdf_files = [f for f in os.listdir(assets_dir) if f.lower().endswith('.pdf')]
+    
+    # Try to match by title keywords or organization
+    title_lower = doc_title.lower() if doc_title else ""
+    org_lower = organization.lower() if organization else ""
+    
+    for pdf_file in pdf_files:
+        pdf_lower = pdf_file.lower()
+        
+        # Check for NIST documents
+        if ('nist' in org_lower or 'nist' in title_lower) and 'nist' in pdf_lower:
+            return os.path.join(assets_dir, pdf_file)
+            
+        # Check for AI-related documents
+        if 'ai' in title_lower and 'ai' in pdf_lower:
+            return os.path.join(assets_dir, pdf_file)
+            
+        # Check for direct filename matches (remove common suffixes)
+        title_clean = re.sub(r'[^\w\s]', '', title_lower).strip()
+        if title_clean and any(word in pdf_lower for word in title_clean.split() if len(word) > 3):
+            return os.path.join(assets_dir, pdf_file)
+    
+    return None
+
+def get_real_pdf_thumbnail(doc_id, file_path=None, pdf_bytes=None):
+    """Get real PDF thumbnail with fallback"""
+    if file_path:
+        return generate_pdf_thumbnail(file_path, doc_id)
+    elif pdf_bytes:
+        return generate_pdf_thumbnail_from_bytes(pdf_bytes, doc_id)
+    return None
+
+def generate_thumbnail_svg(doc_title, doc_type, organization):
+    """
+    Generate SVG thumbnail based on document metadata (fallback only).
+    """
+    
+    # Determine thumbnail style based on organization and type
+    if is_nist_document(organization, doc_title):
+        return create_nist_thumbnail(doc_title, doc_type)
+    elif is_eu_document(organization, doc_title):
+        return create_eu_thumbnail(doc_title, doc_type)
+    elif is_nasa_document(organization, doc_title):
+        return create_nasa_thumbnail(doc_title, doc_type)
+    elif is_academic_document(organization, doc_title):
+        return create_academic_thumbnail(doc_title, doc_type)
+    elif is_government_document(organization, doc_title):
+        return create_government_thumbnail(doc_title, doc_type)
+    else:
+        return create_generic_thumbnail(doc_title, doc_type)
