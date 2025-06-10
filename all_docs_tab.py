@@ -6,6 +6,7 @@ from utils.comprehensive_scoring import comprehensive_document_scoring, format_s
 from utils.document_metadata_extractor import extract_document_metadata
 from utils.content_cleaner import clean_document_content
 from utils.clean_preview_generator import generate_clean_preview, extract_clean_metadata
+from utils.retroactive_updater import update_all_documents_metadata, check_if_update_needed
 
 def get_comprehensive_badge(score, framework):
     """Create badge for comprehensive scoring system."""
@@ -35,14 +36,28 @@ def is_probably_quantum(content):
 def render():
     st.markdown("<h2 style='text-align:center;'>All Uploaded Documents</h2>", unsafe_allow_html=True)
     
-    # Clear metadata cache button
+    # Enhanced refresh button with retroactive updates
     col1, col2 = st.columns([1, 4])
     with col1:
-        if st.button("🔄 Refresh Analysis", help="Regenerate document metadata with latest algorithms"):
-            # Clear ALL session state to force complete refresh
-            st.session_state.clear()
-            st.success("Complete cache cleared - reloading...")
-            st.rerun()
+        if st.button("🔄 Refresh Analysis", help="Update all documents with improved metadata extraction"):
+            with st.spinner("Updating all documents with improved analysis..."):
+                try:
+                    updated_count = update_all_documents_metadata()
+                    if updated_count > 0:
+                        st.success(f"Updated {updated_count} documents with improved metadata")
+                    else:
+                        st.info("All documents are already up to date")
+                    
+                    # Clear session state to force refresh of displayed data
+                    st.session_state.clear()
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Error updating documents: {e}")
+    
+    with col2:
+        # Check if updates are recommended
+        if check_if_update_needed():
+            st.info("💡 Document metadata can be improved - click Refresh Analysis to apply latest extraction algorithms")
     
     try:
         all_docs = fetch_documents()

@@ -72,7 +72,9 @@ def extract_title_fallback(content: str, source: str) -> str:
         # Formal document title patterns
         r'(?:^|\n)\s*([A-Z][A-Za-z\s\d-]{15,80}(?:Guidelines?|Framework|Strategy|Policy|Standard|Publication|Advisory))\s*(?:\n|$)',
         
-        # AI/Cybersecurity formal document titles - prioritize these over org names
+        # AI/Cybersecurity formal document titles with organization names
+        r"([A-Z]{2,6}'s\s+AI\s+[^.\n]{10,60}(?:Principles?|Guidelines?|Framework|Policy|Standard))",
+        r'(?:^|\n)\s*(AI\s+Security\s+(?:Policy\s+)?Principles?[^.\n]*)\s*(?:\n|$)',
         r'(?:^|\n)\s*(AI\s+Security\s+Playbook(?:\s+for\s+[^.!?\n]+)?)\s*(?:\n|$)',
         r'(?:^|\n)\s*(CISA\s+AI\s+Security\s+Playbook)\s*(?:\n|$)',
         r'(?:^|\n)\s*(Artificial\s+Intelligence\s+Cybersecurity\s+Guidelines?)\s*(?:\n|$)',
@@ -243,8 +245,12 @@ def classify_document_type_fallback(content: str) -> str:
 def extract_organization_fallback(content: str) -> str:
     """Extract organization/author information."""
     
-    # Enhanced organization patterns for government documents
+    # Enhanced organization patterns for government and industry documents
     org_patterns = [
+        # Extract organization from title patterns like "ITI's AI Security Policy"
+        r"([A-Z]{2,6})'s\s+AI\s+Security\s+Policy",
+        r"([A-Z]{2,6})'s\s+AI\s+[^.\n]*(?:Principles?|Guidelines?|Framework|Policy)",
+        
         # Multi-agency collaboration patterns
         r'(National Security Agency[^.\n]*(?:CISA|Cybersecurity)[^.\n]*)',
         r'(NSA[^.\n]*(?:CISA|along with)[^.\n]*)',
@@ -254,12 +260,14 @@ def extract_organization_fallback(content: str) -> str:
         r'(National Security Agency\'s?\s+[A-Z][^.\n]{0,30})',
         r'(Cybersecurity and Infrastructure Security Agency)',
         r'(National Institute of Standards and Technology)',
-        r'(CISA|NSA|NIST|DHS)',
+        
+        # Industry organizations and acronyms
+        r'([A-Z]{2,6})\s*(?:Report|Document|Publication|Policy|Framework)',
+        r'(CISA|NSA|NIST|DHS|ITI)',
         
         # General patterns
         r'(?:published by|by|author:|from)\s*([A-Z][^.\n]{5,50})',
         r'((?:National|Federal|Department|Ministry|Institute|Agency|Bureau|Office)[^.\n]{5,40})',
-        r'([A-Z]{2,10})\s*(?:Report|Document|Publication)',
         r'©\s*\d{4}\s*([^.\n]{5,40})',
     ]
     
@@ -291,6 +299,9 @@ def extract_date_fallback(content: str) -> Optional[str]:
         r'(?:published|issued)\s+(\w+ \d{4})',  # "Published March 2024"
         r'(\w+ \d{1,2}, \d{4})',  # "March 15, 2024"
         r'(\d{1,2}/\d{1,2}/\d{4})',  # MM/DD/YYYY
+        
+        # Date patterns on document covers and standalone
+        r'(?:^|\n)\s*(\w+ \d{4})\s*(?:\n|$)',  # "October 2024" on separate line
         r'(\d{4})',  # Just year - common in government docs
         
         # Version and revision dates
