@@ -355,43 +355,84 @@ def main():
                 with st.spinner(f"Fetching content from {url_input}..."):
                     try:
                         import trafilatura
+                        import requests
+                        import io
+                        from urllib.parse import urlparse
                         from utils.db import save_document
                         from utils.document_analyzer import analyze_document_metadata
                         from utils.comprehensive_scoring import comprehensive_document_scoring
                         
-                        # Fetch content from URL
-                        downloaded = trafilatura.fetch_url(url_input)
-                        if not downloaded:
-                            st.error("Could not fetch content from URL. Please check the URL and try again.")
+                        # Determine file type from URL
+                        parsed_url = urlparse(url_input.lower())
+                        file_extension = parsed_url.path.split('.')[-1] if '.' in parsed_url.path else ''
+                        
+                        text_content = None
+                        document_title = None
+                        
+                        # Check if it's a direct file download
+                        if file_extension in ['pdf', 'txt']:
+                            st.info(f"Detected {file_extension.upper()} file, downloading and processing...")
+                            
+                            # Download the file
+                            response = requests.get(url_input, timeout=30)
+                            response.raise_for_status()
+                            
+                            if file_extension == 'pdf':
+                                try:
+                                    from pypdf import PdfReader
+                                    pdf_file = io.BytesIO(response.content)
+                                    pdf_reader = PdfReader(pdf_file)
+                                    text_content = ""
+                                    for page in pdf_reader.pages:
+                                        text_content += page.extract_text() + "\n"
+                                    document_title = f"PDF Document from {parsed_url.netloc}"
+                                except Exception as e:
+                                    st.error(f"Could not extract text from PDF: {e}")
+                                    return
+                                    
+                            elif file_extension == 'txt':
+                                text_content = response.text
+                                document_title = f"Text Document from {parsed_url.netloc}"
+                        
                         else:
-                            text_content = trafilatura.extract(downloaded)
-                            if not text_content:
-                                st.error("No text content found on the webpage.")
+                            # It's a webpage, use trafilatura
+                            st.info("Processing webpage content...")
+                            downloaded = trafilatura.fetch_url(url_input)
+                            if downloaded:
+                                text_content = trafilatura.extract(downloaded)
+                                document_title = f"Webpage from {parsed_url.netloc}"
+                        
+                        if not text_content or len(text_content.strip()) < 50:
+                            st.error("Could not extract meaningful text content from the URL. The document may be empty, password-protected, or in an unsupported format.")
+                        else:
+                            # Extract metadata using AI
+                            metadata = analyze_document_metadata(text_content, document_title or url_input)
+                            
+                            # Generate comprehensive scores
+                            final_title = metadata.get('title') or document_title or "URL Document"
+                            scores = comprehensive_document_scoring(text_content, final_title)
+                            
+                            # Prepare document for database
+                            document_data = {
+                                'title': metadata.get('title', document_title or f"Document from {url_input}"),
+                                'content': text_content[:500] + "..." if len(text_content) > 500 else text_content,
+                                'text_content': text_content,
+                                'document_type': metadata.get('document_type', 'Unknown'),
+                                'source': f"URL: {url_input}",
+                                'quantum_score': scores.get('quantum_cybersecurity', 0) or 0,
+                                'analyzed_metadata': metadata,
+                                'comprehensive_scores': scores
+                            }
+                            
+                            # Save to database
+                            if save_document(document_data):
+                                st.success(f"Successfully processed and saved: {metadata.get('title', document_title)}")
+                                st.info("Document has been analyzed and added to your collection. Check the All Documents tab to view it.")
+                                # Clear the URL input
+                                st.session_state.clear()
+                                st.rerun()
                             else:
-                                # Extract metadata using AI
-                                metadata = analyze_document_metadata(text_content, url_input)
-                                
-                                # Generate comprehensive scores
-                                scores = comprehensive_document_scoring(text_content, metadata.get('title', 'URL Document'))
-                                
-                                # Prepare document for database
-                                document_data = {
-                                    'title': metadata.get('title', f"Document from {url_input}"),
-                                    'content': text_content[:500] + "..." if len(text_content) > 500 else text_content,
-                                    'text_content': text_content,
-                                    'document_type': metadata.get('document_type', 'Unknown'),
-                                    'source': f"URL: {url_input}",
-                                    'quantum_score': scores.get('quantum_cybersecurity', 0) or 0,
-                                    'analyzed_metadata': metadata,
-                                    'comprehensive_scores': scores
-                                }
-                                
-                                # Save to database
-                                if save_document(document_data):
-                                    st.success(f"Successfully processed and saved: {metadata.get('title', 'URL Document')}")
-                                    st.info("Document has been analyzed and added to your collection. Check the All Documents tab to view it.")
-                                else:
-                                    st.error("Failed to save document to database.")
+                                st.error("Failed to save document to database.")
                                     
                     except Exception as e:
                         st.error(f"Error processing URL: {str(e)}")
