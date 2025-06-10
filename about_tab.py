@@ -2,21 +2,21 @@ import streamlit as st
 import plotly.graph_objects as go
 
 def create_scoring_gauge(title, value, max_value=100, color_scheme="cybersecurity"):
-    """Create an interactive gauge for scoring visualization."""
+    """Create a compact needle gauge for scoring visualization."""
     
-    # Define color schemes
+    # Define vibrant color schemes
     color_schemes = {
         "cybersecurity": {
-            "low": "#DC2626",      # Red
-            "medium": "#EA580C",   # Orange  
-            "good": "#059669",     # Green
-            "excellent": "#047857" # Dark Green
+            "low": "#FF0000",      # Bright Red
+            "medium": "#FF6600",   # Bright Orange  
+            "good": "#00CC00",     # Bright Green
+            "excellent": "#009900" # Dark Bright Green
         },
         "ethics": {
-            "low": "#DC2626",      # Red
-            "medium": "#D97706",   # Amber
-            "good": "#065F46",     # Emerald
-            "excellent": "#064E3B" # Dark Emerald
+            "low": "#FF0000",      # Bright Red
+            "medium": "#FF9900",   # Bright Amber
+            "good": "#00AA00",     # Bright Emerald
+            "excellent": "#007700" # Dark Bright Emerald
         }
     }
     
@@ -37,35 +37,46 @@ def create_scoring_gauge(title, value, max_value=100, color_scheme="cybersecurit
         performance = "Excellent"
     
     fig = go.Figure(go.Indicator(
-        mode = "gauge+number+delta",
+        mode = "gauge+number",
         value = value,
-        domain = {'x': [0, 1], 'y': [0, 1]},
-        title = {'text': f"<b>{title}</b><br><span style='font-size:0.8em;color:gray'>{performance}</span>"},
-        delta = {'reference': 50},
+        domain = {'x': [0, 1], 'y': [0.1, 0.9]},
+        title = {'text': f"<b style='font-size:0.9em'>{title}</b>"},
+        number = {'font': {'size': 20, 'color': needle_color}},
         gauge = {
-            'axis': {'range': [None, max_value], 'tickwidth': 1, 'tickcolor': "darkblue"},
-            'bar': {'color': needle_color, 'thickness': 0.3},
+            'axis': {
+                'range': [None, max_value], 
+                'tickwidth': 1, 
+                'tickcolor': "#333333",
+                'tickfont': {'size': 10}
+            },
+            'bar': {
+                'color': needle_color, 
+                'thickness': 0.15,  # Thinner needle
+                'line': {'color': "#000000", 'width': 1}
+            },
             'bgcolor': "white",
-            'borderwidth': 2,
-            'bordercolor': "gray",
+            'borderwidth': 1,
+            'bordercolor': "#333333",
             'steps': [
-                {'range': [0, 25], 'color': '#FEE2E2'},      # Light red
-                {'range': [25, 50], 'color': '#FED7AA'},     # Light orange
-                {'range': [50, 75], 'color': '#D1FAE5'},     # Light green
-                {'range': [75, max_value], 'color': '#A7F3D0'}  # Lighter green
+                {'range': [0, 25], 'color': '#FF4444'},      # Bright red zone
+                {'range': [25, 50], 'color': '#FF8844'},     # Bright orange zone
+                {'range': [50, 75], 'color': '#44CC44'},     # Bright green zone
+                {'range': [75, max_value], 'color': '#22AA22'}  # Dark bright green zone
             ],
             'threshold': {
-                'line': {'color': "red", 'width': 4},
-                'thickness': 0.75,
-                'value': 90
+                'line': {'color': "#333333", 'width': 2},
+                'thickness': 0.8,
+                'value': 75  # Excellence threshold
             }
         }
     ))
     
     fig.update_layout(
-        height=200,
-        font={'color': "darkblue", 'family': "Arial"},
-        margin=dict(l=20, r=20, t=40, b=20)
+        height=150,  # More compact
+        font={'color': "#333333", 'family': "Arial"},
+        margin=dict(l=10, r=10, t=30, b=10),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)'
     )
     
     return fig
