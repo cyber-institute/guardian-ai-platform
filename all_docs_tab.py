@@ -10,6 +10,30 @@ from utils.simple_updater import update_document_metadata
 from components.chatbot_widget import create_tooltip, render_help_tooltip
 from utils.thumbnail_generator import get_thumbnail_html
 
+def ultra_clean_metadata(field_value):
+    """Remove all HTML artifacts from metadata fields"""
+    if not field_value or field_value == 'Unknown':
+        return 'Unknown'
+    
+    text = str(field_value)
+    # Remove all HTML tags and fragments
+    text = re.sub(r'<[^>]*>', '', text)
+    text = re.sub(r'</[^>]*>', '', text)
+    text = re.sub(r'<[^>]*', '', text)
+    text = re.sub(r'[^>]*>', '', text)
+    
+    # Remove HTML entities
+    text = re.sub(r'&[#a-zA-Z0-9]+;?', '', text)
+    
+    # Remove common HTML artifacts that slip through
+    artifacts = ['</div>', '<div', '</span>', '<span', '</p>', '<p', 'style=', 'class=', 'id=']
+    for artifact in artifacts:
+        text = text.replace(artifact, '')
+    
+    # Clean up whitespace
+    text = ' '.join(text.split()).strip()
+    return text if text else 'Unknown'
+
 def get_comprehensive_badge(score, framework):
     """Create badge for comprehensive scoring system with intelligent tooltips."""
     
@@ -493,26 +517,16 @@ def render_card_view(docs):
             doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
             content_preview = doc.get('content_preview', 'No preview available') or 'No preview available'
             
-            # Generate thumbnail
-            thumbnail_html = get_thumbnail_html(title, doc_type, author_org)
-            
-            # Display metadata card with thumbnail
+            # Display metadata card without thumbnail (Card View)
             st.markdown(f"""
                 <div style='border:1px solid #ddd;padding:20px;border-radius:12px;margin:8px;
                 background:white;box-shadow:0 4px 6px rgba(0,0,0,0.1);
-                transition:transform 0.2s ease;border-left:5px solid #3B82F6;min-height:180px'>
-                    <div style='display:flex;align-items:flex-start;gap:16px;margin-bottom:12px'>
-                        <div style='flex-shrink:0'>
-                            {thumbnail_html}
-                        </div>
-                        <div style='flex:1;min-width:0'>
-                            <h3 style='margin:0 0 12px 0;color:#333;line-height:1.3'>{title}</h3>
-                            <div style='margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap'>
-                                <span style='background:#f0f0f0;padding:4px 10px;border-radius:12px;font-size:12px'>{doc_type}</span>
-                                <span style='background:#e0f2fe;padding:4px 10px;border-radius:12px;font-size:12px;color:#0277bd'>{author_org}</span>
-                                {f"<span style='background:#f3e5f5;padding:4px 10px;border-radius:12px;font-size:12px;color:#7b1fa2'>{pub_date}</span>" if pub_date and pub_date != 'Date not available' else ""}
-                            </div>
-                        </div>
+                transition:transform 0.2s ease;border-left:5px solid #3B82F6'>
+                    <h3 style='margin:0 0 12px 0;color:#333;line-height:1.3'>{title}</h3>
+                    <div style='margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap'>
+                        <span style='background:#f0f0f0;padding:4px 10px;border-radius:12px;font-size:12px'>{doc_type}</span>
+                        <span style='background:#e0f2fe;padding:4px 10px;border-radius:12px;font-size:12px;color:#0277bd'>{author_org}</span>
+                        {f"<span style='background:#f3e5f5;padding:4px 10px;border-radius:12px;font-size:12px;color:#7b1fa2'>{pub_date}</span>" if pub_date and pub_date != 'Date not available' else ""}
                     </div>
                 </div>
             """, unsafe_allow_html=True)

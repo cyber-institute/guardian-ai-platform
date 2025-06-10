@@ -349,6 +349,9 @@ def find_pdf_in_assets(doc_title, organization):
     # Get all PDF files in the directory
     pdf_files = [f for f in os.listdir(assets_dir) if f.lower().endswith('.pdf')]
     
+    if not pdf_files:
+        return None
+    
     # Try to match by title keywords or organization
     title_lower = doc_title.lower() if doc_title else ""
     org_lower = organization.lower() if organization else ""
@@ -357,7 +360,15 @@ def find_pdf_in_assets(doc_title, organization):
         pdf_lower = pdf_file.lower()
         
         # Check for NIST documents
-        if ('nist' in org_lower or 'nist' in title_lower) and 'nist' in pdf_lower:
+        if ('nist' in org_lower or 'nist' in title_lower or 'ai risk management framework' in title_lower) and 'nist' in pdf_lower:
+            return os.path.join(assets_dir, pdf_file)
+            
+        # Check for EU documents  
+        if ('european' in org_lower or 'europa.eu' in org_lower or 'eur-lex' in org_lower) and 'eu' in pdf_lower:
+            return os.path.join(assets_dir, pdf_file)
+            
+        # Check for NASA documents
+        if ('nasa' in org_lower or 'ntrs.nasa.gov' in org_lower) and 'nasa' in pdf_lower:
             return os.path.join(assets_dir, pdf_file)
             
         # Check for AI-related documents
@@ -367,6 +378,13 @@ def find_pdf_in_assets(doc_title, organization):
         # Check for direct filename matches (remove common suffixes)
         title_clean = re.sub(r'[^\w\s]', '', title_lower).strip()
         if title_clean and any(word in pdf_lower for word in title_clean.split() if len(word) > 3):
+            return os.path.join(assets_dir, pdf_file)
+    
+    # If no specific match found, try to find any PDF that might be related
+    # by checking if the title contains document-like keywords
+    for pdf_file in pdf_files:
+        # Return the first available PDF for documents that seem policy-related
+        if any(keyword in title_lower for keyword in ['policy', 'framework', 'guideline', 'standard', 'regulation']):
             return os.path.join(assets_dir, pdf_file)
     
     return None
