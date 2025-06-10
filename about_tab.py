@@ -121,121 +121,130 @@ def create_speedometer_dial(value, max_value=100):
 def render():
     """Render the About tab for GUARDIAN system."""
     
-    # Hero section with system overview
+    # Compact hero section
     st.markdown("""
-    <div style="
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-        padding: 2rem;
-        border-radius: 10px;
-        margin-bottom: 2rem;
-        border-left: 4px solid #B91C2C;
-    ">
-        <h2 style="color: #B91C2C; margin-bottom: 1rem; font-size: 1.8rem;">
-            What is GUARDIAN?
-        </h2>
-        <p style="font-size: 1.1rem; line-height: 1.7; color: #374151; margin-bottom: 1rem;">
-            <strong>GUARDIAN</strong> (Governance Using AI for Risk Detection, Integration, Analysis, and Notification) is a 
-            comprehensive AI-powered governance platform that integrates multiple patented technologies for 
-            real-time policy evaluation, cybersecurity assessment, and ethical compliance analysis across 
-            AI and quantum technology domains.
-        </p>
-        <p style="font-size: 1.1rem; line-height: 1.7; color: #374151;">
-            Developed by the Cyber Institute, this unified system combines three breakthrough patent technologies: 
-            Real-Time Dynamic Governance, AI-Powered Policy Evaluation, and Quantum Cybersecurity Framework 
-            to provide organizations with comprehensive governance solutions for emerging technologies.
+    <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #B91C2C;">
+        <h2 style="color: #B91C2C; margin-bottom: 0.8rem; font-size: 1.6rem;">GUARDIAN Emerging Tech Tool</h2>
+        <p style="font-size: 1rem; line-height: 1.5; color: #374151; margin: 0;">
+            <strong>Governance Using AI for Risk Detection, Integration, Analysis, and Notification</strong> - 
+            A comprehensive platform for real-time policy evaluation, cybersecurity assessment, and ethical compliance analysis across AI and quantum technology domains.
         </p>
     </div>
     """, unsafe_allow_html=True)
     
-    # Core capabilities section
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("""
-        ### **Core Capabilities**
-        
-        **AI-Powered Policy Repository**
-        - Hybrid data collection via APIs, document parsing, and web scraping
-        - Unbiased policy summarization using transformer-based models
-        - Cross-jurisdictional policy comparison and harmonization
-        
-        **Cybersecurity & Ethics Gap Analysis**
-        - Machine learning-powered compliance gap scoring
-        - Alignment with global frameworks (NIST, OECD, EU AI Act)
-        - Real-time vulnerability assessment and mitigation recommendations
-        
-        **Quantum Cybersecurity Framework**
-        - Five-tier maturity evaluation algorithm (QCMEA)
-        - Bayesian inference for dynamic threat assessment
-        - Post-quantum cryptography readiness evaluation
-        
-        **Policy Optimization & Stress Testing**
-        - Reinforcement learning for policy customization
-        - Sandbox environment for regulatory impact simulation
-        - Probabilistic adoption scoring and effectiveness prediction
-        """)
-    
-    with col2:
-        st.markdown("""
-        ### **Who Benefits?**
-        
-        **Government Agencies**
-        - Policy compliance verification
-        - Regulatory gap analysis
-        - Strategic planning for quantum initiatives
-        
-        **Enterprise Organizations**
-        - Risk assessment for quantum adoption
-        - Compliance monitoring and reporting
-        - Technology readiness evaluation
-        
-        **Research Institutions**
-        - Academic policy analysis
-        - Comparative framework studies
-        - Emerging technology governance research
-        """)
-    
-    # Technical architecture section
-    st.markdown("---")
-    
-    st.markdown("""
-    ### **Technical Architecture**
-    
-    GUARDIAN employs a sophisticated multi-layered approach to governance analysis:
-    """)
-    
-    # Architecture components
+    # Create a more compact and organized layout
     col1, col2, col3 = st.columns(3)
     
     with col1:
         st.markdown("""
-        **AI Decision Layer**
-        - BERT and GPT-4 transformer models
-        - Named Entity Recognition (NER) for policy extraction
-        - Fuzzy logic-based probabilistic scoring
-        - Sentiment analysis for bias detection
-        """)
+        <div style="background: #f9fafb; padding: 1rem; border-radius: 6px; height: 280px;">
+        <h4 style="color: #B91C2C; margin-bottom: 0.8rem;">Core Capabilities</h4>
+        <div style="font-size: 0.9rem; line-height: 1.4;">
+        <strong>AI Policy Analysis</strong><br>
+        Document parsing, sentiment analysis, compliance scoring<br><br>
+        <strong>Cybersecurity Assessment</strong><br>
+        NIST framework alignment, vulnerability detection<br><br>
+        <strong>Quantum Readiness</strong><br>
+        QCMEA 5-tier evaluation, post-quantum crypto assessment<br><br>
+        <strong>Ethics Compliance</strong><br>
+        Bias detection, transparency scoring, accountability tracking
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col2:
         st.markdown("""
-        **Risk Evaluation Engine**
-        - Graph Neural Networks (GNNs) for interdependency analysis
-        - Dual-modality cybersecurity and ethics scoring
-        - Quantum threat simulation and validation
-        - Real-time vulnerability assessment
-        """)
+        <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; height: 280px;">
+        <h4 style="color: #B91C2C; margin-bottom: 0.8rem;">Key Features</h4>
+        <div style="font-size: 0.9rem; line-height: 1.4;">
+        <strong>Real-Time Scoring</strong><br>
+        Dynamic assessment across 4 frameworks<br><br>
+        <strong>Document Repository</strong><br>
+        Standards, policies, guidelines, frameworks<br><br>
+        <strong>Interactive Analysis</strong><br>
+        Filtering, comparison, detailed breakdowns<br><br>
+        <strong>Intelligent Chatbot</strong><br>
+        Contextual help and guidance system
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col3:
         st.markdown("""
-        **Adaptive Learning**
-        - Bayesian inference for dynamic updates
-        - Reinforcement learning policy optimization
-        - Semantic drift detection and retraining
-        - Continuous compliance monitoring
-        """)
+        <div style="background: #f0fdf4; padding: 1rem; border-radius: 6px; height: 280px;">
+        <h4 style="color: #B91C2C; margin-bottom: 0.8rem;">Target Users</h4>
+        <div style="font-size: 0.9rem; line-height: 1.4;">
+        <strong>Government Agencies</strong><br>
+        Policy compliance, regulatory analysis<br><br>
+        <strong>Enterprise Teams</strong><br>
+        Risk assessment, compliance monitoring<br><br>
+        <strong>Research Institutions</strong><br>
+        Academic analysis, framework studies<br><br>
+        <strong>Compliance Officers</strong><br>
+        Audit preparation, gap identification
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
     
-    # Scoring methodology section
-    st.markdown("---")
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Scoring Frameworks Overview with compact visual presentation
+    st.markdown("""
+    <div style="background: #fefefe; padding: 1.2rem; border-radius: 8px; border: 1px solid #e5e7eb;">
+    <h4 style="color: #B91C2C; margin-bottom: 1rem; text-align: center;">Four Assessment Frameworks</h4>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Compact scoring framework display
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.markdown("""
+        <div style="text-align: center; padding: 1rem; background: #fef2f2; border-radius: 6px;">
+        <h5 style="color: #B91C2C; margin: 0 0 0.5rem 0;">AI Cybersecurity</h5>
+        <p style="font-size: 0.8rem; margin: 0; color: #666;">0-100 Scale</p>
+        <p style="font-size: 0.7rem; margin: 0.3rem 0 0 0; color: #888;">Encryption, Authentication, Monitoring, Response</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div style="text-align: center; padding: 1rem; background: #f0f9ff; border-radius: 6px;">
+        <h5 style="color: #B91C2C; margin: 0 0 0.5rem 0;">Quantum Cybersecurity</h5>
+        <p style="font-size: 0.8rem; margin: 0; color: #666;">1-5 QCMEA Scale</p>
+        <p style="font-size: 0.7rem; margin: 0.3rem 0 0 0; color: #888;">Initial, Basic, Intermediate, Advanced, Dynamic</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with col3:
+        st.markdown("""
+        <div style="text-align: center; padding: 1rem; background: #f0fdf4; border-radius: 6px;">
+        <h5 style="color: #B91C2C; margin: 0 0 0.5rem 0;">AI Ethics</h5>
+        <p style="font-size: 0.8rem; margin: 0; color: #666;">0-100 Scale</p>
+        <p style="font-size: 0.7rem; margin: 0.3rem 0 0 0; color: #888;">Fairness, Transparency, Accountability, Privacy</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with col4:
+        st.markdown("""
+        <div style="text-align: center; padding: 1rem; background: #fffbeb; border-radius: 6px;">
+        <h5 style="color: #B91C2C; margin: 0 0 0.5rem 0;">Quantum Ethics</h5>
+        <p style="font-size: 0.8rem; margin: 0; color: #666;">0-100 Scale</p>
+        <p style="font-size: 0.7rem; margin: 0.3rem 0 0 0; color: #888;">Advantage, Privacy, Security, Access</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Compact contact and development info
+    st.markdown("""
+    <div style="background: #f8fafc; padding: 1rem; border-radius: 6px; text-align: center;">
+    <h5 style="color: #B91C2C; margin-bottom: 0.5rem;">Development Team</h5>
+    <p style="margin: 0.2rem 0; font-size: 0.9rem;">Dr. Andrew Vance & Dr. Taylor Rodriguez-Vance</p>
+    <p style="margin: 0.2rem 0; font-size: 0.8rem; color: #666;">Cyber Institute | New York, NY</p>
+    <p style="margin: 0.2rem 0; font-size: 0.8rem; color: #666;">Patent-pending technologies for emerging tech governance</p>
+    </div>
+    """, unsafe_allow_html=True)
     
     st.markdown("""
     ### **Quantum Cybersecurity Maturity Scoring**
