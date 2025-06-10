@@ -84,15 +84,15 @@ def render():
         st.error(f"Error fetching documents: {e}")
         return
 
-    # Extract document types and years for filtering
+    # Extract document types and organizations for filtering
     doc_types = sorted(set(doc.get("document_type", "Unknown") for doc in all_docs))
-    sources = sorted(set(doc.get("source", "Unknown")[:30] for doc in all_docs if doc.get("source")))
+    organizations = sorted(set(doc.get("organization", "Unknown")[:30] for doc in all_docs if doc.get("organization")))
 
     # Initialize filters in session state
     if "filters" not in st.session_state:
         st.session_state["filters"] = {
             "doc_type": "All",
-            "source_multi": []
+            "org_multi": []
         }
 
     # Filter controls
@@ -136,15 +136,15 @@ def render():
         if st.button("🗑️ Clear Filters", key="clear_filters", help="Reset all filters to default values"):
             st.session_state["filters"] = {
                 "doc_type": "All",
-                "source_multi": []
+                "org_multi": []
             }
             st.rerun()
     
     with col3:
-        st.session_state["filters"]["source_multi"] = st.multiselect(
-            "Filter by Source", 
-            sources, 
-            default=st.session_state["filters"]["source_multi"]
+        st.session_state["filters"]["org_multi"] = st.multiselect(
+            "Filter by Author/Org", 
+            organizations, 
+            default=st.session_state["filters"]["org_multi"]
         )
 
     # Apply filters
@@ -152,8 +152,8 @@ def render():
     docs = all_docs
     if f["doc_type"] != "All":
         docs = [d for d in docs if d.get("document_type") == f["doc_type"]]
-    if f["source_multi"]:
-        docs = [d for d in docs if any(d.get("source", "").startswith(s) for s in f["source_multi"])]
+    if f["org_multi"]:
+        docs = [d for d in docs if any(d.get("organization", "").startswith(s) for s in f["org_multi"])]
 
     # Display mode selection
     display_mode = st.session_state.get("display_mode", "cards")
