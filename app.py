@@ -514,13 +514,6 @@ def main():
 def render_patent_technology_section():
     """Render the hierarchical Patent Technology section."""
     
-    st.markdown("""
-    <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #3B82F6;">
-        <h3 style="margin: 0 0 0.5rem 0; color: #1e40af;">Patent Technology Navigation</h3>
-        <p style="margin: 0; color: #6B7280;">Explore GUARDIAN's patented technologies and assessment frameworks</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
     # Level 1: Patent Application
     patent_section = st.selectbox(
         "Select Patent Technology Section:",
