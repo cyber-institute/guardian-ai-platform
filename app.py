@@ -498,7 +498,7 @@ def main():
     
     with main_tab3:
         # About tab with Patent Technology as subtab
-        about_subtab1, about_subtab2 = st.tabs(["About GUARDIAN", "Patent Pending Technologies"])
+        about_subtab1, about_subtab2 = st.tabs(["GUARDIAN Emerging Tech Tool", "Patent Pending Technologies"])
         
         with about_subtab1:
             from about_tab import render as render_about
