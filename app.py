@@ -6,7 +6,7 @@ from components.chatbot_widget import render_chatbot_widget, inject_chatbot_css
 def main():
     st.set_page_config(
         page_title="GUARDIAN - AI Risk Analysis Navigator",
-        page_icon="🔐",
+        page_icon="",
         layout="wide",
         initial_sidebar_state="expanded"
     )

@@ -19,7 +19,7 @@ def render_chatbot_widget():
     
     # Always show chatbot in sidebar
     with st.sidebar:
-        st.markdown("### 🤖 GUARDIAN Assistant")
+        st.markdown("### GUARDIAN Assistant")
         
         # Quick help buttons
         st.markdown("**Quick Help:**")
@@ -36,7 +36,7 @@ def render_chatbot_widget():
                 handle_quick_question("How do I use the filters?")
         
         # Chat input
-        user_input = st.text_input("Ask me anything about GUARDIAN:", key="chat_input", placeholder="e.g., 'How do I upload a policy?'")
+        user_input = st.text_input("Ask me anything about GUARDIAN:", key="chat_input", placeholder="e.g., How do I upload a policy?")
         
         if st.button("Send", key="send_message", use_container_width=True) and user_input:
             handle_user_message(user_input)
@@ -208,11 +208,7 @@ def render_chatbot_widget():
     </style>
     """, unsafe_allow_html=True)
     
-    # Chatbot toggle button and window
-    if st.session_state.chat_open:
-        render_chat_window()
-    else:
-        render_chat_button()
+    # Remove old floating chat logic - now using sidebar only
 
 def render_chat_button():
     """Render the floating chat toggle button."""
