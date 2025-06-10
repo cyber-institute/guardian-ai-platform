@@ -163,11 +163,12 @@ def render():
     """)
     
     ai_cyber_criteria = [
-        ("**AI Data Security (25 points)**", [
-            "Training data encryption and access controls (0-6 points)",
-            "Model versioning and integrity verification (0-6 points)", 
-            "Secure data pipelines and preprocessing (0-7 points)",
-            "Privacy-preserving techniques (differential privacy, federated learning) (0-6 points)"
+        ("**AI Data Security & Integrity (25 points)**", [
+            "Training data encryption and access controls (0-5 points)",
+            "Data poisoning detection and mitigation systems (0-6 points)",
+            "Model versioning and integrity verification (0-5 points)", 
+            "Secure data pipelines and preprocessing validation (0-5 points)",
+            "Privacy-preserving techniques (differential privacy, federated learning) (0-4 points)"
         ]),
         ("**AI Model Protection (25 points)**", [
             "Model extraction and inversion attack prevention (0-8 points)",
@@ -211,9 +212,11 @@ def render():
     
     ai_ethics_criteria = [
         ("**Fairness & Bias Mitigation (25 points)**", [
-            "Bias detection and testing methodologies (0-8 points)",
-            "Diverse training data and representative datasets (0-8 points)",
-            "Algorithmic fairness metrics and monitoring (0-9 points)"
+            "Pre-training bias assessment and data auditing (0-5 points)",
+            "Algorithmic bias detection across protected classes (0-6 points)",
+            "Post-deployment bias monitoring and correction (0-5 points)",
+            "Diverse training data and representative datasets (0-5 points)",
+            "Fairness-aware machine learning implementation (0-4 points)"
         ]),
         ("**Transparency & Explainability (25 points)**", [
             "Model interpretability and explanation capabilities (0-8 points)",
