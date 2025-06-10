@@ -419,7 +419,7 @@ def main():
         """, unsafe_allow_html=True)
     
     # Create main navigation with hamburger menu structure
-    main_tab1, main_tab2, main_tab3, main_tab4 = st.tabs(["📄 All Documents", "📋 Patent Technology", "🔧 Repository Admin", "ℹ️ About"])
+    main_tab1, main_tab2, main_tab3, main_tab4 = st.tabs(["All Documents", "Patent Technology", "Repository Admin", "About"])
     
     with main_tab1:
         render()
@@ -446,7 +446,7 @@ def render_patent_technology_section():
     
     # Level 1: Patent Application
     patent_section = st.selectbox(
-        "📋 Select Patent Technology Section:",
+        "Select Patent Technology Section:",
         [
             "Patent Application Overview",
             "Patent Frameworks & Scoring",
@@ -790,11 +790,11 @@ def render_system_monitoring():
         ]
     else:
         logs = [
-            f"2024-06-09 15:45:0{i} INFO: {log_type} monitoring active",
-            f"2024-06-09 15:44:5{i} INFO: {log_type} metrics collected",
-            f"2024-06-09 15:44:4{i} INFO: {log_type} analysis completed",
-            f"2024-06-09 15:44:3{i} INFO: {log_type} status: healthy",
-            f"2024-06-09 15:44:2{i} INFO: {log_type} monitoring initialized"
+            f"2024-06-09 15:45:05 INFO: {log_type} monitoring active",
+            f"2024-06-09 15:44:52 INFO: {log_type} metrics collected", 
+            f"2024-06-09 15:44:41 INFO: {log_type} analysis completed",
+            f"2024-06-09 15:44:33 INFO: {log_type} status: healthy",
+            f"2024-06-09 15:44:22 INFO: {log_type} monitoring initialized"
         ]
     
     for log in logs:
