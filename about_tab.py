@@ -384,34 +384,38 @@ def render():
     
     st.markdown("**Score Progression:**")
     
-    # AI Ethics progression with side-by-side speedometer and explanation
-    col1, col2 = st.columns([1, 4])
+    # AI Ethics progression with organized layout
+    col1, col2 = st.columns([1, 3])
     with col1:
         dial1 = create_speedometer_dial(18)
         st.markdown(dial1, unsafe_allow_html=True)
     with col2:
-        st.markdown("**0-25**: Limited ethical considerations, reactive approach")
+        st.markdown("**0-25:** Limited ethical considerations, reactive approach")
+        st.markdown("")
     
-    col1, col2 = st.columns([1, 4])
+    col1, col2 = st.columns([1, 3])
     with col1:
         dial2 = create_speedometer_dial(40)
         st.markdown(dial2, unsafe_allow_html=True)
     with col2:
-        st.markdown("**26-50**: Basic ethical frameworks, some accountability measures")
+        st.markdown("**26-50:** Basic ethical frameworks, some accountability measures")
+        st.markdown("")
     
-    col1, col2 = st.columns([1, 4])
+    col1, col2 = st.columns([1, 3])
     with col1:
         dial3 = create_speedometer_dial(65)
         st.markdown(dial3, unsafe_allow_html=True)
     with col2:
-        st.markdown("**51-75**: Comprehensive ethical AI practices with regular assessment")
+        st.markdown("**51-75:** Comprehensive ethical AI practices with regular assessment")
+        st.markdown("")
     
-    col1, col2 = st.columns([1, 4])
+    col1, col2 = st.columns([1, 3])
     with col1:
         dial4 = create_speedometer_dial(88)
         st.markdown(dial4, unsafe_allow_html=True)
     with col2:
-        st.markdown("**76-100**: Leading-edge ethical AI with proactive governance")
+        st.markdown("**76-100:** Leading-edge ethical AI with proactive governance")
+        st.markdown("")
     
     # Quantum Ethics Scoring section
     st.markdown("---")
@@ -453,34 +457,38 @@ def render():
     
     st.markdown("**Score Progression:**")
     
-    # Quantum Ethics progression with side-by-side speedometer and explanation
-    col1, col2 = st.columns([1, 4])
+    # Quantum Ethics progression with organized layout
+    col1, col2 = st.columns([1, 3])
     with col1:
         dial1 = create_speedometer_dial(20)
         st.markdown(dial1, unsafe_allow_html=True)
     with col2:
-        st.markdown("**0-25**: Minimal quantum ethics awareness, basic compliance only")
+        st.markdown("**0-25:** Minimal quantum ethics awareness, basic compliance only")
+        st.markdown("")
     
-    col1, col2 = st.columns([1, 4])
+    col1, col2 = st.columns([1, 3])
     with col1:
         dial2 = create_speedometer_dial(42)
         st.markdown(dial2, unsafe_allow_html=True)
     with col2:
-        st.markdown("**26-50**: Developing quantum ethics frameworks and policies")
+        st.markdown("**26-50:** Developing quantum ethics frameworks and policies")
+        st.markdown("")
     
-    col1, col2 = st.columns([1, 4])
+    col1, col2 = st.columns([1, 3])
     with col1:
         dial3 = create_speedometer_dial(68)
         st.markdown(dial3, unsafe_allow_html=True)
     with col2:
-        st.markdown("**51-75**: Comprehensive quantum ethics integration with monitoring")
+        st.markdown("**51-75:** Comprehensive quantum ethics integration with monitoring")
+        st.markdown("")
     
-    col1, col2 = st.columns([1, 4])
+    col1, col2 = st.columns([1, 3])
     with col1:
         dial4 = create_speedometer_dial(90)
         st.markdown(dial4, unsafe_allow_html=True)
     with col2:
-        st.markdown("**76-100**: Advanced quantum ethics leadership with innovation")
+        st.markdown("**76-100:** Advanced quantum ethics leadership with innovation")
+        st.markdown("")
     
     # Research foundation section
     st.markdown("---")
