@@ -432,12 +432,34 @@ def render_card_view(docs):
                 scores = {'ai_cybersecurity': None, 'quantum_cybersecurity': None, 'ai_ethics': None, 'quantum_ethics': None}
             
             with st.expander("Intelligent Content Preview"):
-                # Temporary debug trace
-                st.write("**Debug Trace:**")
-                st.code(f"Original content sample: {repr(content[:100])}")
-                st.code(f"Content preview sample: {repr(content_preview[:100])}")
-                st.code(f"Contains HTML: {'<' in content_preview or 'style=' in content_preview}")
+                # Emergency HTML cleaning for display
+                emergency_clean = re.sub(r'<[^>]*>', '', content_preview)
+                emergency_clean = re.sub(r'</[^>]*>', '', emergency_clean) 
+                emergency_clean = re.sub(r'&[a-zA-Z0-9#]+;', ' ', emergency_clean)
+                emergency_clean = re.sub(r'[<>{}]', '', emergency_clean)
+                emergency_clean = re.sub(r'\s+', ' ', emergency_clean).strip()
                 
-                # Show the actual preview
-                st.write("**Content Preview:**")
-                st.write(content_preview)
+                if emergency_clean and len(emergency_clean) > 20:
+                    st.write(emergency_clean)
+                else:
+                    # Generate clean content directly from raw content
+                    direct_clean = re.sub(r'<[^>]*>', '', content)
+                    direct_clean = re.sub(r'[<>{}]', '', direct_clean)
+                    direct_clean = re.sub(r'&[a-zA-Z0-9#]+;', ' ', direct_clean)
+                    direct_clean = re.sub(r'\s+', ' ', direct_clean).strip()
+                    
+                    # Extract meaningful sentences
+                    sentences = direct_clean.split('.')
+                    clean_text = []
+                    for sentence in sentences[:3]:
+                        sentence = sentence.strip()
+                        if len(sentence) > 15 and any(c.isalpha() for c in sentence):
+                            clean_text.append(sentence)
+                    
+                    if clean_text:
+                        final_preview = '. '.join(clean_text) + '.'
+                        if len(final_preview) > 300:
+                            final_preview = final_preview[:297] + '...'
+                        st.write(final_preview)
+                    else:
+                        st.write("Content preview not available")
