@@ -267,6 +267,10 @@ def extract_organization_fallback(content: str) -> str:
         r'(Cybersecurity and Infrastructure Security Agency)',
         r'(National Institute of Standards and Technology)',
         
+        # NIST-specific patterns for AI RMF
+        r'(NIST)\s+AI\s+Risk\s+Management\s+Framework',
+        r'NIST\s+AI\s+(Risk|RMF)',
+        
         # Industry organizations and acronyms
         r'([A-Z]{2,6})\s*(?:Report|Document|Publication|Policy|Framework)',
         r'(CISA|NSA|NIST|DHS|ITI)',
