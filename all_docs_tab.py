@@ -294,10 +294,21 @@ def render_compact_cards(docs):
         with cols[i % 3]:
             content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
             
-            # Use database metadata directly (already corrected)
+            # Use database metadata with HTML cleaning
             title = doc.get('title', 'Untitled Document') or 'Untitled Document'
             author_org = doc.get('author_organization', 'Unknown') or 'Unknown'
-            pub_date = doc.get('publish_date') or 'No date'
+            
+            # Clean date field of HTML artifacts
+            raw_date = doc.get('publish_date', '') or ''
+            if raw_date and raw_date != 'Unknown':
+                # Remove HTML tags and artifacts
+                clean_date = re.sub(r'<[^>]*>', '', str(raw_date))
+                clean_date = re.sub(r'</[^>]*>', '', clean_date)
+                clean_date = clean_date.strip()
+                pub_date = clean_date if clean_date and len(clean_date) > 2 else 'Date not available'
+            else:
+                pub_date = 'Date not available'
+            
             doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
             
             # Calculate comprehensive scores
@@ -326,10 +337,21 @@ def render_grid_view(docs):
         with cols[i % 2]:
             content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
             
-            # Use database metadata directly (already corrected)
+            # Use database metadata with HTML cleaning
             title = doc.get('title', 'Untitled Document') or 'Untitled Document'
             author_org = doc.get('author_organization', 'Unknown') or 'Unknown'
-            pub_date = doc.get('publish_date') or 'No date'
+            
+            # Clean date field of HTML artifacts
+            raw_date = doc.get('publish_date', '') or ''
+            if raw_date and raw_date != 'Unknown':
+                # Remove HTML tags and artifacts
+                clean_date = re.sub(r'<[^>]*>', '', str(raw_date))
+                clean_date = re.sub(r'</[^>]*>', '', clean_date)
+                clean_date = clean_date.strip()
+                pub_date = clean_date if clean_date and len(clean_date) > 2 else 'Date not available'
+            else:
+                pub_date = 'Date not available'
+            
             doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
             content_preview = doc.get('content_preview', 'No preview available') or 'No preview available'
             
@@ -387,10 +409,21 @@ def render_minimal_list(docs):
     for idx, doc in enumerate(docs):
         content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
         
-        # Use database metadata directly (already corrected)
+        # Use database metadata with HTML cleaning
         title = doc.get('title', 'Untitled Document') or 'Untitled Document'
         author_org = doc.get('author_organization', 'Unknown') or 'Unknown'
-        pub_date = doc.get('publish_date') or 'No date'
+        
+        # Clean date field of HTML artifacts
+        raw_date = doc.get('publish_date', '') or ''
+        if raw_date and raw_date != 'Unknown':
+            # Remove HTML tags and artifacts
+            clean_date = re.sub(r'<[^>]*>', '', str(raw_date))
+            clean_date = re.sub(r'</[^>]*>', '', clean_date)
+            clean_date = clean_date.strip()
+            pub_date = clean_date if clean_date and len(clean_date) > 2 else 'Date not available'
+        else:
+            pub_date = 'Date not available'
+        
         doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
         content_preview = doc.get('content_preview', 'No preview available') or 'No preview available'
         
@@ -431,10 +464,21 @@ def render_card_view(docs):
             # Get raw content for scoring
             raw_content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
             
-            # Use database metadata directly (already corrected)
+            # Use database metadata with HTML cleaning
             title = doc.get('title', 'Untitled Document') or 'Untitled Document'
             author_org = doc.get('author_organization', 'Unknown') or 'Unknown'
-            pub_date = doc.get('publish_date', 'Unknown') or 'Unknown'
+            
+            # Clean date field of HTML artifacts
+            raw_date = doc.get('publish_date', '') or ''
+            if raw_date and raw_date != 'Unknown':
+                # Remove HTML tags and artifacts
+                clean_date = re.sub(r'<[^>]*>', '', str(raw_date))
+                clean_date = re.sub(r'</[^>]*>', '', clean_date)
+                clean_date = clean_date.strip()
+                pub_date = clean_date if clean_date and len(clean_date) > 2 else 'Date not available'
+            else:
+                pub_date = 'Date not available'
+            
             doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
             content_preview = doc.get('content_preview', 'No preview available') or 'No preview available'
             
