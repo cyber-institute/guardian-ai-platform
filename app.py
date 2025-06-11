@@ -702,7 +702,7 @@ def render_prototype_phased_plan_section():
 def render_phase_1_foundation():
     """Phase 1: Initial GUARDIAN Foundation - Proof of Concept from Patents and Dissertations"""
     
-    st.markdown("### **Phase 1: Foundation & Proof of Concept**")
+    st.markdown("### Phase 1: Foundation & Proof of Concept")
     st.markdown("*Building the initial GUARDIAN prototype from PhD dissertation research and patent applications*")
     
     # Project overview
@@ -710,7 +710,7 @@ def render_phase_1_foundation():
     
     with col1:
         st.markdown("""
-        #### **📚 Research Foundation**
+        #### Research Foundation
         
         **Source Documents:**
         - **PhD Dissertations**: AI Cybersecurity & Geopolitical Tensions (T. Vance), Quantum Cybersecurity Maturity Framework (A. Vance)
@@ -726,7 +726,7 @@ def render_phase_1_foundation():
     
     with col2:
         st.markdown("""
-        #### **🎯 Phase 1 Goals**
+        #### Phase 1 Goals
         
         **Primary Deliverables:**
         - Working prototype
@@ -743,7 +743,7 @@ def render_phase_1_foundation():
     
     # Technical architecture section
     st.markdown("---")
-    st.markdown("#### **🏗️ System Architecture Dependencies**")
+    st.markdown("#### System Architecture Dependencies")
     
     arch_tabs = st.tabs(["Infrastructure", "Backend Systems", "Frontend Interface", "Data Processing"])
     
@@ -816,31 +816,31 @@ def render_phase_1_foundation():
     
     # Project timeline
     st.markdown("---")
-    st.markdown("#### **📅 Phase 1 Development Timeline**")
+    st.markdown("#### Phase 1 Development Timeline")
     
     timeline_data = {
-        "**Months 1-2: Infrastructure Setup**": [
+        "Months 1-2: Infrastructure Setup": [
             "AWS environment provisioning and security configuration",
             "PostgreSQL database schema design and optimization",
             "Basic Streamlit application scaffolding and deployment pipeline",
             "Core document ingestion system with PDF/DOC support",
             "Initial patent algorithm implementation and testing"
         ],
-        "**Months 3-4: Core Features**": [
+        "Months 3-4: Core Features": [
             "Document metadata extraction and classification systems",
             "Patent-based scoring engines (AI/Quantum Cybersecurity, Ethics)",
             "Basic UI with document upload and analysis workflows",
             "PostgreSQL optimization for large document storage",
             "Initial API integrations (OpenAI, basic Dialogflow)"
         ],
-        "**Months 5-6: Enhancement & Testing**": [
+        "Months 5-6: Enhancement & Testing": [
             "Advanced document processing (OCR, web scraping)",
             "Comprehensive scoring system integration and validation",
             "User interface refinement and responsive design",
             "Performance optimization and caching implementation",
             "Beta testing with academic and policy stakeholders"
         ],
-        "**Months 7-8: Production Readiness**": [
+        "Months 7-8: Production Readiness": [
             "Security hardening and penetration testing",
             "Documentation and user training materials",
             "AWS production deployment and monitoring setup",
@@ -856,7 +856,7 @@ def render_phase_1_foundation():
     
     # Success criteria
     st.markdown("---")
-    st.markdown("#### **✅ Phase 1 Success Criteria & Validation**")
+    st.markdown("#### Phase 1 Success Criteria & Validation")
     
     success_cols = st.columns(3)
     
@@ -892,7 +892,7 @@ def render_phase_1_foundation():
     
     # Research impact
     st.markdown("---")
-    st.markdown("#### **🎓 Academic Foundation & Innovation**")
+    st.markdown("#### Academic Foundation & Innovation")
     
     st.markdown("""
     **PhD Research Integration:**
@@ -919,7 +919,7 @@ def render_phase_1_foundation():
 def render_phase_2_llm_integration():
     """Phase 2: LLM Integration and Formula Enhancement"""
     
-    st.markdown("### **Phase 2: LLM Integration & Formula Enhancement**")
+    st.markdown("### Phase 2: LLM Integration & Formula Enhancement")
     st.markdown("*Extending GUARDIAN with intelligent LLM capabilities and performance optimization*")
     
     # Phase overview
@@ -927,7 +927,7 @@ def render_phase_2_llm_integration():
     
     with col1:
         st.markdown("""
-        #### **🧠 LLM Intelligence Integration**
+        #### LLM Intelligence Integration
         
         **Core Enhancements:**
         - **Free LLM Services**: Ollama, Groq, Hugging Face integration for cost efficiency
@@ -945,7 +945,7 @@ def render_phase_2_llm_integration():
     
     with col2:
         st.markdown("""
-        #### **📈 Phase 2 Objectives**
+        #### Phase 2 Objectives
         
         **Technical Goals:**
         - Multi-LLM service integration
@@ -962,7 +962,7 @@ def render_phase_2_llm_integration():
     
     # Technical implementation
     st.markdown("---")
-    st.markdown("#### **⚙️ Technical Implementation Strategy**")
+    st.markdown("#### Technical Implementation Strategy")
     
     impl_tabs = st.tabs(["LLM Service Integration", "Performance Optimization", "Data Pipeline", "Quality Assurance"])
     
@@ -1066,7 +1066,7 @@ def render_phase_2_llm_integration():
     
     # Development roadmap
     st.markdown("---")
-    st.markdown("#### **🗓️ Phase 2 Development Roadmap**")
+    st.markdown("#### Phase 2 Development Roadmap")
     
     roadmap_quarters = st.tabs(["Q1: Foundation", "Q2: Integration", "Q3: Optimization", "Q4: Production"])
     
@@ -1165,12 +1165,12 @@ def render_phase_2_llm_integration():
 def render_phase_3_multi_llm_ensemble():
     """Phase 3: Multi-LLM Ensemble System - Current Achievement"""
     
-    st.markdown("### **Phase 3: Multi-LLM Ensemble System** ✅")
+    st.markdown("### Phase 3: Multi-LLM Ensemble System")
     st.markdown("*Current Phase: Revolutionary concurrent processing and collective intelligence*")
     
     # Achievement banner
     st.success("""
-    🎉 **PHASE 3 COMPLETED** - Revolutionary multi-LLM ensemble system successfully implemented!
+    **PHASE 3 COMPLETED** - Revolutionary multi-LLM ensemble system successfully implemented!
     
     **Current Achievement:** Concurrent processing framework operational with both parallel and daisy-chain modes
     """)
@@ -1196,7 +1196,7 @@ def render_phase_3_architecture():
     
     with col1:
         st.markdown("""
-        #### **🚀 Revolutionary Multi-LLM Ensemble Achievement**
+        #### Revolutionary Multi-LLM Ensemble Achievement
         
         **Breakthrough Implementation:**
         - **Concurrent Processing**: Multiple LLMs evaluate policies simultaneously
@@ -1217,13 +1217,13 @@ def render_phase_3_architecture():
     
     with col2:
         st.markdown("""
-        #### **📊 Current Metrics**
+        #### Current Metrics
         
         **Operational Status:**
-        - ✅ Multi-LLM ensemble active
-        - ✅ Concurrent processing operational
-        - ✅ Weighted consensus system
-        - ✅ Service orchestration automated
+        - Multi-LLM ensemble active
+        - Concurrent processing operational
+        - Weighted consensus system
+        - Service orchestration automated
         
         **Performance Achieved:**
         - **Response Time**: 3-15 seconds
@@ -1234,7 +1234,7 @@ def render_phase_3_architecture():
     
     # Technical architecture achieved
     st.markdown("---")
-    st.markdown("#### **🏗️ Implemented Architecture**")
+    st.markdown("#### Implemented Architecture")
     
     arch_achieved_tabs = st.tabs(["Service Integration", "Processing Modes", "Consensus Algorithm", "Performance Monitoring"])
     
@@ -1448,7 +1448,7 @@ def render_phase_3_architecture():
 def render_phase_4_enterprise_scale():
     """Phase 4: Enterprise Scale with OpenAI Integration and Containerization"""
     
-    st.markdown("### **Phase 4: Enterprise Scale & Mobile Integration**")
+    st.markdown("### Phase 4: Enterprise Scale & Mobile Integration")
     st.markdown("*Future Phase: Premium APIs, containerization, and mobile real-time evaluation*")
     
     # Phase overview
@@ -1456,7 +1456,7 @@ def render_phase_4_enterprise_scale():
     
     with col1:
         st.markdown("""
-        #### **🏢 Enterprise Platform Evolution**
+        #### Enterprise Platform Evolution
         
         **Strategic Enhancements:**
         - **Premium API Integration**: Sustainable OpenAI and premium service allowances
@@ -1475,7 +1475,7 @@ def render_phase_4_enterprise_scale():
     
     with col2:
         st.markdown("""
-        #### **📱 Mobile Innovation**
+        #### Mobile Innovation
         
         **Real-Time Evaluation:**
         - Camera-based document scanning
@@ -1492,7 +1492,7 @@ def render_phase_4_enterprise_scale():
     
     # Technical architecture
     st.markdown("---")
-    st.markdown("#### **🔧 Enterprise Technical Architecture**")
+    st.markdown("#### Enterprise Technical Architecture")
     
     enterprise_tabs = st.tabs(["Containerization", "Premium APIs", "Mobile Platform", "Advanced Chatbot"])
     
