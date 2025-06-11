@@ -1072,48 +1072,6 @@ def render_multi_llm_ensemble_tab():
             - Quantum Security: Weighted ensemble for technical accuracy
             - Cybersecurity: Hybrid synthesis for comprehensive coverage
             """)
-                        for response in failed_responses:
-                            with st.expander(f"❌ {response.service_name.title()} - Failed"):
-                                st.error(f"Error: {response.error_message}")
-                                st.info("This service may need API key setup or be temporarily unavailable")
-                    
-                    # Enhanced metadata
-                    if ensemble_result.enhanced_metadata:
-                        st.markdown("#### **📊 Analysis Metadata**")
-                        with st.expander("View detailed analysis metadata"):
-                            st.json(ensemble_result.enhanced_metadata)
-                    
-                    # Performance comparison
-                    if len(successful_responses) > 1:
-                        st.markdown("#### **⚡ Performance Comparison**")
-                        
-                        # Create performance dataframe
-                        perf_data = []
-                        for response in successful_responses:
-                            perf_data.append({
-                                'Service': response.service_name.title(),
-                                'Processing Time (s)': round(response.processing_time, 2),
-                                'Confidence Score': round(response.confidence_score, 2),
-                                'Status': '✅ Success'
-                            })
-                        
-                        import pandas as pd
-                        df = pd.DataFrame(perf_data)
-                        st.dataframe(df, use_container_width=True)
-                        
-                        # Performance insights
-                        fastest_service = min(successful_responses, key=lambda x: x.processing_time)
-                        highest_confidence = max(successful_responses, key=lambda x: x.confidence_score)
-                        
-                        col1, col2 = st.columns(2)
-                        with col1:
-                            st.info(f"🏃 **Fastest Service:** {fastest_service.service_name.title()} ({fastest_service.processing_time:.2f}s)")
-                        with col2:
-                            st.info(f"🎯 **Highest Confidence:** {highest_confidence.service_name.title()} ({highest_confidence.confidence_score:.2f})")
-                
-                except Exception as e:
-                    st.error(f"Ensemble analysis failed: {str(e)}")
-                    st.info("This may indicate that LLM services need setup or API keys. Check the Service Testing tab for configuration help.")
     
     with col2:
         if st.button("🔧 Initialize Services"):
