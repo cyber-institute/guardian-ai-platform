@@ -40,7 +40,7 @@ def main():
     
     .quantum-header {
         background: linear-gradient(135deg, #1e3a8a 0%, #312e81 50%, #1e40af 100%) !important;
-        padding: 3rem 2rem !important;
+        padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 4vw, 3rem) !important;
         border-radius: 12px !important;
         margin-bottom: 2.5rem !important;
         color: white !important;
@@ -49,24 +49,28 @@ def main():
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         width: 100% !important;
         display: block !important;
+        overflow: hidden !important;
     }
     
     .quantum-header h1 {
         margin: 0 !important;
-        font-size: 2.8rem !important;
+        font-size: clamp(4rem, 12vw, 8.4rem) !important;
         font-weight: 600 !important;
         font-family: 'Source Serif Pro', serif !important;
         letter-spacing: -0.02em !important;
         color: white !important;
+        line-height: 1.1 !important;
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
     }
     
     .quantum-header p {
         margin: 1rem 0 0 0 !important;
-        font-size: 1.15rem !important;
+        font-size: clamp(1rem, 3vw, 1.4rem) !important;
         opacity: 0.9 !important;
         font-weight: 400 !important;
         letter-spacing: 0.01em !important;
         color: white !important;
+        line-height: 1.4 !important;
     }
     
     .metric-card {
