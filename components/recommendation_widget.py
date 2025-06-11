@@ -58,27 +58,27 @@ def render_comprehensive_recommendations(recommendations: Dict[str, List]):
     
     # Combined recommendations (primary)
     if recommendations.get('combined'):
-        st.markdown("### 🎯 **Recommended Documents**")
+        st.markdown("### **Recommended Documents**")
         render_recommendation_cards(recommendations['combined'][:6])
         
         # Show breakdown in expandable sections
-        with st.expander("📊 View Recommendation Details", expanded=False):
+        with st.expander("View Recommendation Details", expanded=False):
             
             col1, col2, col3 = st.columns(3)
             
             with col1:
                 if recommendations.get('content_similar'):
-                    st.markdown("**📝 Content Similar**")
+                    st.markdown("**Content Similar**")
                     render_compact_recommendations(recommendations['content_similar'][:3])
             
             with col2:
                 if recommendations.get('scoring_similar'):
-                    st.markdown("**📈 Scoring Pattern Similar**")
+                    st.markdown("**Scoring Pattern Similar**")
                     render_compact_recommendations(recommendations['scoring_similar'][:3])
                     
             with col3:
                 if recommendations.get('contextual'):
-                    st.markdown("**🏢 Same Context**")
+                    st.markdown("**Same Context**")
                     render_compact_recommendations(recommendations['contextual'][:3])
 
 def render_recommendation_cards(recommendations: List[Dict]):
@@ -101,26 +101,26 @@ def render_single_recommendation_card(doc: Dict):
     # Get scoring indicators
     scores = []
     if doc.get('ai_cybersecurity_score', 0) > 15:
-        scores.append("🤖 AI Cyber")
+        scores.append("AI Cyber")
     if doc.get('quantum_cybersecurity_score', 0) > 1:
-        scores.append("⚛️ Quantum")
+        scores.append("Quantum")
     if doc.get('ai_ethics_score', 0) > 20:
-        scores.append("🎯 AI Ethics")
+        scores.append("AI Ethics")
     if doc.get('quantum_ethics_score', 0) > 15:
-        scores.append("🔬 Q-Ethics")
+        scores.append("Q-Ethics")
     
-    score_badges = " | ".join(scores) if scores else "📄 General"
+    score_badges = " | ".join(scores) if scores else "General"
     
     # Recommendation score indicator
     rec_score = doc.get('recommendation_score')
     confidence = ""
     if rec_score is not None:
         if rec_score > 0.7:
-            confidence = "🔥 Highly Relevant"
+            confidence = "Highly Relevant"
         elif rec_score > 0.4:
-            confidence = "✨ Relevant"
+            confidence = "Relevant"
         else:
-            confidence = "💡 Related"
+            confidence = "Related"
     
     with st.container():
         st.markdown(f"""
@@ -131,7 +131,7 @@ def render_single_recommendation_card(doc: Dict):
             </div>
             <h4 style="margin: 0 0 8px 0; color: #333;">{doc.get('title', 'Unknown Title')}</h4>
             <div style="font-size: 12px; color: #666; margin-bottom: 8px;">
-                📍 {doc.get('organization', 'Unknown Org')} | {score_badges}
+                {doc.get('organization', 'Unknown Org')} | {score_badges}
             </div>
             <p style="font-size: 13px; color: #555; margin: 0; line-height: 1.4;">
                 {doc.get('content_preview', 'No preview available')[:120]}...
@@ -166,7 +166,7 @@ def render_similarity_recommendations(similarities: List[tuple], category_name: 
         st.info(f"No {category_name.lower()} found")
         return
     
-    st.markdown(f"### 📊 {category_name}")
+    st.markdown(f"### {category_name}")
     
     recommendations = []
     for doc_id, similarity_score in similarities:
@@ -179,9 +179,9 @@ def render_similarity_recommendations(similarities: List[tuple], category_name: 
 def render_trending_documents(max_count: int = 8):
     """Render trending documents across different frameworks."""
     
-    st.markdown("### 🔥 **Trending Documents**")
+    st.markdown("### **Trending Documents**")
     
-    tab1, tab2, tab3, tab4 = st.tabs(["🤖 AI Cybersecurity", "⚛️ Quantum Cyber", "🎯 AI Ethics", "🔬 Quantum Ethics"])
+    tab1, tab2, tab3, tab4 = st.tabs(["AI Cybersecurity", "Quantum Cyber", "AI Ethics", "Quantum Ethics"])
     
     with tab1:
         ai_cyber_trending = recommendation_engine.get_trending_documents(
