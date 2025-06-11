@@ -16,6 +16,9 @@ def clean_metadata_field(value: Any) -> str:
     if not text or text.lower() in ['none', 'null', 'undefined', '']:
         return 'Unknown'
     
+    # Store original for organization fields
+    original = text
+    
     # Multiple aggressive cleaning passes
     for _ in range(5):
         # Remove all HTML tags
@@ -37,12 +40,21 @@ def clean_metadata_field(value: Any) -> str:
     for artifact in artifacts:
         text = text.replace(artifact, ' ')
     
-    # Remove any remaining HTML-like patterns
+    # Remove any remaining HTML-like patterns but preserve forward slashes for URLs
     text = re.sub(r'[<>"\'`]', '', text)
-    text = re.sub(r'[/\\]', ' ', text)
+    text = re.sub(r'\\', ' ', text)
     
     # Clean whitespace
     text = ' '.join(text.split()).strip()
+    
+    # If cleaning destroyed too much content, try to preserve meaningful parts
+    if not text or len(text) < 3:
+        # For organization names, try to preserve non-HTML content
+        if 'institute' in original.lower() or 'university' in original.lower() or 'department' in original.lower():
+            # Extract meaningful words
+            words = re.findall(r'[A-Za-z][A-Za-z\s]*[A-Za-z]', original)
+            if words:
+                text = ' '.join(words).strip()
     
     if not text or len(text) < 2:
         return 'Unknown'

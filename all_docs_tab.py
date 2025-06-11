@@ -164,23 +164,36 @@ def render():
         st.error(f"Error fetching documents: {e}")
         return
 
-    # Extract filter options from documents
-    doc_types = sorted(set(doc.get("document_type", "Unknown") for doc in all_docs))
-    organizations = sorted(set(doc.get("organization", "Unknown")[:30] for doc in all_docs if doc.get("organization")))
+    # Extract filter options from documents using correct field names
+    doc_types = sorted(set(doc.get("document_type", "Unknown") for doc in all_docs if doc.get("document_type") and doc.get("document_type") not in ["Unknown", ""]))
     
-    # Extract years from dates
+    # Extract organizations with better handling
+    organizations = set()
+    for doc in all_docs:
+        org = doc.get("author_organization", "")
+        if org and org not in ["Unknown", "", "Date not available"]:
+            # Truncate long organization names for display
+            org_display = org[:40] + "..." if len(org) > 40 else org
+            organizations.add(org_display)
+    organizations = sorted(list(organizations))
+    
+    # Extract years from publish_date field
     years = set()
     for doc in all_docs:
-        date_str = doc.get("date", "")
-        if date_str:
-            try:
-                # Try to extract year from various date formats
-                import re
-                year_match = re.search(r'\b(19|20)\d{2}\b', str(date_str))
-                if year_match:
-                    years.add(year_match.group())
-            except:
-                pass
+        # Try publish_date first, then other date fields
+        date_fields = ["publish_date", "date", "created_at", "updated_at"]
+        for field in date_fields:
+            date_str = doc.get(field, "")
+            if date_str and str(date_str) != "Date not available":
+                try:
+                    # Try to extract year from various date formats
+                    import re
+                    year_match = re.search(r'\b(19|20)\d{2}\b', str(date_str))
+                    if year_match:
+                        years.add(year_match.group())
+                        break  # Found a year, stop looking in other fields
+                except:
+                    pass
     years = sorted(list(years), reverse=True)
     
     # Define regions based on common organizations/sources
@@ -201,6 +214,21 @@ def render():
         return 'Unknown'
     
     regions = sorted(set(detect_region(org) for org in organizations if org != "Unknown"))
+    
+    # Debug output for troubleshooting empty filters
+    if len(organizations) == 0 or len(years) == 0 or len(regions) == 0:
+        st.write("**Debug: Filter extraction status:**")
+        st.write(f"- Found {len(doc_types)} document types: {doc_types[:5]}")
+        st.write(f"- Found {len(organizations)} organizations: {organizations[:5]}")
+        st.write(f"- Found {len(years)} years: {years[:5]}")
+        st.write(f"- Found {len(regions)} regions: {regions}")
+        
+        # Sample document inspection
+        if all_docs:
+            sample_doc = all_docs[0]
+            st.write("**Sample document fields:**")
+            for key in ["author_organization", "publish_date", "document_type"]:
+                st.write(f"- {key}: `{sample_doc.get(key, 'NOT FOUND')}`")
 
     # Initialize filters in session state
     if "filters" not in st.session_state:
