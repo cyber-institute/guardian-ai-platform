@@ -110,10 +110,25 @@ def render():
         st.session_state["display_mode"] = display_mode
     
     try:
-        # Clear any potential caching to ensure fresh data
+        # Force refresh documents - clear all caching mechanisms
         if 'documents_cache' in st.session_state:
             del st.session_state['documents_cache']
+        if 'all_docs' in st.session_state:
+            del st.session_state['all_docs']
+        if 'cached_docs' in st.session_state:
+            del st.session_state['cached_docs']
         
+        # Add refresh button for immediate data updates
+        col1, col2 = st.columns([6, 1])
+        with col2:
+            if st.button("🔄 Refresh", help="Get latest documents from database", key="refresh_docs"):
+                # Force complete cache clear
+                for key in list(st.session_state.keys()):
+                    if 'doc' in key.lower() or 'cache' in key.lower():
+                        del st.session_state[key]
+                st.rerun()
+        
+        # Fetch fresh documents directly from database
         all_docs = fetch_documents()
         if not all_docs:
             st.info("No documents found in the database. Please upload some documents first.")
