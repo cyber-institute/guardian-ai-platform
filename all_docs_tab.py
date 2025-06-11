@@ -64,6 +64,48 @@ def is_probably_quantum(content):
     keywords = ["quantum", "pqc", "post-quantum", "nist pqc", "qkd", "quantum-safe", "fips 203", "fips 204"]
     return any(kw in content.lower() for kw in keywords)
 
+def is_probably_ai(content):
+    """Check if content is probably AI-related."""
+    if not content:
+        return False
+    
+    content_lower = content.lower()
+    ai_keywords = [
+        'artificial intelligence', 'machine learning', 'deep learning', 'neural network',
+        'ai ', ' ai', 'ml ', ' ml', 'algorithm', 'data science', 'nlp',
+        'natural language processing', 'computer vision', 'reinforcement learning',
+        'supervised learning', 'unsupervised learning', 'neural', 'deep neural',
+        'artificial neural', 'model training', 'data mining', 'predictive analytics'
+    ]
+    
+    return any(keyword in content_lower for keyword in ai_keywords)
+
+def get_document_topic(doc):
+    """Determine if document is AI, Quantum, or Both based on content."""
+    # Check content sources
+    content_sources = [
+        doc.get('title', ''),
+        doc.get('content', ''),
+        doc.get('abstract', ''),
+        doc.get('description', ''),
+        doc.get('document_type', ''),
+        doc.get('organization', '')
+    ]
+    
+    full_content = ' '.join(str(source) for source in content_sources if source)
+    
+    is_ai = is_probably_ai(full_content)
+    is_quantum = is_probably_quantum(full_content)
+    
+    if is_ai and is_quantum:
+        return "Both"
+    elif is_quantum:
+        return "Quantum"
+    elif is_ai:
+        return "AI"
+    else:
+        return "Both"  # Show documents that don't clearly fit either category
+
 def render():
     
     # Enhanced refresh button with display style controls
@@ -188,10 +230,23 @@ def render():
             "selected_types": [],
             "selected_orgs": [],
             "selected_years": [],
-            "selected_regions": []
+            "selected_regions": [],
+            "topic_filter": "Both"
         }
 
     # Compact filter controls with dropdown-style multiselect
+    
+    # Topic filter with radio buttons
+    topic_filter = st.radio(
+        "**Topic Filter:**",
+        ["AI", "Quantum", "Both"],
+        index=["AI", "Quantum", "Both"].index(st.session_state["filters"]["topic_filter"]),
+        horizontal=True,
+        key="topic_filter_radio"
+    )
+    st.session_state["filters"]["topic_filter"] = topic_filter
+    
+    st.markdown("---")  # Separator line
     
     # Create compact filter row
     filter_col1, filter_col2, filter_col3, filter_col4, filter_col5 = st.columns([2, 2, 1.5, 1.5, 1])
@@ -238,7 +293,8 @@ def render():
                 "selected_types": [],
                 "selected_orgs": [],
                 "selected_years": [],
-                "selected_regions": []
+                "selected_regions": [],
+                "topic_filter": "Both"
             }
             st.rerun()
         
@@ -270,6 +326,14 @@ def render():
     # Filter by region
     if f["selected_regions"]:
         docs = [d for d in docs if detect_region(d.get("organization", "Unknown")) in f["selected_regions"]]
+    
+    # Filter by topic (AI/Quantum/Both)
+    topic_filter = f.get("topic_filter", "Both")
+    if topic_filter != "Both":
+        if topic_filter == "AI":
+            docs = [d for d in docs if get_document_topic(d) in ["AI", "Both"]]
+        elif topic_filter == "Quantum":
+            docs = [d for d in docs if get_document_topic(d) in ["Quantum", "Both"]]
 
     # Get display mode from session state (set in top controls)
     display_mode = st.session_state.get("display_mode", "cards")
