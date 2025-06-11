@@ -12,16 +12,17 @@ def render():
     
     st.markdown("""
     <div style="
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        background: linear-gradient(135deg, #082454 0%, #10244D 50%, #133169 100%);
         padding: 2rem;
         border-radius: 12px;
         margin-bottom: 2rem;
-        border: 1px solid #e2e8f0;
+        border: 1px solid rgba(255,255,255,0.2);
+        color: white;
     ">
-        <h2 style="color: #B91C2C; margin-bottom: 1rem; font-size: 2.2rem; text-align: center;">
+        <h2 style="color: white; margin-bottom: 1rem; font-size: 2.2rem; text-align: center;">
             Patent-Based Scoring Frameworks
         </h2>
-        <p style="font-size: 1.1rem; line-height: 1.7; color: #374151; text-align: center;">
+        <p style="font-size: 1.1rem; line-height: 1.7; color: #e5e7eb; text-align: center;">
             Demonstrating the specific assessment frameworks defined in GUARDIAN's three foundational patents
         </p>
     </div>
