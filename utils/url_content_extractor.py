@@ -37,14 +37,27 @@ class URLContentExtractor:
             if not text_content:
                 return self._error_result("Could not extract readable content from URL")
             
-            # Extract metadata
-            metadata = self._extract_metadata(response.text, url)
+            # Enhanced metadata extraction using multi-LLM system
+            from utils.enhanced_metadata_extractor import extract_enhanced_metadata
             
-            # Detect organization from URL and content
-            organization = self._detect_organization(url, text_content, metadata)
+            # Extract comprehensive metadata
+            enhanced_metadata = extract_enhanced_metadata(
+                title="",  # Will be extracted from content
+                content=text_content,
+                url=url,
+                filename=parsed_url.path.split('/')[-1] if parsed_url.path else ""
+            )
             
-            # Generate title
-            title = metadata.get('title') or self._generate_title_from_url(url)
+            # Use enhanced metadata with fallback to basic extraction
+            basic_metadata = self._extract_metadata(response.text, url)
+            
+            title = enhanced_metadata.get('title', 'Unknown')
+            if title == 'Unknown' or self._is_generic_title(title):
+                title = basic_metadata.get('title') or self._generate_title_from_url(url)
+            
+            organization = enhanced_metadata.get('organization', 'Unknown')
+            if organization == 'Unknown':
+                organization = self._detect_organization(url, text_content, basic_metadata)
             
             return {
                 'success': True,
@@ -52,8 +65,11 @@ class URLContentExtractor:
                 'text_content': text_content,
                 'url': url,
                 'organization': organization,
-                'metadata': metadata,
-                'document_type': self._classify_document_type(text_content, url),
+                'metadata': enhanced_metadata,
+                'document_type': enhanced_metadata.get('document_type', self._classify_document_type(text_content, url)),
+                'author': enhanced_metadata.get('author', 'Unknown'),
+                'publication_date': enhanced_metadata.get('publication_date', 'Unknown'),
+                'description': enhanced_metadata.get('description', 'Unknown'),
                 'source': 'url_extraction'
             }
             
@@ -177,6 +193,14 @@ class URLContentExtractor:
         
         # Fallback to domain
         return f"Document from {parsed_url.netloc}"
+    
+    def _is_generic_title(self, title: str) -> bool:
+        """Check if a title is too generic to be useful"""
+        generic_titles = [
+            "cybersecurity document", "document", "untitled", "no title",
+            "web document", "pdf document", "government document"
+        ]
+        return title.lower() in generic_titles or len(title) < 10
     
     def _classify_document_type(self, content: str, url: str) -> str:
         """Classify document type based on content and URL"""

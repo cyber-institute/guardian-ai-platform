@@ -138,13 +138,63 @@ def render_document_uploader():
                 return
             
             with st.spinner("Processing document..."):
-                # Prepare document data
+                # Enhanced metadata extraction for all ingestion methods
+                try:
+                    from utils.enhanced_metadata_extractor import extract_enhanced_metadata
+                    from utils.duplicate_detector import check_document_duplicates
+                    
+                    # Check for duplicates first
+                    duplicate_result = check_document_duplicates(
+                        title=title,
+                        content=final_content,
+                        url=url_field if url_field else "",
+                        filename=uploaded_file.name if uploaded_file else ""
+                    )
+                    
+                    if duplicate_result["is_duplicate"]:
+                        st.error(f"🚫 Duplicate document detected!")
+                        st.warning(f"Confidence: {duplicate_result['confidence']:.1%} - {duplicate_result['match_type']}")
+                        for match in duplicate_result["matches"][:2]:
+                            st.info(f"Similar to: {match['title']} (ID: {match['id']}) - {match['reason']}")
+                        return
+                    
+                    # Extract comprehensive metadata using multi-LLM intelligence
+                    enhanced_metadata = extract_enhanced_metadata(
+                        title=title,
+                        content=final_content,
+                        url=url_field if url_field else "",
+                        filename=uploaded_file.name if uploaded_file else ""
+                    )
+                    
+                    # Use enhanced metadata with form overrides
+                    final_title = title if title != enhanced_metadata.get('title', 'Unknown') else enhanced_metadata.get('title', title)
+                    final_organization = organization if organization else enhanced_metadata.get('organization', 'Unknown')
+                    final_author = enhanced_metadata.get('author', 'Unknown')
+                    final_pub_date = enhanced_metadata.get('publication_date', 'Unknown')
+                    final_description = summary if summary else enhanced_metadata.get('description', 'Unknown')
+                    final_doc_type = document_type if document_type != 'Unknown' else enhanced_metadata.get('document_type', document_type)
+                    
+                    st.info(f"📋 Enhanced metadata extracted - Organization: {final_organization}, Type: {final_doc_type}")
+                    
+                except Exception as e:
+                    st.warning(f"Enhanced metadata extraction failed: {e}. Using form data.")
+                    final_title = title
+                    final_organization = organization if organization else "Unknown"
+                    final_author = "Unknown"
+                    final_pub_date = "Unknown"
+                    final_description = summary if summary else "Unknown"
+                    final_doc_type = document_type
+                
+                # Prepare document data with enhanced metadata
                 document_data = {
-                    'title': title,
-                    'content': summary if summary else final_content[:200] + "...",
+                    'title': final_title,
+                    'content': final_description if final_description != 'Unknown' else final_content[:200] + "...",
                     'text': final_content,
-                    'document_type': document_type,
+                    'document_type': final_doc_type,
                     'source': source,
+                    'author_organization': final_organization,
+                    'author': final_author,
+                    'publication_date': final_pub_date,
                     'quantum_q': 0,  # Will be updated by AI analysis if enabled
                     'has_thumbnail': pdf_thumbnail_extracted
                 }
@@ -283,17 +333,57 @@ def render_bulk_upload():
                         file_title = uploaded_file.name.replace('.txt', '').replace('.md', '').replace('.csv', '')
                         has_thumbnail = False
                     
-                    # Detect document type intelligently
-                    from utils.document_classifier import detect_document_type
-                    detected_type = detect_document_type(file_title, content)
+                    # Check for duplicates
+                    from utils.duplicate_detector import check_document_duplicates
+                    from utils.enhanced_metadata_extractor import extract_enhanced_metadata
                     
-                    # Prepare document
+                    duplicate_result = check_document_duplicates(
+                        title=file_title,
+                        content=content,
+                        filename=uploaded_file.name
+                    )
+                    
+                    if duplicate_result["is_duplicate"]:
+                        st.warning(f"⚠️ Skipping duplicate: {file_title} (confidence: {duplicate_result['confidence']:.1%})")
+                        continue
+                    
+                    # Extract enhanced metadata
+                    try:
+                        enhanced_metadata = extract_enhanced_metadata(
+                            title=file_title,
+                            content=content,
+                            filename=uploaded_file.name
+                        )
+                        
+                        final_title = enhanced_metadata.get('title', file_title)
+                        final_organization = enhanced_metadata.get('organization', 'Unknown')
+                        final_author = enhanced_metadata.get('author', 'Unknown')
+                        final_pub_date = enhanced_metadata.get('publication_date', 'Unknown')
+                        final_description = enhanced_metadata.get('description', 'Unknown')
+                        final_doc_type = enhanced_metadata.get('document_type', 'Unknown')
+                        
+                    except Exception as e:
+                        print(f"Enhanced metadata extraction failed for {file_title}: {e}")
+                        final_title = file_title
+                        final_organization = "Unknown"
+                        final_author = "Unknown"
+                        final_pub_date = "Unknown"
+                        final_description = "Unknown"
+                        
+                        # Fallback to basic detection
+                        from utils.document_classifier import detect_document_type
+                        final_doc_type = detect_document_type(file_title, content)
+                    
+                    # Prepare document with enhanced metadata
                     document_data = {
-                        'title': file_title,
-                        'content': content[:200] + "..." if len(content) > 200 else content,
+                        'title': final_title,
+                        'content': final_description if final_description != 'Unknown' else content[:200] + "..." if len(content) > 200 else content,
                         'text': content,
-                        'document_type': detected_type,
+                        'document_type': final_doc_type,
                         'source': 'file_upload',
+                        'author_organization': final_organization,
+                        'author': final_author,
+                        'publication_date': final_pub_date,
                         'quantum_q': 0,
                         'has_thumbnail': has_thumbnail
                     }
