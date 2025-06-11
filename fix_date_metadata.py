@@ -69,7 +69,12 @@ def validate_date_cleanup():
     print("\nValidating date metadata cleanup...")
     
     try:
-        conn = sqlite3.connect('benchmarks.db')
+        DATABASE_URL = os.environ.get('DATABASE_URL')
+        if not DATABASE_URL:
+            print("DATABASE_URL environment variable not found")
+            return
+            
+        conn = psycopg2.connect(DATABASE_URL)
         cursor = conn.cursor()
         
         # Check for remaining HTML artifacts
