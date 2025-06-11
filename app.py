@@ -551,7 +551,7 @@ def main():
         policy_subtab1, policy_subtab2, policy_subtab3 = st.tabs([
             "Document Repository", 
             "Policy Analyzer", 
-            "Policy Recommendations"
+            "Repository Insights"
         ])
         
         with policy_subtab1:
@@ -563,7 +563,7 @@ def main():
             render_enhanced_policy_uploader()
         
         with policy_subtab3:
-            # Policy Recommendations (renamed from AI Recommendations)
+            # Repository Insights (AI-powered learning system)
             from recommendation_tab import render as render_recommendations
             render_recommendations()
     

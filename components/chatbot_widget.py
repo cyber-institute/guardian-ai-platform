@@ -347,8 +347,8 @@ def handle_quick_question(question: str):
 - Get comprehensive gap analysis using GUARDIAN patent algorithms
 - Receive targeted recommendations for policy improvement
 
-**Step 3: Policy Recommendations**
-- Check 'Policy Repository' → 'Policy Recommendations' for intelligent suggestions
+**Step 3: Repository Insights**
+- Check 'Policy Repository' → 'Repository Insights' for intelligent suggestions
 - Discover similar documents and identify best practices
 - Access AI-powered insights based on content analysis
 
@@ -374,7 +374,7 @@ Ready to explore? Ask me about any specific feature!"""
 **Policy Repository Subtabs:**
 1. **Document Repository**: Browse and filter analyzed policies
 2. **Policy Analyzer**: Upload and analyze new documents
-3. **Policy Recommendations**: AI-powered suggestions and insights
+3. **Repository Insights**: AI-powered learning and suggestions
 
 **Key Features:**
 - Filter by organization, document type, or scoring framework

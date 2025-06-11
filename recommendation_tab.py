@@ -1,6 +1,6 @@
 """
-AI-Powered Document Recommendation Engine Tab
-Provides intelligent document discovery and recommendation capabilities
+GUARDIAN Repository Insights Tab
+Provides intelligent document discovery and continuous learning insights
 """
 
 import streamlit as st
@@ -13,14 +13,16 @@ from utils.document_recommendation_engine import recommendation_engine
 from utils.db import fetch_documents
 
 def render():
-    """Render the AI-Powered Document Recommendation Engine tab."""
+    """Render the GUARDIAN Repository Insights tab."""
     
-    st.markdown("# 🎯 **AI-Powered Document Recommendation Engine**")
+    st.markdown("# 🧠 **GUARDIAN Repository Insights**")
     st.markdown("---")
     
     st.markdown("""
-    Discover relevant documents through intelligent content analysis, scoring pattern matching, 
-    and contextual relationships powered by machine learning algorithms.
+    GUARDIAN continuously learns from its growing repository and AI-powered learning model incorporating 
+    current best practices and globally accepted ethical norms. The system provides intelligent insights 
+    through dynamic pattern recognition, adaptive scoring refinement, and evolving policy recommendations 
+    that improve with each document analyzed.
     """)
     
     # Main recommendation interface
