@@ -64,9 +64,9 @@ def main():
     
     .quantum-header h1 {
         margin: 0 !important;
-        font-size: clamp(4rem, 12vw, 8.4rem) !important;
-        font-weight: 600 !important;
-        font-family: 'Source Serif Pro', serif !important;
+        font-size: clamp(2rem, 6vw, 4.2rem) !important;
+        font-weight: bold !important;
+        font-family: Arial, sans-serif !important;
         letter-spacing: -0.02em !important;
         color: #dc2626 !important;
         line-height: 1.1 !important;
@@ -326,7 +326,6 @@ def main():
                 <img src="data:image/png;base64,{owl_data}" class="guardian-logo" alt="GUARDIAN Logo">
                 <h1>GUARDIAN</h1>
             </div>
-            <p>Developed by Cyber Institute</p>
         </div>
         """, unsafe_allow_html=True)
     except:
@@ -336,11 +335,27 @@ def main():
             <div class="quantum-header-content">
                 <h1>GUARDIAN</h1>
             </div>
-            <p>Developed by Cyber Institute</p>
         </div>
         """, unsafe_allow_html=True)
     
-
+    # Cyber Institute credit with logo inline
+    try:
+        import base64
+        with open("assets/cyber_institute_logo.jpg", "rb") as f:
+            logo_data = base64.b64encode(f.read()).decode()
+        
+        st.markdown(f"""
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 2rem;">
+            <img src="data:image/jpeg;base64,{logo_data}" width="40" height="40" style="border-radius: 50%; margin-right: 0.5rem;">
+            <span style="font-size: 0.9rem; color: #6b7280; white-space: nowrap;">Developed by Cyber Institute</span>
+        </div>
+        """, unsafe_allow_html=True)
+    except:
+        st.markdown("""
+        <div style="text-align: center; font-size: 0.9rem; color: #6b7280; margin-bottom: 2rem;">
+            Developed by Cyber Institute
+        </div>
+        """, unsafe_allow_html=True)
     
     # Enhanced sidebar with document upload and API functionality
     with st.sidebar:
