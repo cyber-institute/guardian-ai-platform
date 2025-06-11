@@ -5,7 +5,8 @@ Updates all documents with enhanced multi-LLM region detection capabilities
 
 import os
 import sys
-from utils.db import fetch_documents, save_document_to_db
+sys.path.append('/home/runner/workspace')
+from utils.db import fetch_documents
 from utils.enhanced_region_detector import enhanced_region_detection
 
 def update_all_documents_with_enhanced_regions():
