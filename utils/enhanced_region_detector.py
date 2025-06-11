@@ -45,7 +45,9 @@ class EnhancedRegionDetector:
             'Asia-Pacific': [
                 'nisc', 'japan', 'japanese', 'singapore', 'csa singapore', 'china',
                 'chinese', 'korea', 'korean', 'taiwan', 'hong kong', 'thailand',
-                'malaysia', 'indonesia', 'philippines', 'vietnam', 'india'
+                'malaysia', 'indonesia', 'philippines', 'vietnam', 'india',
+                'cybersecurity agency of singapore', 'cert singapore', 'govtech singapore',
+                'australian cyber security centre', 'acsc', 'cert australia'
             ],
             'International': [
                 'iso', 'itu', 'oecd', 'united nations', 'un ', 'nato', 'interpol',
