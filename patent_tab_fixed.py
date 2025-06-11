@@ -18,7 +18,7 @@ def render():
     st.markdown(
         """<div style="background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #7c3aed 100%); padding: 2.5rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
             <h1 style="color: white; margin-bottom: 1.2rem; font-size: 2.2rem; font-weight: 700; text-align: center;">
-                🛡️ GUARDIAN Patent Technologies
+                GUARDIAN Patent Technologies
             </h1>
             <div style="background: rgba(255,255,255,0.15); padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0;">
                 <h3 style="color: #fbbf24; margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600; text-align: center;">
@@ -677,7 +677,7 @@ def render_process_flow():
     """, unsafe_allow_html=True)
     
     # Data Ingestion Layer
-    st.markdown("### 📥 Data Ingestion Layer")
+    st.markdown("### Data Ingestion Layer")
     col1, col2, col3 = st.columns(3)
     
     with col1:
@@ -705,7 +705,7 @@ def render_process_flow():
         """, unsafe_allow_html=True)
     
     # Patent Integration Hub
-    st.markdown("### 🗄️ Central Repository & Patent Integration Hub")
+    st.markdown("### Central Repository & Patent Integration Hub")
     
     col1, col2, col3 = st.columns([1, 2, 1])
     
@@ -738,7 +738,7 @@ def render_process_flow():
         """, unsafe_allow_html=True)
     
     # Scoring Engines
-    st.markdown("### ⚖️ Patent-Based Scoring Engines")
+    st.markdown("### Patent-Based Scoring Engines")
     
     col1, col2, col3, col4 = st.columns(4)
     
@@ -775,7 +775,7 @@ def render_process_flow():
         """, unsafe_allow_html=True)
     
     # Continuous Learning
-    st.markdown("### 🧠 Continuous Learning & Reinforcement")
+    st.markdown("### Continuous Learning & Reinforcement")
     
     col1, col2, col3 = st.columns([1, 2, 1])
     
@@ -809,7 +809,7 @@ def render_process_flow():
         """, unsafe_allow_html=True)
     
     # User Guidance
-    st.markdown("### 🎯 Intelligent User Guidance")
+    st.markdown("### Intelligent User Guidance")
     
     col1, col2, col3 = st.columns(3)
     
@@ -838,7 +838,7 @@ def render_process_flow():
         """, unsafe_allow_html=True)
     
     # Feedback Loop
-    st.markdown("### 🔄 Continuous Feedback Loop")
+    st.markdown("### Continuous Feedback Loop")
     st.markdown("""
     <div style="background: #e1f5fe; padding: 1rem; border-radius: 8px; text-align: center; margin: 1rem 0;">
         <strong>User Actions → System Learning → Improved Recommendations → Better Outcomes</strong><br>
