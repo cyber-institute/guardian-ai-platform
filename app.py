@@ -540,9 +540,10 @@ def main():
     # Move onboarding functionality to chatbot
     
     # Create main navigation with reorganized structure
-    main_tab1, main_tab2, main_tab3 = st.tabs([
+    main_tab1, main_tab2, main_tab3, main_tab4 = st.tabs([
         "Policy Repository", 
         "Repository Admin",
+        "LLM Enhancement",
         "About GUARDIAN"
     ])
     
@@ -571,6 +572,11 @@ def main():
         render_repository_admin_section()
     
     with main_tab3:
+        # LLM Enhancement Tab
+        from llm_enhancement_tab import render as render_llm_enhancement
+        render_llm_enhancement()
+    
+    with main_tab4:
         # About tab with Patent Technology as subtab
         about_subtab1, about_subtab2 = st.tabs(["GUARDIAN Emerging Tech Tool", "Patent Pending Technologies"])
         
