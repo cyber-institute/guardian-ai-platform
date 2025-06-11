@@ -335,7 +335,10 @@ def render_simple_hamburger_menu():
                     handle_menu_message("How do I use the filters?")
             
             # Scoring explanation section
-            with st.expander("What do these scores mean?"):
+            if st.button("📊 What do these scores mean?", key="scoring_help", use_container_width=True):
+                st.session_state.show_scoring_help = not st.session_state.get("show_scoring_help", False)
+            
+            if st.session_state.get("show_scoring_help", False):
                 st.markdown("""
                 **AI Cybersecurity Maturity (0-100 Scale)**
                 - **Encryption Standards**: AI system data protection and secure communication protocols
