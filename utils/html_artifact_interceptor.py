@@ -54,6 +54,9 @@ class HTMLArtifactInterceptor:
         text = re.sub(r'\w+\s*=\s*["\'][^"\']*["\']', '', text)
         text = re.sub(r'\w+\s*=\s*\w+', '', text)
         
+        # Fix common OCR/extraction errors
+        text = re.sub(r'\bpecial\b', 'Special', text, flags=re.IGNORECASE)
+        
         # Remove common HTML words that leak through
         html_words = ['div', 'span', 'style', 'class', 'href', 'src', 'alt']
         for word in html_words:
