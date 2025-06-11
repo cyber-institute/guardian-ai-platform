@@ -8,18 +8,54 @@ def render_document_uploader():
     
     st.markdown("### 📄 Add New Document")
     
-    # File upload option
-    uploaded_file = st.file_uploader(
-        "Upload PDF Document (Optional)",
-        type=['pdf'],
-        help="Upload a PDF file to automatically extract content and generate thumbnail"
+    # Content input options
+    input_method = st.radio(
+        "Content Input Method:",
+        ["Manual Entry", "PDF Upload", "URL Extraction"],
+        horizontal=True
     )
+    
+    uploaded_file = None
+    url_content = None
+    
+    if input_method == "PDF Upload":
+        uploaded_file = st.file_uploader(
+            "Upload PDF Document",
+            type=['pdf'],
+            help="Upload a PDF file to automatically extract content and generate thumbnail"
+        )
+    elif input_method == "URL Extraction":
+        url_input = st.text_input(
+            "Enter URL to extract content:",
+            placeholder="https://example.com/document",
+            help="Enter a web URL to automatically extract content and metadata"
+        )
+        
+        if url_input and st.button("Extract from URL", type="secondary"):
+            with st.spinner("Extracting content from URL..."):
+                from utils.url_content_extractor import extract_url_content
+                url_result = extract_url_content(url_input)
+                
+                if url_result['success']:
+                    url_content = url_result
+                    st.success(f"Successfully extracted content from: {url_result['organization']}")
+                    st.info(f"Title: {url_result['title'][:100]}...")
+                else:
+                    st.error(f"Failed to extract content: {url_result['error']}")
+                    url_content = None
     
     with st.form("document_upload_form"):
         col1, col2 = st.columns(2)
         
         with col1:
-            title = st.text_input("Document Title*", placeholder="e.g., Quantum Security Assessment")
+            # Pre-populate from URL extraction if available
+            if url_content:
+                title = st.text_input("Document Title*", value=url_content['title'], placeholder="e.g., Quantum Security Assessment")
+                organization = st.text_input("Author/Organization", value=url_content['organization'])
+            else:
+                title = st.text_input("Document Title*", placeholder="e.g., Quantum Security Assessment")
+                organization = st.text_input("Author/Organization", placeholder="e.g., NIST, NASA, EU Agency")
+            
             from utils.document_classifier import DOCUMENT_TYPES
             document_type = st.selectbox(
                 "Document Type",
@@ -31,15 +67,25 @@ def render_document_uploader():
                 "Source",
                 ["internal", "external", "vendor", "regulatory", "research"]
             )
+            if url_content:
+                url_field = st.text_input("Source URL", value=url_content['url'])
+            else:
+                url_field = st.text_input("Source URL (Optional)", placeholder="https://example.com/document")
             auto_analyze = st.checkbox("Auto-analyze with AI", value=True)
         
-        # Content input - auto-populate if PDF uploaded
+        # Content input - auto-populate based on input method
         content_placeholder = "Paste the full text content of your document here..."
+        content_value = ""
+        
         if uploaded_file:
             content_placeholder = "Content will be automatically extracted from uploaded PDF..."
+        elif url_content:
+            content_placeholder = "Content extracted from URL - you can edit if needed"
+            content_value = url_content['text_content'][:8000] + "..." if len(url_content['text_content']) > 8000 else url_content['text_content']
             
         content = st.text_area(
             "Document Content*",
+            value=content_value,
             placeholder=content_placeholder,
             height=200
         )
@@ -123,13 +169,38 @@ def render_document_uploader():
                             'quantum_q': scores['quantum_cybersecurity_score'] * 20  # Legacy compatibility
                         })
                         
-                        # Add region metadata if available from PDF processing
-                        if uploaded_file and 'pdf_result' in locals():
-                            region_data = pdf_result.get('region_metadata', {})
+                        # Enhanced region detection for all input methods
+                        try:
+                            from utils.enhanced_region_detector import enhanced_region_detection
+                            
+                            # Use organization from form or extracted data
+                            org_for_detection = organization if organization else "Unknown"
+                            url_for_detection = url_field if url_field else ""
+                            
+                            region_result = enhanced_region_detection(
+                                title=title,
+                                content=final_content[:2000],  # First 2000 chars for analysis
+                                organization=org_for_detection,
+                                url=url_for_detection
+                            )
+                            
                             document_data.update({
-                                'detected_region': region_data.get('detected_region', 'Unknown'),
-                                'region_confidence': region_data.get('region_confidence', 0.0),
-                                'region_reasoning': region_data.get('region_reasoning', '')
+                                'detected_region': region_result.get('region', 'Unknown'),
+                                'region_confidence': region_result.get('confidence', 0.0),
+                                'region_reasoning': region_result.get('reasoning', 'Enhanced multi-LLM detection'),
+                                'author_organization': org_for_detection
+                            })
+                            
+                            if region_result.get('confidence', 0) > 0.5:
+                                st.info(f"🌍 Region detected: {region_result['region']} (confidence: {region_result['confidence']:.1%})")
+                                
+                        except Exception as e:
+                            print(f"Region detection failed: {e}")
+                            document_data.update({
+                                'detected_region': 'Unknown',
+                                'region_confidence': 0.0,
+                                'region_reasoning': 'Detection failed',
+                                'author_organization': organization if organization else "Unknown"
                             })
                         
                         st.success("Document analyzed with comprehensive patent-based scoring!")
