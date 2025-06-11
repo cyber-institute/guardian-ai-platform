@@ -68,12 +68,19 @@ def render():
     # Enhanced refresh button with display style controls
     col1, col2 = st.columns([1, 1])
     with col1:
-        if st.button("🔄 Refresh Analysis", help="Update all documents with improved metadata extraction"):
-            with st.spinner("Updating all documents with improved analysis..."):
+        if st.button("🔄 Refresh Analysis", help="Update all documents with comprehensive patent-based scoring"):
+            with st.spinner("Applying comprehensive patent-based scoring to all documents..."):
                 try:
-                    updated_count = update_document_metadata()
-                    if updated_count > 0:
-                        st.success(f"Updated {updated_count} documents with improved metadata")
+                    # Apply comprehensive patent scoring to all documents
+                    from utils.comprehensive_patent_scoring import apply_comprehensive_patent_scoring
+                    
+                    processed = apply_comprehensive_patent_scoring()
+                    
+                    # Also update metadata for improved extraction
+                    metadata_updated = update_document_metadata()
+                    
+                    if processed > 0:
+                        st.success(f"Applied patent-based scoring to {processed} documents with {metadata_updated} metadata updates")
                     else:
                         st.info("All documents are already up to date")
                     

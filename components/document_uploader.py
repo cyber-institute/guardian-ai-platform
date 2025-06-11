@@ -98,20 +98,47 @@ def render_document_uploader():
                     'has_thumbnail': pdf_thumbnail_extracted
                 }
                 
-                # Perform AI analysis if requested
+                # Apply comprehensive patent-based scoring
                 if auto_analyze:
                     try:
-                        ai_result = evaluate_quantum_maturity_hf(content)
-                        document_data['quantum_q'] = ai_result.get('patent_score', 0)
+                        from utils.patent_scoring_engine import ComprehensivePatentScoringEngine
                         
-                        st.success(f"Document analyzed! Quantum maturity score: {ai_result.get('patent_score', 0):.1f}/100")
+                        # Initialize scoring engine
+                        scoring_engine = ComprehensivePatentScoringEngine()
                         
-                        # Show quick analysis preview
-                        if ai_result.get('narrative'):
-                            st.info("Key findings: " + ", ".join(ai_result['narrative'][:2]))
+                        # Apply comprehensive scoring to document content
+                        scores = scoring_engine.assess_document_comprehensive(final_content, title)
+                        
+                        # Update document data with all four framework scores
+                        document_data.update({
+                            'ai_cybersecurity_score': scores['ai_cybersecurity_score'],
+                            'quantum_cybersecurity_score': scores['quantum_cybersecurity_score'],
+                            'ai_ethics_score': scores['ai_ethics_score'],
+                            'quantum_ethics_score': scores['quantum_ethics_score'],
+                            'quantum_q': scores['quantum_cybersecurity_score'] * 20  # Legacy compatibility
+                        })
+                        
+                        st.success("Document analyzed with comprehensive patent-based scoring!")
+                        
+                        # Show scoring results
+                        score_col1, score_col2, score_col3, score_col4 = st.columns(4)
+                        
+                        with score_col1:
+                            st.metric("AI Cybersecurity", f"{scores['ai_cybersecurity_score']}/100")
+                        with score_col2:
+                            st.metric("Quantum QCMEA", f"{scores['quantum_cybersecurity_score']}/5")
+                        with score_col3:
+                            st.metric("AI Ethics", f"{scores['ai_ethics_score']}/100")
+                        with score_col4:
+                            st.metric("Quantum Ethics", f"{scores['quantum_ethics_score']}/100")
                             
                     except Exception as e:
-                        st.warning(f"AI analysis failed, document saved without score: {e}")
+                        st.warning(f"Patent scoring failed, applying fallback analysis: {e}")
+                        try:
+                            ai_result = evaluate_quantum_maturity_hf(final_content)
+                            document_data['quantum_q'] = ai_result.get('patent_score', 0)
+                        except:
+                            document_data['quantum_q'] = 0
                 
                 # Save to database
                 try:
@@ -186,12 +213,28 @@ def render_bulk_upload():
                         'has_thumbnail': has_thumbnail
                     }
                     
-                    # AI analysis
+                    # Apply comprehensive patent-based scoring
                     try:
-                        ai_result = evaluate_quantum_maturity_hf(content)
-                        document_data['quantum_q'] = ai_result.get('patent_score', 0)
-                    except:
-                        pass  # Continue without AI analysis if it fails
+                        from utils.patent_scoring_engine import ComprehensivePatentScoringEngine
+                        
+                        scoring_engine = ComprehensivePatentScoringEngine()
+                        scores = scoring_engine.assess_document_comprehensive(content, file_title)
+                        
+                        # Update document with all four framework scores
+                        document_data.update({
+                            'ai_cybersecurity_score': scores['ai_cybersecurity_score'],
+                            'quantum_cybersecurity_score': scores['quantum_cybersecurity_score'],
+                            'ai_ethics_score': scores['ai_ethics_score'],
+                            'quantum_ethics_score': scores['quantum_ethics_score'],
+                            'quantum_q': scores['quantum_cybersecurity_score'] * 20
+                        })
+                    except Exception as e:
+                        # Fallback to legacy scoring if patent scoring fails
+                        try:
+                            ai_result = evaluate_quantum_maturity_hf(content)
+                            document_data['quantum_q'] = ai_result.get('patent_score', 0)
+                        except:
+                            document_data['quantum_q'] = 0
                     
                     # Save to database
                     if save_document(document_data):
