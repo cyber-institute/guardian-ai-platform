@@ -75,9 +75,10 @@ def main():
         letter-spacing: -0.02em !important;
         color: #dc2626 !important;
         text-shadow: 
-            2px 2px 4px rgba(0, 0, 0, 0.3),
-            -1px -1px 0px rgba(255, 255, 255, 0.2),
-            1px 1px 0px rgba(0, 0, 0, 0.2) !important;
+            2px 2px 6px rgba(0, 0, 0, 0.4),
+            -1px -1px 0px rgba(255, 255, 255, 0.3),
+            1px 1px 0px rgba(0, 0, 0, 0.3),
+            0px 0px 8px rgba(0, 0, 0, 0.2) !important;
         line-height: 1.1 !important;
         flex-shrink: 1 !important;
         filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1)) !important;
