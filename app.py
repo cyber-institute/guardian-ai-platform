@@ -342,6 +342,14 @@ def main():
         
         if uploaded_file:
             st.success(f"File uploaded: {uploaded_file.name}")
+            
+            # Enhanced analysis options
+            col1, col2 = st.columns(2)
+            with col1:
+                use_multi_llm = st.checkbox("🔬 Multi-LLM Analysis", value=True, help="Use advanced multi-LLM ensemble for comprehensive analysis")
+            with col2:
+                analysis_depth = st.selectbox("Analysis Depth", ["Standard", "Comprehensive", "Expert"], index=1)
+            
             if st.button("Process Document"):
                 with st.spinner("Processing document... This may take a moment."):
                     try:
@@ -371,7 +379,7 @@ def main():
                             file_title = uploaded_file.name.rsplit('.', 1)[0].replace('_', ' ').title()
                             has_thumbnail = False
                         
-                        # Prepare document data
+                        # Prepare base document data
                         document_data = {
                             'title': file_title,
                             'content': content[:200] + "..." if len(content) > 200 else content,
@@ -381,6 +389,101 @@ def main():
                             'quantum_score': 0,
                             'has_thumbnail': has_thumbnail
                         }
+                        
+                        # Apply enhanced analysis if Multi-LLM is enabled
+                        if use_multi_llm:
+                            st.info("Running Multi-LLM ensemble analysis...")
+                            try:
+                                import asyncio
+                                from utils.multi_llm_ensemble import multi_llm_ensemble
+                                
+                                # Auto-detect analysis domain
+                                content_lower = content.lower()
+                                if any(term in content_lower for term in ["quantum", "post-quantum", "cryptography"]):
+                                    analysis_domain = "quantum_security"
+                                elif any(term in content_lower for term in ["ai ethics", "bias", "fairness", "transparency"]):
+                                    analysis_domain = "ai_ethics"
+                                else:
+                                    analysis_domain = "cybersecurity"
+                                
+                                # Configure processing based on depth
+                                processing_mode = "parallel" if analysis_depth == "Standard" else "intelligent_synthesis"
+                                synthesis_strategy = "auto_select" if analysis_depth == "Standard" else "hybrid"
+                                
+                                # Run ensemble analysis
+                                use_daisy_chain = (analysis_depth == "Expert")
+                                ensemble_result = asyncio.run(multi_llm_ensemble.evaluate_policy_concurrent(
+                                    document_content=content,
+                                    evaluation_domain=analysis_domain,
+                                    use_daisy_chain=use_daisy_chain
+                                ))
+                                
+                                if ensemble_result and ensemble_result.individual_responses:
+                                    st.success("Multi-LLM analysis completed successfully")
+                                    
+                                    # Display ensemble metrics
+                                    col1, col2, col3 = st.columns(3)
+                                    with col1:
+                                        st.metric("Services Used", len(ensemble_result.individual_responses))
+                                    with col2:
+                                        st.metric("Confidence Level", f"{ensemble_result.confidence_level:.1f}")
+                                    with col3:
+                                        avg_score = sum(score for score in ensemble_result.consensus_score.values()) / len(ensemble_result.consensus_score) if ensemble_result.consensus_score else 0
+                                        st.metric("Consensus Score", f"{avg_score:.1f}")
+                                    
+                                    # Apply comprehensive scoring using ensemble consensus
+                                    from utils.comprehensive_scoring import comprehensive_document_scoring
+                                    scores = comprehensive_document_scoring(content, file_title)
+                                    
+                                    # Enhance scores with ensemble insights
+                                    if ensemble_result.consensus_score:
+                                        for key, value in ensemble_result.consensus_score.items():
+                                            if key in scores:
+                                                scores[key] = max(scores[key], value)
+                                    
+                                    document_data.update(scores)
+                                    
+                                    # Store Multi-LLM metadata
+                                    document_data['multi_llm_analysis'] = True
+                                    document_data['ensemble_confidence'] = ensemble_result.confidence_level
+                                    document_data['ensemble_services'] = len(ensemble_result.individual_responses)
+                                    
+                                else:
+                                    st.warning("Multi-LLM analysis failed, applying standard scoring")
+                                    from utils.comprehensive_scoring import comprehensive_document_scoring
+                                    scores = comprehensive_document_scoring(content, file_title)
+                                    document_data.update(scores)
+                                    
+                            except Exception as e:
+                                st.warning(f"Multi-LLM analysis unavailable: {e}")
+                                # Apply standard comprehensive scoring
+                                try:
+                                    from utils.comprehensive_scoring import comprehensive_document_scoring
+                                    scores = comprehensive_document_scoring(content, file_title)
+                                    document_data.update(scores)
+                                except Exception:
+                                    document_data['quantum_score'] = 0
+                        else:
+                            # Standard comprehensive scoring
+                            try:
+                                from utils.comprehensive_scoring import comprehensive_document_scoring
+                                scores = comprehensive_document_scoring(content, file_title)
+                                document_data.update(scores)
+                            except Exception:
+                                document_data['quantum_score'] = 0
+                        
+                        # Display final scoring results
+                        if 'ai_cybersecurity_score' in document_data:
+                            st.markdown("#### Analysis Results")
+                            score_col1, score_col2, score_col3, score_col4 = st.columns(4)
+                            with score_col1:
+                                st.metric("AI Cybersecurity", f"{document_data.get('ai_cybersecurity_score', 0)}/100")
+                            with score_col2:
+                                st.metric("Quantum QCMEA", f"{document_data.get('quantum_cybersecurity_score', 0)}/5")
+                            with score_col3:
+                                st.metric("AI Ethics", f"{document_data.get('ai_ethics_score', 0)}/100")
+                            with score_col4:
+                                st.metric("Quantum Ethics", f"{document_data.get('quantum_ethics_score', 0)}/100")
                         
                         # Save to database with enhanced metadata extraction
                         if save_document_direct(document_data):
@@ -401,6 +504,14 @@ def main():
         # URL submission section  
         st.markdown("### URL")
         url_input = st.text_input("Enter URL:", placeholder="https://example.com/document")
+        
+        # Enhanced URL analysis options
+        url_col1, url_col2 = st.columns(2)
+        with url_col1:
+            url_use_multi_llm = st.checkbox("🔬 Multi-LLM URL Analysis", value=True, help="Apply advanced multi-LLM ensemble to URL content")
+        with url_col2:
+            url_analysis_depth = st.selectbox("URL Analysis Depth", ["Standard", "Comprehensive", "Expert"], index=1, key="url_depth")
+        
         if st.button("Submit URL", use_container_width=True):
             if url_input:
                 with st.spinner(f"Fetching content from {url_input}..."):
