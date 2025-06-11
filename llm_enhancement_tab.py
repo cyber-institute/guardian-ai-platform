@@ -32,11 +32,12 @@ def render():
     )
     
     # Main tabs for different aspects of LLM enhancement
-    tab1, tab2, tab3, tab4 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "Service Testing", 
         "Knowledge Integration", 
         "Data Architecture",
-        "Enhancement Demo"
+        "Enhancement Demo",
+        "Multi-LLM Ensemble"
     ])
     
     with tab1:
@@ -50,6 +51,9 @@ def render():
     
     with tab4:
         render_enhancement_demo_tab()
+    
+    with tab5:
+        render_multi_llm_ensemble_tab()
 
 def render_service_testing_tab():
     """Test available free LLM services"""
@@ -568,3 +572,420 @@ def render_enhancement_demo_tab():
                 
                 except Exception as e:
                     st.error(f"Enhanced analysis failed: {str(e)}")
+
+def render_multi_llm_ensemble_tab():
+    """Demonstrate concurrent multi-LLM processing capabilities"""
+    
+    st.markdown("### **Multi-LLM Ensemble Processing**")
+    st.markdown("Experience concurrent policy evaluation using multiple AI systems - like multithreading for document analysis")
+    
+    # Architecture explanation
+    with st.expander("🔧 **How Multi-LLM Ensemble Works**"):
+        st.markdown("""
+        **Parallel Processing Mode (CPU Multithreading Analogy):**
+        - All available LLMs evaluate the document simultaneously
+        - Results are synthesized using weighted consensus
+        - Faster processing, diverse perspectives
+        
+        **Daisy-Chain Mode (Sequential Refinement):**
+        - Each LLM builds upon the previous analysis
+        - Later evaluations have access to earlier insights
+        - Higher quality through iterative refinement
+        
+        **Service Integration:**
+        - OpenAI GPT-4o (if available)
+        - Anthropic Claude (if available)
+        - Ollama (local deployment)
+        - Groq (fast inference)
+        - Hugging Face (specialized models)
+        - Together AI (open models)
+        - Perplexity (real-time research)
+        """)
+    
+    # Processing mode selection
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        processing_mode = st.radio(
+            "Select Processing Mode:",
+            ["Parallel Processing", "Daisy-Chain Refinement"],
+            help="Parallel: All LLMs process simultaneously. Daisy-Chain: Sequential refinement building on previous analysis."
+        )
+    
+    with col2:
+        evaluation_domain = st.selectbox(
+            "Evaluation Domain:",
+            ["ai_ethics", "quantum_security", "cybersecurity"],
+            format_func=lambda x: {
+                "ai_ethics": "AI Ethics & Fairness",
+                "quantum_security": "Quantum Security", 
+                "cybersecurity": "Cybersecurity Frameworks"
+            }[x]
+        )
+    
+    # Sample policy documents for testing
+    sample_policies = {
+        "AI Ethics Policy": """
+        Our organization commits to responsible AI development through comprehensive ethical frameworks.
+        
+        CORE PRINCIPLES:
+        1. Fairness: AI systems must not discriminate against protected classes
+        2. Transparency: Decision-making processes must be explainable to affected individuals
+        3. Accountability: Clear ownership and responsibility for AI system outcomes
+        4. Human Oversight: Meaningful human control over high-risk AI decisions
+        5. Privacy: Data minimization and purpose limitation in AI training and deployment
+        
+        IMPLEMENTATION REQUIREMENTS:
+        - Bias testing across demographic groups before deployment
+        - Regular algorithmic audits with third-party validation
+        - Impact assessments for AI systems affecting individuals
+        - Clear appeals processes for automated decisions
+        - Data governance frameworks ensuring privacy protection
+        
+        GOVERNANCE STRUCTURE:
+        - AI Ethics Board with diverse stakeholder representation
+        - Quarterly reviews of AI system performance and bias metrics
+        - Incident response procedures for ethical violations
+        - Training programs for development teams on ethical AI principles
+        """,
+        
+        "Quantum Security Framework": """
+        QUANTUM THREAT ASSESSMENT AND CRYPTOGRAPHIC TRANSITION STRATEGY
+        
+        EXECUTIVE SUMMARY:
+        The emergence of cryptographically relevant quantum computers poses an existential threat to current public-key cryptography. This framework establishes our transition to post-quantum cryptographic standards.
+        
+        QUANTUM TIMELINE ASSESSMENT:
+        - Current quantum computers: 100-1000 qubits (research phase)
+        - Threat threshold: 4000+ stable qubits for RSA-2048 breaking
+        - Conservative estimate: 10-15 years to cryptographic relevance
+        - Aggressive timeline: 5-8 years for breakthrough scenarios
+        
+        CRYPTOGRAPHIC INVENTORY:
+        - RSA encryption: 85% of current implementations
+        - Elliptic Curve: 12% of implementations
+        - Legacy symmetric: 3% remaining systems
+        
+        POST-QUANTUM MIGRATION PLAN:
+        Phase 1 (0-2 years): NIST standardization compliance
+        - Implement CRYSTALS-Kyber for key encapsulation
+        - Deploy CRYSTALS-Dilithium for digital signatures
+        - Begin hybrid classical/post-quantum systems
+        
+        Phase 2 (2-5 years): Full transition preparation
+        - Replace all RSA/ECC in critical systems
+        - Quantum key distribution for high-security communications
+        - Regular quantum threat reassessment
+        
+        RISK MITIGATION:
+        - Crypto-agility architecture for rapid algorithm changes
+        - Quantum-safe VPNs for sensitive communications
+        - Supply chain quantum risk assessment
+        """,
+        
+        "Cybersecurity Control Framework": """
+        COMPREHENSIVE CYBERSECURITY CONTROL FRAMEWORK
+        Aligned with NIST Cybersecurity Framework 2.0
+        
+        IDENTIFY (ID):
+        ID.AM-1: Physical devices and systems are inventoried
+        ID.AM-2: Software platforms and applications are inventoried
+        ID.AM-3: Organizational communication and data flows are mapped
+        ID.GV-1: Organizational cybersecurity policy is established
+        ID.RA-1: Asset vulnerabilities are identified and documented
+        
+        PROTECT (PR):
+        PR.AC-1: Identities and credentials are issued, managed, verified, revoked
+        PR.AC-3: Remote access is managed
+        PR.AT-1: All users are informed and trained
+        PR.DS-1: Data-at-rest is protected
+        PR.DS-2: Data-in-transit is protected
+        PR.PT-1: Audit/log records are determined, documented, implemented
+        
+        DETECT (DE):
+        DE.AE-1: A baseline of network operations is established
+        DE.CM-1: Networks and network services are monitored
+        DE.CM-3: Personnel activity is monitored
+        DE.DP-1: Roles and responsibilities for detection are well defined
+        
+        RESPOND (RS):
+        RS.RP-1: Response plan is executed during or after an incident
+        RS.CO-2: Incidents are reported consistent with established criteria
+        RS.AN-1: Notifications from detection systems are investigated
+        RS.MI-1: Incidents are contained
+        
+        RECOVER (RC):
+        RC.RP-1: Recovery plan is executed during or after a cybersecurity incident
+        RC.IM-1: Recovery plans incorporate lessons learned
+        RC.CO-1: Public relations are managed
+        
+        IMPLEMENTATION METRICS:
+        - 98% asset inventory accuracy
+        - <24 hour incident response time
+        - 95% staff security training completion
+        - Quarterly penetration testing
+        - Annual third-party security assessment
+        """
+    }
+    
+    # Document selection
+    selected_policy = st.selectbox(
+        "Choose a sample policy or enter your own:",
+        ["Custom Document"] + list(sample_policies.keys())
+    )
+    
+    if selected_policy == "Custom Document":
+        document_text = st.text_area(
+            "Enter policy document text:",
+            height=200,
+            placeholder="Paste your AI ethics, quantum security, or cybersecurity policy document here..."
+        )
+    else:
+        document_text = sample_policies[selected_policy]
+        st.text_area(
+            "Selected policy document:",
+            value=document_text,
+            height=200,
+            disabled=True
+        )
+    
+    # Ensemble processing controls
+    col1, col2, col3 = st.columns([2, 1, 1])
+    
+    with col1:
+        if st.button("🚀 **Run Multi-LLM Ensemble Analysis**", type="primary") and document_text:
+            with st.spinner(f"Running {processing_mode.lower()} analysis across multiple LLMs..."):
+                try:
+                    # Import and initialize ensemble
+                    from utils.multi_llm_ensemble import multi_llm_ensemble
+                    
+                    # Initialize available services
+                    initialization_result = asyncio.run(multi_llm_ensemble.initialize_services())
+                    
+                    st.info(f"Initialized {initialization_result['total_services']} LLM services: {', '.join(initialization_result['available_services'])}")
+                    
+                    # Run ensemble evaluation
+                    use_daisy_chain = (processing_mode == "Daisy-Chain Refinement")
+                    
+                    ensemble_result = asyncio.run(
+                        multi_llm_ensemble.evaluate_policy_concurrent(
+                            document_text,
+                            evaluation_domain,
+                            use_daisy_chain=use_daisy_chain
+                        )
+                    )
+                    
+                    # Display results
+                    st.success(f"Ensemble analysis completed in {ensemble_result.processing_summary['processing_time']:.2f} seconds")
+                    
+                    # Consensus scores
+                    st.markdown("#### **🎯 Consensus Evaluation Scores**")
+                    
+                    score_cols = st.columns(len(ensemble_result.consensus_score))
+                    for i, (metric, score) in enumerate(ensemble_result.consensus_score.items()):
+                        with score_cols[i]:
+                            st.metric(
+                                metric.replace('_', ' ').title(),
+                                f"{score}/100" if isinstance(score, (int, float)) and score <= 100 else f"{score:.2f}"
+                            )
+                    
+                    # Confidence and processing summary
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("Confidence Level", f"{ensemble_result.confidence_level:.1%}")
+                    with col2:
+                        st.metric("Services Used", f"{ensemble_result.processing_summary['successful_responses']}/{ensemble_result.processing_summary['total_services_attempted']}")
+                    with col3:
+                        st.metric("Processing Mode", ensemble_result.processing_summary['processing_mode'].title())
+                    
+                    # Individual service responses
+                    st.markdown("#### **🔍 Individual LLM Responses**")
+                    
+                    successful_responses = [r for r in ensemble_result.individual_responses if r.success]
+                    failed_responses = [r for r in ensemble_result.individual_responses if not r.success]
+                    
+                    if successful_responses:
+                        for i, response in enumerate(successful_responses):
+                            with st.expander(f"✅ {response.service_name.title()} - {response.processing_time:.2f}s - Confidence: {response.confidence_score:.2f}"):
+                                
+                                # Service metrics
+                                col1, col2, col3 = st.columns(3)
+                                with col1:
+                                    st.metric("Processing Time", f"{response.processing_time:.2f}s")
+                                with col2:
+                                    st.metric("Confidence", f"{response.confidence_score:.2f}")
+                                with col3:
+                                    st.metric("Status", "✅ Success")
+                                
+                                # Response data
+                                if response.response_data:
+                                    if 'policy_scores' in response.response_data:
+                                        st.markdown("**Policy Scores:**")
+                                        score_data = response.response_data['policy_scores']
+                                        score_cols = st.columns(len(score_data))
+                                        for j, (metric, score) in enumerate(score_data.items()):
+                                            with score_cols[j]:
+                                                st.metric(metric.title(), f"{score}/100")
+                                    
+                                    if 'key_insights' in response.response_data:
+                                        st.markdown("**Key Insights:**")
+                                        insights = response.response_data['key_insights']
+                                        for insight in insights[:3]:  # Show top 3 insights
+                                            st.markdown(f"• {insight}")
+                                    
+                                    if 'domain_relevance' in response.response_data:
+                                        st.markdown(f"**Domain Relevance:** {response.response_data['domain_relevance']}/100")
+                    
+                    # Failed responses (if any)
+                    if failed_responses:
+                        st.markdown("#### **⚠️ Service Issues**")
+                        for response in failed_responses:
+                            with st.expander(f"❌ {response.service_name.title()} - Failed"):
+                                st.error(f"Error: {response.error_message}")
+                                st.info("This service may need API key setup or be temporarily unavailable")
+                    
+                    # Enhanced metadata
+                    if ensemble_result.enhanced_metadata:
+                        st.markdown("#### **📊 Analysis Metadata**")
+                        with st.expander("View detailed analysis metadata"):
+                            st.json(ensemble_result.enhanced_metadata)
+                    
+                    # Performance comparison
+                    if len(successful_responses) > 1:
+                        st.markdown("#### **⚡ Performance Comparison**")
+                        
+                        # Create performance dataframe
+                        perf_data = []
+                        for response in successful_responses:
+                            perf_data.append({
+                                'Service': response.service_name.title(),
+                                'Processing Time (s)': round(response.processing_time, 2),
+                                'Confidence Score': round(response.confidence_score, 2),
+                                'Status': '✅ Success'
+                            })
+                        
+                        import pandas as pd
+                        df = pd.DataFrame(perf_data)
+                        st.dataframe(df, use_container_width=True)
+                        
+                        # Performance insights
+                        fastest_service = min(successful_responses, key=lambda x: x.processing_time)
+                        highest_confidence = max(successful_responses, key=lambda x: x.confidence_score)
+                        
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.info(f"🏃 **Fastest Service:** {fastest_service.service_name.title()} ({fastest_service.processing_time:.2f}s)")
+                        with col2:
+                            st.info(f"🎯 **Highest Confidence:** {highest_confidence.service_name.title()} ({highest_confidence.confidence_score:.2f})")
+                
+                except Exception as e:
+                    st.error(f"Ensemble analysis failed: {str(e)}")
+                    st.info("This may indicate that LLM services need setup or API keys. Check the Service Testing tab for configuration help.")
+    
+    with col2:
+        if st.button("🔧 Initialize Services"):
+            with st.spinner("Checking available LLM services..."):
+                try:
+                    from utils.multi_llm_ensemble import multi_llm_ensemble
+                    init_result = asyncio.run(multi_llm_ensemble.initialize_services())
+                    
+                    st.success(f"Found {init_result['total_services']} available services")
+                    
+                    for service in init_result['available_services']:
+                        st.markdown(f"✅ {service.title()}")
+                    
+                except Exception as e:
+                    st.error(f"Service initialization failed: {str(e)}")
+    
+    with col3:
+        if st.button("📊 Compare Modes"):
+            st.info("""
+            **Parallel vs Daisy-Chain:**
+            
+            **Parallel Processing:**
+            • Faster execution
+            • Diverse perspectives
+            • Independent evaluations
+            • Better for quick analysis
+            
+            **Daisy-Chain Refinement:**
+            • Higher quality results
+            • Builds on previous insights
+            • Sequential improvement
+            • Better for thorough analysis
+            """)
+    
+    # Architecture details
+    st.markdown("---")
+    
+    with st.expander("🏗️ **Technical Architecture Details**"):
+        st.markdown("""
+        ### **Concurrent Processing Framework**
+        
+        **Service Orchestration:**
+        - Automatic service discovery and health checking
+        - Weighted consensus based on service reliability
+        - Timeout management and graceful degradation
+        - Error handling with fallback strategies
+        
+        **Parallel Processing Implementation:**
+        ```python
+        # All services evaluate simultaneously
+        tasks = [evaluate_with_service(service, content, domain) 
+                for service in available_services]
+        results = await asyncio.gather(*tasks)
+        consensus = weighted_average(results, service_weights)
+        ```
+        
+        **Daisy-Chain Implementation:**
+        ```python
+        # Sequential refinement with context accumulation
+        context = original_document
+        for service in ordered_services:
+            result = await evaluate_with_service(service, context, domain)
+            context += f"Previous analysis: {result}"
+            accumulated_insights.append(result)
+        ```
+        
+        **Synthesis Algorithms:**
+        - **Weighted Consensus:** Combines scores using service reliability weights
+        - **Confidence Scoring:** Based on inter-service agreement levels
+        - **Outlier Detection:** Identifies and handles anomalous responses
+        - **Quality Metrics:** Tracks accuracy and consistency over time
+        
+        **Performance Optimizations:**
+        - Async/await for true concurrency
+        - Service-specific timeout handling
+        - Response caching for repeated evaluations
+        - Load balancing across available services
+        """)
+    
+    # Usage recommendations
+    st.markdown("### **💡 Usage Recommendations**")
+    
+    recommendation_cols = st.columns(2)
+    
+    with recommendation_cols[0]:
+        st.markdown("""
+        **When to Use Parallel Processing:**
+        - Time-sensitive evaluations
+        - Broad consensus needed
+        - Initial document screening
+        - High-volume processing
+        - Diverse perspective validation
+        """)
+    
+    with recommendation_cols[1]:
+        st.markdown("""
+        **When to Use Daisy-Chain:**
+        - Complex policy analysis
+        - Detailed compliance review
+        - Quality over speed priority
+        - Iterative improvement needed
+        - Final evaluation stages
+        """)
+        
+    st.info("""
+    **💡 Pro Tip:** Start with parallel processing for quick assessment, then use daisy-chain refinement for final evaluation of important policies. 
+    The ensemble system automatically adapts to available services and provides fallback options when services are unavailable.
+    """)
