@@ -11,8 +11,7 @@ def main():
         initial_sidebar_state="collapsed"
     )
     
-    # Initialize streamlit tooltip system
-    from components.streamlit_tooltips import streamlit_tooltips
+    # Onboarding system moved to chatbot widget
     
     # Custom CSS styling - Government/Nonprofit Theme
     st.markdown("""
@@ -538,74 +537,49 @@ def main():
         with st.expander("WEB | url > success"):
             st.code("2025-06-07 21:08:56.927833")
     
-    # Render welcome banner for new users
-    streamlit_tooltips.render_welcome_banner()
+    # Move onboarding functionality to chatbot
     
-    # Render tour progress and quick help in sidebar
-    streamlit_tooltips.render_tour_progress()
-    streamlit_tooltips.render_quick_help_sidebar()
-    
-    # Render feature overview for users who clicked "Learn More"
-    streamlit_tooltips.render_feature_overview()
-    
-    # Create main navigation with enhanced AI capabilities
-    main_tab1, main_tab2, main_tab3, main_tab4 = st.tabs([
+    # Create main navigation with reorganized structure
+    main_tab1, main_tab2, main_tab3 = st.tabs([
         "Policy Repository", 
-        "Policy Analyzer", 
-        "AI Recommendations", 
-        "Repository Admin"
+        "Repository Admin",
+        "About GUARDIAN"
     ])
     
     with main_tab1:
-        streamlit_tooltips.render_navigation_hint("policy_repository")
-        streamlit_tooltips.render_step_guidance("policy_repository", 1)
-        render()
+        # Policy Repository with subtabs for Analyzer and Recommendations
+        policy_subtab1, policy_subtab2, policy_subtab3 = st.tabs([
+            "Document Repository", 
+            "Policy Analyzer", 
+            "Policy Recommendations"
+        ])
+        
+        with policy_subtab1:
+            render()
+        
+        with policy_subtab2:
+            # Enhanced Policy Analysis with Gap Detection
+            from components.enhanced_policy_uploader import render_enhanced_policy_uploader
+            render_enhanced_policy_uploader()
+        
+        with policy_subtab3:
+            # Policy Recommendations (renamed from AI Recommendations)
+            from recommendation_tab import render as render_recommendations
+            render_recommendations()
     
     with main_tab2:
-        streamlit_tooltips.render_navigation_hint("policy_analyzer")
-        streamlit_tooltips.render_step_guidance("policy_analyzer", 2)
-        
-        # Enhanced Policy Analysis with Gap Detection
-        from components.enhanced_policy_uploader import render_enhanced_policy_uploader
-        render_enhanced_policy_uploader()
-        
-        # Add contextual help
-        streamlit_tooltips.render_contextual_help("gap_analysis", "Gap Analysis Guide")
+        render_repository_admin_section()
     
     with main_tab3:
-        streamlit_tooltips.render_navigation_hint("ai_recommendations")
-        streamlit_tooltips.render_step_guidance("ai_recommendations", 3)
+        # About tab with Patent Technology as subtab
+        about_subtab1, about_subtab2 = st.tabs(["GUARDIAN Emerging Tech Tool", "Patent Pending Technologies"])
         
-        # AI-Powered Document Recommendations
-        from recommendation_tab import render as render_recommendations
-        render_recommendations()
+        with about_subtab1:
+            from about_tab import render as render_about
+            render_about()
         
-        # Add contextual help
-        streamlit_tooltips.render_contextual_help("scoring_framework", "Scoring Framework")
-    
-    with main_tab4:
-        streamlit_tooltips.render_navigation_hint("repository_admin")
-        streamlit_tooltips.render_step_guidance("repository_admin", 4)
-        
-        # Repository Admin and About sections
-        admin_subtab1, admin_subtab2 = st.tabs(["Repository Management", "About GUARDIAN"])
-        
-        with admin_subtab1:
-            render_repository_admin_section()
-            
-            # Add contextual help
-            streamlit_tooltips.render_contextual_help("patent_algorithms", "Patent Technology")
-        
-        with admin_subtab2:
-            # About tab with Patent Technology as subtab
-            about_subtab1, about_subtab2 = st.tabs(["GUARDIAN Emerging Tech Tool", "Patent Pending Technologies"])
-            
-            with about_subtab1:
-                from about_tab import render as render_about
-                render_about()
-            
-            with about_subtab2:
-                render_patent_technology_section()
+        with about_subtab2:
+            render_patent_technology_section()
     
     # Render hamburger menu instead of sidebar chatbot
     from components.hamburger_menu import render_simple_hamburger_menu

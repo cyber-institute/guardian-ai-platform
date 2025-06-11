@@ -21,19 +21,40 @@ def render_chatbot_widget():
     with st.sidebar:
         st.markdown("### GUARDIAN Assistant")
         
-        # Quick help buttons
+        # Onboarding and Quick Help
+        from components.streamlit_tooltips import streamlit_tooltips
+        
+        # Welcome message for new users
+        if not st.session_state.get("guardian_welcome_shown", False):
+            st.info("Welcome to GUARDIAN! Start a guided tour?")
+            if st.button("Start Tour", key="start_tour_chat", use_container_width=True):
+                st.session_state.guardian_tour_active = True
+                st.session_state.guardian_tour_step = 1
+                st.session_state.guardian_welcome_shown = True
+                handle_quick_question("Start guided tour")
+                st.rerun()
+        
+        # Tour progress
+        if st.session_state.get("guardian_tour_active", False):
+            progress = st.session_state.get("guardian_tour_step", 1) / 4
+            st.progress(progress, text=f"Tour Step {st.session_state.get('guardian_tour_step', 1)}/4")
+            if st.button("End Tour", key="end_tour_chat"):
+                st.session_state.guardian_tour_active = False
+                st.session_state.guardian_tour_completed = True
+                st.rerun()
+        
         st.markdown("**Quick Help:**")
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("AI Security", key="quick_ai_cyber", help="Learn about AI Cybersecurity"):
-                handle_quick_question("What is AI Cybersecurity Maturity?")
+            if st.button("Navigation Guide", key="quick_nav", help="Learn how to navigate GUARDIAN"):
+                handle_quick_question("How do I navigate the Policy Repository?")
             if st.button("Document Upload", key="quick_upload", help="How to upload documents"):
-                handle_quick_question("How do I upload a document?")
+                handle_quick_question("How do I upload and analyze a policy document?")
         with col2:
-            if st.button("Quantum Security", key="quick_quantum", help="Learn about Quantum Cybersecurity"):
-                handle_quick_question("Explain Quantum Cybersecurity")
-            if st.button("Interface Help", key="quick_interface", help="Navigation assistance"):
-                handle_quick_question("How do I use the filters?")
+            if st.button("Scoring Guide", key="quick_scoring", help="Understanding scores"):
+                handle_quick_question("How does GUARDIAN scoring work?")
+            if st.button("Gap Analysis", key="quick_gaps", help="Policy gap analysis"):
+                handle_quick_question("What is policy gap analysis?")
         
         # Chat input
         user_input = st.text_input("Ask me anything about GUARDIAN:", key="chat_input", placeholder="e.g., How do I upload a policy?")
@@ -312,7 +333,176 @@ def handle_user_message(message: str):
 
 def handle_quick_question(question: str):
     """Handle predefined quick help questions."""
-    handle_user_message(question)
+    # Handle tour-specific responses
+    if "Start guided tour" in question:
+        response = """Welcome to GUARDIAN! Let me guide you through the system:
+
+**Step 1: Policy Repository**
+- Navigate to 'Policy Repository' → 'Document Repository' to browse analyzed documents
+- View comprehensive scores across AI cybersecurity, quantum security, and ethics frameworks
+- Use filters to find specific document types and organizations
+
+**Step 2: Policy Analyzer**
+- Go to 'Policy Repository' → 'Policy Analyzer' to upload new policies
+- Get comprehensive gap analysis using GUARDIAN patent algorithms
+- Receive targeted recommendations for policy improvement
+
+**Step 3: Policy Recommendations**
+- Check 'Policy Repository' → 'Policy Recommendations' for intelligent suggestions
+- Discover similar documents and identify best practices
+- Access AI-powered insights based on content analysis
+
+Ready to explore? Ask me about any specific feature!"""
+        
+        st.session_state.chat_messages.append({
+            'role': 'user',
+            'content': question
+        })
+        st.session_state.chat_messages.append({
+            'role': 'assistant',
+            'content': response
+        })
+        st.rerun()
+    elif "How do I navigate the Policy Repository" in question:
+        response = """**GUARDIAN Navigation Guide:**
+
+**Main Tabs:**
+- **Policy Repository**: All document and analysis features
+- **Repository Admin**: System management and monitoring
+- **About GUARDIAN**: System information and patent technology
+
+**Policy Repository Subtabs:**
+1. **Document Repository**: Browse and filter analyzed policies
+2. **Policy Analyzer**: Upload and analyze new documents
+3. **Policy Recommendations**: AI-powered suggestions and insights
+
+**Key Features:**
+- Filter by organization, document type, or scoring framework
+- View detailed scoring breakdowns and gap analysis
+- Access patent-based algorithms for comprehensive assessment
+
+Navigate using the tabs at the top. Need help with a specific section?"""
+        
+        st.session_state.chat_messages.append({
+            'role': 'user',
+            'content': question
+        })
+        st.session_state.chat_messages.append({
+            'role': 'assistant',
+            'content': response
+        })
+        st.rerun()
+    elif "How does GUARDIAN scoring work" in question:
+        response = """**GUARDIAN Scoring Framework:**
+
+**Four Assessment Areas:**
+1. **AI Cybersecurity**: 0-100 points measuring AI security maturity
+2. **Quantum Cybersecurity**: 1-5 tier QCMEA framework assessment
+3. **AI Ethics**: 0-100 points evaluating ethical AI practices
+4. **Quantum Ethics**: 0-100 points assessing quantum ethics compliance
+
+**Patent-Based Algorithms:**
+- Dynamic governance using reinforcement learning
+- Bayesian updates for real-time risk assessment
+- Adaptive scoring based on emerging threats
+
+**Color-Coded Results:**
+- Green (High): Strong compliance and maturity
+- Yellow (Medium): Areas needing attention
+- Red (Low): Critical gaps requiring immediate action
+
+Each score includes detailed breakdowns and improvement recommendations."""
+        
+        st.session_state.chat_messages.append({
+            'role': 'user',
+            'content': question
+        })
+        st.session_state.chat_messages.append({
+            'role': 'assistant',
+            'content': response
+        })
+        st.rerun()
+    elif "upload and analyze a policy document" in question:
+        response = """**Document Upload & Analysis:**
+
+**Step 1: Access Policy Analyzer**
+- Go to 'Policy Repository' → 'Policy Analyzer'
+- Use the document upload section
+
+**Step 2: Upload Document**
+- Supports PDF, TXT, and URL formats
+- Drag & drop or click to browse files
+- Add organization name and document type
+
+**Step 3: Analysis Process**
+- GUARDIAN extracts and processes content
+- Applies patent-based scoring algorithms
+- Generates comprehensive gap analysis
+
+**Step 4: Review Results**
+- View detailed scoring across all frameworks
+- Check gap analysis with severity levels
+- Access strategic recommendations for improvement
+
+**Step 5: Save & Track**
+- Documents are automatically saved to repository
+- Track progress over time
+- Compare with similar organizational policies
+
+Upload takes 30-60 seconds depending on document size."""
+        
+        st.session_state.chat_messages.append({
+            'role': 'user',
+            'content': question
+        })
+        st.session_state.chat_messages.append({
+            'role': 'assistant',
+            'content': response
+        })
+        st.rerun()
+    elif "What is policy gap analysis" in question:
+        response = """**Policy Gap Analysis:**
+
+**GUARDIAN Patent Algorithm:**
+Uses reinforcement learning to identify policy weaknesses and provide targeted recommendations.
+
+**Gap Severity Levels:**
+- **Critical**: Immediate attention required (security vulnerabilities)
+- **High**: Address within 30 days (compliance issues)
+- **Medium**: Address within 90 days (best practice improvements)
+- **Low**: Monitor and improve (optimization opportunities)
+
+**Analysis Areas:**
+- Regulatory compliance gaps
+- Security framework deficiencies
+- Ethics policy weaknesses
+- Implementation inconsistencies
+
+**Strategic Recommendations:**
+- Specific policy language suggestions
+- Regulatory alignment guidance
+- Best practice implementation steps
+- Timeline for addressing gaps
+
+**Benefits:**
+- Proactive risk identification
+- Compliance assurance
+- Continuous improvement tracking
+- Evidence-based policy development
+
+Gap analysis helps organizations strengthen their AI and quantum governance before issues arise."""
+        
+        st.session_state.chat_messages.append({
+            'role': 'user',
+            'content': question
+        })
+        st.session_state.chat_messages.append({
+            'role': 'assistant',
+            'content': response
+        })
+        st.rerun()
+    else:
+        handle_user_message(question)
 
 def create_tooltip(text: str, tooltip_text: str, element_type: str = "general", element_name: str = "") -> str:
     """Create HTML tooltip for any text element."""
