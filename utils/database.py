@@ -90,7 +90,7 @@ class DatabaseManager:
                     'document_type': row['document_type'] or 'Report',
                     'source': row['source'] or '',
                     'author_organization': row.get('author_organization', 'Unknown'),
-                    'publish_date': row.get('publish_date'),
+                    'publish_date': str(row.get('publish_date')) if row.get('publish_date') else None,
                     'content_preview': row.get('content_preview', 'No preview available'),
                     'detected_region': row.get('detected_region', 'Unknown'),
                     'region_confidence': float(row.get('region_confidence', 0.0)) if row.get('region_confidence') else 0.0,
