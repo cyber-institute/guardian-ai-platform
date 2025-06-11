@@ -549,7 +549,7 @@ def main():
     with main_tab1:
         # Policy Repository with subtabs for Analyzer and Recommendations
         policy_subtab1, policy_subtab2, policy_subtab3 = st.tabs([
-            "Document Repository", 
+            "Repository", 
             "Policy Analyzer", 
             "Repository Insights"
         ])

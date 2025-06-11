@@ -372,7 +372,7 @@ Ready to explore? Ask me about any specific feature!"""
 - **About GUARDIAN**: System information and patent technology
 
 **Policy Repository Subtabs:**
-1. **Document Repository**: Browse and filter analyzed policies
+1. **Repository**: Browse and filter analyzed policies
 2. **Policy Analyzer**: Upload and analyze new documents
 3. **Repository Insights**: AI-powered learning and suggestions
 
