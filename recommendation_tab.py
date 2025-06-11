@@ -15,7 +15,7 @@ from utils.db import fetch_documents
 def render():
     """Render the GUARDIAN Repository Insights tab."""
     
-    st.markdown("# 🧠 **GUARDIAN Repository Insights**")
+    st.markdown("# **GUARDIAN Repository Insights**")
     st.markdown("---")
     
     st.markdown("""
@@ -27,10 +27,10 @@ def render():
     
     # Main recommendation interface
     tab1, tab2, tab3, tab4 = st.tabs([
-        "🎯 Smart Recommendations", 
-        "🔥 Trending Documents", 
-        "📊 Similarity Analysis",
-        "🔍 Context Discovery"
+        "Smart Recommendations", 
+        "Trending Documents", 
+        "Similarity Analysis",
+        "Context Discovery"
     ])
     
     with tab1:
@@ -48,7 +48,7 @@ def render():
 def render_smart_recommendations_tab():
     """Render smart recommendations interface."""
     
-    st.markdown("### 🎯 **Intelligent Document Recommendations**")
+    st.markdown("### **Intelligent Document Recommendations**")
     
     # Document selection for recommendations
     documents = fetch_documents()
@@ -77,10 +77,10 @@ def render_smart_recommendations_tab():
                 "Recommendation Method:",
                 ["comprehensive", "content", "scoring", "contextual"],
                 format_func=lambda x: {
-                    "comprehensive": "🎯 All Methods Combined",
-                    "content": "📝 Content Similarity",
-                    "scoring": "📊 Scoring Patterns", 
-                    "contextual": "🏢 Same Context"
+                    "comprehensive": "All Methods Combined",
+                    "content": "Content Similarity",
+                    "scoring": "Scoring Patterns", 
+                    "contextual": "Same Context"
                 }[x],
                 horizontal=True
             )
@@ -100,7 +100,7 @@ def render_smart_recommendations_tab():
 def render_trending_documents_tab():
     """Render trending documents interface."""
     
-    st.markdown("### 🔥 **Trending Documents by Framework**")
+    st.markdown("### **Trending Documents by Framework**")
     st.markdown("Documents with highest relevance scores in each assessment framework")
     
     render_trending_documents(max_count=10)
@@ -108,7 +108,7 @@ def render_trending_documents_tab():
 def render_similarity_analysis_tab():
     """Render similarity analysis interface."""
     
-    st.markdown("### 📊 **Document Similarity Analysis**")
+    st.markdown("### **Document Similarity Analysis**")
     
     documents = fetch_documents()
     if not documents:
@@ -131,7 +131,7 @@ def render_similarity_analysis_tab():
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("#### 📝 **Content Similarity**")
+            st.markdown("#### **Content Similarity**")
             st.markdown("*Based on text analysis and semantic matching*")
             
             with st.spinner("Analyzing content similarity..."):
@@ -153,7 +153,7 @@ def render_similarity_analysis_tab():
                     st.info("No content-similar documents found")
         
         with col2:
-            st.markdown("#### 📊 **Scoring Pattern Similarity**")
+            st.markdown("#### **Scoring Pattern Similarity**")
             st.markdown("*Based on patent framework scoring patterns*")
             
             with st.spinner("Analyzing scoring patterns..."):
@@ -177,7 +177,7 @@ def render_similarity_analysis_tab():
 def render_context_discovery_tab():
     """Render context-based discovery interface."""
     
-    st.markdown("### 🔍 **Context-Based Document Discovery**")
+    st.markdown("### **Context-Based Document Discovery**")
     st.markdown("Find documents by organizational context, document type, or framework focus")
     
     col1, col2, col3 = st.columns(3)
