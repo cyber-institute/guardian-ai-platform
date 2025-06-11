@@ -69,7 +69,7 @@ class DocumentScoringSystem:
                     ]
                     
                     if (any(pattern in title.upper() for pattern in protected_patterns) or
-                        doc_id in [10, 26, 29]):  # Specific document IDs to protect
+                        doc_id in [10, 26, 27, 28, 29]):  # Specific document IDs to protect
                         logger.info(f"Skipping document {doc_id} - manually corrected metadata")
                         continue
                     

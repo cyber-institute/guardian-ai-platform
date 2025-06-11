@@ -235,16 +235,30 @@ class EnhancedMetadataExtractor:
         
         for key, value in metadata.items():
             if isinstance(value, str):
-                # Remove HTML tags
-                cleaned_value = re.sub(r'<[^>]+>', '', str(value))
-                # Remove HTML entities
-                cleaned_value = re.sub(r'&[a-z]+;', '', cleaned_value)
-                # Remove excess whitespace
-                cleaned_value = re.sub(r'\s+', ' ', cleaned_value).strip()
-                # Remove specific artifacts
-                cleaned_value = cleaned_value.replace('</div>', '').replace('<div>', '')
+                # Remove all HTML tags and artifacts comprehensively
+                cleaned_value = str(value)
                 
-                cleaned[key] = cleaned_value if cleaned_value else "Unknown"
+                # Remove HTML tags
+                cleaned_value = re.sub(r'<[^>]*>', '', cleaned_value)
+                # Remove HTML entities
+                cleaned_value = re.sub(r'&[a-zA-Z0-9#]+;', '', cleaned_value)
+                # Remove div artifacts specifically
+                cleaned_value = re.sub(r'</div>|<div[^>]*>', '', cleaned_value)
+                # Remove span artifacts
+                cleaned_value = re.sub(r'</span>|<span[^>]*>', '', cleaned_value)
+                # Remove other common artifacts
+                cleaned_value = re.sub(r'</p>|<p[^>]*>', '', cleaned_value)
+                cleaned_value = re.sub(r'</td>|<td[^>]*>', '', cleaned_value)
+                cleaned_value = re.sub(r'</tr>|<tr[^>]*>', '', cleaned_value)
+                cleaned_value = re.sub(r'</table>|<table[^>]*>', '', cleaned_value)
+                
+                # Remove excess whitespace and normalize
+                cleaned_value = re.sub(r'\s+', ' ', cleaned_value).strip()
+                
+                # Remove leading/trailing punctuation artifacts
+                cleaned_value = re.sub(r'^[^\w]*|[^\w]*$', '', cleaned_value)
+                
+                cleaned[key] = cleaned_value if cleaned_value and len(cleaned_value) > 1 else "Unknown"
             else:
                 cleaned[key] = value
         
