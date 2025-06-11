@@ -64,7 +64,7 @@ def main():
     
     .quantum-header h1 {
         margin: 0 !important;
-        font-size: clamp(3.5rem, 10.5vw, 7.35rem) !important;
+        font-size: clamp(1.75rem, 5.25vw, 3.675rem) !important;
         font-weight: bold !important;
         font-family: Arial, sans-serif !important;
         letter-spacing: -0.02em !important;
