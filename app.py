@@ -702,8 +702,23 @@ def render_prototype_phased_plan_section():
 def render_phase_1_foundation():
     """Phase 1: Initial GUARDIAN Foundation - Proof of Concept from Patents and Dissertations"""
     
-    st.markdown("### Phase 1: Foundation & Proof of Concept")
-    st.markdown("*Building the initial GUARDIAN prototype from PhD dissertation research and patent applications*")
+    # Enhanced header matching Patent Technologies style
+    st.markdown(
+        """<div style="background: linear-gradient(135deg, #082454 0%, #10244D 50%, #133169 100%); padding: 2.5rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
+            <h1 style="color: white; margin-bottom: 1.2rem; font-size: 2.2rem; font-weight: 700; text-align: center;">
+                Phase 1: Foundation & Proof of Concept
+            </h1>
+            <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0; border: 1px solid rgba(255,255,255,0.2);">
+                <h3 style="color: #3D9BE9; margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600; text-align: center;">
+                    Building the Initial GUARDIAN Prototype
+                </h3>
+                <p style="color: #e5e7eb; text-align: center; font-size: 1.1rem; line-height: 1.6; margin: 0;">
+                    Transform PhD dissertation research and patent applications into a working governance platform with validated algorithms and real policy data processing capabilities.
+                </p>
+            </div>
+        </div>""", 
+        unsafe_allow_html=True
+    )
     
     # Project overview
     col1, col2 = st.columns([2, 1])
@@ -919,8 +934,23 @@ def render_phase_1_foundation():
 def render_phase_2_llm_integration():
     """Phase 2: LLM Integration and Formula Enhancement"""
     
-    st.markdown("### Phase 2: LLM Integration & Formula Enhancement")
-    st.markdown("*Extending GUARDIAN with intelligent LLM capabilities and performance optimization*")
+    # Enhanced header matching Patent Technologies style
+    st.markdown(
+        """<div style="background: linear-gradient(135deg, #082454 0%, #10244D 50%, #133169 100%); padding: 2.5rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
+            <h1 style="color: white; margin-bottom: 1.2rem; font-size: 2.2rem; font-weight: 700; text-align: center;">
+                Phase 2: LLM Integration & Formula Enhancement
+            </h1>
+            <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0; border: 1px solid rgba(255,255,255,0.2);">
+                <h3 style="color: #3D9BE9; margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600; text-align: center;">
+                    Extending GUARDIAN with Intelligent LLM Capabilities
+                </h3>
+                <p style="color: #e5e7eb; text-align: center; font-size: 1.1rem; line-height: 1.6; margin: 0;">
+                    Integrate free LLM services, optimize performance algorithms, and transition from synthetic to real-world policy data with enhanced processing capabilities.
+                </p>
+            </div>
+        </div>""", 
+        unsafe_allow_html=True
+    )
     
     # Phase overview
     col1, col2 = st.columns([2, 1])
@@ -1165,8 +1195,23 @@ def render_phase_2_llm_integration():
 def render_phase_3_multi_llm_ensemble():
     """Phase 3: Multi-LLM Ensemble System - Current Achievement"""
     
-    st.markdown("### Phase 3: Multi-LLM Ensemble System")
-    st.markdown("*Current Phase: Revolutionary concurrent processing and collective intelligence*")
+    # Enhanced header matching Patent Technologies style
+    st.markdown(
+        """<div style="background: linear-gradient(135deg, #082454 0%, #10244D 50%, #133169 100%); padding: 2.5rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
+            <h1 style="color: white; margin-bottom: 1.2rem; font-size: 2.2rem; font-weight: 700; text-align: center;">
+                Phase 3: Multi-LLM Ensemble System
+            </h1>
+            <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0; border: 1px solid rgba(255,255,255,0.2);">
+                <h3 style="color: #3D9BE9; margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600; text-align: center;">
+                    Revolutionary Concurrent Processing & Collective Intelligence
+                </h3>
+                <p style="color: #e5e7eb; text-align: center; font-size: 1.1rem; line-height: 1.6; margin: 0;">
+                    Multi-LLM ensemble system successfully implemented with concurrent processing framework operational in both parallel and daisy-chain modes.
+                </p>
+            </div>
+        </div>""", 
+        unsafe_allow_html=True
+    )
     
     # Achievement banner
     st.success("""
@@ -1448,8 +1493,23 @@ def render_phase_3_architecture():
 def render_phase_4_enterprise_scale():
     """Phase 4: Enterprise Scale with OpenAI Integration and Containerization"""
     
-    st.markdown("### Phase 4: Enterprise Scale & Mobile Integration")
-    st.markdown("*Future Phase: Premium APIs, containerization, and mobile real-time evaluation*")
+    # Enhanced header matching Patent Technologies style
+    st.markdown(
+        """<div style="background: linear-gradient(135deg, #082454 0%, #10244D 50%, #133169 100%); padding: 2.5rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
+            <h1 style="color: white; margin-bottom: 1.2rem; font-size: 2.2rem; font-weight: 700; text-align: center;">
+                Phase 4: Enterprise Scale & Mobile Integration
+            </h1>
+            <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0; border: 1px solid rgba(255,255,255,0.2);">
+                <h3 style="color: #3D9BE9; margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600; text-align: center;">
+                    Premium APIs, Containerization & Mobile Real-Time Evaluation
+                </h3>
+                <p style="color: #e5e7eb; text-align: center; font-size: 1.1rem; line-height: 1.6; margin: 0;">
+                    Scale GUARDIAN for enterprise deployment with commercial-grade LLM integration, containerized infrastructure, and mobile policy evaluation capabilities.
+                </p>
+            </div>
+        </div>""", 
+        unsafe_allow_html=True
+    )
     
     # Phase overview
     col1, col2 = st.columns([2, 1])
@@ -1729,8 +1789,23 @@ def render_phase_4_enterprise_scale():
 def render_phase_5_autonomous_platform():
     """Phase 5: Autonomous Platform with Comprehensive Data Lake"""
     
-    st.markdown("### Phase 5: Autonomous Policy Generation Platform")
-    st.markdown("*Ultimate Vision: Self-learning AI system with comprehensive policy generation capabilities*")
+    # Enhanced header matching Patent Technologies style
+    st.markdown(
+        """<div style="background: linear-gradient(135deg, #082454 0%, #10244D 50%, #133169 100%); padding: 2.5rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
+            <h1 style="color: white; margin-bottom: 1.2rem; font-size: 2.2rem; font-weight: 700; text-align: center;">
+                Phase 5: Autonomous Policy Generation Platform
+            </h1>
+            <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0; border: 1px solid rgba(255,255,255,0.2);">
+                <h3 style="color: #3D9BE9; margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600; text-align: center;">
+                    Self-Learning AI System with Comprehensive Policy Generation
+                </h3>
+                <p style="color: #e5e7eb; text-align: center; font-size: 1.1rem; line-height: 1.6; margin: 0;">
+                    Ultimate vision: Revolutionary autonomous platform with self-evolving policy generation, massive data lake integration, and predictive governance capabilities.
+                </p>
+            </div>
+        </div>""", 
+        unsafe_allow_html=True
+    )
     
     # Vision overview
     col1, col2 = st.columns([2, 1])
