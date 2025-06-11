@@ -52,7 +52,7 @@ def main():
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: clamp(0.5rem, 3vw, 1.5rem) !important;
+        gap: clamp(0.25rem, 2vw, 0.75rem) !important;
         flex-wrap: wrap !important;
     }
     
