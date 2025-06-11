@@ -62,7 +62,14 @@ class DocumentScoringSystem:
                         continue
                     
                     # Skip documents with manually corrected metadata
-                    if any(marker in title.upper() for marker in ['NASA', 'NIST', 'RESPONSIBLE AI PLAN']):
+                    protected_patterns = [
+                        'NASA', 'NIST', 'RESPONSIBLE AI PLAN', 
+                        'National Institute of Standards', 'ARTIFICIAL INTELLIGENCE RISK',
+                        'DIGITAL IDENTITY GUIDELINES'
+                    ]
+                    
+                    if (any(pattern in title.upper() for pattern in protected_patterns) or
+                        doc_id in [10, 26, 29]):  # Specific document IDs to protect
                         logger.info(f"Skipping document {doc_id} - manually corrected metadata")
                         continue
                     

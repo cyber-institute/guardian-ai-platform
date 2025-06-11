@@ -31,9 +31,20 @@ def update_document_metadata():
             if not content:
                 continue
             
-            # Skip documents with manually corrected metadata (NASA, NIST, etc.)
+            # Skip documents with manually corrected metadata
             current_title = doc.get('title', '')
-            if any(org in current_title.upper() for org in ['NASA', 'NIST', 'RESPONSIBLE AI PLAN']):
+            current_org = doc.get('author_organization', '')
+            
+            # Protected documents - never update these
+            protected_patterns = [
+                'NASA', 'NIST', 'RESPONSIBLE AI PLAN', 
+                'National Institute of Standards', 'ARTIFICIAL INTELLIGENCE RISK',
+                'DIGITAL IDENTITY GUIDELINES'
+            ]
+            
+            if (any(pattern in current_title.upper() for pattern in protected_patterns) or
+                any(pattern in current_org.upper() for pattern in protected_patterns) or
+                doc_id in [10, 26, 29]):  # Specific document IDs to protect
                 logger.info(f"Skipping document {doc_id} - manually corrected metadata")
                 continue
             
