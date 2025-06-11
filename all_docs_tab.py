@@ -142,15 +142,7 @@ def render():
         if 'cached_docs' in st.session_state:
             del st.session_state['cached_docs']
         
-        # Add refresh button for immediate data updates
-        col1, col2 = st.columns([6, 1])
-        with col2:
-            if st.button("🔄 Refresh", help="Get latest documents from database", key="refresh_docs"):
-                # Force complete cache clear
-                for key in list(st.session_state.keys()):
-                    if 'doc' in key.lower() or 'cache' in key.lower():
-                        del st.session_state[key]
-                st.rerun()
+
         
         # Fetch fresh documents directly from database with comprehensive HTML cleaning
         raw_docs = fetch_documents()
