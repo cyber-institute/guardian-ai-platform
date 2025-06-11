@@ -29,7 +29,14 @@ def clean_date_safely(doc):
     try:
         cleaned_date = ultra_clean_metadata(str(raw_date))
         if cleaned_date and cleaned_date != 'Unknown' and len(cleaned_date.strip()) >= 4:
-            return cleaned_date
+            # Format date properly if it looks like a date
+            date_str = cleaned_date.strip()
+            if len(date_str) == 10 and date_str.count('-') == 2:
+                return date_str  # Already in YYYY-MM-DD format
+            elif len(date_str) >= 4:
+                return date_str
+            else:
+                return 'Date not available'
         else:
             return 'Date not available'
     except:
@@ -495,6 +502,14 @@ def render_compact_cards(docs):
             # Calculate comprehensive scores
             scores = comprehensive_document_scoring(content, str(title))
             
+            # Properly escape all HTML content for compact cards
+            import html
+            
+            safe_title = html.escape(title)
+            safe_doc_type = html.escape(doc_type)
+            safe_author_org = html.escape(author_org)
+            safe_pub_date = html.escape(pub_date)
+            
             st.markdown(f"""
                 <div style='border:1px solid #e0e0e0;padding:12px;border-radius:8px;margin:4px;
                 background:linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
@@ -504,8 +519,8 @@ def render_compact_cards(docs):
                             {thumbnail_html.replace('width:120px;height:150px', 'width:60px;height:75px')}
                         </div>
                         <div style='flex:1;min-width:0'>
-                            <div style='font-weight:bold;font-size:12px;margin-bottom:4px;line-height:1.2'>{title[:32]}{'...' if len(title) > 32 else ''}</div>
-                            <div style='font-size:9px;color:#666;margin-bottom:6px'>{doc_type} • {author_org[:15]}{'...' if len(author_org) > 15 else ''}</div>
+                            <div style='font-weight:bold;font-size:12px;margin-bottom:4px;line-height:1.2'>{safe_title[:32]}{'...' if len(safe_title) > 32 else ''}</div>
+                            <div style='font-size:9px;color:#666;margin-bottom:6px'>{safe_doc_type} • {safe_author_org[:15]}{'...' if len(safe_author_org) > 15 else ''}</div>
                         </div>
                     </div>
                     <div style='font-size:8px;line-height:1.3;margin-bottom:6px'>
@@ -514,7 +529,7 @@ def render_compact_cards(docs):
                         <div>AI Ethics: {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics')}</div>
                         <div>Q Ethics: {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics')}</div>
                     </div>
-                    <div style='font-size:8px;color:#888'>{pub_date}</div>
+                    <div style='font-size:8px;color:#888'>{safe_pub_date if safe_pub_date != 'Date not available' else 'Date not available'}</div>
                 </div>
             """, unsafe_allow_html=True)
 
@@ -538,19 +553,28 @@ def render_grid_view(docs):
             # Calculate comprehensive scores
             scores = comprehensive_document_scoring(content, str(title))
             
+            # Properly escape all HTML content for grid view
+            import html
+            
+            safe_title = html.escape(title)
+            safe_doc_type = html.escape(doc_type)
+            safe_author_org = html.escape(author_org)
+            safe_pub_date = html.escape(pub_date)
+            safe_content_preview = html.escape(content_preview)
+            
             st.markdown(f"""
                 <div style='border:2px solid #f0f0f0;padding:12px;border-radius:8px;margin:6px;
                 background:white;box-shadow:0 2px 4px rgba(0,0,0,0.08);
                 border-left:4px solid #3B82F6'>
-                    <h4 style='margin:0 0 6px 0;font-size:15px'>{title[:40]}{'...' if len(title) > 40 else ''}</h4>
-                    <div style='font-size:10px;color:#666;margin-bottom:8px'>{doc_type} • {author_org} • {pub_date}</div>
+                    <h4 style='margin:0 0 6px 0;font-size:15px'>{safe_title[:40]}{'...' if len(safe_title) > 40 else ''}</h4>
+                    <div style='font-size:10px;color:#666;margin-bottom:8px'>{safe_doc_type} • {safe_author_org} • {safe_pub_date}</div>
                     <div style='display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px;font-size:10px'>
                         <div>AI Cyber: {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity')}</div>
                         <div>Q Cyber: {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity')}</div>
                         <div>AI Ethics: {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics')}</div>
                         <div>Q Ethics: {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics')}</div>
                     </div>
-                    <p style='font-size:11px;color:#666;margin:0'>{content_preview[:120]}{'...' if len(content_preview) > 120 else ''}</p>
+                    <p style='font-size:11px;color:#666;margin:0'>{safe_content_preview[:120]}{'...' if len(safe_content_preview) > 120 else ''}</p>
                 </div>
             """, unsafe_allow_html=True)
 
@@ -656,16 +680,25 @@ def render_card_view(docs):
             content_preview = ultra_clean_metadata(doc.get('content_preview', 'No preview available') or 'No preview available')
             
             # Display metadata card without thumbnail (Card View)
+            import html
+            
+            # Properly escape all HTML content
+            safe_title = html.escape(title)
+            safe_doc_type = html.escape(doc_type)
+            safe_author_org = html.escape(author_org)
+            safe_pub_date = html.escape(pub_date)
+            safe_topic = html.escape(ultra_clean_metadata(doc.get('topic', 'General')))
+            
             st.markdown(f"""
                 <div style='border:1px solid #ddd;padding:20px;border-radius:12px;margin:8px;
                 background:white;box-shadow:0 4px 6px rgba(0,0,0,0.1);
                 transition:transform 0.2s ease;border-left:5px solid #3B82F6'>
-                    <h3 style='margin:0 0 12px 0;color:#333;line-height:1.3'>{title}</h3>
+                    <h3 style='margin:0 0 12px 0;color:#333;line-height:1.3'>{safe_title}</h3>
                     <div style='margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap'>
-                        <span style='background:#e8f5e8;padding:4px 10px;border-radius:12px;font-size:12px;color:#2e7d32'>{ultra_clean_metadata(doc.get('topic', 'General'))}</span>
-                        <span style='background:#f0f0f0;padding:4px 10px;border-radius:12px;font-size:12px'>{doc_type}</span>
-                        <span style='background:#e0f2fe;padding:4px 10px;border-radius:12px;font-size:12px;color:#0277bd'>{author_org}</span>
-                        {f"<span style='background:#f3e5f5;padding:4px 10px;border-radius:12px;font-size:12px;color:#7b1fa2'>{pub_date}</span>" if pub_date and pub_date != 'Date not available' else ""}
+                        <span style='background:#e8f5e8;padding:4px 10px;border-radius:12px;font-size:12px;color:#2e7d32'>{safe_topic}</span>
+                        <span style='background:#f0f0f0;padding:4px 10px;border-radius:12px;font-size:12px'>{safe_doc_type}</span>
+                        <span style='background:#e0f2fe;padding:4px 10px;border-radius:12px;font-size:12px;color:#0277bd'>{safe_author_org}</span>
+                        {f"<span style='background:#f3e5f5;padding:4px 10px;border-radius:12px;font-size:12px;color:#7b1fa2'>{safe_pub_date}</span>" if pub_date and pub_date != 'Date not available' else "<span style='background:#ffeaa7;padding:4px 10px;border-radius:12px;font-size:12px;color:#636e72'>Date not available</span>"}
                     </div>
                 </div>
             """, unsafe_allow_html=True)
