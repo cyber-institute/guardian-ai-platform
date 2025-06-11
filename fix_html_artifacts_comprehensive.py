@@ -28,12 +28,18 @@ def comprehensive_metadata_cleanup():
         print(f"Processing {len(documents)} documents with Multi-LLM metadata extraction...")
         
         updated_count = 0
-        for doc_id, content, filename in documents:
+        for doc_id, content, title in documents:
             if content:
                 print(f"Processing document {doc_id}...")
                 
-                # Extract clean metadata using Multi-LLM system
-                clean_metadata = extract_clean_metadata(content, filename or "")
+                # Extract clean metadata using HTML artifact interceptor
+                from utils.html_artifact_interceptor import clean_field
+                
+                # Clean existing metadata directly
+                clean_title = clean_field(title or 'Unknown')
+                clean_org = clean_field('Unknown')  # Will be extracted from content if needed
+                clean_date = None  # Will be extracted if needed
+                clean_type = clean_field('Document')
                 
                 # Update document with clean metadata
                 cursor.execute("""
