@@ -11,8 +11,13 @@ import aiohttp
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 from openai import OpenAI
-import anthropic
-from anthropic import Anthropic
+# Anthropic import made optional to prevent deployment issues
+try:
+    import anthropic
+    from anthropic import Anthropic
+    ANTHROPIC_AVAILABLE = True
+except ImportError:
+    ANTHROPIC_AVAILABLE = False
 
 @dataclass
 class KnowledgeSource:
@@ -40,10 +45,15 @@ class LLMIntelligenceEnhancer:
         api_key = os.environ.get("OPENAI_API_KEY")
         return OpenAI(api_key=api_key) if api_key else None
     
-    def _init_anthropic(self) -> Optional[Anthropic]:
+    def _init_anthropic(self) -> Optional[Any]:
         """Initialize Anthropic client if available"""
-        api_key = os.environ.get("ANTHROPIC_API_KEY")
-        return Anthropic(api_key=api_key) if api_key else None
+        if not ANTHROPIC_AVAILABLE:
+            return None
+        try:
+            api_key = os.environ.get("ANTHROPIC_API_KEY")
+            return Anthropic(api_key=api_key) if api_key else None
+        except:
+            return None
     
     def _configure_knowledge_sources(self) -> List[KnowledgeSource]:
         """Configure external knowledge sources for AI/Quantum intelligence"""
