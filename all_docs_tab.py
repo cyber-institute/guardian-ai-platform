@@ -607,7 +607,8 @@ def render_minimal_list(docs):
         col1, col2 = st.columns([3, 2])
         with col1:
             st.markdown(f"**{title}**")
-            st.caption(f"{doc_type} • {author_org} • {pub_date}")
+            topic = ultra_clean_metadata(doc.get('topic', 'General'))
+            st.caption(f"{topic} • {doc_type} • {author_org} • {pub_date}")
         with col2:
             # Display all four scores in compact format
             st.markdown(f"""
@@ -661,6 +662,7 @@ def render_card_view(docs):
                 transition:transform 0.2s ease;border-left:5px solid #3B82F6'>
                     <h3 style='margin:0 0 12px 0;color:#333;line-height:1.3'>{title}</h3>
                     <div style='margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap'>
+                        <span style='background:#e8f5e8;padding:4px 10px;border-radius:12px;font-size:12px;color:#2e7d32'>{ultra_clean_metadata(doc.get('topic', 'General'))}</span>
                         <span style='background:#f0f0f0;padding:4px 10px;border-radius:12px;font-size:12px'>{doc_type}</span>
                         <span style='background:#e0f2fe;padding:4px 10px;border-radius:12px;font-size:12px;color:#0277bd'>{author_org}</span>
                         {f"<span style='background:#f3e5f5;padding:4px 10px;border-radius:12px;font-size:12px;color:#7b1fa2'>{pub_date}</span>" if pub_date and pub_date != 'Date not available' else ""}
