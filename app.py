@@ -296,47 +296,12 @@ def main():
     </style>
     """, unsafe_allow_html=True)
     
+    # Apply adaptive color theme
+    from components.color_palette_selector import apply_current_theme
+    apply_current_theme()
+    
     # Main header - responsive design
     st.markdown("""
-    <style>
-    .guardian-title {
-        margin: 0 0 1rem 0;
-        font-weight: bold;
-        font-family: Arial, sans-serif;
-        letter-spacing: -0.02em;
-        color: #B91C2C;
-        font-size: clamp(2rem, 8vw, 5.6rem);
-    }
-    
-    /* Mobile phones (portrait) */
-    @media (max-width: 480px) {
-        .guardian-title {
-            font-size: 2.5rem;
-        }
-    }
-    
-    /* Mobile phones (landscape) and small tablets */
-    @media (min-width: 481px) and (max-width: 768px) {
-        .guardian-title {
-            font-size: 3.5rem;
-        }
-    }
-    
-    /* Tablets and small desktops */
-    @media (min-width: 769px) and (max-width: 1024px) {
-        .guardian-title {
-            font-size: 4.5rem;
-        }
-    }
-    
-    /* Large desktops */
-    @media (min-width: 1025px) {
-        .guardian-title {
-            font-size: 5.6rem;
-        }
-    }
-    </style>
-    
     <div style="text-align: center; margin-bottom: 2rem;">
         <h1 class="guardian-title">GUARDIAN</h1>
     </div>
@@ -749,6 +714,12 @@ def main():
         
         st.markdown("---")
         show_chatbot_capabilities()
+        
+        st.markdown("---")
+        
+        # Adaptive Color Palette Selector
+        from components.color_palette_selector import render_color_palette_selector
+        render_color_palette_selector()
         
         st.markdown("---")
         
