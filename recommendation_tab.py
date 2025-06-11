@@ -236,7 +236,7 @@ def render_context_discovery_tab():
             )
             
             if contextual_docs:
-                st.markdown(f"### 📋 **Found {len(contextual_docs)} Relevant Documents**")
+                st.markdown(f"### **Found {len(contextual_docs)} Relevant Documents**")
                 
                 # Display as cards
                 recommendations = [
@@ -251,7 +251,7 @@ def render_context_discovery_tab():
 def render_recommendation_analytics():
     """Render analytics about recommendation system performance."""
     
-    st.markdown("### 📈 **Recommendation System Analytics**")
+    st.markdown("### **Recommendation System Analytics**")
     
     with st.spinner("Generating analytics..."):
         # Get basic statistics
