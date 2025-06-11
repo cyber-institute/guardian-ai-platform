@@ -276,22 +276,33 @@ def comprehensive_document_scoring(text: str, title: str) -> Dict[str, Optional[
         initialization_result = asyncio.run(multi_llm_ensemble.initialize_services())
         
         if initialization_result.get('total_services', 0) > 0:
-            ensemble_result = asyncio.run(
-                multi_llm_ensemble.evaluate_policy_concurrent(
-                    document_content=text,
-                    evaluation_domain="comprehensive_scoring",
-                    use_daisy_chain=False
-                )
-            )
+            # Map domain to individual scoring frameworks
+            domains = ['ai_cybersecurity', 'quantum_cybersecurity', 'ai_ethics', 'quantum_ethics']
+            ensemble_scores = {}
             
-            if ensemble_result and hasattr(ensemble_result, 'consensus_score'):
-                scores = ensemble_result.consensus_score
-                return {
-                    'ai_cybersecurity': scores.get('ai_cybersecurity'),
-                    'quantum_cybersecurity': scores.get('quantum_cybersecurity'), 
-                    'ai_ethics': scores.get('ai_ethics'),
-                    'quantum_ethics': scores.get('quantum_ethics')
-                }
+            for domain in domains:
+                try:
+                    ensemble_result = asyncio.run(
+                        multi_llm_ensemble.evaluate_policy_concurrent(
+                            document_content=text,
+                            evaluation_domain=domain,
+                            use_daisy_chain=False
+                        )
+                    )
+                    
+                    if ensemble_result and hasattr(ensemble_result, 'consensus_score'):
+                        score = ensemble_result.consensus_score.get('consensus_score', None)
+                        # Convert quantum_cybersecurity from 0-100 to 1-5 scale
+                        if domain == 'quantum_cybersecurity' and score is not None:
+                            score = max(1, min(5, int((score / 100) * 5) + 1))
+                        ensemble_scores[domain] = score
+                    else:
+                        ensemble_scores[domain] = None
+                except:
+                    ensemble_scores[domain] = None
+            
+            if any(score is not None for score in ensemble_scores.values()):
+                return ensemble_scores
         
         # Fallback to enhanced OpenAI analysis
         return enhanced_scoring_with_llm_insights(text, title)
@@ -303,46 +314,96 @@ def comprehensive_document_scoring(text: str, title: str) -> Dict[str, Optional[
 
 def enhanced_scoring_with_llm_insights(text: str, title: str) -> Dict[str, Optional[int]]:
     """
-    Enhanced scoring that leverages LLM analysis patterns for more accurate assessment.
+    Enhanced scoring that leverages intelligent pattern analysis for more accurate assessment.
     """
-    try:
-        # Import OpenAI for enhanced analysis
-        import os
-        from openai import OpenAI
+    # Enhanced pattern-based scoring with improved logic
+    text_lower = text.lower()
+    title_lower = title.lower()
+    combined_content = f"{title_lower} {text_lower}"
+    
+    scores = {}
+    
+    # AI Cybersecurity Maturity (0-100)
+    ai_cyber_keywords = [
+        'ai security', 'machine learning security', 'artificial intelligence security',
+        'ai threat', 'ai vulnerability', 'ai attack', 'adversarial', 'model security',
+        'ai governance', 'ai compliance', 'ai audit', 'ai monitoring', 'ai risk',
+        'secure ai', 'ai authentication', 'ai encryption', 'ai privacy'
+    ]
+    
+    ai_cyber_score = 0
+    for keyword in ai_cyber_keywords:
+        if keyword in combined_content:
+            ai_cyber_score += 15
+            
+    # Additional context scoring
+    if any(term in combined_content for term in ['cybersecurity', 'cyber security', 'information security']):
+        if any(term in combined_content for term in ['ai', 'artificial intelligence', 'machine learning']):
+            ai_cyber_score += 25
+    
+    scores['ai_cybersecurity'] = min(100, ai_cyber_score) if ai_cyber_score > 0 else None
+    
+    # Quantum Cybersecurity Maturity (1-5)
+    quantum_cyber_keywords = [
+        'quantum cryptography', 'quantum security', 'post-quantum', 'quantum-safe',
+        'quantum key distribution', 'quantum resistant', 'quantum computing threat',
+        'quantum encryption', 'lattice cryptography', 'quantum supremacy'
+    ]
+    
+    quantum_cyber_matches = sum(1 for keyword in quantum_cyber_keywords if keyword in combined_content)
+    
+    if quantum_cyber_matches >= 4:
+        quantum_cyber_score = 5
+    elif quantum_cyber_matches >= 3:
+        quantum_cyber_score = 4
+    elif quantum_cyber_matches >= 2:
+        quantum_cyber_score = 3
+    elif quantum_cyber_matches >= 1:
+        quantum_cyber_score = 2
+    else:
+        quantum_cyber_score = None
         
-        client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-        
-        # Create comprehensive analysis prompt
-        prompt = f"""
-        Analyze this document for AI and quantum technology maturity across four frameworks:
-
-        Title: {title}
-        Content: {text[:2000]}...
-
-        Provide scores for:
-        1. AI Cybersecurity Maturity (0-100): Security practices for AI systems
-        2. Quantum Cybersecurity Maturity (1-5): Quantum-safe cryptography readiness  
-        3. AI Ethics Score (0-100): Ethical AI implementation and governance
-        4. Quantum Ethics Score (0-100): Ethical quantum technology considerations
-
-        Return only a JSON object with numeric scores, or null if not applicable:
-        {{"ai_cybersecurity": 45, "quantum_cybersecurity": 2, "ai_ethics": 67, "quantum_ethics": null}}
-        """
-        
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[{"role": "user", "content": prompt}],
-            response_format={"type": "json_object"},
-            max_tokens=200
-        )
-        
-        import json
-        scores = json.loads(response.choices[0].message.content)
-        return scores
-        
-    except Exception as e:
-        print(f"Enhanced LLM scoring failed: {e}")
-        return fallback_scoring(text, title)
+    scores['quantum_cybersecurity'] = quantum_cyber_score
+    
+    # AI Ethics Score (0-100)
+    ai_ethics_keywords = [
+        'ai ethics', 'algorithmic bias', 'fairness', 'transparency', 'explainable ai',
+        'responsible ai', 'ai accountability', 'ethical ai', 'ai governance',
+        'bias mitigation', 'algorithmic fairness', 'ai transparency', 'trustworthy ai'
+    ]
+    
+    ai_ethics_score = 0
+    for keyword in ai_ethics_keywords:
+        if keyword in combined_content:
+            ai_ethics_score += 12
+            
+    # Boost for comprehensive ethical considerations
+    if any(term in combined_content for term in ['ethics', 'ethical', 'bias', 'fairness']):
+        if any(term in combined_content for term in ['ai', 'artificial intelligence', 'algorithm']):
+            ai_ethics_score += 20
+    
+    scores['ai_ethics'] = min(100, ai_ethics_score) if ai_ethics_score > 0 else None
+    
+    # Quantum Ethics Score (0-100)
+    quantum_ethics_keywords = [
+        'quantum ethics', 'quantum advantage ethics', 'quantum privacy',
+        'quantum equity', 'quantum access', 'quantum responsibility',
+        'quantum computing ethics', 'quantum fairness'
+    ]
+    
+    quantum_ethics_score = 0
+    for keyword in quantum_ethics_keywords:
+        if keyword in combined_content:
+            quantum_ethics_score += 20
+            
+    # General quantum considerations
+    if any(term in combined_content for term in ['quantum', 'quantum computing']):
+        if any(term in combined_content for term in ['ethics', 'ethical', 'responsibility', 'access']):
+            quantum_ethics_score += 30
+    
+    scores['quantum_ethics'] = min(100, quantum_ethics_score) if quantum_ethics_score > 0 else None
+    
+    return scores
 
 def fallback_scoring(text: str, title: str) -> Dict[str, Optional[int]]:
     """

@@ -38,23 +38,25 @@ def rescore_documents_with_multi_llm():
         
         print(f"  New scores: {scores}")
         
-        # Update database with new scores
+        # Update database with new scores using direct SQL execution
+        from utils.database import db_manager
+        
         update_query = """
         UPDATE documents 
-        SET ai_cybersecurity_score = %(ai_cyber)s,
-            quantum_cybersecurity_score = %(quantum_cyber)s,
-            ai_ethics_score = %(ai_ethics)s,
-            quantum_ethics_score = %(quantum_ethics)s
-        WHERE id = %(doc_id)s
+        SET ai_cybersecurity_score = %s,
+            quantum_cybersecurity_score = %s,
+            ai_ethics_score = %s,
+            quantum_ethics_score = %s
+        WHERE id = %s
         """
         
-        result = db_manager.execute_query(update_query, {
-            'ai_cyber': scores.get('ai_cybersecurity'),
-            'quantum_cyber': scores.get('quantum_cybersecurity'),
-            'ai_ethics': scores.get('ai_ethics'),
-            'quantum_ethics': scores.get('quantum_ethics'),
-            'doc_id': doc['id']
-        })
+        result = db_manager.execute_query(update_query, (
+            scores.get('ai_cybersecurity'),
+            scores.get('quantum_cybersecurity'),
+            scores.get('ai_ethics'),
+            scores.get('quantum_ethics'),
+            doc['id']
+        ))
         
         if result:
             print(f"  Updated database successfully")
