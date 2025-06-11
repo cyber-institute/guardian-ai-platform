@@ -152,12 +152,23 @@ def render():
                         del st.session_state[key]
                 st.rerun()
         
-        # Fetch fresh documents directly from database
-        all_docs = fetch_documents()
-        if not all_docs:
+        # Fetch fresh documents directly from database with comprehensive HTML cleaning
+        raw_docs = fetch_documents()
+        if not raw_docs:
             st.info("No documents found in the database. Please upload some documents first.")
             return
             
+        # Apply ultra-aggressive HTML artifact cleaning to all document fields
+        all_docs = []
+        for doc in raw_docs:
+            cleaned_doc = {}
+            for key, value in doc.items():
+                if isinstance(value, str):
+                    cleaned_doc[key] = clean_field(value)
+                else:
+                    cleaned_doc[key] = value
+            all_docs.append(cleaned_doc)
+        
         # Clean all documents and force fresh metadata analysis
         all_docs = [clean_document_content(doc) for doc in all_docs]
         # Force regeneration of all metadata with enhanced cleaning
