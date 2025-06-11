@@ -262,20 +262,86 @@ def score_quantum_ethics(text: str, title: str) -> Optional[int]:
 
 def comprehensive_document_scoring(text: str, title: str) -> Dict[str, Optional[int]]:
     """
-    Perform comprehensive scoring across all four frameworks.
+    Perform comprehensive scoring across all four frameworks using Multi-LLM analysis.
     
     Returns:
         Dict with scores for each framework or None if not applicable
     """
     try:
-        return {
-            'ai_cybersecurity': score_ai_cybersecurity_maturity(text, title),
-            'quantum_cybersecurity': score_quantum_cybersecurity_maturity(text, title),
-            'ai_ethics': score_ai_ethics(text, title),
-            'quantum_ethics': score_quantum_ethics(text, title)
-        }
-    except Exception:
+        # First try Multi-LLM intelligent analysis
+        import asyncio
+        from utils.multi_llm_ensemble import multi_llm_ensemble
+        
+        # Initialize and run Multi-LLM ensemble analysis
+        initialization_result = asyncio.run(multi_llm_ensemble.initialize_services())
+        
+        if initialization_result.get('total_services', 0) > 0:
+            ensemble_result = asyncio.run(
+                multi_llm_ensemble.evaluate_policy_concurrent(
+                    document_content=text,
+                    evaluation_domain="comprehensive_scoring",
+                    use_daisy_chain=False
+                )
+            )
+            
+            if ensemble_result and hasattr(ensemble_result, 'consensus_score'):
+                scores = ensemble_result.consensus_score
+                return {
+                    'ai_cybersecurity': scores.get('ai_cybersecurity'),
+                    'quantum_cybersecurity': scores.get('quantum_cybersecurity'), 
+                    'ai_ethics': scores.get('ai_ethics'),
+                    'quantum_ethics': scores.get('quantum_ethics')
+                }
+        
+        # Fallback to enhanced OpenAI analysis
+        return enhanced_scoring_with_llm_insights(text, title)
+            
+    except Exception as e:
+        print(f"Multi-LLM scoring failed, using fallback: {e}")
         # Fallback to pattern-based scoring when API fails
+        return fallback_scoring(text, title)
+
+def enhanced_scoring_with_llm_insights(text: str, title: str) -> Dict[str, Optional[int]]:
+    """
+    Enhanced scoring that leverages LLM analysis patterns for more accurate assessment.
+    """
+    try:
+        # Import OpenAI for enhanced analysis
+        import os
+        from openai import OpenAI
+        
+        client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        
+        # Create comprehensive analysis prompt
+        prompt = f"""
+        Analyze this document for AI and quantum technology maturity across four frameworks:
+
+        Title: {title}
+        Content: {text[:2000]}...
+
+        Provide scores for:
+        1. AI Cybersecurity Maturity (0-100): Security practices for AI systems
+        2. Quantum Cybersecurity Maturity (1-5): Quantum-safe cryptography readiness  
+        3. AI Ethics Score (0-100): Ethical AI implementation and governance
+        4. Quantum Ethics Score (0-100): Ethical quantum technology considerations
+
+        Return only a JSON object with numeric scores, or null if not applicable:
+        {{"ai_cybersecurity": 45, "quantum_cybersecurity": 2, "ai_ethics": 67, "quantum_ethics": null}}
+        """
+        
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "user", "content": prompt}],
+            response_format={"type": "json_object"},
+            max_tokens=200
+        )
+        
+        import json
+        scores = json.loads(response.choices[0].message.content)
+        return scores
+        
+    except Exception as e:
+        print(f"Enhanced LLM scoring failed: {e}")
         return fallback_scoring(text, title)
 
 def fallback_scoring(text: str, title: str) -> Dict[str, Optional[int]]:
