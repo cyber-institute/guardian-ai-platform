@@ -22,9 +22,9 @@ def render():
             System for Real-Time Dynamic Governance of Emerging Technologies based on three patent pending technologies:
         </p>
         <ul style="font-size: 0.95rem; line-height: 1.4; color: #4b5563; margin: 0.8rem 0 0 1.2rem; padding-left: 0;">
-            <li><strong>AI Policy Assessment Framework:</strong> Provides comprehensive gap analysis and reinforcement learning algorithms for policy evaluation that enable continuous improvement of governance frameworks through machine learning feedback loops.</li>
-            <li><strong>Quantum Cybersecurity Maturity Evaluation (QCMEA):</strong> Delivers quantum-specific risk assessment capabilities through a 5-tier scoring system that addresses the unique security challenges posed by quantum computing technologies.</li>
-            <li><strong>Dynamic Risk Scoring Engine:</strong> Implements real-time adaptive risk calculations using Bayesian inference and mathematical formulations that automatically adjust governance recommendations based on emerging threat landscapes.</li>
+            <li><strong>AI-Powered Policy Evaluation and Ethical Compliance System</strong> (Patent Application 19/045,526): Provides comprehensive gap analysis and reinforcement learning algorithms for policy evaluation that enable continuous improvement of governance frameworks through machine learning feedback loops.</li>
+            <li><strong>Quantum Cybersecurity Framework for Policy Assessment and Maturity Evaluation</strong> (Patent Application 19/004,435): Delivers quantum-specific risk assessment capabilities through a 5-tier scoring system that addresses the unique security challenges posed by quantum computing technologies.</li>
+            <li><strong>System for Real-Time Dynamic Governance of Emerging Technologies</strong> (Patent Application 19/204,583): Implements real-time adaptive risk calculations using Bayesian inference and mathematical formulations that automatically adjust governance recommendations based on emerging threat landscapes.</li>
         </ul>
         <p style="font-size: 0.9rem; line-height: 1.4; color: #6b7280; margin: 0.8rem 0 0 0; font-style: italic;">
             This integrated approach creates the first comprehensive governance platform capable of dynamically adapting to emerging technology risks in real-time, filling a critical gap in existing regulatory frameworks.
