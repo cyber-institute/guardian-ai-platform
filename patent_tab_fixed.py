@@ -19,7 +19,15 @@ def render():
     <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #B91C2C;">
         <h2 style="color: #B91C2C; margin-bottom: 0.8rem; font-size: 1.6rem;">GUARDIAN Patent Application Overview</h2>
         <p style="font-size: 1rem; line-height: 1.5; color: #374151; margin: 0;">
-            System for Real-Time Dynamic Governance of Emerging Technologies - Nonprovisional Utility Patent Application for Advanced AI Risk Assessment Framework
+            System for Real-Time Dynamic Governance of Emerging Technologies based on three patent pending technologies:
+        </p>
+        <ul style="font-size: 0.95rem; line-height: 1.4; color: #4b5563; margin: 0.8rem 0 0 1.2rem; padding-left: 0;">
+            <li><strong>AI Policy Assessment Framework:</strong> Provides comprehensive gap analysis and reinforcement learning algorithms for policy evaluation that enable continuous improvement of governance frameworks through machine learning feedback loops.</li>
+            <li><strong>Quantum Cybersecurity Maturity Evaluation (QCMEA):</strong> Delivers quantum-specific risk assessment capabilities through a 5-tier scoring system that addresses the unique security challenges posed by quantum computing technologies.</li>
+            <li><strong>Dynamic Risk Scoring Engine:</strong> Implements real-time adaptive risk calculations using Bayesian inference and mathematical formulations that automatically adjust governance recommendations based on emerging threat landscapes.</li>
+        </ul>
+        <p style="font-size: 0.9rem; line-height: 1.4; color: #6b7280; margin: 0.8rem 0 0 0; font-style: italic;">
+            This integrated approach creates the first comprehensive governance platform capable of dynamically adapting to emerging technology risks in real-time, filling a critical gap in existing regulatory frameworks.
         </p>
     </div>
     """, unsafe_allow_html=True)
