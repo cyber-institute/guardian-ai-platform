@@ -17,23 +17,53 @@ def ultra_clean_metadata(field_value):
         return 'Unknown'
     
     text = str(field_value)
-    # Remove all HTML tags and fragments
-    text = re.sub(r'<[^>]*>', '', text)
-    text = re.sub(r'</[^>]*>', '', text)
-    text = re.sub(r'<[^>]*', '', text)
-    text = re.sub(r'[^>]*>', '', text)
     
-    # Remove HTML entities
+    # First pass: Remove complete HTML tags
+    text = re.sub(r'<[^>]+>', '', text)
+    
+    # Second pass: Remove broken HTML tags and fragments
+    text = re.sub(r'<[^>]*$', '', text)  # Remove incomplete opening tags
+    text = re.sub(r'^[^<]*>', '', text)  # Remove incomplete closing tags
+    text = re.sub(r'</[^>]*>', '', text)  # Remove any remaining closing tags
+    text = re.sub(r'<[^>]*', '', text)   # Remove any remaining opening tag fragments
+    
+    # Third pass: Remove HTML entities
     text = re.sub(r'&[#a-zA-Z0-9]+;?', '', text)
     
-    # Remove common HTML artifacts that slip through
-    artifacts = ['</div>', '<div', '</span>', '<span', '</p>', '<p', 'style=', 'class=', 'id=']
-    for artifact in artifacts:
-        text = text.replace(artifact, '')
+    # Fourth pass: Remove specific HTML artifacts that commonly leak through
+    html_artifacts = [
+        '</div>', '<div>', '<div', '</span>', '<span>', '<span',
+        '</p>', '<p>', '<p', '</h1>', '<h1>', '</h2>', '<h2>',
+        '</h3>', '<h3>', '</h4>', '<h4>', '</h5>', '<h5>',
+        '</strong>', '<strong>', '</em>', '<em>', '</b>', '<b>',
+        '</i>', '<i>', '</u>', '<u>', '</br>', '<br>', '<br/>',
+        'style=', 'class=', 'id=', 'href=', 'src=', 'alt=',
+        '&nbsp;', '&amp;', '&lt;', '&gt;', '&quot;', '&#39;'
+    ]
     
-    # Clean up whitespace
+    for artifact in html_artifacts:
+        text = text.replace(artifact, ' ')
+    
+    # Fifth pass: Clean up any remaining angle brackets and quotes
+    text = re.sub(r'[<>]', '', text)
+    text = re.sub(r'["\']', '', text)
+    
+    # Sixth pass: Remove any remaining attribute-like patterns
+    text = re.sub(r'\w+\s*=\s*["\'][^"\']*["\']', '', text)
+    text = re.sub(r'\w+\s*=\s*\w+', '', text)
+    
+    # Final cleanup: normalize whitespace and validate result
     text = ' '.join(text.split()).strip()
-    return text if text else 'Unknown'
+    
+    # If result is empty, too short, or contains suspicious patterns, return Unknown
+    if not text or len(text) < 2 or text.isspace():
+        return 'Unknown'
+    
+    # Check for remaining HTML-like patterns
+    if re.search(r'[<>]|&\w+;?|\w+=', text):
+        return 'Unknown'
+    
+    return text
 
 def get_comprehensive_badge(score, framework):
     """Create badge for comprehensive scoring system with intelligent tooltips."""

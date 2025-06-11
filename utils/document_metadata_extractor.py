@@ -488,9 +488,59 @@ def clean_organization_name(text: str) -> str:
     text = re.sub(r'(?i)( and associates| inc\.?| corp\.?| llc)$', '', text)
     return text.strip()
 
+def clean_date_metadata(date_value) -> Optional[str]:
+    """Comprehensive date field cleaning to remove HTML artifacts."""
+    if not date_value:
+        return None
+    
+    text = str(date_value)
+    
+    # Remove all HTML tags and fragments
+    text = re.sub(r'<[^>]+>', '', text)
+    text = re.sub(r'</[^>]*>', '', text)
+    text = re.sub(r'<[^>]*', '', text)
+    text = re.sub(r'[^<]*>', '', text)
+    
+    # Remove HTML entities
+    text = re.sub(r'&[#a-zA-Z0-9]+;?', '', text)
+    
+    # Remove common HTML artifacts
+    html_artifacts = [
+        '</div>', '<div>', '<div', '</span>', '<span>', '<span',
+        '</p>', '<p>', '<p', 'style=', 'class=', 'id=', 'href=',
+        '&nbsp;', '&amp;', '&lt;', '&gt;', '&quot;', '&#39;'
+    ]
+    
+    for artifact in html_artifacts:
+        text = text.replace(artifact, ' ')
+    
+    # Remove angle brackets and quotes
+    text = re.sub(r'[<>"\']', '', text)
+    
+    # Remove attribute patterns
+    text = re.sub(r'\w+\s*=\s*["\'][^"\']*["\']', '', text)
+    text = re.sub(r'\w+\s*=\s*\w+', '', text)
+    
+    # Normalize whitespace
+    text = ' '.join(text.split()).strip()
+    
+    # Validate result
+    if not text or len(text) < 3 or re.search(r'[<>]|&\w+;?|\w+=', text):
+        return None
+    
+    return text
+
 def normalize_date(date_str: str) -> Optional[str]:
-    """Normalize date string to YYYY-MM-DD format."""
-    date_str = date_str.strip()
+    """Normalize date string to YYYY-MM-DD format with HTML cleaning."""
+    if not date_str:
+        return None
+    
+    # Clean HTML artifacts first
+    clean_date = clean_date_metadata(date_str)
+    if not clean_date:
+        return None
+    
+    clean_date = clean_date.strip()
     
     # Try different date formats
     formats = [
@@ -506,10 +556,10 @@ def normalize_date(date_str: str) -> Optional[str]:
         try:
             if fmt.endswith('%Y') and not fmt.endswith('%d, %Y'):
                 # Month-year format, assume day 1
-                dt = datetime.strptime(date_str, fmt)
+                dt = datetime.strptime(clean_date, fmt)
                 return dt.strftime('%Y-%m-01')
             else:
-                dt = datetime.strptime(date_str, fmt)
+                dt = datetime.strptime(clean_date, fmt)
                 return dt.strftime('%Y-%m-%d')
         except ValueError:
             continue
