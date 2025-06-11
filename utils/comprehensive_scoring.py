@@ -374,10 +374,12 @@ def analyze_with_enhanced_patterns(text: str, title: str) -> Dict[str, int]:
         ethics_weight += 20
     scores['ai_ethics'] = min(100, ethics_weight * 3)
     
-    # Quantum Ethics
+    # Quantum Ethics - Only score if quantum content is present
     quantum_ethics_indicators = ['quantum ethics', 'quantum responsibility', 'quantum access', 'quantum equity']
     qe_weight = sum(10 for indicator in quantum_ethics_indicators if indicator in combined)
-    scores['quantum_ethics'] = min(100, qe_weight * 5) if qe_weight > 0 else 0
+    if qe_weight > 0 or 'quantum' in combined:
+        scores['quantum_ethics'] = min(100, qe_weight * 5)
+    # Note: No score assigned for non-quantum documents (returns None)
     
     return scores
 
@@ -414,8 +416,10 @@ def analyze_with_contextual_understanding(text: str, title: str) -> Dict[str, in
     else:
         scores['ai_ethics'] = 10
     
-    # Quantum Ethics
-    scores['quantum_ethics'] = 30 if 'quantum' in combined and any(term in combined for term in ['ethics', 'responsibility']) else 0
+    # Quantum Ethics - Only score if quantum content is present
+    if 'quantum' in combined and any(term in combined for term in ['ethics', 'responsibility']):
+        scores['quantum_ethics'] = 30
+    # Note: No score assigned for non-quantum documents (returns None)
     
     return scores
 
