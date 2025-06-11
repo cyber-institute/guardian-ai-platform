@@ -592,14 +592,14 @@ def render_patent_technology_section():
     patent_section = st.selectbox(
         "Select Patent Technology Section:",
         [
-            "Patent Application Overview",
+            "GUARDIAN Overview",
             "Patent Frameworks & Scoring",
             "Maturity Assessment Systems",
             "Ethics Evaluation Frameworks"
         ]
     )
     
-    if patent_section == "Patent Application Overview":
+    if patent_section == "GUARDIAN Overview":
         from patent_tab_fixed import render as render_patent
         render_patent()
         
