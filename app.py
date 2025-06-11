@@ -60,6 +60,11 @@ def main():
         height: clamp(3rem, 8vw, 6rem) !important;
         width: auto !important;
         flex-shrink: 0 !important;
+        filter: 
+            drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3))
+            drop-shadow(-1px -1px 0px rgba(255, 255, 255, 0.2))
+            drop-shadow(1px 1px 0px rgba(0, 0, 0, 0.2))
+            drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1)) !important;
     }
     
     .quantum-header h1 {
