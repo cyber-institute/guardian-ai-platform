@@ -17,6 +17,24 @@ def ultra_clean_metadata(field_value):
     """Remove all HTML artifacts from metadata fields using enhanced interceptor"""
     return clean_field(field_value)
 
+def clean_date_safely(doc):
+    """Safely clean date field to prevent None value issues causing </div> artifacts"""
+    raw_date = doc.get('publish_date')
+    
+    # Handle None, empty, or invalid values first
+    if raw_date is None or raw_date == '' or str(raw_date).lower() in ['none', 'null', 'unknown']:
+        return 'Date not available'
+    
+    # Only process valid date values
+    try:
+        cleaned_date = ultra_clean_metadata(str(raw_date))
+        if cleaned_date and cleaned_date != 'Unknown' and len(cleaned_date.strip()) >= 4:
+            return cleaned_date
+        else:
+            return 'Date not available'
+    except:
+        return 'Date not available'
+
 def get_comprehensive_badge(score, framework):
     """Create badge for comprehensive scoring system with intelligent tooltips."""
     
@@ -459,14 +477,8 @@ def render_compact_cards(docs):
             title = ultra_clean_metadata(doc.get('title', 'Untitled Document'))
             author_org = ultra_clean_metadata(doc.get('author_organization', 'Unknown'))
             
-            # Clean date field comprehensively
-            raw_date = doc.get('publish_date', '') or ''
-            if raw_date and raw_date != 'Unknown':
-                pub_date = ultra_clean_metadata(raw_date)
-                if not pub_date or pub_date == 'Unknown' or len(pub_date) < 3:
-                    pub_date = 'Date not available'
-            else:
-                pub_date = 'Date not available'
+            # Clean date field safely to prevent </div> artifacts
+            pub_date = clean_date_safely(doc)
             
             doc_type = ultra_clean_metadata(doc.get('document_type', 'Unknown'))
             
@@ -517,14 +529,8 @@ def render_grid_view(docs):
             title = ultra_clean_metadata(doc.get('title', 'Untitled Document'))
             author_org = ultra_clean_metadata(doc.get('author_organization', 'Unknown'))
             
-            # Clean date field comprehensively
-            raw_date = doc.get('publish_date', '') or ''
-            if raw_date and raw_date != 'Unknown':
-                pub_date = ultra_clean_metadata(raw_date)
-                if not pub_date or pub_date == 'Unknown' or len(pub_date) < 3:
-                    pub_date = 'Date not available'
-            else:
-                pub_date = 'Date not available'
+            # Clean date field safely to prevent </div> artifacts
+            pub_date = clean_date_safely(doc)
             
             doc_type = ultra_clean_metadata(doc.get('document_type', 'Unknown'))
             content_preview = doc.get('content_preview', 'No preview available') or 'No preview available'
@@ -643,14 +649,8 @@ def render_card_view(docs):
             title = ultra_clean_metadata(doc.get('title', 'Untitled Document'))
             author_org = ultra_clean_metadata(doc.get('author_organization', 'Unknown'))
             
-            # Clean date field comprehensively
-            raw_date = doc.get('publish_date', '') or ''
-            if raw_date and raw_date != 'Unknown':
-                pub_date = ultra_clean_metadata(raw_date)
-                if not pub_date or pub_date == 'Unknown' or len(pub_date) < 3:
-                    pub_date = 'Date not available'
-            else:
-                pub_date = 'Date not available'
+            # Clean date field safely to prevent </div> artifacts
+            pub_date = clean_date_safely(doc)
             
             doc_type = ultra_clean_metadata(doc.get('document_type', 'Unknown'))
             content_preview = doc.get('content_preview', 'No preview available') or 'No preview available'
