@@ -196,24 +196,32 @@ def render():
                     pass
     years = sorted(list(years), reverse=True)
     
-    # Define regions based on common organizations/sources
-    def detect_region(org_name):
-        org_lower = org_name.lower()
-        if any(term in org_lower for term in ['nist', 'dhs', 'usa', 'united states', 'us ', 'federal', 'dod', 'nasa']):
-            return 'US'
-        elif any(term in org_lower for term in ['eu', 'european', 'gdpr', 'enisa', 'europa']):
-            return 'EU'
-        elif any(term in org_lower for term in ['uk', 'britain', 'british', 'ncsc']):
-            return 'UK'
-        elif any(term in org_lower for term in ['iso', 'itu', 'oecd', 'un ', 'united nations']):
-            return 'International'
-        elif any(term in org_lower for term in ['china', 'japan', 'korea', 'singapore', 'asia']):
-            return 'Asia'
-        elif any(term in org_lower for term in ['canada', 'australia', 'new zealand']):
-            return 'Other'
-        return 'Unknown'
+    # Extract regions from detected_region field with fallback to pattern-based detection
+    regions = set()
+    for doc in all_docs:
+        # First try to use the AI-detected region
+        detected_region = doc.get("detected_region", "")
+        if detected_region and detected_region not in ["Unknown", "", "None"]:
+            regions.add(detected_region)
+        else:
+            # Fallback to pattern-based detection for documents without AI analysis
+            org = doc.get("author_organization", "")
+            if org and org not in ["Unknown", "", "Date not available"]:
+                org_lower = org.lower()
+                if any(term in org_lower for term in ['nist', 'dhs', 'usa', 'united states', 'us ', 'federal', 'dod', 'nasa']):
+                    regions.add('US')
+                elif any(term in org_lower for term in ['eu', 'european', 'gdpr', 'enisa', 'europa']):
+                    regions.add('EU')
+                elif any(term in org_lower for term in ['uk', 'britain', 'british', 'ncsc']):
+                    regions.add('UK')
+                elif any(term in org_lower for term in ['iso', 'itu', 'oecd', 'un ', 'united nations']):
+                    regions.add('International')
+                elif any(term in org_lower for term in ['china', 'japan', 'korea', 'singapore', 'asia']):
+                    regions.add('Asia')
+                elif any(term in org_lower for term in ['canada', 'australia', 'new zealand']):
+                    regions.add('Other')
     
-    regions = sorted(set(detect_region(org) for org in organizations if org != "Unknown"))
+    regions = sorted(list(regions))
     
     # Debug output for troubleshooting empty filters
     if len(organizations) == 0 or len(years) == 0 or len(regions) == 0:
@@ -343,9 +351,33 @@ def render():
     if f["selected_years"]:
         docs = [d for d in docs if any(year in str(d.get("date", "")) for year in f["selected_years"])]
     
-    # Filter by region
+    # Filter by region using AI-detected regions with fallback
     if f["selected_regions"]:
-        docs = [d for d in docs if detect_region(d.get("organization", "Unknown")) in f["selected_regions"]]
+        def get_document_region(doc):
+            # First try AI-detected region
+            detected_region = doc.get("detected_region", "")
+            if detected_region and detected_region not in ["Unknown", "", "None"]:
+                return detected_region
+            
+            # Fallback to pattern-based detection
+            org = doc.get("author_organization", "") or doc.get("organization", "")
+            if org and org not in ["Unknown", "", "Date not available"]:
+                org_lower = org.lower()
+                if any(term in org_lower for term in ['nist', 'dhs', 'usa', 'united states', 'us ', 'federal', 'dod', 'nasa']):
+                    return 'US'
+                elif any(term in org_lower for term in ['eu', 'european', 'gdpr', 'enisa', 'europa']):
+                    return 'EU'
+                elif any(term in org_lower for term in ['uk', 'britain', 'british', 'ncsc']):
+                    return 'UK'
+                elif any(term in org_lower for term in ['iso', 'itu', 'oecd', 'un ', 'united nations']):
+                    return 'International'
+                elif any(term in org_lower for term in ['china', 'japan', 'korea', 'singapore', 'asia']):
+                    return 'Asia'
+                elif any(term in org_lower for term in ['canada', 'australia', 'new zealand']):
+                    return 'Other'
+            return 'Unknown'
+        
+        docs = [d for d in docs if get_document_region(d) in f["selected_regions"]]
     
     # Filter by topic (AI/Quantum/Both)
     topic_filter = f.get("topic_filter", "Both")

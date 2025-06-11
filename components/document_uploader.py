@@ -123,6 +123,15 @@ def render_document_uploader():
                             'quantum_q': scores['quantum_cybersecurity_score'] * 20  # Legacy compatibility
                         })
                         
+                        # Add region metadata if available from PDF processing
+                        if uploaded_file and 'pdf_result' in locals():
+                            region_data = pdf_result.get('region_metadata', {})
+                            document_data.update({
+                                'detected_region': region_data.get('detected_region', 'Unknown'),
+                                'region_confidence': region_data.get('region_confidence', 0.0),
+                                'region_reasoning': region_data.get('region_reasoning', '')
+                            })
+                        
                         st.success("Document analyzed with comprehensive patent-based scoring!")
                         
                         # Show scoring results

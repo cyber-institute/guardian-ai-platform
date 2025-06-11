@@ -67,6 +67,7 @@ class DatabaseManager:
         query = """
         SELECT id, title, content, text_content as text, quantum_score as quantum_q,
                document_type, source, author_organization, publish_date, content_preview,
+               detected_region, region_confidence, region_reasoning,
                created_at, updated_at
         FROM documents 
         ORDER BY updated_at DESC, created_at DESC
@@ -91,6 +92,9 @@ class DatabaseManager:
                     'author_organization': row.get('author_organization', 'Unknown'),
                     'publish_date': row.get('publish_date'),
                     'content_preview': row.get('content_preview', 'No preview available'),
+                    'detected_region': row.get('detected_region', 'Unknown'),
+                    'region_confidence': float(row.get('region_confidence', 0.0)) if row.get('region_confidence') else 0.0,
+                    'region_reasoning': row.get('region_reasoning', ''),
                     'created_at': row['created_at'],
                     'updated_at': row['updated_at']
                 }
