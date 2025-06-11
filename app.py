@@ -39,14 +39,10 @@ def main():
     }
     
     .quantum-header {
-        background: linear-gradient(135deg, #1e3a8a 0%, #312e81 50%, #1e40af 100%) !important;
-        padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 4vw, 3rem) !important;
-        border-radius: 12px !important;
+        background: transparent !important;
+        padding: clamp(1rem, 4vw, 2rem) clamp(1rem, 4vw, 3rem) !important;
         margin-bottom: 2.5rem !important;
-        color: white !important;
         text-align: center !important;
-        box-shadow: 0 8px 32px rgba(30, 58, 138, 0.15) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
         width: 100% !important;
         display: block !important;
         overflow: hidden !important;
@@ -63,8 +59,6 @@ def main():
     .guardian-logo {
         height: clamp(3rem, 8vw, 6rem) !important;
         width: auto !important;
-        filter: brightness(0) invert(1) !important;
-        drop-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
         flex-shrink: 0 !important;
     }
     
@@ -74,9 +68,8 @@ def main():
         font-weight: 600 !important;
         font-family: 'Source Serif Pro', serif !important;
         letter-spacing: -0.02em !important;
-        color: white !important;
+        color: #dc2626 !important;
         line-height: 1.1 !important;
-        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
         flex-shrink: 1 !important;
     }
     
