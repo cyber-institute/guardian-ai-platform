@@ -25,7 +25,7 @@ class StreamlitTooltipSystem:
     
     def render_welcome_banner(self):
         """Render welcome banner for new users."""
-        if not st.session_state.guardian_welcome_shown and not st.session_state.guardian_tour_completed:
+        if not st.session_state.get("guardian_welcome_shown", False) and not st.session_state.get("guardian_tour_completed", False):
             with st.container():
                 st.info("🛡️ **Welcome to GUARDIAN!** AI-powered governance platform for emerging technology risk assessment. Would you like a guided tour?")
                 
@@ -52,9 +52,9 @@ class StreamlitTooltipSystem:
     
     def render_tour_progress(self):
         """Render tour progress indicator."""
-        if st.session_state.guardian_tour_active:
-            progress = st.session_state.guardian_tour_step / 5
-            st.sidebar.markdown(f"**Tour Progress: Step {st.session_state.guardian_tour_step}/5**")
+        if st.session_state.get("guardian_tour_active", False):
+            progress = st.session_state.get("guardian_tour_step", 1) / 5
+            st.sidebar.markdown(f"**Tour Progress: Step {st.session_state.get('guardian_tour_step', 1)}/5**")
             st.sidebar.progress(progress)
             
             if st.sidebar.button("End Tour Early", key="end_tour_btn"):
@@ -64,7 +64,7 @@ class StreamlitTooltipSystem:
     
     def render_step_guidance(self, step_key: str, step_number: int):
         """Render step-specific guidance."""
-        if st.session_state.guardian_tour_active and st.session_state.guardian_tour_step == step_number:
+        if st.session_state.get("guardian_tour_active", False) and st.session_state.get("guardian_tour_step", 1) == step_number:
             
             guidance_content = {
                 "policy_repository": {
@@ -113,7 +113,7 @@ class StreamlitTooltipSystem:
     
     def render_navigation_hint(self, current_tab: str):
         """Render navigation hints."""
-        if st.session_state.guardian_tour_active:
+        if st.session_state.get("guardian_tour_active", False):
             hint_mapping = {
                 1: ("policy_repository", "👈 Click 'Policy Repository' to see analyzed documents"),
                 2: ("policy_analyzer", "👈 Try 'Policy Analyzer' to upload and analyze a policy"),
@@ -121,7 +121,7 @@ class StreamlitTooltipSystem:
                 4: ("repository_admin", "👈 Check 'Repository Admin' for system management")
             }
             
-            step = st.session_state.guardian_tour_step
+            step = st.session_state.get("guardian_tour_step", 1)
             if step in hint_mapping:
                 target_tab, hint_text = hint_mapping[step]
                 if current_tab != target_tab:
@@ -194,11 +194,11 @@ class StreamlitTooltipSystem:
     
     def is_tour_active(self) -> bool:
         """Check if tour is currently active."""
-        return st.session_state.guardian_tour_active
+        return st.session_state.get("guardian_tour_active", False)
     
     def get_current_step(self) -> int:
         """Get current tour step."""
-        return st.session_state.guardian_tour_step
+        return st.session_state.get("guardian_tour_step", 1)
 
 # Global instance
 streamlit_tooltips = StreamlitTooltipSystem()
