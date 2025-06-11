@@ -47,10 +47,10 @@ class DocumentRecommendationEngine:
             cursor = conn.cursor()
             
             cursor.execute("""
-                SELECT id, title, content, text_content, document_type, organization,
+                SELECT id, title, content, text_content, document_type, author_organization,
                        ai_cybersecurity_score, quantum_cybersecurity_score, 
                        ai_ethics_score, quantum_ethics_score,
-                       date, source
+                       created_at, source
                 FROM documents 
                 WHERE text_content IS NOT NULL 
                 AND text_content != ''
@@ -78,9 +78,18 @@ class DocumentRecommendationEngine:
         # Prepare document texts for vectorization
         doc_texts = []
         for doc in documents:
-            # Combine title, content preview, and key portions of full text
-            text_content = doc.get('text_content', '') or doc.get('content', '')
-            combined_text = f"{doc.get('title', '')} {doc.get('content', '')} {text_content[:1000]}"
+            # Handle database tuple format: (id, title, content, text_content, document_type, author_organization, ...)
+            if isinstance(doc, tuple):
+                title = doc[1] or ''
+                content = doc[2] or ''
+                text_content = doc[3] or ''
+            else:
+                # Handle dictionary format for compatibility
+                title = doc.get('title', '')
+                content = doc.get('content', '')
+                text_content = doc.get('text_content', '') or doc.get('content', '')
+            
+            combined_text = f"{title} {content} {text_content[:1000]}"
             doc_texts.append(combined_text.lower())
         
         # Create TF-IDF vectors
