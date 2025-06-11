@@ -14,21 +14,118 @@ import base64
 def render():
     """Render the interactive patent web application."""
     
-    # Patent header - clean version without blue background or icons
+    # Enhanced Patent header with visual appeal
     st.markdown("""
-    <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #B91C2C;">
-        <h2 style="color: #B91C2C; margin-bottom: 0.8rem; font-size: 1.6rem;">GUARDIAN Patent Application Overview</h2>
-        <p style="font-size: 1rem; line-height: 1.5; color: #374151; margin: 0;">
-            System for Real-Time Dynamic Governance of Emerging Technologies based on three patent pending technologies:
-        </p>
-        <ul style="font-size: 0.95rem; line-height: 1.4; color: #4b5563; margin: 0.8rem 0 0 1.2rem; padding-left: 0;">
-            <li><strong>AI-Powered Policy Evaluation and Ethical Compliance System</strong> (Patent Application 19/045,526): Provides comprehensive gap analysis and reinforcement learning algorithms for policy evaluation that enable continuous improvement of governance frameworks through machine learning feedback loops.</li>
-            <li><strong>Quantum Cybersecurity Framework for Policy Assessment and Maturity Evaluation</strong> (Patent Application 19/004,435): Delivers quantum-specific risk assessment capabilities through a 5-tier scoring system that addresses the unique security challenges posed by quantum computing technologies.</li>
-            <li><strong>System for Real-Time Dynamic Governance of Emerging Technologies</strong> (Patent Application 19/204,583): Implements real-time adaptive risk calculations using Bayesian inference and mathematical formulations that automatically adjust governance recommendations based on emerging threat landscapes.</li>
-        </ul>
-        <p style="font-size: 0.9rem; line-height: 1.4; color: #6b7280; margin: 0.8rem 0 0 0; font-style: italic;">
-            This integrated approach creates the first comprehensive governance platform capable of dynamically adapting to emerging technology risks in real-time, filling a critical gap in existing regulatory frameworks.
-        </p>
+    <div style="background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #7c3aed 100%); padding: 2.5rem; border-radius: 12px; margin-bottom: 2rem; color: white; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%; opacity: 0.3;"></div>
+        <div style="position: absolute; bottom: -30px; left: -30px; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 50%; opacity: 0.5;"></div>
+        
+        <div style="position: relative; z-index: 2;">
+            <h1 style="color: white; margin-bottom: 1.2rem; font-size: 2.2rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                🛡️ GUARDIAN Patent Technologies
+            </h1>
+            
+            <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0;">
+                <h3 style="color: #fbbf24; margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600;">
+                    System for Real-Time Dynamic Governance of Emerging Technologies
+                </h3>
+                <p style="font-size: 1.1rem; line-height: 1.6; color: #e5e7eb; margin-bottom: 0;">
+                    Revolutionary platform integrating three breakthrough patent pending technologies for comprehensive emerging technology governance
+                </p>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Three patent cards with enhanced visual design
+    st.markdown("""
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
+        
+        <!-- AI Policy Patent Card -->
+        <div style="background: linear-gradient(145deg, #ecfdf5 0%, #d1fae5 100%); border: 2px solid #10b981; border-radius: 12px; padding: 1.8rem; position: relative; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <div style="position: absolute; top: 15px; right: 15px; background: #10b981; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
+                Patent #1
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <div style="width: 50px; height: 4px; background: #10b981; border-radius: 2px; margin-bottom: 1rem;"></div>
+                <h4 style="color: #065f46; font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.3;">
+                    AI-Powered Policy Evaluation and Ethical Compliance System
+                </h4>
+                <div style="background: #065f46; color: white; display: inline-block; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem;">
+                    Patent Application: 19/045,526
+                </div>
+            </div>
+            <p style="font-size: 0.95rem; line-height: 1.5; color: #374151; margin-bottom: 1rem;">
+                Provides comprehensive gap analysis and reinforcement learning algorithms for policy evaluation that enable continuous improvement of governance frameworks through machine learning feedback loops.
+            </p>
+            <div style="background: rgba(16, 185, 129, 0.1); padding: 0.8rem; border-radius: 6px; border-left: 3px solid #10b981;">
+                <strong style="color: #065f46; font-size: 0.9rem;">Core Innovation:</strong> 
+                <span style="color: #374151; font-size: 0.85rem;">Machine learning-driven policy gap identification and automated improvement recommendations</span>
+            </div>
+        </div>
+        
+        <!-- Quantum Cybersecurity Patent Card -->
+        <div style="background: linear-gradient(145deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 1.8rem; position: relative; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <div style="position: absolute; top: 15px; right: 15px; background: #f59e0b; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
+                Patent #2
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <div style="width: 50px; height: 4px; background: #f59e0b; border-radius: 2px; margin-bottom: 1rem;"></div>
+                <h4 style="color: #92400e; font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.3;">
+                    Quantum Cybersecurity Framework for Policy Assessment and Maturity Evaluation
+                </h4>
+                <div style="background: #92400e; color: white; display: inline-block; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem;">
+                    Patent Application: 19/004,435
+                </div>
+            </div>
+            <p style="font-size: 0.95rem; line-height: 1.5; color: #374151; margin-bottom: 1rem;">
+                Delivers quantum-specific risk assessment capabilities through a 5-tier scoring system that addresses the unique security challenges posed by quantum computing technologies.
+            </p>
+            <div style="background: rgba(245, 158, 11, 0.1); padding: 0.8rem; border-radius: 6px; border-left: 3px solid #f59e0b;">
+                <strong style="color: #92400e; font-size: 0.9rem;">Core Innovation:</strong> 
+                <span style="color: #374151; font-size: 0.85rem;">QCMEA 5-tier quantum cybersecurity maturity evaluation system</span>
+            </div>
+        </div>
+        
+        <!-- Dynamic Risk Patent Card -->
+        <div style="background: linear-gradient(145deg, #ddd6fe 0%, #c4b5fd 100%); border: 2px solid #8b5cf6; border-radius: 12px; padding: 1.8rem; position: relative; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <div style="position: absolute; top: 15px; right: 15px; background: #8b5cf6; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
+                Patent #3
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <div style="width: 50px; height: 4px; background: #8b5cf6; border-radius: 2px; margin-bottom: 1rem;"></div>
+                <h4 style="color: #5b21b6; font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.3;">
+                    System for Real-Time Dynamic Governance of Emerging Technologies
+                </h4>
+                <div style="background: #5b21b6; color: white; display: inline-block; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem;">
+                    Patent Application: 19/204,583
+                </div>
+            </div>
+            <p style="font-size: 0.95rem; line-height: 1.5; color: #374151; margin-bottom: 1rem;">
+                Implements real-time adaptive risk calculations using Bayesian inference and mathematical formulations that automatically adjust governance recommendations based on emerging threat landscapes.
+            </p>
+            <div style="background: rgba(139, 92, 246, 0.1); padding: 0.8rem; border-radius: 6px; border-left: 3px solid #8b5cf6;">
+                <strong style="color: #5b21b6; font-size: 0.9rem;">Core Innovation:</strong> 
+                <span style="color: #374151; font-size: 0.85rem;">Real-time Bayesian inference engine for dynamic risk adaptation</span>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Impact statement with enhanced styling
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 2px solid #ef4444; border-radius: 12px; padding: 2rem; margin: 2rem 0; position: relative;">
+        <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #ef4444; color: white; padding: 0.5rem 1.5rem; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
+            INNOVATION IMPACT
+        </div>
+        <div style="margin-top: 1rem; text-align: center;">
+            <h3 style="color: #b91c1c; font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem;">
+                First Comprehensive Governance Platform for Emerging Technology Risks
+            </h3>
+            <p style="font-size: 1rem; line-height: 1.6; color: #374151; max-width: 800px; margin: 0 auto;">
+                This integrated approach creates the first comprehensive governance platform capable of <strong>dynamically adapting to emerging technology risks in real-time</strong>, filling a critical gap in existing regulatory frameworks through patent-pending innovations that currently do not exist in the market.
+            </p>
+        </div>
     </div>
     """, unsafe_allow_html=True)
     
