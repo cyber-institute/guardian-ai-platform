@@ -270,18 +270,23 @@ def comprehensive_document_scoring(text: str, title: str) -> Dict[str, Optional[
         Dict with scores for each framework or None if not applicable
     """
     try:
+        # Clean input text and title of any HTML artifacts before processing
+        from utils.html_artifact_interceptor import clean_field
+        clean_text = clean_field(str(text)) if text else ""
+        clean_title = clean_field(str(title)) if title else ""
+        
         # Use intelligent Multi-LLM ensemble analysis as primary method
-        scores = multi_llm_intelligent_scoring(text, title)
+        scores = multi_llm_intelligent_scoring(clean_text, clean_title)
         if any(score is not None for score in scores.values()):
             return scores
         
         # Secondary fallback to enhanced pattern analysis
-        return enhanced_scoring_with_llm_insights(text, title)
+        return enhanced_scoring_with_llm_insights(clean_text, clean_title)
             
     except Exception as e:
         print(f"Multi-LLM scoring failed, using fallback: {e}")
         # Fallback to pattern-based scoring when API fails
-        return fallback_scoring(text, title)
+        return fallback_scoring(clean_text if 'clean_text' in locals() else text, clean_title if 'clean_title' in locals() else title)
 
 def multi_llm_intelligent_scoring(text: str, title: str) -> Dict[str, Optional[int]]:
     """

@@ -150,16 +150,9 @@ def render():
             st.info("No documents found in the database. Please upload some documents first.")
             return
             
-        # Apply ultra-aggressive HTML artifact cleaning to all document fields
-        all_docs = []
-        for doc in raw_docs:
-            cleaned_doc = {}
-            for key, value in doc.items():
-                if isinstance(value, str):
-                    cleaned_doc[key] = clean_field(value)
-                else:
-                    cleaned_doc[key] = value
-            all_docs.append(cleaned_doc)
+        # Apply comprehensive metadata cleaning to eliminate all HTML artifacts
+        from utils.metadata_cleaner import clean_document_list
+        all_docs = clean_document_list(raw_docs)
         
         # Clean all documents and force fresh metadata analysis
         all_docs = [clean_document_content(doc) for doc in all_docs]
