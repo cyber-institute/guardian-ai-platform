@@ -4,6 +4,7 @@ from utils.db import fetch_documents
 from utils.hf_ai_scoring import evaluate_quantum_maturity_hf
 from utils.comprehensive_scoring import comprehensive_document_scoring, format_score_display, get_score_badge_color
 from utils.document_metadata_extractor import extract_document_metadata
+from utils.multi_llm_metadata_extractor import extract_clean_metadata
 from utils.content_cleaner import clean_document_content
 from utils.clean_preview_generator import generate_clean_preview, extract_clean_metadata
 from utils.simple_updater import update_document_metadata
