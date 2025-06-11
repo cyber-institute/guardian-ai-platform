@@ -68,10 +68,7 @@ def main():
         font-weight: bold !important;
         font-family: Arial, sans-serif !important;
         letter-spacing: -0.02em !important;
-        background: linear-gradient(145deg, #dc2626, #b91c1c, #991b1b) !important;
-        background-clip: text !important;
-        -webkit-background-clip: text !important;
-        -webkit-text-fill-color: transparent !important;
+        color: #dc2626 !important;
         text-shadow: 
             2px 2px 4px rgba(0, 0, 0, 0.3),
             -1px -1px 0px rgba(255, 255, 255, 0.2),
