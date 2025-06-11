@@ -510,7 +510,7 @@ def main():
         render_dialogflow_settings()
         
         st.markdown("---")
-        st.markdown("### 🤖 Chatbot System Status")
+        st.markdown("### Chatbot System Status")
         render_chatbot_status()
         
         st.markdown("---")
@@ -997,7 +997,7 @@ def render_database_status():
     from utils.database import db_manager
     from utils.db import fetch_documents
     
-    st.markdown("### 🗄️ Database Management")
+    st.markdown("### Database Management")
     
     # Connection status
     if db_manager.engine:

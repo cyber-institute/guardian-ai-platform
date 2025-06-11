@@ -9,7 +9,7 @@ import os
 def render_dialogflow_settings():
     """Render Dialogflow CX configuration interface."""
     
-    st.markdown("### 🤖 Chatbot Configuration")
+    st.markdown("### Chatbot Configuration")
     
     with st.expander("Configure Google Dialogflow CX", expanded=False):
         st.markdown("""
