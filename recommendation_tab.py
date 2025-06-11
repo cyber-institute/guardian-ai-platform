@@ -219,16 +219,16 @@ def render_context_discovery_tab():
             ["Any", "ai_cybersecurity", "quantum_cybersecurity", "ai_ethics", "quantum_ethics"],
             format_func=lambda x: {
                 "Any": "Any Framework",
-                "ai_cybersecurity": "🤖 AI Cybersecurity",
-                "quantum_cybersecurity": "⚛️ Quantum Cybersecurity", 
-                "ai_ethics": "🎯 AI Ethics",
-                "quantum_ethics": "🔬 Quantum Ethics"
+                "ai_cybersecurity": "AI Cybersecurity",
+                "quantum_cybersecurity": "Quantum Cybersecurity", 
+                "ai_ethics": "AI Ethics",
+                "quantum_ethics": "Quantum Ethics"
             }[x],
             help="Focus on specific assessment framework"
         )
     
     # Apply context filters
-    if st.button("🔍 Discover Documents", type="primary", use_container_width=True):
+    if st.button("Discover Documents", type="primary", use_container_width=True):
         
         # Build context parameters
         context_doc_type = None if selected_doc_type == "Any" else selected_doc_type
@@ -290,13 +290,13 @@ def render_recommendation_analytics():
                 st.metric("Organizations", organizations)
         
         # Show system status
-        st.markdown("#### 🔧 **System Status**")
+        st.markdown("#### **System Status**")
         
         system_status = {
-            "Content Vectorization": "✅ Ready" if recommendation_engine.document_vectors is not None else "⚠️ Not Initialized",
-            "Patent Scoring Integration": "✅ Active",
-            "Database Connection": "✅ Connected",
-            "Machine Learning Models": "✅ Operational"
+            "Content Vectorization": "Ready" if recommendation_engine.document_vectors is not None else "Not Initialized",
+            "Patent Scoring Integration": "Active",
+            "Database Connection": "Connected",
+            "Machine Learning Models": "Operational"
         }
         
         for component, status in system_status.items():

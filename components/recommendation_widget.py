@@ -237,8 +237,8 @@ def render_trending_list(trending_docs: List[Dict], framework_name: str):
             with col2:
                 st.markdown(f"""
                 **{doc.get('title', 'Unknown Title')}**  
-                📍 {doc.get('organization', 'Unknown')} | 📊 Score: {score:.1f}  
-                📄 {doc.get('document_type', 'Document')} | 📅 {doc.get('date', 'Unknown date')}
+                {doc.get('organization', 'Unknown')} | Score: {score:.1f}  
+                {doc.get('document_type', 'Document')} | {doc.get('date', 'Unknown date')}
                 """)
                 
                 if st.button(f"View Document", key=f"trending_{framework_name}_{doc['id']}", use_container_width=True):
@@ -251,16 +251,16 @@ def render_recommendation_sidebar(selected_doc_id: Optional[int] = None):
     """Render recommendation widget in sidebar."""
     
     with st.sidebar:
-        st.markdown("### 💡 **Smart Recommendations**")
+        st.markdown("### **Smart Recommendations**")
         
         rec_mode = st.selectbox(
             "Recommendation Type",
             ["comprehensive", "content", "scoring", "trending"],
             format_func=lambda x: {
-                "comprehensive": "🎯 All Methods",
-                "content": "📝 Content Similar",
-                "scoring": "📊 Score Pattern",
-                "trending": "🔥 Trending"
+                "comprehensive": "All Methods",
+                "content": "Content Similar",
+                "scoring": "Score Pattern",
+                "trending": "Trending"
             }[x]
         )
         
