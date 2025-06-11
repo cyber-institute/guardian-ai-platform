@@ -52,6 +52,22 @@ def main():
         overflow: hidden !important;
     }
     
+    .quantum-header-content {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: clamp(0.5rem, 3vw, 1.5rem) !important;
+        flex-wrap: wrap !important;
+    }
+    
+    .guardian-logo {
+        height: clamp(3rem, 8vw, 6rem) !important;
+        width: auto !important;
+        filter: brightness(0) invert(1) !important;
+        drop-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+        flex-shrink: 0 !important;
+    }
+    
     .quantum-header h1 {
         margin: 0 !important;
         font-size: clamp(4rem, 12vw, 8.4rem) !important;
@@ -61,6 +77,7 @@ def main():
         color: white !important;
         line-height: 1.1 !important;
         text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+        flex-shrink: 1 !important;
     }
     
     .quantum-header p {
@@ -304,31 +321,33 @@ def main():
     from components.color_palette_selector import apply_current_theme
     apply_current_theme()
     
-    # Main header - responsive design
-    st.markdown("""
-    <div style="text-align: center; margin-bottom: 2rem;">
-        <h1 class="guardian-title">GUARDIAN</h1>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Cyber Institute credit with logo inline
+    # Main header with owl logo - responsive design
     try:
         import base64
-        with open("assets/cyber_institute_logo.jpg", "rb") as f:
-            logo_data = base64.b64encode(f.read()).decode()
+        with open("assets/owl_logo.png", "rb") as f:
+            owl_data = base64.b64encode(f.read()).decode()
         
         st.markdown(f"""
-        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 2rem;">
-            <img src="data:image/jpeg;base64,{logo_data}" width="40" height="40" style="border-radius: 50%; margin-right: 0.5rem;">
-            <span style="font-size: 0.9rem; color: #6b7280; white-space: nowrap;">Developed by Cyber Institute</span>
+        <div class="quantum-header">
+            <div class="quantum-header-content">
+                <img src="data:image/png;base64,{owl_data}" class="guardian-logo" alt="GUARDIAN Logo">
+                <h1>GUARDIAN</h1>
+            </div>
+            <p>Developed by Cyber Institute</p>
         </div>
         """, unsafe_allow_html=True)
     except:
+        # Fallback without logo if file not found
         st.markdown("""
-        <div style="text-align: center; font-size: 0.9rem; color: #6b7280; margin-bottom: 2rem;">
-            Developed by Cyber Institute
+        <div class="quantum-header">
+            <div class="quantum-header-content">
+                <h1>GUARDIAN</h1>
+            </div>
+            <p>Developed by Cyber Institute</p>
         </div>
         """, unsafe_allow_html=True)
+    
+
     
     # Enhanced sidebar with document upload and API functionality
     with st.sidebar:
