@@ -9,6 +9,7 @@ from utils.clean_preview_generator import generate_clean_preview, extract_clean_
 from utils.simple_updater import update_document_metadata
 from components.chatbot_widget import create_tooltip, render_help_tooltip
 from utils.thumbnail_generator import get_thumbnail_html
+from components.recommendation_widget import render_document_recommendations, render_recommendation_sidebar
 
 def ultra_clean_metadata(field_value):
     """Remove all HTML artifacts from metadata fields"""
