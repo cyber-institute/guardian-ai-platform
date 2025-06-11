@@ -20,7 +20,8 @@ def analyze_document_applicability(text: str, title: str) -> Dict[str, bool]:
     ai_keywords = [
         'artificial intelligence', 'machine learning', 'deep learning', 'neural network',
         'ai system', 'algorithm', 'automated decision', 'chatbot', 'llm', 'gpt',
-        'computer vision', 'natural language', 'recommendation system'
+        'computer vision', 'natural language', 'recommendation system', 'responsible ai',
+        'trustworthy ai', 'ai plan', 'ai framework', 'ai policy', 'ai governance'
     ]
     
     # Quantum-related keywords (positive indicators only)
@@ -32,18 +33,20 @@ def analyze_document_applicability(text: str, title: str) -> Dict[str, bool]:
         'lattice-based', 'quantum key distribution'
     ]
     
-    # Cybersecurity keywords
+    # Cybersecurity keywords (expanded for AI documents)
     cybersecurity_keywords = [
         'cybersecurity', 'security', 'encryption', 'cryptography', 'vulnerability',
         'threat', 'attack', 'defense', 'protection', 'breach', 'incident response',
-        'risk management', 'compliance', 'authentication', 'authorization'
+        'risk management', 'compliance', 'authentication', 'authorization', 'secure',
+        'safety', 'risk', 'mitigation', 'safeguard', 'assurance', 'trustworthy'
     ]
     
-    # Ethics keywords
+    # Ethics keywords (expanded for AI governance documents)  
     ethics_keywords = [
         'ethics', 'ethical', 'bias', 'fairness', 'transparency', 'accountability',
         'privacy', 'discrimination', 'human rights', 'responsible', 'governance',
-        'oversight', 'explainable', 'interpretable', 'audit'
+        'oversight', 'explainable', 'interpretable', 'audit', 'trustworthy',
+        'principle', 'guideline', 'standard', 'framework', 'policy', 'plan'
     ]
     
     # Check for keyword presence

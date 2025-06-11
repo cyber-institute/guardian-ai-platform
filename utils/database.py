@@ -67,7 +67,7 @@ class DatabaseManager:
         query = """
         SELECT id, title, content, text_content as text, quantum_score as quantum_q,
                document_type, source, author_organization, publish_date, content_preview,
-               detected_region, region_confidence, region_reasoning,
+               detected_region, region_confidence, region_reasoning, topic,
                created_at, updated_at
         FROM documents 
         ORDER BY updated_at DESC, created_at DESC
@@ -95,6 +95,7 @@ class DatabaseManager:
                     'detected_region': row.get('detected_region', 'Unknown'),
                     'region_confidence': float(row.get('region_confidence', 0.0)) if row.get('region_confidence') else 0.0,
                     'region_reasoning': row.get('region_reasoning', ''),
+                    'topic': row.get('topic', 'General'),
                     'created_at': row['created_at'],
                     'updated_at': row['updated_at']
                 }
@@ -119,12 +120,13 @@ class DatabaseManager:
         final_doc_type = enhanced_metadata.get('document_type') or document.get('document_type', 'unknown')
         final_preview = enhanced_metadata.get('content_preview', document.get('content', ''))
         final_date = enhanced_metadata.get('publish_date')
+        final_topic = enhanced_metadata.get('topic', 'General')
         
         query = """
         INSERT INTO documents (title, content, text_content, quantum_score, document_type, source,
-                             author_organization, publish_date)
+                             author_organization, publish_date, topic)
         VALUES (:title, :content, :text_content, :quantum_score, :document_type, :source,
-                :author_organization, :publish_date)
+                :author_organization, :publish_date, :topic)
         RETURNING id
         """
         
@@ -136,7 +138,8 @@ class DatabaseManager:
             'document_type': final_doc_type,
             'source': source_hint,
             'author_organization': final_org,
-            'publish_date': final_date
+            'publish_date': final_date,
+            'topic': final_topic
         }
         
         result = self.execute_query(query, params)
