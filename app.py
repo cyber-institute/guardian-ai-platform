@@ -535,25 +535,44 @@ def main():
         with st.expander("WEB | url > success"):
             st.code("2025-06-07 21:08:56.927833")
     
-    # Create main navigation with hamburger menu structure
-    main_tab1, main_tab2, main_tab3 = st.tabs(["Policy Repository", "Repository Admin", "About"])
+    # Create main navigation with enhanced AI capabilities
+    main_tab1, main_tab2, main_tab3, main_tab4 = st.tabs([
+        "Policy Repository", 
+        "AI Policy Analyzer", 
+        "AI Recommendations", 
+        "Repository Admin"
+    ])
     
     with main_tab1:
         render()
     
     with main_tab2:
-        render_repository_admin_section()
+        # Enhanced Policy Analysis with Gap Detection
+        from components.enhanced_policy_uploader import render_enhanced_policy_uploader
+        render_enhanced_policy_uploader()
     
     with main_tab3:
-        # About tab with Patent Technology as subtab
-        about_subtab1, about_subtab2 = st.tabs(["GUARDIAN Emerging Tech Tool", "Patent Pending Technologies"])
+        # AI-Powered Document Recommendations
+        from recommendation_tab import render as render_recommendations
+        render_recommendations()
+    
+    with main_tab4:
+        # Repository Admin and About sections
+        admin_subtab1, admin_subtab2 = st.tabs(["Repository Management", "About GUARDIAN"])
         
-        with about_subtab1:
-            from about_tab import render as render_about
-            render_about()
+        with admin_subtab1:
+            render_repository_admin_section()
         
-        with about_subtab2:
-            render_patent_technology_section()
+        with admin_subtab2:
+            # About tab with Patent Technology as subtab
+            about_subtab1, about_subtab2 = st.tabs(["GUARDIAN Emerging Tech Tool", "Patent Pending Technologies"])
+            
+            with about_subtab1:
+                from about_tab import render as render_about
+                render_about()
+            
+            with about_subtab2:
+                render_patent_technology_section()
     
     # Render hamburger menu instead of sidebar chatbot
     from components.hamburger_menu import render_simple_hamburger_menu
