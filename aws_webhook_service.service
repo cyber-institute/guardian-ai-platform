@@ -1,0 +1,15 @@
+[Unit]
+Description=GUARDIAN Webhook Handler
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/opt/guardian
+Environment=PATH=/opt/guardian/guardian_env/bin
+ExecStart=/opt/guardian/guardian_env/bin/python webhook_handler.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
