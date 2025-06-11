@@ -248,7 +248,11 @@ class IntelligentSynthesisEngine:
                     (weighted_mean * sum(weights) / observation_variance)
                 ) / posterior_precision
                 
-                synthesized_scores[metric] = round(max(0, min(100, posterior_mean)), 2)
+                # Apply proper scale limits based on metric type
+                if metric == 'quantum_cybersecurity':
+                    synthesized_scores[metric] = round(max(1, min(5, posterior_mean)), 2)
+                else:
+                    synthesized_scores[metric] = round(max(0, min(100, posterior_mean)), 2)
         
         # Calculate consensus score
         consensus_score = sum(synthesized_scores.values()) / len(synthesized_scores) if synthesized_scores else 0

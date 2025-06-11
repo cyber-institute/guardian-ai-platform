@@ -360,7 +360,10 @@ def analyze_with_enhanced_patterns(text: str, title: str) -> Dict[str, int]:
         'quantum key distribution', 'quantum resistant', 'lattice cryptography'
     ]
     quantum_weight = sum(1 for indicator in quantum_indicators if indicator in combined)
-    scores['quantum_cybersecurity'] = max(1, min(5, quantum_weight + 1)) if quantum_weight > 0 else 1
+    if quantum_weight > 0:
+        scores['quantum_cybersecurity'] = max(1, min(5, quantum_weight + 1))
+    else:
+        scores['quantum_cybersecurity'] = 1  # Baseline score for non-quantum documents
     
     # AI Ethics - Enhanced ethical framework detection
     ethics_indicators = [
@@ -402,7 +405,7 @@ def analyze_with_contextual_understanding(text: str, title: str) -> Dict[str, in
     elif 'quantum' in combined:
         scores['quantum_cybersecurity'] = 2
     else:
-        scores['quantum_cybersecurity'] = 1
+        scores['quantum_cybersecurity'] = 1  # Baseline for non-quantum documents
     
     # AI Ethics with document authority context
     if any(term in combined for term in ['guidance', 'framework', 'standards']):
