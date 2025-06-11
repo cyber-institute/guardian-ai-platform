@@ -149,6 +149,9 @@ class IntelligentSynthesisEngine:
             return 'consensus_clustering'
         elif avg_confidence > 0.8 and confidence_variance < 0.1:
             return 'weighted_ensemble'
+        elif domain in ['comprehensive_scoring']:
+            # Force weighted ensemble for comprehensive scoring to avoid Bayesian prior issues
+            return 'weighted_ensemble'
         elif domain in ['ai_ethics', 'quantum_security'] and num_responses >= 3:
             return 'advanced_bayesian'
         else:
@@ -189,8 +192,14 @@ class IntelligentSynthesisEngine:
     ) -> Dict[str, Any]:
         """Advanced Bayesian synthesis with domain-specific priors"""
         
-        # Domain-specific prior distributions
+        # Domain-specific prior distributions for actual scoring metrics
         domain_priors = {
+            'comprehensive_scoring': {
+                'ai_cybersecurity': {'mean': 45, 'variance': 20},
+                'quantum_cybersecurity': {'mean': 1.5, 'variance': 0.5},  # 1-5 scale, low baseline
+                'ai_ethics': {'mean': 35, 'variance': 15},
+                'quantum_ethics': {'mean': 10, 'variance': 10}
+            },
             'ai_ethics': {
                 'completeness': {'mean': 68, 'variance': 15},
                 'clarity': {'mean': 72, 'variance': 12},
@@ -461,9 +470,19 @@ class IntelligentSynthesisEngine:
                         bayesian_result['scores'][metric] * bayesian_weight +
                         ensemble_result['scores'][metric] * ensemble_weight
                     ) / total_weight
-                    hybrid_scores[metric] = round(hybrid_score, 2)
+                    
+                    # Apply proper scale limits based on metric type
+                    if metric == 'quantum_cybersecurity':
+                        hybrid_scores[metric] = round(max(1, min(5, hybrid_score)), 2)
+                    else:
+                        hybrid_scores[metric] = round(hybrid_score, 2)
                 else:
-                    hybrid_scores[metric] = bayesian_result['scores'][metric]
+                    # Apply scale limits to fallback score as well
+                    fallback_score = bayesian_result['scores'][metric]
+                    if metric == 'quantum_cybersecurity':
+                        hybrid_scores[metric] = round(max(1, min(5, fallback_score)), 2)
+                    else:
+                        hybrid_scores[metric] = fallback_score
         
         return {
             'scores': hybrid_scores,
