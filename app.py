@@ -34,7 +34,7 @@ def main():
     
     .main .block-container {
         background-color: #ffffff;
-        padding-top: 2rem;
+        padding-top: 0.5rem;
         padding-bottom: 2rem;
     }
     
