@@ -677,7 +677,6 @@ def render_prototype_phased_plan_section():
     
     # Phase selection
     phase_tabs = st.tabs([
-        "LLM Enhancement", 
         "Phase 1: Foundation", 
         "Phase 2: LLM Integration", 
         "Phase 3: Multi-LLM Ensemble", 
@@ -686,22 +685,18 @@ def render_prototype_phased_plan_section():
     ])
     
     with phase_tabs[0]:
-        from llm_enhancement_tab import render as render_llm_enhancement
-        render_llm_enhancement()
-    
-    with phase_tabs[1]:
         render_phase_1_foundation()
     
-    with phase_tabs[2]:
+    with phase_tabs[1]:
         render_phase_2_llm_integration()
     
-    with phase_tabs[3]:
+    with phase_tabs[2]:
         render_phase_3_multi_llm_ensemble()
     
-    with phase_tabs[4]:
+    with phase_tabs[3]:
         render_phase_4_enterprise_scale()
     
-    with phase_tabs[5]:
+    with phase_tabs[4]:
         render_phase_5_autonomous_platform()
 
 def render_phase_1_foundation():
@@ -1180,6 +1175,22 @@ def render_phase_3_multi_llm_ensemble():
     **Current Achievement:** Concurrent processing framework operational with both parallel and daisy-chain modes
     """)
     
+    # Phase 3 subtabs
+    phase3_tabs = st.tabs([
+        "Multi-LLM Architecture", 
+        "LLM Enhancement Testing"
+    ])
+    
+    with phase3_tabs[0]:
+        render_phase_3_architecture()
+    
+    with phase3_tabs[1]:
+        from llm_enhancement_tab import render as render_llm_enhancement
+        render_llm_enhancement()
+
+def render_phase_3_architecture():
+    """Render the core Phase 3 Multi-LLM Ensemble architecture details"""
+    
     # Current status overview
     col1, col2 = st.columns([2, 1])
     
@@ -1371,7 +1382,7 @@ def render_phase_3_multi_llm_ensemble():
     st.info("""
     **Experience the Multi-LLM Ensemble System:**
     
-    Navigate to: **About GUARDIAN → Prototype Phased Plan → LLM Enhancement → Multi-LLM Ensemble**
+    Navigate to: **About GUARDIAN → Prototype Phased Plan → Phase 3 → LLM Enhancement Testing → Multi-LLM Ensemble**
     
     **Try Both Processing Modes:**
     1. **Parallel Processing**: Fast concurrent evaluation across multiple LLMs
