@@ -120,7 +120,10 @@ class IntelligentSynthesisEngine:
         raw_scores = response.get('scores', {})
         for metric, value in raw_scores.items():
             if isinstance(value, (int, float)):
-                if value <= 1.0:  # Convert 0-1 scale to 0-100
+                if metric == 'quantum_cybersecurity':
+                    # Keep quantum cybersecurity on its native 1-5 scale
+                    normalized['scores'][metric] = max(1, min(5, value))
+                elif value <= 1.0:  # Convert 0-1 scale to 0-100
                     normalized['scores'][metric] = value * 100
                 else:
                     normalized['scores'][metric] = min(max(value, 0), 100)

@@ -62,6 +62,20 @@ def debug_synthesis():
     print(f"quantum_cybersecurity: {synthesis_result['scores']['quantum_cybersecurity']}")
     print(f"Full scores: {synthesis_result['scores']}")
     print(f"Method used: {synthesis_result.get('synthesis_method', 'unknown')}")
+    print(f"Confidence: {synthesis_result.get('confidence', 'unknown')}")
+    
+    # Debug confidence and variance calculation
+    confidences = [r['confidence'] for r in mock_responses]
+    avg_confidence = sum(confidences) / len(confidences) if confidences else 0
+    import numpy as np
+    confidence_variance = np.var(confidences) if len(confidences) > 1 else 0
+    
+    print(f"\nConfidence Analysis:")
+    print(f"Individual confidences: {confidences}")
+    print(f"Average confidence: {avg_confidence}")
+    print(f"Confidence variance: {confidence_variance}")
+    print(f"Weighted ensemble criteria: avg_confidence > 0.8 and variance < 0.1")
+    print(f"Meets criteria: {avg_confidence > 0.8 and confidence_variance < 0.1}")
 
 if __name__ == "__main__":
     debug_synthesis()
