@@ -2547,6 +2547,9 @@ def render_document_management():
     st.markdown("### Document Ingestion & Upload Management")
     
     from components.document_uploader import render_document_uploader, render_bulk_upload
+    from utils.database import DatabaseManager
+    
+    db_manager = DatabaseManager()
     
     # Document upload interface
     st.markdown("#### Single Document Upload")
@@ -2560,79 +2563,309 @@ def render_document_management():
     
     st.markdown("---")
     
-    # Ingestion log
-    st.markdown("#### Document Ingestion Log")
+    # Document deletion interface
+    st.markdown("#### Document Management & Deletion")
     
-    # Display recent ingestion activity
-    st.markdown("""
-    **Recent Ingestion Activity:**
+    # Get all documents for selection
+    try:
+        all_documents = db_manager.execute_query("""
+            SELECT id, title, document_type, created_at, source, multi_llm_analysis
+            FROM documents 
+            ORDER BY created_at DESC
+        """)
+        if not isinstance(all_documents, list):
+            all_documents = []
+    except:
+        all_documents = []
     
-    - 2024-06-09 14:30: AI Policy Document uploaded successfully
-    - 2024-06-09 14:25: Quantum Framework PDF processed
-    - 2024-06-09 14:20: NIST Guidelines ingested
-    - 2024-06-09 14:15: EU AI Act sections imported
-    """)
+    if all_documents and len(all_documents) > 0:
+        st.markdown("**Select documents to delete:**")
+        
+        # Create checkbox list for document selection
+        selected_docs = []
+        
+        # Use columns for better layout
+        col1, col2 = st.columns([3, 1])
+        
+        with col1:
+            st.markdown("**Documents in Database:**")
+        
+        with col2:
+            if st.button("🔄 Refresh List"):
+                st.rerun()
+        
+        # Document selection interface
+        for doc in all_documents:
+            doc_col1, doc_col2, doc_col3, doc_col4 = st.columns([1, 3, 1, 1])
+            
+            with doc_col1:
+                if st.checkbox("", key=f"delete_{doc['id']}", label_visibility="collapsed"):
+                    selected_docs.append(doc['id'])
+            
+            with doc_col2:
+                created_date = doc['created_at'].strftime("%Y-%m-%d") if doc['created_at'] else "Unknown"
+                analysis_badge = "🔬 Multi-LLM" if doc.get('multi_llm_analysis') else "📄 Standard"
+                st.markdown(f"**{doc['title']}** ({doc['document_type']}) - {created_date} {analysis_badge}")
+            
+            with doc_col3:
+                source_display = doc['source'][:20] + "..." if doc['source'] and len(doc['source']) > 20 else doc['source'] or "Direct"
+                st.caption(source_display)
+            
+            with doc_col4:
+                st.caption(f"ID: {doc['id']}")
+        
+        # Deletion controls
+        st.markdown("---")
+        
+        # Get selected document IDs from session state
+        selected_for_deletion = []
+        for doc in all_documents:
+            if st.session_state.get(f"delete_{doc['id']}", False):
+                selected_for_deletion.append(doc['id'])
+        
+        if selected_for_deletion:
+            st.warning(f"**{len(selected_for_deletion)} documents selected for deletion**")
+            
+            # Show selected documents
+            with st.expander("Review Selected Documents", expanded=False):
+                for doc_id in selected_for_deletion:
+                    selected_doc = next((doc for doc in all_documents if doc['id'] == doc_id), None)
+                    if selected_doc:
+                        st.markdown(f"- **{selected_doc['title']}** (ID: {selected_doc['id']})")
+            
+            # Deletion confirmation
+            col1, col2, col3 = st.columns([1, 1, 1])
+            
+            with col2:
+                if st.button("🗑️ Delete Selected Documents", type="primary"):
+                    # Confirm deletion
+                    if st.session_state.get('confirm_deletion', False):
+                        # Perform deletion
+                        try:
+                            deleted_count = 0
+                            for doc_id in selected_for_deletion:
+                                result = db_manager.execute_query(
+                                    "DELETE FROM documents WHERE id = %s",
+                                    (doc_id,)
+                                )
+                                if result is not None:  # Successful deletion
+                                    deleted_count += 1
+                            
+                            if deleted_count > 0:
+                                st.success(f"Successfully deleted {deleted_count} documents")
+                                # Clear selection state
+                                for doc_id in selected_for_deletion:
+                                    if f"delete_{doc_id}" in st.session_state:
+                                        del st.session_state[f"delete_{doc_id}"]
+                                st.session_state['confirm_deletion'] = False
+                                st.rerun()
+                            else:
+                                st.error("Failed to delete documents")
+                        except Exception as e:
+                            st.error(f"Error during deletion: {str(e)}")
+                    else:
+                        st.session_state['confirm_deletion'] = True
+                        st.rerun()
+            
+            # Show confirmation step
+            if st.session_state.get('confirm_deletion', False):
+                st.error("⚠️ **CONFIRM DELETION** - This action cannot be undone!")
+                col1, col2 = st.columns(2)
+                with col1:
+                    if st.button("✅ Yes, Delete Forever"):
+                        st.session_state['confirm_deletion'] = True
+                        st.rerun()
+                with col2:
+                    if st.button("❌ Cancel"):
+                        st.session_state['confirm_deletion'] = False
+                        st.rerun()
+        
+        else:
+            st.info("Select documents using the checkboxes to enable deletion")
     
-    # Ingestion statistics
+    else:
+        st.info("No documents found in database")
+    
+    st.markdown("---")
+    
+    # Real ingestion statistics
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.metric("Total Documents", "247")
+        total_docs = db_manager.execute_query("SELECT COUNT(*) as count FROM documents")
+        total_count = total_docs[0]['count'] if total_docs else 0
+        st.metric("Total Documents", total_count)
+    
     with col2:
-        st.metric("This Week", "12")
+        week_docs = db_manager.execute_query("""
+            SELECT COUNT(*) as count FROM documents 
+            WHERE created_at >= NOW() - INTERVAL '7 days'
+        """)
+        week_count = week_docs[0]['count'] if week_docs else 0
+        st.metric("This Week", week_count)
+    
     with col3:
-        st.metric("Processing Queue", "3")
+        today_docs = db_manager.execute_query("""
+            SELECT COUNT(*) as count FROM documents 
+            WHERE created_at >= CURRENT_DATE
+        """)
+        today_count = today_docs[0]['count'] if today_docs else 0
+        st.metric("Today", today_count)
+    
     with col4:
-        st.metric("Failed Ingestions", "1")
+        multi_llm_docs = db_manager.execute_query("""
+            SELECT COUNT(*) as count FROM documents 
+            WHERE multi_llm_analysis = true
+        """)
+        multi_llm_count = multi_llm_docs[0]['count'] if multi_llm_docs else 0
+        st.metric("Multi-LLM Enhanced", multi_llm_count)
 
 def render_system_monitoring():
     """System logs and monitoring interface."""
     
     st.markdown("### System Logs & Monitoring")
     
-    # System health metrics
+    # Get real system metrics
+    from datetime import datetime, timedelta
+    from utils.database import DatabaseManager
+    
+    db_manager = DatabaseManager()
+    
+    # System health metrics from database
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.metric("System Uptime", "99.8%", "0.1%")
+        # Get document count from today
+        try:
+            today_docs = db_manager.execute_query("""
+                SELECT COUNT(*) as count FROM documents 
+                WHERE created_at >= CURRENT_DATE
+            """)
+            today_count = today_docs[0]['count'] if today_docs and isinstance(today_docs, list) and len(today_docs) > 0 else 0
+        except:
+            today_count = 0
+        st.metric("Documents Today", today_count)
+    
     with col2:
-        st.metric("Active Users", "142", "8")
+        # Get total documents
+        try:
+            total_docs = db_manager.execute_query("SELECT COUNT(*) as count FROM documents")
+            total_count = total_docs[0]['count'] if total_docs and isinstance(total_docs, list) and len(total_docs) > 0 else 0
+        except:
+            total_count = 0
+        st.metric("Total Documents", total_count)
+    
     with col3:
-        st.metric("Processing Speed", "1.2s avg", "-0.3s")
+        # Get recent analysis count
+        try:
+            recent_analysis = db_manager.execute_query("""
+                SELECT COUNT(*) as count FROM documents 
+                WHERE created_at >= NOW() - INTERVAL '1 hour'
+            """)
+            recent_count = recent_analysis[0]['count'] if recent_analysis and isinstance(recent_analysis, list) and len(recent_analysis) > 0 else 0
+        except:
+            recent_count = 0
+        st.metric("Last Hour Activity", recent_count)
     
-    # Log viewer
-    st.markdown("#### Recent System Logs")
+    # Real activity logs from database
+    st.markdown("#### Recent System Activity")
     
-    log_type = st.selectbox("Log Type:", ["Application", "Database", "Security", "Performance"])
+    log_type = st.selectbox("Activity Type:", ["Document Uploads", "Multi-LLM Analysis", "Database Operations", "All Activity"])
     
-    # Mock log entries based on selection
-    if log_type == "Application":
-        logs = [
-            "2024-06-09 15:45:12 INFO: Document analysis completed successfully",
-            "2024-06-09 15:44:58 INFO: User query processed: 'NIST compliance check'",
-            "2024-06-09 15:44:45 INFO: Patent scoring calculation initiated",
-            "2024-06-09 15:44:32 INFO: Database connection established",
-            "2024-06-09 15:44:18 INFO: Application startup completed"
-        ]
-    elif log_type == "Database":
-        logs = [
-            "2024-06-09 15:45:10 INFO: Query executed successfully (0.125s)",
-            "2024-06-09 15:44:55 INFO: Database backup completed",
-            "2024-06-09 15:44:42 INFO: Connection pool status: 8/10 active",
-            "2024-06-09 15:44:28 INFO: Index optimization completed",
-            "2024-06-09 15:44:15 INFO: Database health check passed"
-        ]
-    else:
-        logs = [
-            f"2024-06-09 15:45:05 INFO: {log_type} monitoring active",
-            f"2024-06-09 15:44:52 INFO: {log_type} metrics collected", 
-            f"2024-06-09 15:44:41 INFO: {log_type} analysis completed",
-            f"2024-06-09 15:44:33 INFO: {log_type} status: healthy",
-            f"2024-06-09 15:44:22 INFO: {log_type} monitoring initialized"
-        ]
+    # Get real logs based on selection
+    if log_type == "Document Uploads":
+        recent_uploads = db_manager.execute_query("""
+            SELECT title, created_at, document_type, source
+            FROM documents 
+            ORDER BY created_at DESC 
+            LIMIT 10
+        """)
+        
+        if recent_uploads:
+            st.markdown("**Recent Document Uploads:**")
+            for doc in recent_uploads:
+                timestamp = doc['created_at'].strftime("%Y-%m-%d %H:%M:%S") if doc['created_at'] else "Unknown"
+                source_info = doc['source'] if doc['source'] else "Direct upload"
+                st.text(f"{timestamp} INFO: Document uploaded - '{doc['title']}' ({doc['document_type']}) via {source_info}")
+        else:
+            st.info("No recent document uploads found")
     
-    for log in logs:
-        st.text(log)
+    elif log_type == "Multi-LLM Analysis":
+        # Check for Multi-LLM enhanced documents
+        multi_llm_docs = db_manager.execute_query("""
+            SELECT title, created_at, ensemble_confidence, ensemble_services
+            FROM documents 
+            WHERE multi_llm_analysis = true
+            ORDER BY created_at DESC 
+            LIMIT 10
+        """)
+        
+        if multi_llm_docs:
+            st.markdown("**Recent Multi-LLM Analysis:**")
+            for doc in multi_llm_docs:
+                timestamp = doc['created_at'].strftime("%Y-%m-%d %H:%M:%S") if doc['created_at'] else "Unknown"
+                confidence = doc.get('ensemble_confidence', 'N/A')
+                services = doc.get('ensemble_services', 'N/A')
+                st.text(f"{timestamp} INFO: Multi-LLM analysis completed - '{doc['title']}' (Confidence: {confidence}, Services: {services})")
+        else:
+            st.info("No Multi-LLM analyses found")
+    
+    elif log_type == "Database Operations":
+        # Database operation logs
+        st.markdown("**Database Operations:**")
+        current_time = datetime.now()
+        
+        # Connection status
+        try:
+            db_status = db_manager.execute_query("SELECT NOW() as current_time")
+            if db_status:
+                st.text(f"{current_time.strftime('%Y-%m-%d %H:%M:%S')} INFO: Database connection active")
+                st.text(f"{current_time.strftime('%Y-%m-%d %H:%M:%S')} INFO: Last query executed successfully")
+        except Exception as e:
+            st.text(f"{current_time.strftime('%Y-%m-%d %H:%M:%S')} ERROR: Database connection issue - {str(e)}")
+        
+        # Table status
+        table_counts = db_manager.execute_query("""
+            SELECT 
+                schemaname,
+                tablename,
+                n_tup_ins as inserts,
+                n_tup_upd as updates,
+                n_tup_del as deletes
+            FROM pg_stat_user_tables 
+            WHERE schemaname = 'public'
+        """)
+        
+        if table_counts:
+            for table in table_counts:
+                st.text(f"{current_time.strftime('%Y-%m-%d %H:%M:%S')} INFO: Table {table['tablename']} - Inserts: {table['inserts']}, Updates: {table['updates']}, Deletes: {table['deletes']}")
+    
+    else:  # All Activity
+        st.markdown("**Combined System Activity:**")
+        
+        # Recent documents with enhanced info
+        all_activity = db_manager.execute_query("""
+            SELECT 
+                title, 
+                created_at, 
+                document_type, 
+                source,
+                multi_llm_analysis,
+                ensemble_confidence
+            FROM documents 
+            ORDER BY created_at DESC 
+            LIMIT 15
+        """)
+        
+        if all_activity:
+            for doc in all_activity:
+                timestamp = doc['created_at'].strftime("%Y-%m-%d %H:%M:%S") if doc['created_at'] else "Unknown"
+                analysis_type = "Multi-LLM" if doc.get('multi_llm_analysis') else "Standard"
+                confidence_info = f" (Confidence: {doc.get('ensemble_confidence', 'N/A')})" if doc.get('multi_llm_analysis') else ""
+                
+                st.text(f"{timestamp} INFO: {analysis_type} analysis - '{doc['title']}'{confidence_info}")
+        else:
+            st.info("No recent activity found")
 
 def render_system_configuration():
     """System configuration and settings."""
