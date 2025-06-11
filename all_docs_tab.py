@@ -533,7 +533,7 @@ def render_grid_view(docs):
             pub_date = clean_date_safely(doc)
             
             doc_type = ultra_clean_metadata(doc.get('document_type', 'Unknown'))
-            content_preview = doc.get('content_preview', 'No preview available') or 'No preview available'
+            content_preview = ultra_clean_metadata(doc.get('content_preview', 'No preview available') or 'No preview available')
             
             # Calculate comprehensive scores
             scores = comprehensive_document_scoring(content, str(title))
@@ -653,7 +653,7 @@ def render_card_view(docs):
             pub_date = clean_date_safely(doc)
             
             doc_type = ultra_clean_metadata(doc.get('document_type', 'Unknown'))
-            content_preview = doc.get('content_preview', 'No preview available') or 'No preview available'
+            content_preview = ultra_clean_metadata(doc.get('content_preview', 'No preview available') or 'No preview available')
             
             # Display metadata card without thumbnail (Card View)
             st.markdown(f"""

@@ -31,7 +31,7 @@ class HTMLArtifactInterceptor:
         # Remove HTML entities
         text = re.sub(r'&[#a-zA-Z0-9]+;?', '', text)
         
-        # Remove specific problematic artifacts
+        # Remove specific problematic artifacts - expanded list
         artifacts = [
             '</div>', '<div>', '<div', '</span>', '<span>', '<span',
             '</p>', '<p>', '<p', '</h1>', '<h1>', '</h2>', '<h2>',
@@ -40,7 +40,10 @@ class HTMLArtifactInterceptor:
             '</i>', '<i>', '</u>', '<u>', '</br>', '<br>', '<br/>',
             'style=', 'class=', 'id=', 'href=', 'src=', 'alt=',
             '&nbsp;', '&amp;', '&lt;', '&gt;', '&quot;', '&#39;',
-            'div>', 'span>', '/div', '/span', 'div', 'span'
+            'div>', 'span>', '/div', '/span', 'div', 'span',
+            '</div', '<div>', '</span', '<span>', '</p', '<p>',
+            'onclick=', 'onload=', 'width=', 'height=', 'border=',
+            'margin=', 'padding=', 'color=', 'background=', 'font='
         ]
         
         for artifact in artifacts:

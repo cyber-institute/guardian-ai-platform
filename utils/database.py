@@ -81,21 +81,26 @@ class DatabaseManager:
         documents = []
         if isinstance(results, list):
             for row in results:
+                # Apply comprehensive HTML cleaning at the database level
+                from utils.html_artifact_interceptor import clean_field
+                
                 doc = {
                     'id': row['id'],
-                    'title': row['title'] or 'Untitled Document',
-                    'content': row['content'],
+                    'title': clean_field(row['title'] or 'Untitled Document'),
+                    'content': row['content'],  # Keep raw content for scoring
+                    'clean_content': clean_field(row['content']),  # Add cleaned version
                     'text': row['text'],
+                    'text_content': clean_field(row['text']),  # Add cleaned version
                     'quantum_q': float(row['quantum_q']) if row['quantum_q'] else 0,
-                    'document_type': row['document_type'] or 'Report',
+                    'document_type': clean_field(row['document_type'] or 'Report'),
                     'source': row['source'] or '',
-                    'author_organization': row.get('author_organization', 'Unknown'),
+                    'author_organization': clean_field(row.get('author_organization', 'Unknown')),
                     'publish_date': str(row.get('publish_date')) if row.get('publish_date') else None,
-                    'content_preview': row.get('content_preview', 'No preview available'),
-                    'detected_region': row.get('detected_region', 'Unknown'),
+                    'content_preview': clean_field(row.get('content_preview', 'No preview available')),
+                    'detected_region': clean_field(row.get('detected_region', 'Unknown')),
                     'region_confidence': float(row.get('region_confidence', 0.0)) if row.get('region_confidence') else 0.0,
-                    'region_reasoning': row.get('region_reasoning', ''),
-                    'topic': row.get('topic', 'General'),
+                    'region_reasoning': clean_field(row.get('region_reasoning', '')),
+                    'topic': clean_field(row.get('topic', 'General')),
                     'created_at': row['created_at'],
                     'updated_at': row['updated_at']
                 }
