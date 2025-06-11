@@ -64,67 +64,98 @@ def create_speedometer_dial(value, max_value=100):
 def render():
     """Render the About tab for GUARDIAN system."""
     
-    # Compact hero section
-    st.markdown("""
-    <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #B91C2C;">
-        <h2 style="color: #B91C2C; margin-bottom: 0.8rem; font-size: 1.6rem;">GUARDIAN Emerging Tech Tool</h2>
-        <p style="font-size: 1rem; line-height: 1.5; color: #374151; margin: 0;">
-            <strong>Governance Using AI for Risk Detection, Integration, Analysis, and Notification</strong> - 
-            A comprehensive platform for real-time policy evaluation, cybersecurity assessment, and ethical compliance analysis across AI and quantum technology domains.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+    # Enhanced header matching Patent Technologies style
+    st.markdown(
+        """<div style="background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #7c3aed 100%); padding: 2.5rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
+            <h1 style="color: white; margin-bottom: 1.2rem; font-size: 2.2rem; font-weight: 700; text-align: center;">
+                GUARDIAN Emerging Technology Tool
+            </h1>
+            <div style="background: rgba(255,255,255,0.15); padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0;">
+                <h3 style="color: #fbbf24; margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600; text-align: center;">
+                    Governance Using AI for Risk Detection, Integration, Analysis, and Notification
+                </h3>
+                <p style="color: #e5e7eb; text-align: center; font-size: 1.1rem; line-height: 1.6; margin: 0;">
+                    A comprehensive platform for real-time policy evaluation, cybersecurity assessment, and ethical compliance analysis across AI and quantum technology domains.
+                </p>
+            </div>
+        </div>""", 
+        unsafe_allow_html=True
+    )
     
-    # Create a more compact and organized layout
+    # Professional three-column layout matching Patent Technologies style
     col1, col2, col3 = st.columns(3)
     
     with col1:
         st.markdown("""
-        <div style="background: #f9fafb; padding: 1rem; border-radius: 6px; height: 280px;">
-        <h4 style="color: #B91C2C; margin-bottom: 0.8rem;">Patent-Based Frameworks</h4>
-        <div style="font-size: 0.9rem; line-height: 1.4;">
-        <strong>AI Cybersecurity (0-100)</strong><br>
-        Authentication, encryption, monitoring, incident response<br><br>
-        <strong>Quantum Cybersecurity (1-5 QCMEA)</strong><br>
-        Five-tier quantum readiness: awareness → adaptation<br><br>
-        <strong>AI Ethics (0-100)</strong><br>
-        Fairness, transparency, accountability, privacy<br><br>
-        <strong>Quantum Ethics (0-100)</strong><br>
-        Advantage equity, privacy protection, access fairness
+        <div style="background: #e1f5fe; padding: 1.5rem; border-radius: 10px; height: 320px; border: 1px solid #b3e5fc;">
+        <h4 style="color: #0277bd; margin-bottom: 1rem; font-size: 1.1rem; font-weight: 600;">Patent-Based Frameworks</h4>
+        <div style="font-size: 0.9rem; line-height: 1.5; color: #37474f;">
+        <div style="margin-bottom: 0.8rem; padding: 0.5rem; background: rgba(255,255,255,0.7); border-radius: 5px;">
+        <strong style="color: #0277bd;">AI Cybersecurity (0-100)</strong><br>
+        <small>Authentication, encryption, monitoring, incident response</small>
+        </div>
+        <div style="margin-bottom: 0.8rem; padding: 0.5rem; background: rgba(255,255,255,0.7); border-radius: 5px;">
+        <strong style="color: #0277bd;">Quantum Cybersecurity (1-5 QCMEA)</strong><br>
+        <small>Five-tier quantum readiness: awareness → adaptation</small>
+        </div>
+        <div style="margin-bottom: 0.8rem; padding: 0.5rem; background: rgba(255,255,255,0.7); border-radius: 5px;">
+        <strong style="color: #0277bd;">AI Ethics (0-100)</strong><br>
+        <small>Fairness, transparency, accountability, privacy</small>
+        </div>
+        <div style="padding: 0.5rem; background: rgba(255,255,255,0.7); border-radius: 5px;">
+        <strong style="color: #0277bd;">Quantum Ethics (0-100)</strong><br>
+        <small>Advantage equity, privacy protection, access fairness</small>
+        </div>
         </div>
         </div>
         """, unsafe_allow_html=True)
     
     with col2:
         st.markdown("""
-        <div style="background: #f0f9ff; padding: 1rem; border-radius: 6px; height: 280px;">
-        <h4 style="color: #B91C2C; margin-bottom: 0.8rem;">Mathematical Formulations</h4>
-        <div style="font-size: 0.85rem; line-height: 1.3;">
-        <strong>Patent 1 - AI Ethics Risk</strong><br>
-        Ethics_Score = Σ(wi × Di × Ri)<br><br>
-        <strong>Patent 2 - QCMEA Quantum</strong><br>
-        QCMEA_Level = max{L | Σ(Qi × Wi) ≥ Threshold_L}<br><br>
-        <strong>Patent 3 - Cybersecurity Risk</strong><br>
-        Risk_Cyber = Σ(Wi × Vi × Ci × Ii)<br><br>
-        <strong>Bayesian Dynamic Updates</strong><br>
-        P(M|D) = P(D|M) × P(M) / P(D)
+        <div style="background: #f3e5f5; padding: 1.5rem; border-radius: 10px; height: 320px; border: 1px solid #e1bee7;">
+        <h4 style="color: #7b1fa2; margin-bottom: 1rem; font-size: 1.1rem; font-weight: 600;">Mathematical Formulations</h4>
+        <div style="font-size: 0.85rem; line-height: 1.4; color: #37474f;">
+        <div style="margin-bottom: 0.8rem; padding: 0.5rem; background: rgba(255,255,255,0.7); border-radius: 5px;">
+        <strong style="color: #7b1fa2;">Patent 19/045,526 - AI Ethics</strong><br>
+        <code style="font-size: 0.8rem;">Ethics_Score = Σ(wi × Di × Ri)</code>
+        </div>
+        <div style="margin-bottom: 0.8rem; padding: 0.5rem; background: rgba(255,255,255,0.7); border-radius: 5px;">
+        <strong style="color: #7b1fa2;">Patent 19/004,435 - QCMEA Quantum</strong><br>
+        <code style="font-size: 0.8rem;">QCMEA_Level = max{L | Σ(Qi × Wi) ≥ TL}</code>
+        </div>
+        <div style="margin-bottom: 0.8rem; padding: 0.5rem; background: rgba(255,255,255,0.7); border-radius: 5px;">
+        <strong style="color: #7b1fa2;">Patent 19/204,583 - Dynamic Risk</strong><br>
+        <code style="font-size: 0.8rem;">Risk = Σ(Wi × Vi × Ci × Ii)</code>
+        </div>
+        <div style="padding: 0.5rem; background: rgba(255,255,255,0.7); border-radius: 5px;">
+        <strong style="color: #7b1fa2;">Bayesian Updates</strong><br>
+        <code style="font-size: 0.8rem;">P(M|D) = P(D|M) × P(M) / P(D)</code>
+        </div>
         </div>
         </div>
         """, unsafe_allow_html=True)
     
     with col3:
         st.markdown("""
-        <div style="background: #f0fdf4; padding: 1rem; border-radius: 6px; height: 280px;">
-        <h4 style="color: #B91C2C; margin-bottom: 0.8rem;">Target Users</h4>
-        <div style="font-size: 0.9rem; line-height: 1.4;">
-        <strong>Government Agencies</strong><br>
-        Policy compliance, regulatory analysis<br><br>
-        <strong>Enterprise Teams</strong><br>
-        Risk assessment, compliance monitoring<br><br>
-        <strong>Research Institutions</strong><br>
-        Academic analysis, framework studies<br><br>
-        <strong>Compliance Officers</strong><br>
-        Audit preparation, gap identification
+        <div style="background: #e8f5e8; padding: 1.5rem; border-radius: 10px; height: 320px; border: 1px solid #c8e6c9;">
+        <h4 style="color: #2e7d32; margin-bottom: 1rem; font-size: 1.1rem; font-weight: 600;">Target Users</h4>
+        <div style="font-size: 0.9rem; line-height: 1.5; color: #37474f;">
+        <div style="margin-bottom: 0.8rem; padding: 0.5rem; background: rgba(255,255,255,0.7); border-radius: 5px;">
+        <strong style="color: #2e7d32;">Government Agencies</strong><br>
+        <small>Policy compliance, regulatory analysis</small>
+        </div>
+        <div style="margin-bottom: 0.8rem; padding: 0.5rem; background: rgba(255,255,255,0.7); border-radius: 5px;">
+        <strong style="color: #2e7d32;">Enterprise Teams</strong><br>
+        <small>Risk assessment, compliance monitoring</small>
+        </div>
+        <div style="margin-bottom: 0.8rem; padding: 0.5rem; background: rgba(255,255,255,0.7); border-radius: 5px;">
+        <strong style="color: #2e7d32;">Research Institutions</strong><br>
+        <small>Academic analysis, framework studies</small>
+        </div>
+        <div style="padding: 0.5rem; background: rgba(255,255,255,0.7); border-radius: 5px;">
+        <strong style="color: #2e7d32;">Compliance Officers</strong><br>
+        <small>Audit preparation, gap identification</small>
+        </div>
         </div>
         </div>
         """, unsafe_allow_html=True)

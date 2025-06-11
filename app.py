@@ -822,12 +822,23 @@ def render_quantum_ethics_assessment():
 def render_repository_admin_section():
     """Render the Repository Admin section with all administrative functions."""
     
-    st.markdown("""
-    <div style="background: #fef3c7; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #f59e0b;">
-        <h3 style="margin: 0 0 0.5rem 0; color: #92400e;">🔧 Repository Administration</h3>
-        <p style="margin: 0; color: #78350f;">Administrative tools and system monitoring for GUARDIAN</p>
-    </div>
-    """, unsafe_allow_html=True)
+    # Enhanced header matching Patent Technologies style
+    st.markdown(
+        """<div style="background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #7c3aed 100%); padding: 2.5rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
+            <h1 style="color: white; margin-bottom: 1.2rem; font-size: 2.2rem; font-weight: 700; text-align: center;">
+                Repository Administration
+            </h1>
+            <div style="background: rgba(255,255,255,0.15); padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0;">
+                <h3 style="color: #fbbf24; margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600; text-align: center;">
+                    System Management & Configuration Hub
+                </h3>
+                <p style="color: #e5e7eb; text-align: center; font-size: 1.1rem; line-height: 1.6; margin: 0;">
+                    Administrative tools and system monitoring for GUARDIAN platform management
+                </p>
+            </div>
+        </div>""", 
+        unsafe_allow_html=True
+    )
     
     admin_section = st.selectbox(
         "Select Administrative Function:",

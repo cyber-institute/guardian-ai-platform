@@ -15,15 +15,23 @@ from utils.db import fetch_documents
 def render():
     """Render the GUARDIAN Repository Insights tab."""
     
-    st.markdown("# **GUARDIAN Repository Insights**")
-    st.markdown("---")
-    
-    st.markdown("""
-    GUARDIAN continuously learns from its growing repository and AI-powered learning model incorporating 
-    current best practices and globally accepted ethical norms. The system provides intelligent insights 
-    through dynamic pattern recognition, adaptive scoring refinement, and evolving policy recommendations 
-    that improve with each document analyzed.
-    """)
+    # Enhanced header matching Patent Technologies style
+    st.markdown(
+        """<div style="background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #7c3aed 100%); padding: 2.5rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
+            <h1 style="color: white; margin-bottom: 1.2rem; font-size: 2.2rem; font-weight: 700; text-align: center;">
+                GUARDIAN Repository Insights
+            </h1>
+            <div style="background: rgba(255,255,255,0.15); padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0;">
+                <h3 style="color: #fbbf24; margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600; text-align: center;">
+                    AI-Powered Document Discovery & Learning System
+                </h3>
+                <p style="color: #e5e7eb; text-align: center; font-size: 1.1rem; line-height: 1.6; margin: 0;">
+                    GUARDIAN continuously learns from its growing repository through dynamic pattern recognition, adaptive scoring refinement, and evolving policy recommendations that improve with each document analyzed.
+                </p>
+            </div>
+        </div>""", 
+        unsafe_allow_html=True
+    )
     
     # Main recommendation interface
     tab1, tab2, tab3, tab4 = st.tabs([
