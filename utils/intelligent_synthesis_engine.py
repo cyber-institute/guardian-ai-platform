@@ -391,7 +391,12 @@ class IntelligentSynthesisEngine:
                     total_weight += weight
             
             if total_weight > 0:
-                synthesized_scores[metric] = round(weighted_sum / total_weight, 2)
+                score = weighted_sum / total_weight
+                # Apply proper scale limits based on metric type
+                if metric == 'quantum_cybersecurity':
+                    synthesized_scores[metric] = round(max(1, min(5, score)), 2)
+                else:
+                    synthesized_scores[metric] = round(score, 2)
         
         consensus_score = sum(synthesized_scores.values()) / len(synthesized_scores) if synthesized_scores else 0
         synthesized_scores['consensus_score'] = round(consensus_score, 2)
