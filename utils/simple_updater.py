@@ -31,6 +31,12 @@ def update_document_metadata():
             if not content:
                 continue
             
+            # Skip documents with manually corrected metadata (NASA, NIST, etc.)
+            current_title = doc.get('title', '')
+            if any(org in current_title.upper() for org in ['NASA', 'NIST', 'RESPONSIBLE AI PLAN']):
+                logger.info(f"Skipping document {doc_id} - manually corrected metadata")
+                continue
+            
             # Extract improved metadata
             metadata = extract_metadata_fallback(content, source)
             

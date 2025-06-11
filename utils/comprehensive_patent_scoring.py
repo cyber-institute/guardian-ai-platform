@@ -61,10 +61,15 @@ class DocumentScoringSystem:
                     if not content:
                         continue
                     
+                    # Skip documents with manually corrected metadata
+                    if any(marker in title.upper() for marker in ['NASA', 'NIST', 'RESPONSIBLE AI PLAN']):
+                        logger.info(f"Skipping document {doc_id} - manually corrected metadata")
+                        continue
+                    
                     # Apply comprehensive patent-based scoring
                     scores = self.scoring_engine.assess_document_comprehensive(content, title)
                     
-                    # Update document with all four framework scores
+                    # Update document with all four framework scores only
                     cursor.execute("""
                         UPDATE documents 
                         SET ai_cybersecurity_score = %s,
