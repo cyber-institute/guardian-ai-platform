@@ -586,7 +586,7 @@ def render_table_view(docs):
         pub_date = doc.get('publish_date') or 'N/A'
         doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
         
-        scores = comprehensive_document_scoring(content, str(title))
+        scores = get_cached_comprehensive_scores(content, str(title))
         
         table_data.append({
             'Title': title[:45],
@@ -625,8 +625,8 @@ def render_minimal_list(docs):
         doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
         content_preview = doc.get('content_preview', 'No preview available') or 'No preview available'
         
-        # Calculate comprehensive scores
-        scores = comprehensive_document_scoring(content, str(title))
+        # Calculate comprehensive scores with caching
+        scores = get_cached_comprehensive_scores(content, str(title))
         
         col1, col2 = st.columns([3, 2])
         with col1:
