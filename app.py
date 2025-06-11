@@ -2632,14 +2632,13 @@ def render_document_management():
                     if selected_doc:
                         st.markdown(f"- **{selected_doc['title']}** (ID: {selected_doc['id']})")
             
-            # Deletion confirmation
-            col1, col2, col3 = st.columns([1, 1, 1])
-            
-            with col2:
-                if st.button("🗑️ Delete Selected Documents", type="primary"):
-                    # Confirm deletion
-                    if st.session_state.get('confirm_deletion', False):
-                        # Perform deletion
+            # Show confirmation step first
+            if st.session_state.get('confirm_deletion', False):
+                st.error("⚠️ **CONFIRM DELETION** - This action cannot be undone!")
+                col1, col2, col3 = st.columns([1, 1, 1])
+                with col1:
+                    if st.button("✅ Yes, Delete Forever", type="primary"):
+                        # Perform actual deletion
                         try:
                             deleted_count = 0
                             for doc_id in selected_for_deletion:
@@ -2647,36 +2646,28 @@ def render_document_management():
                                     "DELETE FROM documents WHERE id = %s",
                                     (doc_id,)
                                 )
-                                if result is not None:  # Successful deletion
-                                    deleted_count += 1
+                                deleted_count += 1
                             
-                            if deleted_count > 0:
-                                st.success(f"Successfully deleted {deleted_count} documents")
-                                # Clear selection state
-                                for doc_id in selected_for_deletion:
-                                    if f"delete_{doc_id}" in st.session_state:
-                                        del st.session_state[f"delete_{doc_id}"]
-                                st.session_state['confirm_deletion'] = False
-                                st.rerun()
-                            else:
-                                st.error("Failed to delete documents")
+                            st.success(f"Successfully deleted {deleted_count} documents")
+                            # Clear selection state
+                            for doc_id in selected_for_deletion:
+                                if f"delete_{doc_id}" in st.session_state:
+                                    del st.session_state[f"delete_{doc_id}"]
+                            st.session_state['confirm_deletion'] = False
+                            st.rerun()
                         except Exception as e:
                             st.error(f"Error during deletion: {str(e)}")
-                    else:
-                        st.session_state['confirm_deletion'] = True
-                        st.rerun()
-            
-            # Show confirmation step
-            if st.session_state.get('confirm_deletion', False):
-                st.error("⚠️ **CONFIRM DELETION** - This action cannot be undone!")
-                col1, col2 = st.columns(2)
-                with col1:
-                    if st.button("✅ Yes, Delete Forever"):
-                        st.session_state['confirm_deletion'] = True
-                        st.rerun()
-                with col2:
+                            st.session_state['confirm_deletion'] = False
+                with col3:
                     if st.button("❌ Cancel"):
                         st.session_state['confirm_deletion'] = False
+                        st.rerun()
+            else:
+                # Initial deletion button
+                col1, col2, col3 = st.columns([1, 1, 1])
+                with col2:
+                    if st.button("🗑️ Delete Selected Documents", type="primary"):
+                        st.session_state['confirm_deletion'] = True
                         st.rerun()
         
         else:
