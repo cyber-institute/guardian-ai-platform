@@ -1729,7 +1729,7 @@ def render_phase_4_enterprise_scale():
 def render_phase_5_autonomous_platform():
     """Phase 5: Autonomous Platform with Comprehensive Data Lake"""
     
-    st.markdown("### **Phase 5: Autonomous Policy Generation Platform**")
+    st.markdown("### Phase 5: Autonomous Policy Generation Platform")
     st.markdown("*Ultimate Vision: Self-learning AI system with comprehensive policy generation capabilities*")
     
     # Vision overview
@@ -1737,7 +1737,7 @@ def render_phase_5_autonomous_platform():
     
     with col1:
         st.markdown("""
-        #### **🤖 Autonomous AI Governance Platform**
+        #### Autonomous AI Governance Platform
         
         **Revolutionary Capabilities:**
         - **Comprehensive Data Lake**: Massive repository of global policy knowledge
@@ -1756,7 +1756,7 @@ def render_phase_5_autonomous_platform():
     
     with col2:
         st.markdown("""
-        #### **🎯 Ultimate Goals**
+        #### Ultimate Goals
         
         **Autonomous Capabilities:**
         - Complete policy generation
@@ -1773,7 +1773,7 @@ def render_phase_5_autonomous_platform():
     
     # Technical architecture
     st.markdown("---")
-    st.markdown("#### **🧠 Autonomous Platform Architecture**")
+    st.markdown("#### Autonomous Platform Architecture")
     
     autonomous_tabs = st.tabs(["Data Lake Architecture", "Self-Learning LLM", "Policy Generation Engine", "Global Monitoring"])
     
@@ -2597,11 +2597,18 @@ def render_patent_scoring_management():
             st.rerun()
     
     with col2:
-        if st.button("📊 Export Data", help="Export all documents as JSON"):
+        if st.button("Export Data", help="Export all documents as JSON"):
             try:
-                documents = fetch_documents()
+                from utils.database import get_db_connection
+                conn = get_db_connection()
+                cursor = conn.cursor()
+                cursor.execute("SELECT * FROM documents")
+                documents = cursor.fetchall()
+                cursor.close()
+                conn.close()
+                
                 st.download_button(
-                    label="📥 Download JSON",
+                    label="Download JSON",
                     data=str(documents),
                     file_name=f"quantum_documents_{datetime.now().strftime('%Y%m%d')}.json",
                     mime="application/json"
@@ -2610,20 +2617,29 @@ def render_patent_scoring_management():
                 st.error(f"Export failed: {e}")
     
     # Database schema info
-    with st.expander("🔍 Database Schema"):
-        schema_info = db_manager.execute_query("""
-            SELECT table_name, column_name, data_type, is_nullable
-            FROM information_schema.columns 
-            WHERE table_schema = 'public' 
-            ORDER BY table_name, ordinal_position
-        """)
-        
-        if schema_info:
-            import pandas as pd
-            df = pd.DataFrame(schema_info)
-            st.dataframe(df, use_container_width=True)
-        else:
-            st.write("Schema information not available")
+    with st.expander("Database Schema"):
+        try:
+            from utils.database import get_db_connection
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT table_name, column_name, data_type, is_nullable
+                FROM information_schema.columns 
+                WHERE table_schema = 'public' 
+                ORDER BY table_name, ordinal_position
+            """)
+            schema_info = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            
+            if schema_info:
+                import pandas as pd
+                df = pd.DataFrame(schema_info, columns=['Table', 'Column', 'Type', 'Nullable'])
+                st.dataframe(df, use_container_width=True)
+            else:
+                st.write("Schema information not available")
+        except Exception as e:
+            st.error(f"Unable to fetch schema information: {e}")
 
 if __name__ == "__main__":
     main()
