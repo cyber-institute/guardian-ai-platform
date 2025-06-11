@@ -40,7 +40,7 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python webhook_handler.py"
-waitForPort = 8080
+waitForPort = 8081
 
 [[ports]]
 localPort = 5000
@@ -49,3 +49,7 @@ externalPort = 80
 [[ports]]
 localPort = 8080
 externalPort = 8080
+
+[[ports]]
+localPort = 8081
+externalPort = 8081
