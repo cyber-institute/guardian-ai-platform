@@ -15,117 +15,105 @@ def render():
     """Render the interactive patent web application."""
     
     # Enhanced Patent header with visual appeal
-    st.markdown("""
-    <div style="background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #7c3aed 100%); padding: 2.5rem; border-radius: 12px; margin-bottom: 2rem; color: white; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%; opacity: 0.3;"></div>
-        <div style="position: absolute; bottom: -30px; left: -30px; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 50%; opacity: 0.5;"></div>
-        
-        <div style="position: relative; z-index: 2;">
-            <h1 style="color: white; margin-bottom: 1.2rem; font-size: 2.2rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+    st.markdown(
+        """<div style="background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #7c3aed 100%); padding: 2.5rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
+            <h1 style="color: white; margin-bottom: 1.2rem; font-size: 2.2rem; font-weight: 700; text-align: center;">
                 🛡️ GUARDIAN Patent Technologies
             </h1>
-            
-            <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0;">
-                <h3 style="color: #fbbf24; margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600;">
+            <div style="background: rgba(255,255,255,0.15); padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0;">
+                <h3 style="color: #fbbf24; margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600; text-align: center;">
                     System for Real-Time Dynamic Governance of Emerging Technologies
                 </h3>
-                <p style="font-size: 1.1rem; line-height: 1.6; color: #e5e7eb; margin-bottom: 0;">
+                <p style="font-size: 1.1rem; line-height: 1.6; color: #e5e7eb; margin-bottom: 0; text-align: center;">
                     Revolutionary platform integrating three breakthrough patent pending technologies for comprehensive emerging technology governance
                 </p>
             </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+        </div>""", 
+        unsafe_allow_html=True
+    )
     
-    # Three patent cards with enhanced visual design
-    st.markdown("""
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
-        
-        <!-- AI Policy Patent Card -->
-        <div style="background: linear-gradient(145deg, #ecfdf5 0%, #d1fae5 100%); border: 2px solid #10b981; border-radius: 12px; padding: 1.8rem; position: relative; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-            <div style="position: absolute; top: 15px; right: 15px; background: #10b981; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
+    # Use Streamlit columns for patent cards
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("""
+        <div style="background: linear-gradient(145deg, #ecfdf5 0%, #d1fae5 100%); border: 2px solid #10b981; border-radius: 12px; padding: 1.5rem; margin: 1rem 0;">
+            <div style="background: #10b981; color: white; display: inline-block; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-bottom: 1rem;">
                 Patent #1
             </div>
-            <div style="margin-bottom: 1rem;">
-                <div style="width: 50px; height: 4px; background: #10b981; border-radius: 2px; margin-bottom: 1rem;"></div>
-                <h4 style="color: #065f46; font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.3;">
-                    AI-Powered Policy Evaluation and Ethical Compliance System
-                </h4>
-                <div style="background: #065f46; color: white; display: inline-block; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem;">
-                    Patent Application: 19/045,526
-                </div>
+            <h4 style="color: #065f46; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">
+                AI-Powered Policy Evaluation and Ethical Compliance System
+            </h4>
+            <div style="background: #065f46; color: white; display: inline-block; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.8rem; margin-bottom: 1rem;">
+                Patent Application: 19/045,526
             </div>
-            <p style="font-size: 0.95rem; line-height: 1.5; color: #374151; margin-bottom: 1rem;">
-                Provides comprehensive gap analysis and reinforcement learning algorithms for policy evaluation that enable continuous improvement of governance frameworks through machine learning feedback loops.
+            <p style="font-size: 0.9rem; line-height: 1.4; color: #374151; margin-bottom: 1rem;">
+                Comprehensive gap analysis and reinforcement learning algorithms for policy evaluation that enable continuous improvement of governance frameworks through machine learning feedback loops.
             </p>
             <div style="background: rgba(16, 185, 129, 0.1); padding: 0.8rem; border-radius: 6px; border-left: 3px solid #10b981;">
-                <strong style="color: #065f46; font-size: 0.9rem;">Core Innovation:</strong> 
+                <strong style="color: #065f46;">Core Innovation:</strong><br>
                 <span style="color: #374151; font-size: 0.85rem;">Machine learning-driven policy gap identification and automated improvement recommendations</span>
             </div>
         </div>
-        
-        <!-- Quantum Cybersecurity Patent Card -->
-        <div style="background: linear-gradient(145deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 1.8rem; position: relative; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-            <div style="position: absolute; top: 15px; right: 15px; background: #f59e0b; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div style="background: linear-gradient(145deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 1.5rem; margin: 1rem 0;">
+            <div style="background: #f59e0b; color: white; display: inline-block; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-bottom: 1rem;">
                 Patent #2
             </div>
-            <div style="margin-bottom: 1rem;">
-                <div style="width: 50px; height: 4px; background: #f59e0b; border-radius: 2px; margin-bottom: 1rem;"></div>
-                <h4 style="color: #92400e; font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.3;">
-                    Quantum Cybersecurity Framework for Policy Assessment and Maturity Evaluation
-                </h4>
-                <div style="background: #92400e; color: white; display: inline-block; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem;">
-                    Patent Application: 19/004,435
-                </div>
+            <h4 style="color: #92400e; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">
+                Quantum Cybersecurity Framework for Policy Assessment and Maturity Evaluation
+            </h4>
+            <div style="background: #92400e; color: white; display: inline-block; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.8rem; margin-bottom: 1rem;">
+                Patent Application: 19/004,435
             </div>
-            <p style="font-size: 0.95rem; line-height: 1.5; color: #374151; margin-bottom: 1rem;">
-                Delivers quantum-specific risk assessment capabilities through a 5-tier scoring system that addresses the unique security challenges posed by quantum computing technologies.
+            <p style="font-size: 0.9rem; line-height: 1.4; color: #374151; margin-bottom: 1rem;">
+                Quantum-specific risk assessment capabilities through a 5-tier scoring system that addresses the unique security challenges posed by quantum computing technologies.
             </p>
             <div style="background: rgba(245, 158, 11, 0.1); padding: 0.8rem; border-radius: 6px; border-left: 3px solid #f59e0b;">
-                <strong style="color: #92400e; font-size: 0.9rem;">Core Innovation:</strong> 
+                <strong style="color: #92400e;">Core Innovation:</strong><br>
                 <span style="color: #374151; font-size: 0.85rem;">QCMEA 5-tier quantum cybersecurity maturity evaluation system</span>
             </div>
         </div>
-        
-        <!-- Dynamic Risk Patent Card -->
-        <div style="background: linear-gradient(145deg, #ddd6fe 0%, #c4b5fd 100%); border: 2px solid #8b5cf6; border-radius: 12px; padding: 1.8rem; position: relative; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-            <div style="position: absolute; top: 15px; right: 15px; background: #8b5cf6; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
+        """, unsafe_allow_html=True)
+    
+    with col3:
+        st.markdown("""
+        <div style="background: linear-gradient(145deg, #ddd6fe 0%, #c4b5fd 100%); border: 2px solid #8b5cf6; border-radius: 12px; padding: 1.5rem; margin: 1rem 0;">
+            <div style="background: #8b5cf6; color: white; display: inline-block; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-bottom: 1rem;">
                 Patent #3
             </div>
-            <div style="margin-bottom: 1rem;">
-                <div style="width: 50px; height: 4px; background: #8b5cf6; border-radius: 2px; margin-bottom: 1rem;"></div>
-                <h4 style="color: #5b21b6; font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.3;">
-                    System for Real-Time Dynamic Governance of Emerging Technologies
-                </h4>
-                <div style="background: #5b21b6; color: white; display: inline-block; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem;">
-                    Patent Application: 19/204,583
-                </div>
+            <h4 style="color: #5b21b6; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">
+                System for Real-Time Dynamic Governance of Emerging Technologies
+            </h4>
+            <div style="background: #5b21b6; color: white; display: inline-block; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.8rem; margin-bottom: 1rem;">
+                Patent Application: 19/204,583
             </div>
-            <p style="font-size: 0.95rem; line-height: 1.5; color: #374151; margin-bottom: 1rem;">
-                Implements real-time adaptive risk calculations using Bayesian inference and mathematical formulations that automatically adjust governance recommendations based on emerging threat landscapes.
+            <p style="font-size: 0.9rem; line-height: 1.4; color: #374151; margin-bottom: 1rem;">
+                Real-time adaptive risk calculations using Bayesian inference and mathematical formulations that automatically adjust governance recommendations based on emerging threat landscapes.
             </p>
             <div style="background: rgba(139, 92, 246, 0.1); padding: 0.8rem; border-radius: 6px; border-left: 3px solid #8b5cf6;">
-                <strong style="color: #5b21b6; font-size: 0.9rem;">Core Innovation:</strong> 
+                <strong style="color: #5b21b6;">Core Innovation:</strong><br>
                 <span style="color: #374151; font-size: 0.85rem;">Real-time Bayesian inference engine for dynamic risk adaptation</span>
             </div>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
     
-    # Impact statement with enhanced styling
+    # Impact statement with simplified styling
+    st.markdown("---")
     st.markdown("""
-    <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 2px solid #ef4444; border-radius: 12px; padding: 2rem; margin: 2rem 0; position: relative;">
-        <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #ef4444; color: white; padding: 0.5rem 1.5rem; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
+    <div style="background: #fef2f2; border: 2px solid #ef4444; border-radius: 12px; padding: 2rem; margin: 2rem 0; text-align: center;">
+        <div style="background: #ef4444; color: white; display: inline-block; padding: 0.5rem 1.5rem; border-radius: 20px; font-weight: 600; margin-bottom: 1rem;">
             INNOVATION IMPACT
         </div>
-        <div style="margin-top: 1rem; text-align: center;">
-            <h3 style="color: #b91c1c; font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem;">
-                First Comprehensive Governance Platform for Emerging Technology Risks
-            </h3>
-            <p style="font-size: 1rem; line-height: 1.6; color: #374151; max-width: 800px; margin: 0 auto;">
-                This integrated approach creates the first comprehensive governance platform capable of <strong>dynamically adapting to emerging technology risks in real-time</strong>, filling a critical gap in existing regulatory frameworks through patent-pending innovations that currently do not exist in the market.
-            </p>
-        </div>
+        <h3 style="color: #b91c1c; font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem;">
+            First Comprehensive Governance Platform for Emerging Technology Risks
+        </h3>
+        <p style="font-size: 1rem; line-height: 1.6; color: #374151;">
+            This integrated approach creates the first comprehensive governance platform capable of <strong>dynamically adapting to emerging technology risks in real-time</strong>, filling a critical gap in existing regulatory frameworks through patent-pending innovations that currently do not exist in the market.
+        </p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -678,16 +666,185 @@ def render_combined_calculator():
 def render_process_flow():
     """Process flow demonstration."""
     
-    st.markdown("""
-    ## GUARDIAN Patent System Flow
+    st.markdown("## GUARDIAN Patent System Flow")
+    st.markdown("Comprehensive visual diagram showing how the three patent pending technologies interact within the complete GUARDIAN ecosystem.")
     
-    Comprehensive visual diagram showing how the three patent pending technologies interact within the complete GUARDIAN ecosystem.
-    """)
-    
-    # Create comprehensive system flow diagram
+    # Title
     st.markdown("""
-    <div style="background: #f8fafc; padding: 2rem; border-radius: 12px; margin: 1.5rem 0;">
-        <h3 style="color: #B91C2C; text-align: center; margin-bottom: 2rem;">GUARDIAN Three-Patent Integration Flow</h3>
+    <div style="text-align: center; background: #f8fafc; padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0;">
+        <h3 style="color: #B91C2C; margin: 0;">GUARDIAN Three-Patent Integration Flow</h3>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Data Ingestion Layer
+    st.markdown("### 📥 Data Ingestion Layer")
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("""
+        <div style="background: #e0f2fe; padding: 1rem; border-radius: 8px; text-align: center; margin: 0.5rem 0;">
+            <strong>Backend Scraping</strong><br>
+            <small>• Web APIs<br>• RSS Feeds<br>• Government Portals</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div style="background: #e0f2fe; padding: 1rem; border-radius: 8px; text-align: center; margin: 0.5rem 0;">
+            <strong>Frontend Uploads</strong><br>
+            <small>• PDF Documents<br>• Policy Files<br>• Manual Entry</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col3:
+        st.markdown("""
+        <div style="background: #e0f2fe; padding: 1rem; border-radius: 8px; text-align: center; margin: 0.5rem 0;">
+            <strong>URL Processing</strong><br>
+            <small>• Direct Links<br>• Content Extraction<br>• Real-time Monitoring</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Patent Integration Hub
+    st.markdown("### 🗄️ Central Repository & Patent Integration Hub")
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    
+    with col1:
+        st.markdown("""
+        <div style="background: #f3e5f5; padding: 1rem; border-radius: 8px; text-align: center;">
+            <strong>Document Storage</strong><br>
+            <small>PostgreSQL Database<br>Metadata Extraction<br>Thumbnail Generation</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div style="background: #fff3e0; padding: 1rem; border-radius: 8px; text-align: center; border: 2px dashed #ff9800;">
+            <strong>Patent Integration Hub</strong><br>
+            <div style="font-size: 0.9rem; margin-top: 0.5rem;">
+                <div><strong>Patent 19/045,526:</strong> AI Policy Analysis</div>
+                <div><strong>Patent 19/004,435:</strong> Quantum Cybersecurity</div>
+                <div><strong>Patent 19/204,583:</strong> Dynamic Risk Scoring</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col3:
+        st.markdown("""
+        <div style="background: #f3e5f5; padding: 1rem; border-radius: 8px; text-align: center;">
+            <strong>Content Processing</strong><br>
+            <small>NLP Analysis<br>Feature Extraction<br>Classification</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Scoring Engines
+    st.markdown("### ⚖️ Patent-Based Scoring Engines")
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.markdown("""
+        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px; text-align: center;">
+            <strong>AI Cybersecurity</strong><br>
+            <small>Formula: Σ(w × v × c)<br>Risk = 0-100 Scale</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px; text-align: center;">
+            <strong>Quantum Cybersecurity</strong><br>
+            <small>QCMEA: 5-Tier System<br>Initial → Optimized</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col3:
+        st.markdown("""
+        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px; text-align: center;">
+            <strong>AI Ethics</strong><br>
+            <small>Ethics = F + T + A + P<br>Range: 0-100 Points</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col4:
+        st.markdown("""
+        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px; text-align: center;">
+            <strong>Quantum Ethics</strong><br>
+            <small>Multi-dimensional<br>Ethical Framework</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Continuous Learning
+    st.markdown("### 🧠 Continuous Learning & Reinforcement")
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    
+    with col1:
+        st.markdown("""
+        <div style="background: #fff3e0; padding: 1rem; border-radius: 8px; text-align: center;">
+            <strong>Bayesian Updates</strong><br>
+            <small>Prior → Posterior<br>Evidence Integration</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px; text-align: center; border: 2px solid #4caf50;">
+            <strong>Reinforcement Learning Engine</strong><br>
+            <small>
+                • Q-Learning: Policy Optimization<br>
+                • Reward Matrices: Governance Effectiveness<br>
+                • Action Spaces: Recommendation Strategies<br>
+                • State Transitions: Risk Environment Changes
+            </small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col3:
+        st.markdown("""
+        <div style="background: #fff3e0; padding: 1rem; border-radius: 8px; text-align: center;">
+            <strong>Model Adaptation</strong><br>
+            <small>Weight Updates<br>Threshold Adjustments</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # User Guidance
+    st.markdown("### 🎯 Intelligent User Guidance")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("""
+        <div style="background: #fce4ec; padding: 1rem; border-radius: 8px; text-align: center;">
+            <strong>Gap Analysis Reports</strong><br>
+            <small>Framework Compliance<br>Missing Elements<br>Risk Identification</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div style="background: #fce4ec; padding: 1rem; border-radius: 8px; text-align: center;">
+            <strong>Smart Recommendations</strong><br>
+            <small>Priority Rankings<br>Implementation Guidance<br>Resource Allocation</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col3:
+        st.markdown("""
+        <div style="background: #fce4ec; padding: 1rem; border-radius: 8px; text-align: center;">
+            <strong>Dynamic Alerts</strong><br>
+            <small>Threshold Breaches<br>Emerging Risks<br>Compliance Issues</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Feedback Loop
+    st.markdown("### 🔄 Continuous Feedback Loop")
+    st.markdown("""
+    <div style="background: #e1f5fe; padding: 1rem; border-radius: 8px; text-align: center; margin: 1rem 0;">
+        <strong>User Actions → System Learning → Improved Recommendations → Better Outcomes</strong><br>
+        <small style="color: #666;">Real-time adaptation based on user decisions and policy effectiveness metrics</small>
+    </div>
+    """, unsafe_allow_html=True)
         
         <!-- Data Ingestion Layer -->
         <div style="background: #e0f2fe; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
