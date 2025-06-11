@@ -12,6 +12,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import logging
 from utils.free_llm_services import free_llm_manager
 from utils.llm_intelligence_enhancer import llm_enhancer
+from utils.intelligent_synthesis_engine import intelligent_synthesis_engine
 
 @dataclass
 class LLMResponse:
@@ -150,8 +151,8 @@ class MultiLLMEnsemble:
             if isinstance(r, LLMResponse) and r.success
         ]
         
-        # Synthesize consensus
-        consensus_result = self._synthesize_consensus(valid_responses, evaluation_domain)
+        # Use intelligent synthesis engine for optimal consensus
+        consensus_result = self._synthesize_with_intelligent_engine(valid_responses, evaluation_domain)
         
         processing_time = time.time() - start_time
         
@@ -408,7 +409,7 @@ class MultiLLMEnsemble:
         return domain_contexts.get(domain, 'You are an expert policy analyst.')
     
     def _synthesize_consensus(self, responses: List[LLMResponse], domain: str) -> Dict[str, Any]:
-        """Synthesize consensus from parallel responses"""
+        """Advanced consensus synthesis with intelligent disagreement resolution"""
         
         if not responses:
             return {
@@ -417,36 +418,185 @@ class MultiLLMEnsemble:
                 'metadata': {'synthesis_method': 'no_responses'}
             }
         
-        # Weighted averaging based on service reliability and confidence
-        total_weight = 0
-        weighted_scores = {}
-        all_insights = []
+        # Multi-stage synthesis approach
+        synthesis_result = self._advanced_consensus_synthesis(responses, domain)
+        
+        return synthesis_result
+    
+    def _advanced_consensus_synthesis(self, responses: List[LLMResponse], domain: str) -> Dict[str, Any]:
+        """
+        Revolutionary multi-stage consensus synthesis:
+        1. Weighted Bayesian averaging
+        2. Outlier detection and handling
+        3. Disagreement analysis and resolution
+        4. Confidence calibration
+        """
+        
+        # Stage 1: Extract and normalize all scores
+        normalized_responses = self._normalize_response_scores(responses)
+        
+        # Stage 2: Detect and handle outliers
+        filtered_responses = self._detect_and_handle_outliers(normalized_responses)
+        
+        # Stage 3: Bayesian weighted consensus
+        bayesian_consensus = self._bayesian_weighted_synthesis(filtered_responses, domain)
+        
+        # Stage 4: Disagreement analysis
+        disagreement_analysis = self._analyze_disagreements(normalized_responses)
+        
+        # Stage 5: Confidence calibration
+        calibrated_confidence = self._calibrate_confidence(
+            bayesian_consensus, 
+            disagreement_analysis,
+            len(filtered_responses)
+        )
+        
+        # Stage 6: Enhanced metadata synthesis
+        enhanced_metadata = self._synthesize_enhanced_metadata(
+            responses, 
+            disagreement_analysis,
+            bayesian_consensus
+        )
+        
+        return {
+            'scores': bayesian_consensus['scores'],
+            'confidence': calibrated_confidence,
+            'metadata': {
+                'synthesis_method': 'advanced_bayesian_consensus',
+                'participating_services': [r.service_name for r in responses],
+                'outliers_detected': bayesian_consensus['outliers'],
+                'disagreement_level': disagreement_analysis['disagreement_level'],
+                'consensus_strength': disagreement_analysis['consensus_strength'],
+                **enhanced_metadata
+            }
+        }
+    
+    def _normalize_response_scores(self, responses: List[LLMResponse]) -> List[Dict[str, Any]]:
+        """Normalize all response scores to consistent scale and structure"""
+        normalized = []
         
         for response in responses:
-            service_weight = self.processing_weights.get(response.service_name, 0.5)
-            confidence_weight = response.confidence_score
-            combined_weight = service_weight * confidence_weight
-            
-            total_weight += combined_weight
-            
-            # Aggregate scores
             policy_scores = response.response_data.get('policy_scores', {})
-            for metric, score in policy_scores.items():
-                if metric not in weighted_scores:
-                    weighted_scores[metric] = 0
-                weighted_scores[metric] += score * combined_weight
+            domain_relevance = response.response_data.get('domain_relevance', 50)
             
-            # Collect insights
-            insights = response.response_data.get('key_insights', [])
-            all_insights.extend(insights)
+            # Ensure all scores are on 0-100 scale
+            normalized_scores = {}
+            for metric, score in policy_scores.items():
+                if isinstance(score, (int, float)):
+                    # Normalize to 0-100 if needed
+                    if score <= 1.0:  # Assume 0-1 scale
+                        normalized_scores[metric] = score * 100
+                    else:  # Assume already 0-100
+                        normalized_scores[metric] = min(max(score, 0), 100)
+            
+            normalized.append({
+                'service_name': response.service_name,
+                'scores': normalized_scores,
+                'domain_relevance': min(max(domain_relevance, 0), 100),
+                'confidence': response.confidence_score,
+                'service_weight': self.processing_weights.get(response.service_name, 0.5),
+                'processing_time': response.processing_time,
+                'insights': response.response_data.get('key_insights', [])
+            })
         
-        # Normalize weighted scores
+        return normalized
+    
+    def _detect_and_handle_outliers(self, normalized_responses: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Detect statistical outliers and apply appropriate handling"""
+        if len(normalized_responses) < 3:
+            return normalized_responses  # Need at least 3 for outlier detection
+        
+        # Calculate score statistics for each metric
+        all_metrics = set()
+        for resp in normalized_responses:
+            all_metrics.update(resp['scores'].keys())
+        
+        outlier_services = set()
+        
+        for metric in all_metrics:
+            scores = []
+            for resp in normalized_responses:
+                if metric in resp['scores']:
+                    scores.append(resp['scores'][metric])
+            
+            if len(scores) >= 3:
+                # Use IQR method for outlier detection
+                scores.sort()
+                q1 = scores[len(scores)//4]
+                q3 = scores[3*len(scores)//4]
+                iqr = q3 - q1
+                lower_bound = q1 - 1.5 * iqr
+                upper_bound = q3 + 1.5 * iqr
+                
+                # Mark services with outlier scores
+                for resp in normalized_responses:
+                    if metric in resp['scores']:
+                        score = resp['scores'][metric]
+                        if score < lower_bound or score > upper_bound:
+                            outlier_services.add(resp['service_name'])
+        
+        # Filter out outliers but preserve at least 2 responses
+        filtered = []
+        non_outliers = [r for r in normalized_responses if r['service_name'] not in outlier_services]
+        
+        if len(non_outliers) >= 2:
+            filtered = non_outliers
+        else:
+            # Keep all if too many outliers detected
+            filtered = normalized_responses
+        
+        return filtered
+    
+    def _bayesian_weighted_synthesis(self, responses: List[Dict[str, Any]], domain: str) -> Dict[str, Any]:
+        """Bayesian weighted synthesis with prior knowledge integration"""
+        
+        # Domain-specific priors (based on typical policy evaluation ranges)
+        domain_priors = {
+            'ai_ethics': {'completeness': 65, 'clarity': 70, 'enforceability': 60},
+            'quantum_security': {'completeness': 70, 'clarity': 65, 'enforceability': 75},
+            'cybersecurity': {'completeness': 75, 'clarity': 70, 'enforceability': 80},
+            'default': {'completeness': 70, 'clarity': 70, 'enforceability': 70}
+        }
+        
+        priors = domain_priors.get(domain, domain_priors['default'])
+        
+        # Collect all unique metrics
+        all_metrics = set()
+        for resp in responses:
+            all_metrics.update(resp['scores'].keys())
+        
         final_scores = {}
-        if total_weight > 0:
-            for metric, weighted_sum in weighted_scores.items():
+        outliers_detected = []
+        
+        for metric in all_metrics:
+            # Extract scores and weights for this metric
+            scores = []
+            weights = []
+            
+            for resp in responses:
+                if metric in resp['scores']:
+                    score = resp['scores'][metric]
+                    # Combined weight: service reliability × confidence × domain relevance
+                    weight = (
+                        resp['service_weight'] * 
+                        resp['confidence'] * 
+                        (resp['domain_relevance'] / 100)
+                    )
+                    scores.append(score)
+                    weights.append(weight)
+            
+            if scores:
+                # Bayesian weighted average with prior
+                prior_score = priors.get(metric, 70)
+                prior_weight = 0.3  # Prior contributes 30% to final result
+                
+                # Calculate posterior
+                total_weight = sum(weights) + prior_weight
+                weighted_sum = sum(s * w for s, w in zip(scores, weights)) + prior_score * prior_weight
+                
                 final_scores[metric] = round(weighted_sum / total_weight, 2)
         
-        # Calculate overall consensus score
+        # Calculate consensus score
         if final_scores:
             consensus_score = round(sum(final_scores.values()) / len(final_scores), 2)
         else:
@@ -454,18 +604,92 @@ class MultiLLMEnsemble:
         
         final_scores['consensus_score'] = consensus_score
         
-        # Calculate confidence based on agreement between services
-        confidence = min(total_weight / len(responses), 1.0) if responses else 0.0
-        
         return {
             'scores': final_scores,
-            'confidence': confidence,
-            'metadata': {
-                'synthesis_method': 'weighted_consensus',
-                'participating_services': [r.service_name for r in responses],
-                'total_insights': len(all_insights),
-                'unique_insights': list(set(all_insights))
+            'outliers': outliers_detected
+        }
+    
+    def _analyze_disagreements(self, responses: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Analyze disagreement patterns between LLM responses"""
+        
+        if len(responses) < 2:
+            return {'disagreement_level': 0.0, 'consensus_strength': 1.0}
+        
+        # Calculate variance for each metric
+        all_metrics = set()
+        for resp in responses:
+            all_metrics.update(resp['scores'].keys())
+        
+        metric_variances = {}
+        
+        for metric in all_metrics:
+            scores = [resp['scores'][metric] for resp in responses if metric in resp['scores']]
+            if len(scores) >= 2:
+                mean_score = sum(scores) / len(scores)
+                variance = sum((s - mean_score) ** 2 for s in scores) / len(scores)
+                metric_variances[metric] = variance
+        
+        # Overall disagreement level (normalized variance)
+        if metric_variances:
+            avg_variance = sum(metric_variances.values()) / len(metric_variances)
+            disagreement_level = min(avg_variance / 100, 1.0)  # Normalize to 0-1
+        else:
+            disagreement_level = 0.0
+        
+        consensus_strength = 1.0 - disagreement_level
+        
+        return {
+            'disagreement_level': round(disagreement_level, 3),
+            'consensus_strength': round(consensus_strength, 3),
+            'metric_variances': metric_variances
+        }
+    
+    def _calibrate_confidence(self, consensus_result: Dict[str, Any], disagreement_analysis: Dict[str, Any], num_responses: int) -> float:
+        """Calibrate confidence based on consensus strength and response count"""
+        
+        # Base confidence from consensus strength
+        consensus_confidence = disagreement_analysis['consensus_strength']
+        
+        # Response count factor (more responses = higher confidence)
+        count_factor = min(num_responses / 5, 1.0)  # Cap at 5 responses
+        
+        # Service diversity factor (different services = higher confidence)
+        diversity_factor = min(num_responses / 3, 1.0)
+        
+        # Combined calibrated confidence
+        calibrated = (
+            consensus_confidence * 0.6 +
+            count_factor * 0.2 +
+            diversity_factor * 0.2
+        )
+        
+        return round(min(max(calibrated, 0.0), 1.0), 3)
+    
+    def _synthesize_enhanced_metadata(self, responses: List[LLMResponse], disagreement_analysis: Dict[str, Any], consensus_result: Dict[str, Any]) -> Dict[str, Any]:
+        """Synthesize enhanced metadata from all responses"""
+        
+        # Collect all insights
+        all_insights = []
+        service_performance = {}
+        
+        for response in responses:
+            insights = response.response_data.get('key_insights', [])
+            all_insights.extend(insights)
+            
+            service_performance[response.service_name] = {
+                'processing_time': response.processing_time,
+                'confidence': response.confidence_score,
+                'success': response.success
             }
+        
+        # Deduplicate insights using semantic similarity (simplified)
+        unique_insights = list(set(all_insights))[:10]  # Limit to top 10
+        
+        return {
+            'total_insights_collected': len(all_insights),
+            'unique_insights': unique_insights,
+            'service_performance': service_performance,
+            'synthesis_quality': 'high' if disagreement_analysis['consensus_strength'] > 0.7 else 'medium'
         }
     
     def _synthesize_daisy_chain(self, responses: List[LLMResponse], domain: str) -> Dict[str, Any]:
@@ -529,6 +753,33 @@ class MultiLLMEnsemble:
                 'final_insights': all_insights[-3:] if len(all_insights) > 3 else all_insights
             }
         }
+    
+    def _synthesize_with_intelligent_engine(self, responses: List[LLMResponse], domain: str) -> Dict[str, Any]:
+        """Use the intelligent synthesis engine for optimal consensus"""
+        
+        # Convert LLMResponse objects to the format expected by synthesis engine
+        synthesis_responses = []
+        for response in responses:
+            synthesis_response = {
+                'service_name': response.service_name,
+                'confidence': response.confidence_score,
+                'scores': response.response_data.get('policy_scores', {}),
+                'processing_time': response.processing_time,
+                'metadata': {
+                    'domain_relevance': response.response_data.get('domain_relevance', 75),
+                    'key_insights': response.response_data.get('key_insights', [])
+                }
+            }
+            synthesis_responses.append(synthesis_response)
+        
+        # Use intelligent synthesis engine
+        synthesis_result = intelligent_synthesis_engine.synthesize_optimal_consensus(
+            synthesis_responses, 
+            domain,
+            target_confidence=0.85
+        )
+        
+        return synthesis_result
 
 # Global ensemble instance
 multi_llm_ensemble = MultiLLMEnsemble()
