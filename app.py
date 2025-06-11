@@ -41,7 +41,7 @@ def main():
     .quantum-header {
         background: transparent !important;
         padding: clamp(1rem, 4vw, 2rem) clamp(1rem, 4vw, 3rem) !important;
-        margin-bottom: 2.5rem !important;
+        margin-bottom: 0.5rem !important;
         text-align: center !important;
         width: 100% !important;
         display: block !important;
