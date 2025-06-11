@@ -23,11 +23,13 @@ def analyze_document_applicability(text: str, title: str) -> Dict[str, bool]:
         'computer vision', 'natural language', 'recommendation system'
     ]
     
-    # Quantum-related keywords
+    # Quantum-related keywords (positive indicators only)
     quantum_keywords = [
-        'quantum', 'post-quantum', 'quantum computing', 'quantum cryptography',
+        'post-quantum', 'quantum computing', 'quantum cryptography',
         'quantum encryption', 'quantum key', 'quantum-safe', 'quantum-resistant',
-        'qkd', 'quantum supremacy', 'quantum advantage'
+        'qkd', 'quantum supremacy', 'quantum advantage', 'quantum security',
+        'quantum technology', 'quantum systems', 'quantum protocols',
+        'lattice-based', 'quantum key distribution'
     ]
     
     # Cybersecurity keywords
@@ -323,11 +325,15 @@ def multi_llm_intelligent_scoring(text: str, title: str) -> Dict[str, Optional[i
         
         if synthesis_result and synthesis_result.get('scores'):
             scores = synthesis_result['scores']
+            
+            # Apply logical filtering based on document applicability
+            applicability = analyze_document_applicability(text, title)
+            
             return {
-                'ai_cybersecurity': scores.get('ai_cybersecurity'),
-                'quantum_cybersecurity': scores.get('quantum_cybersecurity'),
-                'ai_ethics': scores.get('ai_ethics'), 
-                'quantum_ethics': scores.get('quantum_ethics')
+                'ai_cybersecurity': scores.get('ai_cybersecurity') if applicability['ai_cybersecurity'] else None,
+                'quantum_cybersecurity': scores.get('quantum_cybersecurity') if applicability['quantum_cybersecurity'] else None,
+                'ai_ethics': scores.get('ai_ethics') if applicability['ai_ethics'] else None,
+                'quantum_ethics': scores.get('quantum_ethics') if applicability['quantum_ethics'] else None
             }
     except Exception as e:
         print(f"Intelligent synthesis failed: {e}")
