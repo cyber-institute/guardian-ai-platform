@@ -648,6 +648,58 @@ def main():
         
         st.markdown("---")
         
+        # Quick Benchmarking Tool
+        st.markdown("### 📊 Multi-LLM Performance")
+        
+        try:
+            from utils.benchmarking_system import multi_llm_benchmarker
+            
+            # Get quick benchmark summary
+            report = multi_llm_benchmarker.generate_benchmark_report()
+            
+            if not report.get("no_data"):
+                improvements = report["average_improvements"]
+                
+                # Compact metrics display
+                bench_col1, bench_col2 = st.columns(2)
+                
+                with bench_col1:
+                    confidence_boost = improvements["confidence_boost"]
+                    st.metric(
+                        "Confidence Boost", 
+                        f"+{confidence_boost:.1f}%",
+                        delta=confidence_boost if confidence_boost > 0 else None
+                    )
+                
+                with bench_col2:
+                    consensus = improvements["consensus_strength"]
+                    st.metric(
+                        "Consensus Quality", 
+                        f"{consensus:.1f}/1.0"
+                    )
+                
+                # Quality indicators
+                quality = report["quality_indicators"]
+                if quality["multi_llm_advantage"]:
+                    st.success("Multi-LLM analysis shows measurable improvements")
+                else:
+                    st.info("Building performance baseline - upload more documents")
+                
+                st.markdown(f"**Comparisons tracked:** {report['total_comparisons']}")
+                
+            else:
+                st.info("**Test Multi-LLM improvements:**")
+                st.markdown("""
+                1. Upload a document with Multi-LLM **disabled**
+                2. Upload the same document with Multi-LLM **enabled**
+                3. See improvement metrics here automatically
+                """)
+        
+        except Exception as e:
+            st.caption("Benchmarking system loading...")
+        
+        st.markdown("---")
+        
         # API section
         st.markdown("### Run Multi-API Ingest")
         if st.button("Run Multi-API Ingest", use_container_width=True):
