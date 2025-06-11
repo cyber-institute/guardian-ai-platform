@@ -3,6 +3,7 @@ import re
 from utils.db import fetch_documents
 from utils.hf_ai_scoring import evaluate_quantum_maturity_hf
 from utils.comprehensive_scoring import comprehensive_document_scoring, format_score_display, get_score_badge_color
+from utils.performance_cache import get_cached_comprehensive_scores
 from utils.document_metadata_extractor import extract_document_metadata
 from utils.multi_llm_metadata_extractor import extract_clean_metadata
 from utils.html_artifact_interceptor import clean_documents, clean_field
@@ -489,18 +490,11 @@ def render_compact_cards(docs):
             
             doc_type = ultra_clean_metadata(doc.get('document_type', 'Unknown'))
             
-            # Generate thumbnail - prioritize ingested PDF thumbnails
-            doc_id = doc.get('id')
-            from utils.pdf_ingestion_thumbnails import get_ingested_thumbnail_html
-            from utils.realistic_pdf_thumbnail import get_pdf_page_thumbnail_html
+            # Use simple placeholder thumbnail for performance
+            thumbnail_html = f'<div style="width:60px;height:75px;background:#f0f0f0;border:1px solid #ddd;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#666;">Doc</div>'
             
-            # Try ingested thumbnail first, fallback to realistic PDF page
-            thumbnail_html = get_ingested_thumbnail_html(doc_id)
-            if not thumbnail_html:
-                thumbnail_html = get_pdf_page_thumbnail_html(doc_id, title, content, doc_type, author_org)
-            
-            # Calculate comprehensive scores
-            scores = comprehensive_document_scoring(content, str(title))
+            # Calculate comprehensive scores with caching
+            scores = get_cached_comprehensive_scores(content, str(title))
             
             # Properly escape all HTML content for compact cards
             import html
@@ -550,8 +544,8 @@ def render_grid_view(docs):
             doc_type = ultra_clean_metadata(doc.get('document_type', 'Unknown'))
             content_preview = ultra_clean_metadata(doc.get('content_preview', 'No preview available') or 'No preview available')
             
-            # Calculate comprehensive scores
-            scores = comprehensive_document_scoring(content, str(title))
+            # Calculate comprehensive scores with caching
+            scores = get_cached_comprehensive_scores(content, str(title))
             
             # Properly escape all HTML content for grid view
             import html
@@ -705,7 +699,7 @@ def render_card_view(docs):
             
             # ISOLATED STEP 3: Calculate scores separately (after metadata display)
             try:
-                scores = comprehensive_document_scoring(raw_content, str(title))
+                scores = get_cached_comprehensive_scores(raw_content, str(title))
                 
                 # Display scores in completely separate section
                 st.markdown(f"""
