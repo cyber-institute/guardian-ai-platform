@@ -395,7 +395,10 @@ def main():
                             st.info("Running Multi-LLM ensemble analysis...")
                             try:
                                 import asyncio
+                                import time
+                                from datetime import datetime
                                 from utils.multi_llm_ensemble import multi_llm_ensemble
+                                from utils.benchmarking_system import multi_llm_benchmarker, BenchmarkResult
                                 
                                 # Auto-detect analysis domain
                                 content_lower = content.lower()
@@ -405,6 +408,10 @@ def main():
                                     analysis_domain = "ai_ethics"
                                 else:
                                     analysis_domain = "cybersecurity"
+                                
+                                # Initialize benchmarking
+                                content_hash = multi_llm_benchmarker.generate_content_hash(content)
+                                start_time = time.time()
                                 
                                 # Configure processing based on depth
                                 processing_mode = "parallel" if analysis_depth == "Standard" else "intelligent_synthesis"
@@ -419,7 +426,8 @@ def main():
                                 ))
                                 
                                 if ensemble_result and ensemble_result.individual_responses:
-                                    st.success("Multi-LLM analysis completed successfully")
+                                    processing_time = time.time() - start_time
+                                    st.success(f"Multi-LLM analysis completed in {processing_time:.2f}s")
                                     
                                     # Display ensemble metrics
                                     col1, col2, col3 = st.columns(3)
@@ -438,8 +446,8 @@ def main():
                                     # Enhance scores with ensemble insights
                                     if ensemble_result.consensus_score:
                                         for key, value in ensemble_result.consensus_score.items():
-                                            if key in scores:
-                                                scores[key] = max(scores[key], value)
+                                            if key in scores and value is not None:
+                                                scores[key] = max(scores.get(key, 0), value)
                                     
                                     document_data.update(scores)
                                     
@@ -447,6 +455,37 @@ def main():
                                     document_data['multi_llm_analysis'] = True
                                     document_data['ensemble_confidence'] = ensemble_result.confidence_level
                                     document_data['ensemble_services'] = len(ensemble_result.individual_responses)
+                                    
+                                    # Store benchmark result
+                                    benchmark_result = BenchmarkResult(
+                                        document_title=file_title,
+                                        analysis_type="multi_llm",
+                                        processing_time=processing_time,
+                                        confidence_score=ensemble_result.confidence_level,
+                                        accuracy_metrics={"consensus_strength": avg_score},
+                                        detailed_scores=scores,
+                                        timestamp=datetime.now().isoformat(),
+                                        services_used=len(ensemble_result.individual_responses),
+                                        consensus_strength=avg_score
+                                    )
+                                    multi_llm_benchmarker.store_benchmark_result(benchmark_result, content)
+                                    
+                                    # Check for previous analysis of same content
+                                    comparison = multi_llm_benchmarker.get_benchmark_comparison(content_hash)
+                                    if comparison.get("comparison_available"):
+                                        st.info("📊 **Performance Comparison Available**")
+                                        improvements = comparison["improvements"]
+                                        
+                                        comp_col1, comp_col2, comp_col3 = st.columns(3)
+                                        with comp_col1:
+                                            conf_improvement = improvements.get("confidence_improvement", 0)
+                                            st.metric("Confidence Boost", f"+{conf_improvement:.1f}", delta=conf_improvement if conf_improvement > 0 else None)
+                                        with comp_col2:
+                                            consensus = improvements["quality_metrics"].get("consensus_strength", 0)
+                                            st.metric("Consensus Strength", f"{consensus:.1f}")
+                                        with comp_col3:
+                                            services = improvements["quality_metrics"].get("services_used", 0)
+                                            st.metric("LLM Services", services)
                                     
                                 else:
                                     st.warning("Multi-LLM analysis failed, applying standard scoring")
