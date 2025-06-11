@@ -2642,19 +2642,30 @@ def render_document_management():
                         try:
                             deleted_count = 0
                             for doc_id in selected_for_deletion:
+                                # Execute deletion with proper parameter format
                                 result = db_manager.execute_query(
-                                    "DELETE FROM documents WHERE id = %s",
-                                    (doc_id,)
+                                    "DELETE FROM documents WHERE id = %(doc_id)s",
+                                    {"doc_id": doc_id}
                                 )
-                                deleted_count += 1
+                                # Check if deletion was successful (rowcount > 0)
+                                if result and result > 0:
+                                    deleted_count += 1
                             
-                            st.success(f"Successfully deleted {deleted_count} documents")
-                            # Clear selection state
-                            for doc_id in selected_for_deletion:
-                                if f"delete_{doc_id}" in st.session_state:
-                                    del st.session_state[f"delete_{doc_id}"]
-                            st.session_state['confirm_deletion'] = False
-                            st.rerun()
+                            if deleted_count > 0:
+                                st.success(f"Successfully deleted {deleted_count} documents")
+                                # Clear selection state
+                                for doc_id in selected_for_deletion:
+                                    if f"delete_{doc_id}" in st.session_state:
+                                        del st.session_state[f"delete_{doc_id}"]
+                                st.session_state['confirm_deletion'] = False
+                                # Clear any cached data
+                                for key in list(st.session_state.keys()):
+                                    if 'doc' in key.lower() or 'cache' in key.lower():
+                                        del st.session_state[key]
+                                st.rerun()
+                            else:
+                                st.error("No documents were deleted. Please check if the documents still exist.")
+                                st.session_state['confirm_deletion'] = False
                         except Exception as e:
                             st.error(f"Error during deletion: {str(e)}")
                             st.session_state['confirm_deletion'] = False
