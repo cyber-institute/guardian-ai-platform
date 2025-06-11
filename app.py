@@ -2569,7 +2569,7 @@ def render_document_management():
     # Get all documents for selection
     try:
         all_documents = db_manager.execute_query("""
-            SELECT id, title, document_type, created_at, source, multi_llm_analysis
+            SELECT id, title, document_type, created_at, source
             FROM documents 
             ORDER BY created_at DESC
         """)
@@ -2604,8 +2604,7 @@ def render_document_management():
             
             with doc_col2:
                 created_date = doc['created_at'].strftime("%Y-%m-%d") if doc['created_at'] else "Unknown"
-                analysis_badge = "🔬 Multi-LLM" if doc.get('multi_llm_analysis') else "📄 Standard"
-                st.markdown(f"**{doc['title']}** ({doc['document_type']}) - {created_date} {analysis_badge}")
+                st.markdown(f"**{doc['title']}** ({doc['document_type']}) - {created_date}")
             
             with doc_col3:
                 source_display = doc['source'][:20] + "..." if doc['source'] and len(doc['source']) > 20 else doc['source'] or "Direct"
@@ -2713,11 +2712,23 @@ def render_document_management():
         st.metric("Today", today_count)
     
     with col4:
-        multi_llm_docs = db_manager.execute_query("""
-            SELECT COUNT(*) as count FROM documents 
-            WHERE multi_llm_analysis = true
-        """)
-        multi_llm_count = multi_llm_docs[0]['count'] if multi_llm_docs else 0
+        try:
+            # Check if column exists first
+            schema_check = db_manager.execute_query("""
+                SELECT column_name FROM information_schema.columns 
+                WHERE table_name = 'documents' AND column_name = 'multi_llm_analysis'
+            """)
+            
+            if schema_check and len(schema_check) > 0:
+                multi_llm_docs = db_manager.execute_query("""
+                    SELECT COUNT(*) as count FROM documents 
+                    WHERE multi_llm_analysis = true
+                """)
+                multi_llm_count = multi_llm_docs[0]['count'] if multi_llm_docs and isinstance(multi_llm_docs, list) and len(multi_llm_docs) > 0 else 0
+            else:
+                multi_llm_count = 0
+        except:
+            multi_llm_count = 0
         st.metric("Multi-LLM Enhanced", multi_llm_count)
 
 def render_system_monitoring():
