@@ -11,6 +11,9 @@ def main():
         initial_sidebar_state="collapsed"
     )
     
+    # Initialize streamlit tooltip system
+    from components.streamlit_tooltips import streamlit_tooltips
+    
     # Custom CSS styling - Government/Nonprofit Theme
     st.markdown("""
     <style>
@@ -535,33 +538,63 @@ def main():
         with st.expander("WEB | url > success"):
             st.code("2025-06-07 21:08:56.927833")
     
+    # Render welcome banner for new users
+    streamlit_tooltips.render_welcome_banner()
+    
+    # Render tour progress and quick help in sidebar
+    streamlit_tooltips.render_tour_progress()
+    streamlit_tooltips.render_quick_help_sidebar()
+    
+    # Render feature overview for users who clicked "Learn More"
+    streamlit_tooltips.render_feature_overview()
+    
     # Create main navigation with enhanced AI capabilities
     main_tab1, main_tab2, main_tab3, main_tab4 = st.tabs([
         "Policy Repository", 
-        "AI Policy Analyzer", 
+        "Policy Analyzer", 
         "AI Recommendations", 
         "Repository Admin"
     ])
     
     with main_tab1:
+        streamlit_tooltips.render_navigation_hint("policy_repository")
+        streamlit_tooltips.render_step_guidance("policy_repository", 1)
         render()
     
     with main_tab2:
+        streamlit_tooltips.render_navigation_hint("policy_analyzer")
+        streamlit_tooltips.render_step_guidance("policy_analyzer", 2)
+        
         # Enhanced Policy Analysis with Gap Detection
         from components.enhanced_policy_uploader import render_enhanced_policy_uploader
         render_enhanced_policy_uploader()
+        
+        # Add contextual help
+        streamlit_tooltips.render_contextual_help("gap_analysis", "Gap Analysis Guide")
     
     with main_tab3:
+        streamlit_tooltips.render_navigation_hint("ai_recommendations")
+        streamlit_tooltips.render_step_guidance("ai_recommendations", 3)
+        
         # AI-Powered Document Recommendations
         from recommendation_tab import render as render_recommendations
         render_recommendations()
+        
+        # Add contextual help
+        streamlit_tooltips.render_contextual_help("scoring_framework", "Scoring Framework")
     
     with main_tab4:
+        streamlit_tooltips.render_navigation_hint("repository_admin")
+        streamlit_tooltips.render_step_guidance("repository_admin", 4)
+        
         # Repository Admin and About sections
         admin_subtab1, admin_subtab2 = st.tabs(["Repository Management", "About GUARDIAN"])
         
         with admin_subtab1:
             render_repository_admin_section()
+            
+            # Add contextual help
+            streamlit_tooltips.render_contextual_help("patent_algorithms", "Patent Technology")
         
         with admin_subtab2:
             # About tab with Patent Technology as subtab
