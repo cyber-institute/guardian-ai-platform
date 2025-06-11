@@ -121,14 +121,14 @@ def extract_pdf_thumbnail_from_path(pdf_path, doc_id):
 
 def process_uploaded_pdf_with_thumbnail(uploaded_file, doc_id):
     """
-    Process uploaded PDF file and extract both content and thumbnail.
+    Process uploaded PDF file and extract both content and thumbnail with intelligent region detection.
     
     Args:
         uploaded_file: Streamlit uploaded file object
         doc_id: Document ID for storage
         
     Returns:
-        Dict containing extracted text content and thumbnail data
+        Dict containing extracted text content, thumbnail data, and region analysis
     """
     try:
         # Read PDF bytes
@@ -153,11 +153,53 @@ def process_uploaded_pdf_with_thumbnail(uploaded_file, doc_id):
             print(f"Error extracting text from PDF: {text_error}")
             text_content = f"PDF file uploaded: {uploaded_file.name}"
         
+        # Perform intelligent region detection using multi-LLM analysis
+        region_metadata = {}
+        try:
+            from utils.region_detector import extract_enhanced_metadata_with_region
+            
+            # Extract title from filename
+            title = uploaded_file.name.replace('.pdf', '').replace('_', ' ').title()
+            
+            # Use first 1000 characters for region analysis
+            content_sample = text_content[:1000]
+            
+            # Extract organization from content or use filename
+            org_name = "Unknown"
+            if len(text_content) > 50:
+                # Try to extract organization from early content
+                import re
+                org_patterns = [
+                    r'(?:published by|from|issued by|prepared by)\s+([A-Z][^.]*?)(?:\.|,|\n)',
+                    r'([A-Z][A-Za-z\s&]+(?:Institute|University|Department|Agency|Organization))',
+                    r'(National[^.]*?)(?:\.|,|\n)',
+                    r'(Department of[^.]*?)(?:\.|,|\n)'
+                ]
+                
+                for pattern in org_patterns:
+                    match = re.search(pattern, text_content[:500], re.IGNORECASE)
+                    if match:
+                        org_name = match.group(1).strip()
+                        break
+            
+            region_metadata = extract_enhanced_metadata_with_region(title, content_sample, org_name)
+            print(f"Region detected for {uploaded_file.name}: {region_metadata.get('detected_region', 'Unknown')} (confidence: {region_metadata.get('region_confidence', 0):.2f})")
+            
+        except Exception as region_error:
+            print(f"Region detection failed: {region_error}")
+            region_metadata = {
+                'detected_region': 'Unknown',
+                'region_confidence': 0.0,
+                'region_reasoning': 'Region detection unavailable',
+                'region_indicators': []
+            }
+        
         return {
             'text_content': text_content.strip(),
             'thumbnail_data': thumbnail_data,
             'file_type': 'pdf',
-            'filename': uploaded_file.name
+            'filename': uploaded_file.name,
+            'region_metadata': region_metadata
         }
         
     except Exception as e:

@@ -70,8 +70,13 @@ def render_document_uploader():
                         pdf_content = pdf_result['text_content']
                         pdf_thumbnail_extracted = pdf_result['thumbnail_data'] is not None
                         
+                        # Extract region detection results
+                        region_data = pdf_result.get('region_metadata', {})
+                        detected_region = region_data.get('detected_region', 'Unknown')
+                        region_confidence = region_data.get('region_confidence', 0.0)
+                        
                         if pdf_thumbnail_extracted:
-                            st.success("PDF processed successfully! Thumbnail extracted from first page.")
+                            st.success(f"PDF processed successfully! Thumbnail extracted and region detected: {detected_region} (confidence: {region_confidence:.1%})")
                         else:
                             st.warning("PDF processed but thumbnail extraction failed. Using fallback thumbnail.")
                         
