@@ -18,56 +18,8 @@ from utils.db import save_document
 from utils.pdf_ingestion_thumbnails import process_uploaded_pdf_with_thumbnail
 import time
 
-def create_speedometer_dial(value, max_value=100):
-    """Create a full circular speedometer dial gauge using matplotlib."""
-    fig, ax = plt.subplots(figsize=(1.2, 1.2), facecolor='white')
-    
-    # Calculate angle for the value (full circle: 0 to 360 degrees)
-    angle = (value / max_value) * 360
-    
-    # Create color zones - bold vibrant primary colors
-    colors = ['#ff0000', '#ff8000', '#ffff00', '#00ff00', '#008000']  # Red to Green
-    zone_size = 360 / 5  # Each zone is 72 degrees
-    
-    # Draw colored zones
-    for i, color in enumerate(colors):
-        start_angle = i * zone_size
-        wedge = Wedge((0, 0), 0.8, start_angle, start_angle + zone_size,
-                     facecolor=color, alpha=0.3, edgecolor='white', linewidth=1)
-        ax.add_patch(wedge)
-    
-    # Draw the needle
-    needle_angle_rad = np.radians(angle - 90)  # Adjust for matplotlib's coordinate system
-    needle_x = 0.6 * np.cos(needle_angle_rad)
-    needle_y = 0.6 * np.sin(needle_angle_rad)
-    
-    # Needle line
-    ax.plot([0, needle_x], [0, needle_y], color='#000000', linewidth=3, zorder=10)
-    
-    # Center dot
-    center_circle = Circle((0, 0), 0.08, color='#000000', zorder=15)
-    ax.add_patch(center_circle)
-    
-    # Add value text in center
-    ax.text(0, -0.3, f'{value}', ha='center', va='center', fontsize=10, 
-            fontweight='bold', color='#000000')
-    
-    # Set equal aspect ratio and remove axes
-    ax.set_xlim(-1, 1)
-    ax.set_ylim(-1, 1)
-    ax.set_aspect('equal')
-    ax.axis('off')
-    
-    # Convert to base64 for embedding
-    buffer = io.BytesIO()
-    plt.savefig(buffer, format='png', bbox_inches='tight', dpi=100, 
-                facecolor='white', transparent=True)
-    buffer.seek(0)
-    image_base64 = base64.b64encode(buffer.getvalue()).decode()
-    plt.close(fig)
-    
-    # Return with fixed dimensions (square for circular gauge)
-    return f'<img src="data:image/png;base64,{image_base64}" style="width: 90px; height: 90px; display: block; margin: 0 auto; object-fit: contain;">'
+# Import the exact gauge function from about_tab to ensure consistency
+from about_tab import create_speedometer_dial
 
 def create_tier_bubbles(value, max_value=5):
     """Create tier bubble visualization for 1-5 scale."""
