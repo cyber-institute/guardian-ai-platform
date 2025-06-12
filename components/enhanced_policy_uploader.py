@@ -158,6 +158,19 @@ def process_enhanced_upload(uploaded_file, title: str, document_type: str,
             # Show compliance assessment
             if enable_compliance_check:
                 display_compliance_assessment(gap_report)
+            
+            # Add standalone report generation button after analysis
+            if gap_report:
+                st.markdown("---")
+                st.markdown("### 📊 **Generate Comprehensive Report**")
+                
+                col1, col2 = st.columns([2, 1])
+                with col1:
+                    st.info("Create a professional PDF report containing all the analysis results shown above, formatted for sharing and documentation.")
+                
+                with col2:
+                    if st.button("📄 Generate PDF Report", type="primary", use_container_width=True):
+                        generate_standalone_report(title, document_content, document_type, gap_report, has_thumbnail)
         
         # Save document to database with enhanced metadata
         save_enhanced_document(
@@ -488,6 +501,78 @@ def save_enhanced_document(title: str, content: str, document_type: str,
             
     except Exception as e:
         st.error(f"Error saving document: {e}")
+
+def generate_standalone_report(title: str, content: str, document_type: str, 
+                              gap_report: GapAnalysisReport, has_thumbnail: bool):
+    """Generate standalone PDF report containing the same analysis results displayed on screen."""
+    
+    try:
+        from utils.enhanced_risk_report_generator import EnhancedRiskReportGenerator
+        
+        st.markdown("### 📊 **Generating Comprehensive Analysis Report**")
+        
+        with st.spinner("Creating professional PDF report with all analysis results..."):
+            generator = EnhancedRiskReportGenerator()
+            
+            # Prepare comprehensive document data that matches on-screen analysis
+            report_doc_data = {
+                'title': title,
+                'document_type': document_type,
+                'text_content': content,
+                'content': content[:200] + "..." if len(content) > 200 else content,
+                'source': 'policy_analyzer',
+                'has_thumbnail': has_thumbnail,
+                
+                # Include all scoring data from gap analysis
+                'ai_cybersecurity_score': gap_report.framework_scores['ai_cybersecurity_score'],
+                'quantum_cybersecurity_score': gap_report.framework_scores['quantum_cybersecurity_score'],
+                'ai_ethics_score': gap_report.framework_scores['ai_ethics_score'],
+                'quantum_ethics_score': gap_report.framework_scores['quantum_ethics_score'],
+                
+                # Include gap analysis results
+                'gap_analysis_report': gap_report,
+                'overall_maturity_score': gap_report.overall_maturity_score,
+                'identified_gaps': gap_report.identified_gaps,
+                'compliance_status': gap_report.compliance_status,
+                'strategic_recommendations': gap_report.strategic_recommendations
+            }
+            
+            # Generate enhanced PDF that matches screen content
+            pdf_data = generator.generate_policy_analysis_report(report_doc_data)
+        
+        # Create filename
+        safe_title = title.replace(' ', '_').replace('/', '_')[:30]
+        from datetime import datetime
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"GUARDIAN_Policy_Analysis_{safe_title}_{timestamp}.pdf"
+        
+        st.success("Comprehensive analysis report generated successfully!")
+        
+        # Download button
+        st.download_button(
+            label="📥 Download Complete Analysis Report",
+            data=pdf_data,
+            file_name=filename,
+            mime="application/pdf",
+            use_container_width=True
+        )
+        
+        st.info(f"""
+        **Report Contents (Same as Screen Analysis):**
+        - Executive Summary with Overall Maturity Score ({gap_report.overall_maturity_score}/100)
+        - Detailed Framework Scoring (AI Cyber, Quantum Cyber, AI Ethics, Quantum Ethics)
+        - Comprehensive Gap Analysis ({len(gap_report.identified_gaps)} gaps identified)
+        - Compliance Assessment ({len(gap_report.compliance_status)} frameworks evaluated)
+        - Intelligent Recommendations ({len(gap_report.recommendations)} action items)
+        - Risk Visualizations and Professional Formatting
+        
+        **File:** {filename}
+        **Size:** {len(pdf_data):,} bytes
+        """)
+        
+    except Exception as e:
+        st.error(f"Error generating comprehensive report: {str(e)}")
+        st.info("Please try again or contact support if the issue persists.")
 
 def render_policy_analysis_dashboard():
     """Render policy analysis dashboard for uploaded documents."""
