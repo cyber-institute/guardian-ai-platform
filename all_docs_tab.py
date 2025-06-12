@@ -144,49 +144,7 @@ def get_document_topic(doc):
 
 def render():
     
-    # Enhanced refresh button with display style controls
-    col1, col2 = st.columns([1, 1])
-    with col1:
-        if st.button("🔄 Refresh Analysis", help="Update all documents with comprehensive patent-based scoring"):
-            with st.spinner("Applying comprehensive patent-based scoring to all documents..."):
-                try:
-                    # Apply comprehensive patent scoring to all documents
-                    from utils.comprehensive_patent_scoring import apply_comprehensive_patent_scoring
-                    
-                    processed = apply_comprehensive_patent_scoring()
-                    
-                    # Also update metadata for improved extraction
-                    metadata_updated = update_document_metadata()
-                    
-                    if processed > 0:
-                        st.success(f"Applied patent-based scoring to {processed} documents with {metadata_updated} metadata updates")
-                    else:
-                        st.info("All documents are already up to date")
-                    
-                    # Clear session state to force refresh of displayed data
-                    st.session_state.clear()
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"Error updating documents: {e}")
-    
-    with col2:
-        # Display mode selection with radio buttons
-        display_mode = st.session_state.get("display_mode", "cards")
-        display_mode = st.radio(
-            "**View Mode:**",
-            ["cards", "compact", "table", "grid", "minimal"],
-            index=["cards", "compact", "table", "grid", "minimal"].index(display_mode),
-            format_func=lambda x: {
-                "cards": "Cards",
-                "compact": "Compact", 
-                "table": "Table",
-                "grid": "Grid",
-                "minimal": "Minimal"
-            }[x],
-            horizontal=True,
-            key="display_mode_radio"
-        )
-        st.session_state["display_mode"] = display_mode
+
     
     try:
         # Force refresh documents - clear all caching mechanisms
@@ -303,17 +261,39 @@ def render():
             "topic_filter": "Both"
         }
 
-    # Compact filter controls with dropdown-style multiselect
+    # Compact filter controls with inline topic and view mode
     
-    # Topic filter with radio buttons
-    topic_filter = st.radio(
-        "**Topic Filter:**",
-        ["AI", "Quantum", "Both"],
-        index=["AI", "Quantum", "Both"].index(st.session_state["filters"]["topic_filter"]),
-        horizontal=True,
-        key="topic_filter_radio"
-    )
-    st.session_state["filters"]["topic_filter"] = topic_filter
+    # Topic filter and View Mode on same row
+    topic_col, view_col = st.columns([1, 1])
+    
+    with topic_col:
+        topic_filter = st.radio(
+            "**Topic Filter:**",
+            ["AI", "Quantum", "Both"],
+            index=["AI", "Quantum", "Both"].index(st.session_state["filters"]["topic_filter"]),
+            horizontal=True,
+            key="topic_filter_radio"
+        )
+        st.session_state["filters"]["topic_filter"] = topic_filter
+    
+    with view_col:
+        # Display mode selection with radio buttons
+        display_mode = st.session_state.get("display_mode", "cards")
+        display_mode = st.radio(
+            "**View Mode:**",
+            ["cards", "compact", "table", "grid", "minimal"],
+            index=["cards", "compact", "table", "grid", "minimal"].index(display_mode),
+            format_func=lambda x: {
+                "cards": "Cards",
+                "compact": "Compact", 
+                "table": "Table",
+                "grid": "Grid",
+                "minimal": "Minimal"
+            }[x],
+            horizontal=True,
+            key="display_mode_radio"
+        )
+        st.session_state["display_mode"] = display_mode
     
 
     

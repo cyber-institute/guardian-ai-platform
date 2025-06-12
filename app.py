@@ -406,6 +406,31 @@ def main():
         
         # Update session state
         st.session_state.nav_selection = nav_option
+        
+        # Add Refresh Analysis button below navigation
+        st.markdown("---")
+        if st.button("🔄 Refresh Analysis", help="Update all documents with comprehensive patent-based scoring", use_container_width=True):
+            with st.spinner("Applying comprehensive patent-based scoring to all documents..."):
+                try:
+                    # Apply comprehensive patent scoring to all documents
+                    from utils.comprehensive_patent_scoring import apply_comprehensive_patent_scoring
+                    from all_docs_tab import update_document_metadata
+                    
+                    processed = apply_comprehensive_patent_scoring()
+                    
+                    # Also update metadata for improved extraction
+                    metadata_updated = update_document_metadata()
+                    
+                    if processed > 0:
+                        st.success(f"Applied patent-based scoring to {processed} documents with {metadata_updated} metadata updates")
+                    else:
+                        st.info("All documents are already up to date")
+                    
+                    # Clear session state to force refresh of displayed data
+                    st.session_state.clear()
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Error updating documents: {e}")
     
     # Render content based on sidebar selection
     if st.session_state.nav_selection == "Policy Repository":
