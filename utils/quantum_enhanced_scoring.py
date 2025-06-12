@@ -6,7 +6,7 @@ Integrates quantum routing with existing comprehensive patent scoring
 import json
 from typing import Dict, List, Any, Optional
 from utils.qiskit_router import quantum_task_specific_routing, quantum_confidence_weighting
-from utils.comprehensive_patent_scoring import comprehensive_document_scoring
+from utils.patent_scoring_engine import ComprehensivePatentScoringEngine
 
 class QuantumEnhancedScoringEngine:
     """Enhanced scoring engine that uses quantum routing for optimal LLM selection."""

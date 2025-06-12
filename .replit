@@ -1,59 +1,10 @@
-modules = ["python-3.11", "postgresql-16", "python3"]
+run = "streamlit run app.py"
+language = "python3"
+modules = ["python-3.11"]
 
 [nix]
-channel = "stable-24_05"
-packages = ["cairo", "catch2", "ffmpeg-full", "fmt", "freetype", "ghostscript", "glibcLocales", "gobject-introspection", "gtk3", "lcms2", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "muparserx", "nlohmann_json", "openjpeg", "pkg-config", "poppler_utils", "qhull", "spdlog", "tcl", "tk", "zlib"]
-
-[deployment]
-deploymentTarget = "autoscale"
-run = ["streamlit", "run", "app.py", "--server.port", "5000"]
-
-[workflows]
-runButton = "Project"
-
-[[workflows.workflow]]
-name = "Project"
-mode = "parallel"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Webhook Server"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Streamlit Server"
-
-[[workflows.workflow]]
-name = "Webhook Server"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python webhook_handler.py"
-waitForPort = 8082
-
-[[workflows.workflow]]
-name = "Streamlit Server"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "streamlit run app.py --server.port 5000"
-waitForPort = 5000
+packages = ["nano"]
 
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 8080
-externalPort = 8080
-
-[[ports]]
-localPort = 8081
-externalPort = 8081
-
-[[ports]]
-localPort = 8082
-externalPort = 3000

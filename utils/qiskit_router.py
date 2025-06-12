@@ -80,8 +80,23 @@ def quantum_task_specific_routing(content, document_type="policy"):
         document_type (str): Type of document being processed
         
     Returns:
-        list: Optimally selected LLM combinations
+        dict: Enhanced routing results with selected models and analysis
     """
+    # Analyze content for quantum biasing
+    content_lower = content.lower()
+    
+    # Task-specific biasing factors
+    ai_keywords = ["artificial intelligence", "machine learning", "ai ethics", "neural", "deep learning"]
+    quantum_keywords = ["quantum", "encryption", "cryptography", "qubit", "superposition"]
+    ethics_keywords = ["ethics", "governance", "policy", "compliance", "regulation"]
+    security_keywords = ["cybersecurity", "security", "risk", "threat", "vulnerability"]
+    
+    # Calculate content bias weights
+    ai_score = sum(1 for keyword in ai_keywords if keyword in content_lower)
+    quantum_score = sum(1 for keyword in quantum_keywords if keyword in content_lower)
+    ethics_score = sum(1 for keyword in ethics_keywords if keyword in content_lower)
+    security_score = sum(1 for keyword in security_keywords if keyword in content_lower)
+    
     # Quantum circuit with conditional gates based on content characteristics
     qc = QuantumCircuit(3, 3)  # 3-qubit system for more routing options
     
@@ -91,14 +106,17 @@ def quantum_task_specific_routing(content, document_type="policy"):
     qc.h(2)
     
     # Apply conditional rotations based on document characteristics
-    if "ai" in content.lower() or "artificial intelligence" in content.lower():
-        qc.ry(0.3, 0)  # Bias toward AI-specialized models
+    if ai_score > 0:
+        bias_angle = min(ai_score * 0.2, 1.0)
+        qc.ry(bias_angle, 0)  # Bias toward AI-specialized models
     
-    if "quantum" in content.lower() or "cybersecurity" in content.lower():
-        qc.ry(0.5, 1)  # Bias toward quantum/security models
+    if quantum_score > 0:
+        bias_angle = min(quantum_score * 0.3, 1.0)
+        qc.ry(bias_angle, 1)  # Bias toward quantum/security models
         
-    if "ethics" in content.lower() or "policy" in content.lower():
-        qc.ry(0.7, 2)  # Bias toward ethics/policy analysis
+    if ethics_score > 0:
+        bias_angle = min(ethics_score * 0.25, 1.0)
+        qc.ry(bias_angle, 2)  # Bias toward ethics/policy analysis
     
     # Entangle qubits for correlated decision making
     qc.cx(0, 1)
@@ -107,10 +125,25 @@ def quantum_task_specific_routing(content, document_type="policy"):
     # Measure all qubits
     qc.measure([0, 1, 2], [0, 1, 2])
     
-    backend = Aer.get_backend("qasm_simulator")
-    job = execute(qc, backend=backend, shots=1)
-    result = job.result()
-    counts = result.get_counts()
+    if QISKIT_AVAILABLE:
+        try:
+            simulator = AerSimulator()
+            transpiled_qc = transpile(qc, simulator)
+            job = simulator.run(transpiled_qc, shots=1)
+            result = job.result()
+            counts = result.get_counts()
+        except Exception:
+            # Fallback to deterministic selection
+            import hashlib
+            seed = hashlib.md5(content.encode()).hexdigest()
+            measured = format(int(seed[:2], 16) % 8, '03b')
+            counts = {measured: 1}
+    else:
+        # Quantum-inspired fallback
+        import hashlib
+        seed = hashlib.md5(content.encode()).hexdigest()
+        measured = format(int(seed[:2], 16) % 8, '03b')
+        counts = {measured: 1}
     
     measured = list(counts.keys())[0]
     
@@ -126,7 +159,33 @@ def quantum_task_specific_routing(content, document_type="policy"):
         "111": ["gpt4", "claude", "local_llm"] # Full ensemble
     }
     
-    return enhanced_routing.get(measured, ["gpt4", "claude"])
+    selected_models = enhanced_routing.get(measured, ["gpt4", "claude"])
+    
+    # Generate reasoning based on content analysis
+    reasoning_parts = []
+    if ai_score > 0:
+        reasoning_parts.append(f"AI content detected (score: {ai_score})")
+    if quantum_score > 0:
+        reasoning_parts.append(f"Quantum content detected (score: {quantum_score})")
+    if ethics_score > 0:
+        reasoning_parts.append(f"Ethics content detected (score: {ethics_score})")
+    if security_score > 0:
+        reasoning_parts.append(f"Security content detected (score: {security_score})")
+    
+    reasoning = f"Quantum measurement: {measured}. " + "; ".join(reasoning_parts) if reasoning_parts else f"Quantum measurement: {measured}"
+    
+    return {
+        "selected_models": selected_models,
+        "quantum_measurement": measured,
+        "content_analysis": {
+            "ai_score": ai_score,
+            "quantum_score": quantum_score,
+            "ethics_score": ethics_score,
+            "security_score": security_score
+        },
+        "routing_reasoning": reasoning,
+        "document_type": document_type
+    }
 
 def quantum_confidence_weighting(routing_results):
     """
