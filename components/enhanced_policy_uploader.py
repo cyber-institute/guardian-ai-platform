@@ -4,6 +4,12 @@ Implements GUARDIAN patent's policy reinforcement learning and recommendation ca
 """
 
 import streamlit as st
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+from matplotlib.patches import Wedge
+import numpy as np
+import base64
+import io
 from typing import Optional, Dict, List
 from utils.policy_gap_analyzer import policy_gap_analyzer, GapAnalysisReport
 from utils.document_recommendation_engine import recommendation_engine
@@ -32,6 +38,27 @@ def render_enhanced_policy_uploader():
         unsafe_allow_html=True
     )
     
+    # Standalone report generation button (outside form)
+    if 'latest_gap_report' in st.session_state:
+        st.markdown("---")
+        st.markdown("### **Generate Comprehensive Report**")
+        
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            st.info("Create a professional PDF report containing all the analysis results shown above, formatted for sharing and documentation.")
+        
+        with col2:
+            if st.button("Generate PDF Report", type="primary", use_container_width=True):
+                report_data = st.session_state.latest_gap_report
+                generate_standalone_report(
+                    report_data['title'], 
+                    report_data['content'], 
+                    report_data['document_type'], 
+                    report_data['gap_report'], 
+                    report_data['has_thumbnail']
+                )
+        st.markdown("---")
+
     with st.form("enhanced_policy_upload"):
         col1, col2 = st.columns([2, 1])
         
@@ -94,7 +121,7 @@ def render_enhanced_policy_uploader():
         else:
             manual_content = ""
         
-        submitted = st.form_submit_button("Analyze & Upload", type="primary")
+        submitted = st.form_submit_button("Upload & Analyze", type="primary")
         
         if submitted:
             # Process the document
@@ -159,18 +186,15 @@ def process_enhanced_upload(uploaded_file, title: str, document_type: str,
             if enable_compliance_check:
                 display_compliance_assessment(gap_report)
             
-            # Add standalone report generation button after analysis
+            # Store gap report in session state for button outside form
             if gap_report:
-                st.markdown("---")
-                st.markdown("### 📊 **Generate Comprehensive Report**")
-                
-                col1, col2 = st.columns([2, 1])
-                with col1:
-                    st.info("Create a professional PDF report containing all the analysis results shown above, formatted for sharing and documentation.")
-                
-                with col2:
-                    if st.button("📄 Generate PDF Report", type="primary", use_container_width=True):
-                        generate_standalone_report(title, document_content, document_type, gap_report, has_thumbnail)
+                st.session_state.latest_gap_report = {
+                    'title': title,
+                    'content': document_content,
+                    'document_type': document_type,
+                    'gap_report': gap_report,
+                    'has_thumbnail': has_thumbnail
+                }
         
         # Save document to database with enhanced metadata
         save_enhanced_document(
@@ -183,7 +207,7 @@ def display_gap_analysis_results(report: GapAnalysisReport):
     """Display comprehensive gap analysis results."""
     
     st.markdown("---")
-    st.markdown("## 📊 **Comprehensive Gap Analysis Report**")
+    st.markdown("## **Comprehensive Gap Analysis Report**")
     
     # Overall maturity score
     col1, col2, col3 = st.columns([1, 1, 2])
