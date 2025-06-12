@@ -295,8 +295,10 @@ def render():
         st.session_state["filters"]["topic_filter"] = topic_filter
     
     with view_col:
-        # Align radio buttons container
-        st.markdown('<div style="display: flex; justify-content: flex-end; align-items: flex-start;">', unsafe_allow_html=True)
+        # Align radio buttons with negative margin to move up
+        st.markdown("""
+        <div style="display: flex; justify-content: flex-end; align-items: flex-start; margin-top: -1.5rem;">
+        """, unsafe_allow_html=True)
         display_mode = st.session_state.get("display_mode", "cards")
         display_mode = st.radio(
             "**View Mode:**",

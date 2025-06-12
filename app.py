@@ -50,14 +50,16 @@ def main():
     
     .main .block-container {
         background-color: #ffffff;
-        padding-top: 0.5rem;
+        padding-top: 0rem;
         padding-bottom: 2rem;
+        margin-top: -2rem;
     }
     
     .quantum-header {
         background: transparent !important;
-        padding: clamp(1rem, 4vw, 2rem) clamp(1rem, 4vw, 3rem) !important;
-        margin-bottom: 0.5rem !important;
+        padding: 0.5rem clamp(1rem, 4vw, 3rem) !important;
+        margin-top: -1rem !important;
+        margin-bottom: 0rem !important;
         text-align: center !important;
         width: 100% !important;
         display: block !important;
