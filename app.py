@@ -757,23 +757,27 @@ def main():
     
     # Move onboarding functionality to chatbot
     
-    # Initialize session state for lazy loading
-    if 'active_main_tab' not in st.session_state:
-        st.session_state.active_main_tab = "Policy Repository"
+    # Sidebar hamburger menu for navigation
+    with st.sidebar:
+        st.markdown("### 🍔 Navigation")
+        
+        # Initialize session state for navigation
+        if 'nav_selection' not in st.session_state:
+            st.session_state.nav_selection = "Policy Repository"
+        
+        # Navigation menu
+        nav_option = st.selectbox(
+            "Select page:",
+            ["Policy Repository", "Repository Admin", "About GUARDIAN"],
+            index=["Policy Repository", "Repository Admin", "About GUARDIAN"].index(st.session_state.nav_selection),
+            key="sidebar_nav"
+        )
+        
+        # Update session state
+        st.session_state.nav_selection = nav_option
     
-    # Create main navigation with true lazy loading
-    selected_tab = st.selectbox(
-        "Navigate:",
-        ["Policy Repository", "Repository Admin", "About GUARDIAN"],
-        index=["Policy Repository", "Repository Admin", "About GUARDIAN"].index(st.session_state.active_main_tab) if st.session_state.active_main_tab in ["Policy Repository", "Repository Admin", "About GUARDIAN"] else 0,
-        key="main_nav_selector"
-    )
-    
-    # Update session state
-    st.session_state.active_main_tab = selected_tab
-    
-    # Only render the selected tab content
-    if selected_tab == "Policy Repository":
+    # Render content based on sidebar selection
+    if st.session_state.nav_selection == "Policy Repository":
         # Policy Repository with subtabs for Analyzer
         policy_subtab1, policy_subtab2 = st.tabs([
             "Repository", 
@@ -788,11 +792,11 @@ def main():
             from components.enhanced_policy_uploader import render_enhanced_policy_uploader
             render_enhanced_policy_uploader()
     
-    elif selected_tab == "Repository Admin":
+    elif st.session_state.nav_selection == "Repository Admin":
         # Only render when actually selected - true lazy loading
         render_repository_admin_section()
     
-    elif selected_tab == "About GUARDIAN":
+    elif st.session_state.nav_selection == "About GUARDIAN":
         # About tab with Patent Technology and Prototype Phased Plan as subtabs
         about_subtab1, about_subtab2, about_subtab3 = st.tabs([
             "GUARDIAN Emerging Tech Tool", 
@@ -809,10 +813,6 @@ def main():
         
         with about_subtab3:
             render_prototype_phased_plan_section()
-    
-    # Render hamburger menu instead of sidebar chatbot
-    from components.hamburger_menu import render_simple_hamburger_menu
-    render_simple_hamburger_menu()
 
 def render_patent_technology_section():
     """Render the hierarchical Patent Technology section."""
