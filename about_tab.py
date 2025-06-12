@@ -37,7 +37,7 @@ def create_speedometer_dial(value, max_value=100):
     ax.plot([0, needle_x], [0, needle_y], color='#B91C2C', linewidth=3, zorder=10)
     
     # Center dot
-    center_circle = plt.Circle((0, 0), 0.08, color='#B91C2C', zorder=15)
+    center_circle = Circle((0, 0), 0.08, color='#B91C2C', zorder=15)
     ax.add_patch(center_circle)
     
     # Add value text in center
