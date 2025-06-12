@@ -809,8 +809,8 @@ def main():
     # Create main navigation with true lazy loading
     selected_tab = st.selectbox(
         "Navigate:",
-        ["Policy Repository", "Repository Admin", "Risk Reports", "About GUARDIAN"],
-        index=["Policy Repository", "Repository Admin", "Risk Reports", "About GUARDIAN"].index(st.session_state.active_main_tab) if st.session_state.active_main_tab in ["Policy Repository", "Repository Admin", "Risk Reports", "About GUARDIAN"] else 0,
+        ["Policy Repository", "Repository Admin", "About GUARDIAN"],
+        index=["Policy Repository", "Repository Admin", "About GUARDIAN"].index(st.session_state.active_main_tab) if st.session_state.active_main_tab in ["Policy Repository", "Repository Admin", "About GUARDIAN"] else 0,
         key="main_nav_selector"
     )
     

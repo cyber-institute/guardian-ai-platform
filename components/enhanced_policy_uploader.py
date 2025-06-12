@@ -76,6 +76,12 @@ def render_enhanced_policy_uploader():
                 value=True,
                 help="Check compliance against major frameworks"
             )
+            
+            generate_report = st.checkbox(
+                "Generate Report",
+                value=False,
+                help="Create comprehensive PDF risk assessment report after analysis"
+            )
         
         # Manual content input (if no file uploaded)
         if not uploaded_file:
@@ -94,12 +100,14 @@ def render_enhanced_policy_uploader():
             # Process the document
             process_enhanced_upload(
                 uploaded_file, title, document_type, manual_content,
-                enable_gap_analysis, enable_recommendations, enable_compliance_check
+                enable_gap_analysis, enable_recommendations, enable_compliance_check,
+                generate_report
             )
 
 def process_enhanced_upload(uploaded_file, title: str, document_type: str, 
                           manual_content: str, enable_gap_analysis: bool,
-                          enable_recommendations: bool, enable_compliance_check: bool):
+                          enable_recommendations: bool, enable_compliance_check: bool,
+                          generate_report: bool = False):
     """Process uploaded document with comprehensive analysis."""
     
     if not title:
@@ -155,7 +163,7 @@ def process_enhanced_upload(uploaded_file, title: str, document_type: str,
         save_enhanced_document(
             title, document_content, document_type, 
             gap_report if enable_gap_analysis else None,
-            has_thumbnail
+            has_thumbnail, generate_report
         )
 
 def display_gap_analysis_results(report: GapAnalysisReport):
@@ -381,7 +389,8 @@ def display_compliance_status(framework: str, status: str):
         st.error(f"❌ {framework}: {status}")
 
 def save_enhanced_document(title: str, content: str, document_type: str, 
-                         gap_report: Optional[GapAnalysisReport], has_thumbnail: bool):
+                         gap_report: Optional[GapAnalysisReport], has_thumbnail: bool,
+                         generate_report: bool = False):
     """Save document with enhanced metadata from gap analysis."""
     
     # Prepare document data
@@ -425,6 +434,53 @@ def save_enhanced_document(title: str, content: str, document_type: str,
                 with col3:
                     compliant_frameworks = len([s for s in gap_report.compliance_status.values() if s == "Compliant"])
                     st.metric("Compliant Frameworks", f"{compliant_frameworks}/{len(gap_report.compliance_status)}")
+            
+            # Generate PDF report if requested
+            if generate_report and gap_report:
+                st.markdown("### 📊 **Generating Risk Assessment Report**")
+                try:
+                    from utils.risk_report_generator import RiskReportGenerator
+                    
+                    generator = RiskReportGenerator()
+                    
+                    # Prepare document data for report generation
+                    report_doc_data = document_data.copy()
+                    report_doc_data['text_content'] = content
+                    
+                    with st.spinner("Creating comprehensive PDF report..."):
+                        pdf_data = generator.generate_document_risk_report(report_doc_data)
+                    
+                    # Create filename
+                    safe_title = title.replace(' ', '_').replace('/', '_')[:30]
+                    from datetime import datetime
+                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    filename = f"GUARDIAN_Risk_Report_{safe_title}_{timestamp}.pdf"
+                    
+                    st.success("Risk assessment report generated successfully!")
+                    
+                    # Download button
+                    st.download_button(
+                        label="📥 Download PDF Risk Report",
+                        data=pdf_data,
+                        file_name=filename,
+                        mime="application/pdf",
+                        use_container_width=True
+                    )
+                    
+                    st.info(f"""
+                    **Report Contents:**
+                    - Executive Summary with Risk Level Assessment
+                    - Risk Assessment Dashboard with Visualizations
+                    - Detailed Analysis by Risk Category
+                    - Prioritized Recommendations and Action Items
+                    
+                    **File:** {filename}
+                    **Size:** {len(pdf_data):,} bytes
+                    """)
+                    
+                except Exception as e:
+                    st.error(f"Error generating PDF report: {str(e)}")
+                    st.info("Report generation failed, but document was saved successfully.")
             
             st.balloons()
         else:
