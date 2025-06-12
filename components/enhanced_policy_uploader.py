@@ -463,7 +463,7 @@ def display_intelligent_recommendations(report: GapAnalysisReport, content: str)
     
     # Strategic recommendations
     if report.strategic_recommendations:
-        st.markdown("#### 🎯 **Strategic Priorities**")
+        st.markdown("#### **Strategic Priorities**")
         for i, recommendation in enumerate(report.strategic_recommendations, 1):
             st.markdown(f"{i}. {recommendation}")
     
@@ -502,7 +502,7 @@ def display_intelligent_recommendations(report: GapAnalysisReport, content: str)
 def display_compliance_assessment(report: GapAnalysisReport):
     """Display compliance assessment results."""
     
-    st.markdown("### ✅ **Compliance Assessment**")
+    st.markdown("### **Compliance Assessment**")
     
     if report.compliance_status:
         col1, col2 = st.columns(2)
@@ -524,11 +524,11 @@ def display_compliance_status(framework: str, status: str):
     """Display individual compliance status."""
     
     if status == "Compliant":
-        st.success(f"✅ {framework}: {status}")
+        st.success(f"{framework}: {status}")
     elif "Partial" in status:
-        st.warning(f"⚠️ {framework}: {status}")
+        st.warning(f"{framework}: {status}")
     else:
-        st.error(f"❌ {framework}: {status}")
+        st.error(f"{framework}: {status}")
 
 def save_enhanced_document(title: str, content: str, document_type: str, 
                          gap_report: Optional[GapAnalysisReport], has_thumbnail: bool,
@@ -559,11 +559,11 @@ def save_enhanced_document(title: str, content: str, document_type: str,
     try:
         success = save_document(document_data)
         if success:
-            st.success("✅ Document successfully analyzed and saved to repository!")
+            st.success("Document successfully analyzed and saved to repository!")
             
             # Show summary
             if gap_report:
-                st.markdown("### 📈 **Analysis Summary**")
+                st.markdown("### **Analysis Summary**")
                 col1, col2, col3 = st.columns(3)
                 
                 with col1:
@@ -579,7 +579,7 @@ def save_enhanced_document(title: str, content: str, document_type: str,
             
             # Generate PDF report if requested
             if generate_report and gap_report:
-                st.markdown("### 📊 **Generating Risk Assessment Report**")
+                st.markdown("### **Generating Risk Assessment Report**")
                 try:
                     from utils.risk_report_generator import RiskReportGenerator
                     
@@ -638,7 +638,7 @@ def generate_standalone_report(title: str, content: str, document_type: str,
     try:
         from utils.enhanced_risk_report_generator import EnhancedRiskReportGenerator
         
-        st.markdown("### 📊 **Generating Comprehensive Analysis Report**")
+        st.markdown("### **Generating Comprehensive Analysis Report**")
         
         with st.spinner("Creating professional PDF report with all analysis results..."):
             generator = EnhancedRiskReportGenerator()
@@ -706,7 +706,7 @@ def generate_standalone_report(title: str, content: str, document_type: str,
 def render_policy_analysis_dashboard():
     """Render policy analysis dashboard for uploaded documents."""
     
-    st.markdown("### 📋 **Policy Analysis Dashboard**")
+    st.markdown("### **Policy Analysis Dashboard**")
     st.markdown("Monitor and analyze uploaded policy documents with comprehensive gap analysis.")
     
     # Dashboard placeholder - can be expanded with analytics
