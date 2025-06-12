@@ -843,11 +843,6 @@ def main():
         # Only render when actually selected - true lazy loading
         render_repository_admin_section()
     
-    elif selected_tab == "Risk Reports":
-        # Risk Report Generator section
-        from components.risk_report_interface import render_risk_report_generator
-        render_risk_report_generator()
-    
     elif selected_tab == "About GUARDIAN":
         # About tab with Patent Technology and Prototype Phased Plan as subtabs
         about_subtab1, about_subtab2, about_subtab3 = st.tabs([
