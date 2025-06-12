@@ -317,7 +317,7 @@ def render():
         st.session_state["display_mode"] = display_mode
         st.markdown('</div>', unsafe_allow_html=True)
     
-    st.markdown("---")  # Separator line
+    st.markdown('<div style="margin-top: -1rem; margin-bottom: -0.5rem;"><hr style="margin: 0; padding: 0;"></div>', unsafe_allow_html=True)
     
     # Create compact filter row
     filter_col1, filter_col2, filter_col3, filter_col4, filter_col5 = st.columns([2, 2, 1.5, 1.5, 1])
