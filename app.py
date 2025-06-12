@@ -2636,13 +2636,78 @@ def render_patent_scoring_management():
     
     st.markdown("---")
     
+    # Duplicate Management Section
+    st.markdown("#### Duplicate Document Management")
+    
+    try:
+        from utils.duplicate_cleanup import get_duplicate_summary, auto_cleanup_exact_duplicates, identify_duplicate_groups, remove_duplicates
+        
+        # Get duplicate summary
+        duplicate_summary = get_duplicate_summary()
+        
+        if duplicate_summary['total_duplicate_groups'] > 0:
+            st.warning(f"Found {duplicate_summary['total_duplicate_groups']} duplicate groups affecting {duplicate_summary['total_duplicate_documents']} documents")
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                if st.button("Auto-Clean Exact Duplicates", help="Automatically remove documents with identical content"):
+                    with st.spinner("Cleaning exact duplicates..."):
+                        cleanup_result = auto_cleanup_exact_duplicates()
+                        if cleanup_result['documents_removed'] > 0:
+                            st.success(f"Removed {cleanup_result['documents_removed']} duplicate documents from {cleanup_result['groups_processed']} groups")
+                            st.rerun()
+                        else:
+                            st.info("No exact duplicates found to clean")
+            
+            with col2:
+                if st.button("View All Duplicates", help="Review all duplicate groups manually"):
+                    st.session_state.show_duplicates = True
+            
+            # Manual duplicate review
+            if st.session_state.get('show_duplicates', False):
+                st.markdown("##### Manual Duplicate Review")
+                
+                duplicate_groups = identify_duplicate_groups()
+                
+                for i, group in enumerate(duplicate_groups):
+                    with st.expander(f"{group['type'].replace('_', ' ').title()} - {group['count']} documents (Confidence: {group['confidence']:.1%})"):
+                        
+                        st.markdown("**Documents in this group:**")
+                        for j, doc in enumerate(group['documents']):
+                            col_doc, col_action = st.columns([3, 1])
+                            
+                            with col_doc:
+                                st.markdown(f"**{doc.get('title', 'Unknown')}**")
+                                st.caption(f"ID: {doc.get('id')} | Type: {doc.get('document_type', 'Unknown')} | Date: {doc.get('upload_date', 'Unknown')}")
+                                
+                                # Show content preview
+                                content_preview = doc.get('content', '')[:200] + "..." if len(doc.get('content', '')) > 200 else doc.get('content', '')
+                                st.text(content_preview)
+                            
+                            with col_action:
+                                if st.button(f"Keep This", key=f"keep_{i}_{j}"):
+                                    with st.spinner("Removing duplicates..."):
+                                        if remove_duplicates(group, doc.get('id')):
+                                            st.success("Duplicates removed successfully!")
+                                            st.rerun()
+                                        else:
+                                            st.error("Failed to remove duplicates")
+        else:
+            st.success("No duplicate documents detected in your repository")
+            
+    except Exception as e:
+        st.error(f"Duplicate detection error: {e}")
+    
+    st.markdown("---")
+    
     # Database actions
-    st.markdown("#### ⚙️ Database Actions")
+    st.markdown("#### Database Actions")
     
     col1, col2 = st.columns(2)
     
     with col1:
-        if st.button("🔄 Refresh Data", help="Reload data from database"):
+        if st.button("Refresh Data", help="Reload data from database"):
             st.rerun()
     
     with col2:

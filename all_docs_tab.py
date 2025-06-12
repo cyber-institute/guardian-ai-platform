@@ -560,11 +560,37 @@ def render():
                         content = trafilatura.extract(response.text, include_comments=False, include_tables=True)
                         
                         if content and len(content.strip()) > 100:
-                            # Generate document ID and basic metadata
-                            doc_id = str(uuid.uuid4())
+                            # Generate basic metadata
                             title = url_input.split('/')[-1] or "URL Document"
                             
-                            # Score the document
+                            # Check for duplicates first
+                            try:
+                                from utils.duplicate_detector import check_document_duplicates
+                                
+                                duplicate_result = check_document_duplicates(
+                                    title=title,
+                                    content=content,
+                                    url=url_input,
+                                    filename=""
+                                )
+                                
+                                if duplicate_result["is_duplicate"]:
+                                    st.error("Duplicate document detected!")
+                                    st.warning(f"Confidence: {duplicate_result['confidence']:.1%} - {duplicate_result.get('match_type', 'Unknown')}")
+                                    
+                                    if duplicate_result.get("matches"):
+                                        st.info("Similar to existing documents:")
+                                        for match in duplicate_result["matches"][:2]:
+                                            st.markdown(f"• **{match.get('title', 'Unknown')}** (ID: {match.get('id')}) - {match.get('reason', 'Similar content')}")
+                                    
+                                    st.warning("Document not saved to prevent duplicates. Please check if this document already exists in your repository.")
+                                    return
+                                    
+                            except Exception as e:
+                                st.warning(f"Duplicate check failed: {str(e)}")
+                            
+                            # Generate document ID and score the document
+                            doc_id = str(uuid.uuid4())
                             scores = comprehensive_document_scoring(content, title)
                             
                             # Save to database

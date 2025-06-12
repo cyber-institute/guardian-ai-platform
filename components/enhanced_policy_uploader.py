@@ -581,6 +581,34 @@ def save_enhanced_document(title: str, content: str, document_type: str,
                          generate_report: bool = False):
     """Save document with enhanced metadata from gap analysis."""
     
+    # Check for duplicates first
+    try:
+        from utils.duplicate_detector import check_document_duplicates
+        
+        duplicate_result = check_document_duplicates(
+            title=title,
+            content=content,
+            url="",
+            filename=""
+        )
+        
+        if duplicate_result["is_duplicate"]:
+            st.error("Duplicate document detected!")
+            st.warning(f"Confidence: {duplicate_result['confidence']:.1%} - {duplicate_result.get('match_type', 'Unknown')}")
+            
+            if duplicate_result.get("matches"):
+                st.info("Similar to existing documents:")
+                for match in duplicate_result["matches"][:2]:
+                    st.markdown(f"• **{match.get('title', 'Unknown')}** (ID: {match.get('id')}) - {match.get('reason', 'Similar content')}")
+            
+            st.warning("Document not saved to prevent duplicates. Please check if this document already exists in your repository.")
+            return False
+            
+    except ImportError:
+        st.warning("Duplicate detection temporarily unavailable")
+    except Exception as e:
+        st.warning(f"Duplicate check failed: {str(e)}")
+    
     # Prepare document data
     document_data = {
         'title': title,
