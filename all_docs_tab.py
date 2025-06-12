@@ -55,11 +55,27 @@ def clean_date_safely(doc):
     except:
         return 'Date not available'
 
-def get_comprehensive_badge(score, framework):
-    """Create badge for comprehensive scoring system with intelligent tooltips."""
+def get_comprehensive_badge(score, framework, doc_content="", doc_title=""):
+    """Create badge for comprehensive scoring system with intelligent topic detection."""
     
-    if score is None:
-        return "N/A"
+    if score is None or score == 0:
+        # Determine if framework is applicable based on content
+        content_lower = (doc_content + " " + doc_title).lower()
+        
+        # Check if document discusses relevant topics
+        if 'ai' in framework:
+            ai_keywords = ['artificial intelligence', 'machine learning', 'ai ', ' ai', 'neural network', 'algorithm']
+            is_ai_related = any(keyword in content_lower for keyword in ai_keywords)
+            if not is_ai_related:
+                return "<span style='color:#6c757d;font-size:9px'>N/A</span>"
+        
+        if 'quantum' in framework:
+            quantum_keywords = ['quantum', 'post-quantum', 'quantum-safe', 'qkd', 'quantum computing']
+            is_quantum_related = any(keyword in content_lower for keyword in quantum_keywords)
+            if not is_quantum_related:
+                return "<span style='color:#6c757d;font-size:9px'>N/A</span>"
+        
+        return "0"
     
     # Get clean score display and remove any HTML artifacts
     display_score = format_score_display(score, framework)

@@ -36,6 +36,25 @@ class ComprehensivePatentScoringEngine:
     def __init__(self):
         """Initialize comprehensive patent-based scoring engine."""
         
+        # === TOPIC DETECTION KEYWORDS ===
+        self.ai_keywords = {
+            'core': ['artificial intelligence', 'machine learning', 'deep learning', 'neural network', 
+                    'ai model', 'ai system', 'algorithm', 'automation', 'predictive', 'classification'],
+            'governance': ['ai governance', 'ai ethics', 'ai policy', 'ai regulation', 'ai compliance',
+                          'ai oversight', 'ai accountability', 'ai transparency', 'algorithmic bias'],
+            'security': ['ai security', 'adversarial attack', 'model poisoning', 'data poisoning',
+                        'ai vulnerability', 'model robustness', 'ai threat', 'ai risk']
+        }
+        
+        self.quantum_keywords = {
+            'core': ['quantum computing', 'quantum computer', 'quantum algorithm', 'quantum circuit',
+                    'quantum gate', 'qubit', 'quantum state', 'quantum entanglement', 'quantum supremacy'],
+            'cryptography': ['quantum cryptography', 'quantum key distribution', 'post-quantum cryptography',
+                           'quantum-safe', 'quantum-resistant', 'lattice cryptography', 'hash-based signatures'],
+            'security': ['quantum threat', 'quantum attack', 'quantum vulnerability', 'quantum readiness',
+                        'quantum cybersecurity', 'quantum-safe migration', 'cryptographic agility']
+        }
+        
         # === QUANTUM CYBERSECURITY MATURITY (QCMEA) FRAMEWORK ===
         # Patent 2: 5-tier quantum readiness assessment
         self.qcmea_levels = {
@@ -882,6 +901,96 @@ class ComprehensivePatentScoringEngine:
             'legal_alignment_score': min(95, 65 + compliance_indicators * 30),
             'implementation_score': min(85, 45 + (technical_complexity + policy_relevance) * 20)
         }
+    
+    def detect_document_topics(self, content: str, title: str = "") -> Dict[str, bool]:
+        """
+        Intelligent topic detection to determine if document discusses AI, Quantum, or both.
+        Only applies relevant scoring frameworks based on actual content analysis.
+        
+        Returns:
+            Dict with 'is_ai_related' and 'is_quantum_related' boolean flags
+        """
+        content_lower = (content + " " + title).lower()
+        
+        # Count AI-related keywords
+        ai_score = 0
+        for category, keywords in self.ai_keywords.items():
+            for keyword in keywords:
+                ai_score += content_lower.count(keyword)
+        
+        # Count Quantum-related keywords  
+        quantum_score = 0
+        for category, keywords in self.quantum_keywords.items():
+            for keyword in keywords:
+                quantum_score += content_lower.count(keyword)
+        
+        # Additional contextual analysis
+        ai_context_indicators = [
+            'generative ai', 'chatgpt', 'openai', 'anthropic', 'large language model',
+            'llm', 'gpt', 'bert', 'transformer', 'natural language processing',
+            'computer vision', 'recommendation system', 'autonomous', 'robotics'
+        ]
+        
+        quantum_context_indicators = [
+            'shor algorithm', 'grover algorithm', 'quantum advantage', 'quantum supremacy',
+            'ibm quantum', 'google quantum', 'nisq', 'quantum error correction',
+            'quantum internet', 'quantum sensing', 'adiabatic quantum'
+        ]
+        
+        for indicator in ai_context_indicators:
+            if indicator in content_lower:
+                ai_score += 2
+        
+        for indicator in quantum_context_indicators:
+            if indicator in content_lower:
+                quantum_score += 2
+        
+        # Determine relevance thresholds
+        # Require at least 2 keyword matches or 1 strong contextual indicator
+        is_ai_related = ai_score >= 2
+        is_quantum_related = quantum_score >= 2
+        
+        return {
+            'is_ai_related': is_ai_related,
+            'is_quantum_related': is_quantum_related,
+            'ai_keyword_count': ai_score,
+            'quantum_keyword_count': quantum_score
+        }
+    
+    def assess_document_comprehensive(self, content: str, title: str = "") -> Dict[str, float]:
+        """
+        Comprehensive document assessment with intelligent topic detection.
+        Only applies relevant scoring frameworks based on content analysis.
+        """
+        # First, detect what topics this document actually covers
+        topic_detection = self.detect_document_topics(content, title)
+        
+        # Initialize scores with N/A values (0)
+        scores = {
+            'ai_cybersecurity_score': 0,
+            'quantum_cybersecurity_score': 0,
+            'ai_ethics_score': 0,
+            'quantum_ethics_score': 0,
+            'topic_detection': topic_detection
+        }
+        
+        # Only apply AI frameworks if document is AI-related
+        if topic_detection['is_ai_related']:
+            ai_cyber_result = self.calculate_ai_cybersecurity_score(content, title)
+            ai_ethics_result = self.calculate_ai_ethics_score(content, title)
+            
+            scores['ai_cybersecurity_score'] = ai_cyber_result['total_score']
+            scores['ai_ethics_score'] = ai_ethics_result['total_score']
+        
+        # Only apply Quantum frameworks if document is quantum-related
+        if topic_detection['is_quantum_related']:
+            quantum_cyber_result = self.calculate_quantum_cybersecurity_score(content, title)
+            quantum_ethics_result = self.calculate_quantum_ethics_score(content, title)
+            
+            scores['quantum_cybersecurity_score'] = quantum_cyber_result['qcmea_level']
+            scores['quantum_ethics_score'] = quantum_ethics_result['total_score']
+        
+        return scores
 
 # Global instance for use across the application
 patent_scoring_engine = ComprehensivePatentScoringEngine()
