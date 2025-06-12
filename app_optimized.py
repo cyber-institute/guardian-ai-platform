@@ -266,9 +266,9 @@ def render_llm_tab():
     
     for service, env_var in services.items():
         if os.getenv(env_var):
-            st.success(f"✅ {service} - API key configured")
+            st.success(f"{service} - API key configured")
         else:
-            st.warning(f"⚠️ {service} - API key needed for full functionality")
+            st.warning(f"{service} - API key needed for full functionality")
 
 def render_about_tab():
     """Simple about tab"""

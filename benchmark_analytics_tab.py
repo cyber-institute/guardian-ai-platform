@@ -126,11 +126,11 @@ def render():
             st.success("**Enhanced Accuracy**")
             st.caption("Measurable improvements in scoring accuracy")
         else:
-            st.info("ℹ️ **Comparable Accuracy**")
+            st.info("**Comparable Accuracy**")
             st.caption("Similar accuracy to baseline analysis")
     
     # Detailed analytics tabs
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 Performance Charts", "📈 Trend Analysis", "🔍 Document Comparisons", "⚙️ Methodology"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Performance Charts", "Trend Analysis", "Document Comparisons", "Methodology"])
     
     with tab1:
         render_performance_charts(report)
