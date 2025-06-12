@@ -80,7 +80,7 @@ def get_documents_cached(limit=50):
     """Optimized document loading with caching"""
     try:
         from utils.db import fetch_documents
-        return fetch_documents()[:limit]
+        return fetch_documents(limit=limit)
     except Exception as e:
         st.error(f"Database connection issue: {e}")
         return []
@@ -89,23 +89,28 @@ def get_documents_cached(limit=50):
 def get_analytics_cached():
     """Cached analytics data"""
     try:
-        from utils.db import fetch_documents
-        documents = fetch_documents()
+        from utils.database import get_db_connection
+        conn = get_db_connection()
+        cursor = conn.cursor()
         
-        total_docs = len(documents)
-        ai_scored = sum(1 for doc in documents if doc.get('ai_cybersecurity_score', 0) > 0)
-        avg_ai_score = sum(doc.get('ai_cybersecurity_score', 0) for doc in documents if doc.get('ai_cybersecurity_score', 0) > 0)
-        if ai_scored > 0:
-            avg_ai_score = avg_ai_score / ai_scored
-        else:
-            avg_ai_score = 0
+        cursor.execute("""
+        SELECT 
+            COUNT(*) as total_docs,
+            COUNT(CASE WHEN ai_cybersecurity_score > 0 THEN 1 END) as ai_scored,
+            AVG(NULLIF(ai_cybersecurity_score, 0)) as avg_ai_score
+        FROM documents
+        """)
+        
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
         
         return {
-            'total_documents': total_docs,
-            'ai_scored_documents': ai_scored,
-            'avg_ai_score': avg_ai_score
+            'total_documents': result[0] if result else 0,
+            'ai_scored_documents': result[1] if result else 0,
+            'avg_ai_score': result[2] if result else 0
         }
-    except Exception as e:
+    except:
         return {'total_documents': 0, 'ai_scored_documents': 0, 'avg_ai_score': 0}
 
 def render_documents_tab():
@@ -297,8 +302,9 @@ def render_about_tab():
         load_time = time.time() - st.session_state.page_load_time
         st.metric("Page Load Time", f"{load_time:.2f}s")
     
-    # System status
-    st.success("✅ System operational")
+    # Cache statistics
+    cache_info = st.cache_data.get_stats()
+    st.metric("Cache Hits", len(cache_info))
 
 if __name__ == "__main__":
     main()
