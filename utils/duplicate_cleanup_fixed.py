@@ -100,13 +100,6 @@ def identify_duplicate_groups() -> List[Dict]:
     except Exception as e:
         print(f"Error in duplicate detection: {e}")
         return []
-                    'title': title,
-                    'documents': docs,
-                    'count': len(docs),
-                    'confidence': 0.8
-                })
-    
-    return duplicate_groups
 
 def remove_duplicates(duplicate_group: Dict, keep_document_id: str) -> bool:
     """Remove duplicate documents, keeping only the specified document."""

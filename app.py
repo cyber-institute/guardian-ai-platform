@@ -422,7 +422,7 @@ def main():
                 status_text.text("Step 1/4: Scanning for duplicate documents...")
                 progress_bar.progress(0.1)
                 
-                from utils.duplicate_cleanup import get_duplicate_summary, auto_cleanup_exact_duplicates
+                from utils.duplicate_cleanup_fixed import get_duplicate_summary, auto_cleanup_exact_duplicates
                 
                 duplicate_summary = get_duplicate_summary()
                 duplicates_removed = 0
