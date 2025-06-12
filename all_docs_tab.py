@@ -1,8 +1,20 @@
 import streamlit as st
 import re
 from utils.db import fetch_documents
+
+# Performance optimization: Cache document fetching
+@st.cache_data(ttl=180)  # Cache for 3 minutes
+def fetch_documents_cached():
+    """Cached version of document fetching to improve performance"""
+    return fetch_documents()
 from utils.hf_ai_scoring import evaluate_quantum_maturity_hf
 from utils.comprehensive_scoring import comprehensive_document_scoring, format_score_display, get_score_badge_color
+
+# Performance optimization: Cache scoring calculations
+@st.cache_data(ttl=600)  # Cache for 10 minutes
+def comprehensive_document_scoring_cached(content, title):
+    """Cached version of comprehensive scoring to improve performance"""
+    return comprehensive_document_scoring(content, title)
 # Performance caching will be handled directly in functions
 from utils.document_metadata_extractor import extract_document_metadata
 from utils.multi_llm_metadata_extractor import extract_clean_metadata
@@ -171,7 +183,7 @@ def render():
 
         
         # Fetch fresh documents directly from database with comprehensive HTML cleaning
-        raw_docs = fetch_documents()
+        raw_docs = fetch_documents_cached()
         if not raw_docs:
             st.info("No documents found in the database. Please upload some documents first.")
             return
@@ -493,8 +505,8 @@ def render_compact_cards(docs):
             # Use simple placeholder thumbnail for performance
             thumbnail_html = f'<div style="width:60px;height:75px;background:#f0f0f0;border:1px solid #ddd;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#666;">Doc</div>'
             
-            # Calculate comprehensive scores directly
-            scores = comprehensive_document_scoring(content, str(title))
+            # Calculate comprehensive scores with caching
+            scores = comprehensive_document_scoring_cached(content, str(title))
             
             # Properly escape all HTML content for compact cards
             import html
@@ -545,7 +557,7 @@ def render_grid_view(docs):
             content_preview = ultra_clean_metadata(doc.get('content_preview', 'No preview available') or 'No preview available')
             
             # Calculate comprehensive scores with caching
-            scores = comprehensive_document_scoring(content, str(title))
+            scores = comprehensive_document_scoring_cached(content, str(title))
             
             # Properly escape all HTML content for grid view
             import html
@@ -625,8 +637,8 @@ def render_minimal_list(docs):
         doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
         content_preview = doc.get('content_preview', 'No preview available') or 'No preview available'
         
-        # Calculate comprehensive scores
-        scores = comprehensive_document_scoring(content, str(title))
+        # Calculate comprehensive scores with caching
+        scores = comprehensive_document_scoring_cached(content, str(title))
         
         col1, col2 = st.columns([3, 2])
         with col1:
@@ -699,7 +711,7 @@ def render_card_view(docs):
             
             # ISOLATED STEP 3: Calculate scores separately (after metadata display)
             try:
-                scores = comprehensive_document_scoring(raw_content, str(title))
+                scores = comprehensive_document_scoring_cached(raw_content, str(title))
                 
                 # Display scores in completely separate section
                 st.markdown(f"""

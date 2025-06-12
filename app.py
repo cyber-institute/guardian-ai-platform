@@ -3,6 +3,22 @@ from all_docs_tab import render
 from datetime import datetime
 from components.chatbot_widget import render_chatbot_widget, inject_chatbot_css
 
+# Performance optimization: Cache database queries
+@st.cache_data(ttl=300)  # Cache for 5 minutes
+def get_cached_analytics():
+    """Cache analytics data to reduce database load"""
+    try:
+        from utils.database import get_db_connection
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM documents")
+        count = cursor.fetchone()[0]
+        cursor.close()
+        conn.close()
+        return count
+    except:
+        return 0
+
 def main():
     st.set_page_config(
         page_title="GUARDIAN - AI Risk Analysis Navigator",
