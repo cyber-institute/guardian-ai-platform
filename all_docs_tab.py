@@ -170,20 +170,21 @@ def render():
                     st.error(f"Error updating documents: {e}")
     
     with col2:
-        # Display mode selection moved up here
+        # Display mode selection with radio buttons
         display_mode = st.session_state.get("display_mode", "cards")
-        display_mode = st.selectbox(
-            "", 
+        display_mode = st.radio(
+            "**View Mode:**",
             ["cards", "compact", "table", "grid", "minimal"],
             index=["cards", "compact", "table", "grid", "minimal"].index(display_mode),
             format_func=lambda x: {
-                "cards": "Card View",
-                "compact": "Compact Cards", 
-                "table": "Table View",
-                "grid": "Grid Layout",
-                "minimal": "Minimal List"
+                "cards": "Cards",
+                "compact": "Compact", 
+                "table": "Table",
+                "grid": "Grid",
+                "minimal": "Minimal"
             }[x],
-            label_visibility="collapsed"
+            horizontal=True,
+            key="display_mode_radio"
         )
         st.session_state["display_mode"] = display_mode
     
