@@ -637,19 +637,18 @@ def render():
                         st.error(f"Error processing URL: {str(e)}")
                         st.info("Please verify the URL is accessible and contains readable content")
     
-    # Policy Gap Analysis Modal Button
+    # Policy Analyzer Modal Button
     st.markdown("---")
-    st.markdown("### Advanced Analysis")
     
     analyze_col1, analyze_col2 = st.columns([1, 2])
     
     with analyze_col1:
-        if st.button("Open Policy Gap Analysis", type="secondary", use_container_width=True):
+        if st.button("Open Policy Analyzer", type="secondary", use_container_width=True):
             st.session_state.show_policy_analyzer = True
             st.rerun()
     
     with analyze_col2:
-        st.markdown("*Comprehensive policy analysis with gap detection and recommendations*")
+        st.markdown("*Comprehensive policy analysis with emerging technologies gap detection and recommendations and Report Generation*")
     
     # Policy Gap Analysis Modal
     if st.session_state.get('show_policy_analyzer', False):
