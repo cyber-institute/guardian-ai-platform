@@ -497,80 +497,44 @@ def render():
     
     # Document Upload and URL Input Section
     st.markdown("---")
-    st.markdown("### Add New Documents")
+    # Add CSS to reduce whitespace
+    st.markdown("""
+    <style>
+    .upload-section h4 {
+        margin-bottom: 0.5rem !important;
+    }
+    .stFileUploader {
+        margin-top: -0.5rem !important;
+    }
+    .stTextInput {
+        margin-top: -0.5rem !important;
+    }
+    div[data-testid="stFileUploader"] {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+    }
+    div[data-testid="stTextInput"] {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+    }
+    .element-container:has(.stFileUploader) {
+        margin-top: -1rem !important;
+    }
+    .element-container:has(.stTextInput) {
+        margin-top: -1rem !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
     
+    st.markdown("### Add New Documents")
     upload_col1, upload_col2 = st.columns(2)
     
     with upload_col1:
-        st.markdown("#### Browse Files")
-        
-        # Custom CSS to make file uploader compact and single line
-        st.markdown("""
-        <style>
-        /* Target the file uploader container more specifically */
-        [data-testid="stFileUploader"] > div > div > div {
-            min-height: 45px !important;
-            max-height: 45px !important;
-            padding: 8px 12px !important;
-            border: 1px dashed #d1d5db !important;
-            border-radius: 6px !important;
-            background: #fafafa !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-            gap: 1rem !important;
-        }
-        
-        /* Hide the cloud icon */
-        [data-testid="stFileUploader"] svg {
-            display: none !important;
-        }
-        
-        /* Style the text area */
-        [data-testid="stFileUploader"] > div > div > div > div:first-child {
-            flex: 1 !important;
-            display: flex !important;
-            align-items: center !important;
-            font-size: 14px !important;
-            color: #6b7280 !important;
-            white-space: nowrap !important;
-        }
-        
-        /* Replace default text with our custom text */
-        [data-testid="stFileUploader"] > div > div > div > div:first-child > div {
-            display: none !important;
-        }
-        
-        [data-testid="stFileUploader"] > div > div > div > div:first-child::before {
-            content: "Drag and drop file here • Limit 200MB per file • PDF, TXT, DOCX" !important;
-            font-size: 14px !important;
-            color: #6b7280 !important;
-        }
-        
-        /* Style the browse button */
-        [data-testid="stFileUploader"] button {
-            height: 32px !important;
-            padding: 6px 12px !important;
-            font-size: 13px !important;
-            background: #f8f9fa !important;
-            border: 1px solid #d1d5db !important;
-            border-radius: 4px !important;
-            color: #374151 !important;
-            cursor: pointer !important;
-            flex-shrink: 0 !important;
-        }
-        
-        [data-testid="stFileUploader"] button:hover {
-            background: #e9ecef !important;
-            border-color: #adb5bd !important;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-        
+        st.markdown('<div class="upload-section"><h4>Browse Files</h4></div>', unsafe_allow_html=True)
         uploaded_file = st.file_uploader(
             "Choose a file",
             type=['pdf', 'txt', 'docx'],
-            help="Upload PDF, TXT, or DOCX files for analysis",
+            help="Drag and drop file here • Limit 200MB per file • PDF, TXT, DOCX",
             label_visibility="collapsed"
         )
         
@@ -594,7 +558,7 @@ def render():
                         st.error(f"Error processing document: {str(e)}")
     
     with upload_col2:
-        st.markdown("#### 🌐 Add from URL")
+        st.markdown('<div class="upload-section"><h4>🌐 Add from URL</h4></div>', unsafe_allow_html=True)
         url_input = st.text_input(
             "Enter document URL",
             placeholder="https://example.com/document.pdf",
@@ -755,6 +719,9 @@ def render():
     
     with col2:
         st.markdown('<div style="margin-left: -1rem; padding-top: 0.5rem;"><span class="policy-description">Comprehensive policy analysis with emerging technologies gap detection and recommendations and Report Generation</span></div>', unsafe_allow_html=True)
+    
+    # Add divider line with reduced margins
+    st.markdown('<div style="margin: 0.5rem 0;"><hr style="margin: 0; padding: 0; border-top: 1px solid #e5e7eb;"></div>', unsafe_allow_html=True)
     
     # Policy Gap Analysis Modal
     if st.session_state.get('show_policy_analyzer', False):
