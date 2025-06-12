@@ -13,6 +13,7 @@ from datetime import datetime
 import io
 from typing import Dict, List, Any, Optional
 from utils.risk_report_generator import RiskReportGenerator
+from utils.professional_gauge_generator import create_professional_assessment_dashboard, create_quantum_assessment_dashboard
 
 class EnhancedRiskReportGenerator(RiskReportGenerator):
     """Enhanced report generator that includes comprehensive gap analysis details"""
