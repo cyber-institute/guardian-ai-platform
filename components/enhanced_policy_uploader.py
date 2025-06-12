@@ -366,17 +366,10 @@ def display_gap_analysis_results(report: GapAnalysisReport):
     
     st.markdown("---")
     
-    # Overall maturity score
-    col1, col2, col3 = st.columns([1, 1, 2])
+    # Critical gaps and framework scores
+    col1, col2 = st.columns([1, 2])
     
     with col1:
-        st.metric(
-            "Overall Maturity",
-            f"{report.overall_maturity_score}/100",
-            help="Composite maturity score across all frameworks"
-        )
-    
-    with col2:
         severity_counts = {}
         for gap in report.identified_gaps:
             severity_counts[gap.severity] = severity_counts.get(gap.severity, 0) + 1
@@ -389,7 +382,7 @@ def display_gap_analysis_results(report: GapAnalysisReport):
             delta_color="inverse"
         )
     
-    with col3:
+    with col2:
         st.markdown("**Framework Scores:**")
         
         # Create 2x2 grid for gauges
