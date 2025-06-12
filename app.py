@@ -753,50 +753,7 @@ def main():
         
         st.markdown("---")
         
-        # API section
-        st.markdown("### Run Multi-API Ingest")
-        if st.button("Run Multi-API Ingest", use_container_width=True):
-            st.info("Starting multi-API document ingestion...")
-        
-        # Chatbot Configuration section
-        from components.dialogflow_settings import render_dialogflow_settings, render_chatbot_status, show_chatbot_capabilities
-        
-        st.markdown("---")
-        render_dialogflow_settings()
-        
-        st.markdown("---")
-        st.markdown("### Chatbot System Status")
-        render_chatbot_status()
-        
-        st.markdown("---")
-        show_chatbot_capabilities()
-        
-        st.markdown("---")
-        
-        # Adaptive Color Palette Selector
-        from components.color_palette_selector import render_color_palette_selector
-        render_color_palette_selector()
-        
-        st.markdown("---")
-        
-        # API logs section
-        st.markdown("### API Logs")
-        
-        # Expandable log sections
-        with st.expander("WEB | url > success"):
-            st.code("2025-06-08 23:05:55.476928")
-            
-        with st.expander("WEB | url > success"):
-            st.code("2025-06-08 08:07:46.906564")
-            
-        with st.expander("WEB | url > success"):
-            st.code("2025-06-08 07:54:13.855608")
-            
-        with st.expander("WEB | url > success"):
-            st.code("2025-06-07 21:21:26.339457")
-            
-        with st.expander("WEB | url > success"):
-            st.code("2025-06-07 21:08:56.927833")
+        st.info("ℹ️ Administrative features like Multi-API Ingest, Chatbot Configuration, and API Logs are now available in Repository Admin")
     
     # Move onboarding functionality to chatbot
     
