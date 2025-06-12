@@ -637,8 +637,13 @@ def render_minimal_list(docs):
         doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
         content_preview = doc.get('content_preview', 'No preview available') or 'No preview available'
         
-        # Calculate comprehensive scores with caching
-        scores = comprehensive_document_scoring_cached(content, str(title))
+        # Use actual database scores instead of recalculating
+        scores = {
+            'ai_cybersecurity': doc.get('ai_cybersecurity_score', 0) or 0,
+            'quantum_cybersecurity': doc.get('quantum_cybersecurity_score', 0) or 0,
+            'ai_ethics': doc.get('ai_ethics_score', 0) or 0,
+            'quantum_ethics': doc.get('quantum_ethics_score', 0) or 0
+        }
         
         col1, col2 = st.columns([3, 2])
         with col1:
