@@ -394,7 +394,7 @@ def main():
     
     # Sidebar hamburger menu for navigation
     with st.sidebar:
-        st.markdown("### Navigation")
+        st.markdown("### Hidden Navigation")
         
         # Initialize session state for navigation
         if 'nav_selection' not in st.session_state:
