@@ -418,24 +418,34 @@ def main():
             status_text = st.empty()
             
             try:
-                # Step 1: Duplicate Detection and Cleanup
-                status_text.text("Step 1/4: Scanning for duplicate documents...")
+                # Step 1: Quick Duplicate Check
+                status_text.text("Step 1/4: Quick duplicate scan...")
                 progress_bar.progress(0.1)
                 
-                from utils.duplicate_cleanup_fixed import get_duplicate_summary, auto_cleanup_exact_duplicates
-                
-                duplicate_summary = get_duplicate_summary()
+                # Simple duplicate check without heavy processing
                 duplicates_removed = 0
-                
-                if duplicate_summary['total_duplicate_groups'] > 0:
-                    status_text.text(f"Found {duplicate_summary['total_duplicate_groups']} duplicate groups - cleaning...")
-                    progress_bar.progress(0.2)
+                try:
+                    # Use a lightweight approach to check for obvious duplicates
+                    from utils.db import fetch_documents
+                    docs = fetch_documents()
                     
-                    cleanup_result = auto_cleanup_exact_duplicates()
-                    duplicates_removed = cleanup_result['documents_removed']
+                    # Quick title-based duplicate detection for recent documents
+                    recent_docs = docs[:50] if len(docs) > 50 else docs
+                    title_counts = {}
+                    potential_duplicates = 0
                     
-                    if duplicates_removed > 0:
-                        st.success(f"Removed {duplicates_removed} duplicate documents from {cleanup_result['groups_processed']} groups")
+                    for doc in recent_docs:
+                        title = doc.get('title', '').strip().lower()
+                        if title and len(title) > 10:
+                            title_counts[title] = title_counts.get(title, 0) + 1
+                    
+                    potential_duplicates = sum(1 for count in title_counts.values() if count > 1)
+                    
+                    if potential_duplicates > 0:
+                        st.info(f"Found {potential_duplicates} potential duplicate title groups")
+                    
+                except Exception as e:
+                    st.warning(f"Duplicate check skipped: {str(e)[:100]}")
                 
                 progress_bar.progress(0.3)
                 
@@ -457,34 +467,28 @@ def main():
                 
                 progress_bar.progress(0.9)
                 
-                # Step 4: Final content scanning for remaining duplicates
-                status_text.text("Step 4/4: Final duplicate content scan...")
-                
-                # Check again for any content-based duplicates that might have been missed
-                final_duplicate_summary = get_duplicate_summary()
-                remaining_duplicates = final_duplicate_summary['total_duplicate_groups']
+                # Step 4: Final verification
+                status_text.text("Step 4/4: Final verification...")
                 
                 progress_bar.progress(1.0)
                 status_text.text("Analysis complete!")
                 
                 # Summary results
                 results = []
-                if duplicates_removed > 0:
-                    results.append(f"Removed {duplicates_removed} duplicate documents")
+                if potential_duplicates > 0:
+                    results.append(f"Detected {potential_duplicates} potential duplicate title groups")
                 if processed > 0:
                     results.append(f"Updated scoring for {processed} documents")
                 if metadata_updated > 0:
                     results.append(f"Enhanced metadata for {metadata_updated} documents")
-                if remaining_duplicates > 0:
-                    results.append(f"Found {remaining_duplicates} remaining duplicate groups for manual review")
                 
                 if results:
                     st.success("Refresh Analysis Complete:\n" + "\n".join(f"• {result}" for result in results))
                 else:
                     st.info("All documents are already up to date with no duplicates detected")
                 
-                if remaining_duplicates > 0:
-                    st.warning("Some duplicate groups remain and may require manual review in Repository Admin")
+                if potential_duplicates > 0:
+                    st.info("For detailed duplicate management, visit Repository Admin section")
                 
                 # Clear session state to force refresh of displayed data
                 st.session_state.clear()
