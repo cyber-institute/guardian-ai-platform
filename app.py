@@ -802,14 +802,23 @@ def main():
     
     # Move onboarding functionality to chatbot
     
-    # Create main navigation with reorganized structure
-    main_tab1, main_tab2, main_tab3 = st.tabs([
-        "Policy Repository", 
-        "Repository Admin",
-        "About GUARDIAN"
-    ])
+    # Initialize session state for lazy loading
+    if 'active_main_tab' not in st.session_state:
+        st.session_state.active_main_tab = "Policy Repository"
     
-    with main_tab1:
+    # Create main navigation with true lazy loading
+    selected_tab = st.selectbox(
+        "Navigate:",
+        ["Policy Repository", "Repository Admin", "About GUARDIAN"],
+        index=["Policy Repository", "Repository Admin", "About GUARDIAN"].index(st.session_state.active_main_tab),
+        key="main_nav_selector"
+    )
+    
+    # Update session state
+    st.session_state.active_main_tab = selected_tab
+    
+    # Only render the selected tab content
+    if selected_tab == "Policy Repository":
         # Policy Repository with subtabs for Analyzer and Recommendations
         policy_subtab1, policy_subtab2, policy_subtab3 = st.tabs([
             "Repository", 
@@ -830,10 +839,11 @@ def main():
             from recommendation_tab import render as render_recommendations
             render_recommendations()
     
-    with main_tab2:
+    elif selected_tab == "Repository Admin":
+        # Only render when actually selected - true lazy loading
         render_repository_admin_section()
     
-    with main_tab3:
+    elif selected_tab == "About GUARDIAN":
         # About tab with Patent Technology and Prototype Phased Plan as subtabs
         about_subtab1, about_subtab2, about_subtab3 = st.tabs([
             "GUARDIAN Emerging Tech Tool", 
