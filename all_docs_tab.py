@@ -264,7 +264,7 @@ def render():
     # Compact filter controls with inline topic and view mode
     
     # Topic filter and View Mode on same row
-    topic_col, view_col = st.columns([1, 1])
+    topic_col, spacer_col, view_col = st.columns([2, 2, 3])
     
     with topic_col:
         topic_filter = st.radio(
@@ -277,7 +277,8 @@ def render():
         st.session_state["filters"]["topic_filter"] = topic_filter
     
     with view_col:
-        # Display mode selection with radio buttons
+        # Display mode selection with radio buttons (right-justified)
+        st.markdown('<div style="text-align: right;">', unsafe_allow_html=True)
         display_mode = st.session_state.get("display_mode", "cards")
         display_mode = st.radio(
             "**View Mode:**",
@@ -294,6 +295,7 @@ def render():
             key="display_mode_radio"
         )
         st.session_state["display_mode"] = display_mode
+        st.markdown('</div>', unsafe_allow_html=True)
     
 
     
