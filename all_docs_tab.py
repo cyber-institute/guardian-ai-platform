@@ -765,10 +765,10 @@ def render_policy_analyzer_modal():
         with header_col1:
             st.markdown("""
             <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); 
-                        color: white; padding: 1rem 2rem; border-radius: 12px; margin-bottom: 2rem;">
-                <h2 style="margin: 0; color: white;">Policy Gap Analysis</h2>
-                <p style="margin: 0.5rem 0 0 0; color: #bfdbfe; font-size: 0.9rem;">
-                    Comprehensive policy analysis with gap detection and recommendations
+                        color: white; padding: 0.75rem 1.5rem; border-radius: 8px; margin-bottom: 1rem;">
+                <h3 style="margin: 0; color: white; font-size: 1.2rem;">AI-Powered Policy Gap Analysis</h3>
+                <p style="margin: 0.25rem 0 0 0; color: #bfdbfe; font-size: 0.85rem;">
+                    Upload policies for comprehensive gap analysis and intelligent recommendations
                 </p>
             </div>
             """, unsafe_allow_html=True)
