@@ -59,7 +59,7 @@ def render():
                 
                 <div style="text-align: center; flex: 1;">
                     <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                        <span style="font-size: 1.5rem;">🛡️</span>
+                        <span style="font-size: 1.5rem;">🔒</span>
                         <div>
                             <div style="font-size: 1.8rem; font-weight: 700;">{avg_cyber:.0f}</div>
                             <div style="font-size: 0.8rem; opacity: 0.9;">Cyber Avg</div>
@@ -208,7 +208,7 @@ def render():
                         border: 1px solid #bbf7d0;
                         min-width: 60px;
                     ">
-                        <div style="font-size: 1.4rem; margin-bottom: 0.2rem;">🛡️</div>
+                        <div style="font-size: 1.4rem; margin-bottom: 0.2rem;">Security</div>
                         <div style="font-size: 0.65rem; color: #166534; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Cyber</div>
                         <div style="font-size: 1.1rem; color: {'#22c55e' if category_scores['cyber'] >= 75 else '#f59e0b' if category_scores['cyber'] >= 50 else '#ef4444'}; font-weight: 800; margin-top: 0.2rem;">
                             {category_scores['cyber']:.0f}
@@ -236,7 +236,7 @@ def render():
 
         if score > 0:
             # Interactive expandable analysis section
-            with st.expander("📊 Detailed Analysis & Insights", expanded=False):
+            with st.expander("Detailed Analysis & Insights", expanded=False):
                 
                 # Create three columns for category analysis
                 col1, col2, col3 = st.columns(3)
@@ -247,7 +247,7 @@ def render():
                     st.markdown(get_score_analysis(category_scores['quantum'], "quantum security"))
                 
                 with col2:
-                    st.markdown("#### 🛡️ Cyber Defense")
+                    st.markdown("#### Cyber Defense")
                     draw_scorecard("Cyber Score", category_scores['cyber'])
                     st.markdown(get_score_analysis(category_scores['cyber'], "cyber security"))
                 
@@ -261,7 +261,7 @@ def render():
                 # Document insights
                 text_content = doc.get("text", "")
                 if text_content:
-                    st.markdown("#### 🔍 Document Insights")
+                    st.markdown("#### Document Insights")
                     
                     # Key metrics about the document
                     word_count = len(text_content.split())
@@ -281,7 +281,7 @@ def render():
                     st.markdown("**Content Preview:**")
                     st.markdown(f"_{preview_text}_")
 
-            with st.expander("🔍 Detailed AI Analysis", expanded=False):
+            with st.expander("Detailed AI Analysis", expanded=False):
                 # Create tabs for better organization
                 tab1, tab2, tab3, tab4 = st.tabs(["Overview", "Confidence Scores", "Maturity Traits", "Recommendations"])
                 
@@ -311,14 +311,14 @@ def render():
                     
                     trait_col1, trait_col2 = st.columns(2)
                     with trait_col1:
-                        plan_status = "✅ Present" if traits.get('implementation_plan') else "❌ Missing"
+                        plan_status = "Present" if traits.get('implementation_plan') else "Missing"
                         st.markdown(f"**Implementation Plan:** {plan_status}")
                         
-                        standards_status = "✅ Present" if traits.get('standards_reference') else "❌ Missing"
+                        standards_status = "Present" if traits.get('standards_reference') else "Missing"
                         st.markdown(f"**Standards Reference:** {standards_status}")
                     
                     with trait_col2:
-                        roadmap_status = "✅ Present" if traits.get('roadmap_timeline') else "❌ Missing"
+                        roadmap_status = "Present" if traits.get('roadmap_timeline') else "Missing"
                         st.markdown(f"**Roadmap/Timeline:** {roadmap_status}")
                         
                         # Overall readiness indicator
