@@ -605,6 +605,83 @@ def render():
                     except Exception as e:
                         st.error(f"Error processing URL: {str(e)}")
                         st.info("Please verify the URL is accessible and contains readable content")
+    
+    # Policy Analyzer Modal Button
+    st.markdown("---")
+    st.markdown("### Advanced Analysis")
+    
+    analyze_col1, analyze_col2 = st.columns([1, 2])
+    
+    with analyze_col1:
+        if st.button("📋 Open Policy Analyzer", type="secondary", use_container_width=True):
+            st.session_state.show_policy_analyzer = True
+            st.rerun()
+    
+    with analyze_col2:
+        st.markdown("*Comprehensive policy analysis with gap detection and recommendations*")
+    
+    # Policy Analyzer Modal
+    if st.session_state.get('show_policy_analyzer', False):
+        render_policy_analyzer_modal()
+
+def render_policy_analyzer_modal():
+    """Render the Policy Analyzer in a modal-style container"""
+    
+    # Create a visually distinct modal-style container
+    st.markdown("""
+    <style>
+    .policy-modal {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border: 2px solid #3b82f6;
+        border-radius: 16px;
+        padding: 2rem;
+        margin: 2rem 0;
+        box-shadow: 0 20px 40px rgba(59, 130, 246, 0.15);
+        position: relative;
+    }
+    .modal-header {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        margin: -2rem -2rem 2rem -2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Modal container with custom styling
+    with st.container():
+        st.markdown('<div class="policy-modal">', unsafe_allow_html=True)
+        
+        # Header with close button
+        header_col1, header_col2 = st.columns([4, 1])
+        
+        with header_col1:
+            st.markdown("""
+            <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); 
+                        color: white; padding: 1rem 2rem; border-radius: 12px; margin-bottom: 2rem;">
+                <h2 style="margin: 0; color: white;">📋 Policy Analyzer</h2>
+                <p style="margin: 0.5rem 0 0 0; color: #bfdbfe; font-size: 0.9rem;">
+                    Comprehensive policy analysis with gap detection and recommendations
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with header_col2:
+            st.markdown("<br>", unsafe_allow_html=True)  # Spacing
+            if st.button("✕ Close", key="close_modal", type="secondary", use_container_width=True):
+                st.session_state.show_policy_analyzer = False
+                st.rerun()
+        
+        # Policy Analyzer content in the modal
+        with st.container():
+            from components.enhanced_policy_uploader import render_enhanced_policy_uploader
+            render_enhanced_policy_uploader()
+        
+        st.markdown('</div>', unsafe_allow_html=True)
 
 def render_compact_cards(docs):
     """Render documents in compact card format."""

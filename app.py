@@ -409,19 +409,8 @@ def main():
     
     # Render content based on sidebar selection
     if st.session_state.nav_selection == "Policy Repository":
-        # Policy Repository with subtabs for Analyzer
-        policy_subtab1, policy_subtab2 = st.tabs([
-            "Repository", 
-            "Policy Analyzer"
-        ])
-        
-        with policy_subtab1:
-            render()
-        
-        with policy_subtab2:
-            # Enhanced Policy Analysis with Gap Detection
-            from components.enhanced_policy_uploader import render_enhanced_policy_uploader
-            render_enhanced_policy_uploader()
+        # Single page Policy Repository
+        render()
     
     elif st.session_state.nav_selection == "Repository Admin":
         # Only render when actually selected - true lazy loading
