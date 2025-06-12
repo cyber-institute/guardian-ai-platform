@@ -1,0 +1,89 @@
+Qiskit Router for CONVERGENCE AI / GUARDIAN
+
+Overview
+
+The qiskit_router.py module introduces a quantum-assisted routing mechanism for large language models (LLMs) within the GUARDIAN/CONVERGENCE AI orchestration framework. It uses simulated quantum circuits (via IBM's Qiskit SDK) to probabilistically select which LLMs should process a given input, enabling non-deterministic, parallel-ready inference that mimics superposition-based decision-making.
+
+Purpose
+
+This module demonstrates how quantum principles such as superposition and probabilistic measurement can be incorporated into modern AI orchestration, providing:
+
+Randomized but traceable LLM selection
+
+Redundancy-resilient routing
+
+Hybrid quantum-classical readiness
+
+Scalable architecture aligned with quantum computing futures
+
+
+Features
+
+Simulates a 2-qubit quantum circuit using Qiskit
+
+Encodes four routing outcomes based on measurement results:
+
+00: GPT-4 + Claude
+
+01: GPT-4 + Local LLM
+
+10: Claude + Local LLM
+
+11: All three models
+
+
+Modular function quantum_llm_selector() returns selected models
+
+Easily extendable for trust score weighting, task-based logic, or future QPU support
+
+
+Requirements
+
+Python 3.8+
+
+Qiskit (install via pip install qiskit)
+
+
+Usage
+
+# Install dependencies
+pip install qiskit
+
+from qiskit_router import quantum_llm_selector
+
+# Example usage
+models = quantum_llm_selector()
+print("Selected models:", models)
+
+Integration with GUARDIAN
+
+You can integrate this router module into your existing orchestration pipeline:
+
+from qiskit_router import quantum_llm_selector
+
+def route_input(document):
+    selected_models = quantum_llm_selector()
+    for model in selected_models:
+        response = query_llm(model, document)
+        # continue synthesis logic...
+
+Future Extensions
+
+Support for hybrid classical/quantum decision-making
+
+Task-specific routing logic based on input metadata
+
+Use of Variational Quantum Circuits (VQC) for dynamic weight optimization
+
+IBM QPU integration for live experiments
+
+
+License
+
+MIT or Custom License (pending inclusion in patent or IP strategy)
+
+
+---
+
+© 2025 Cyber Institute. Part of the CONVERGENCE AI orchestration framework.
+

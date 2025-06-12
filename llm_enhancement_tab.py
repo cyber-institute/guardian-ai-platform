@@ -612,9 +612,204 @@ def render_enhancement_demo_tab():
                     st.error(f"Enhanced analysis failed: {str(e)}")
 
 def render_multi_llm_ensemble_tab():
-    """Demonstrate revolutionary multi-LLM intelligent synthesis capabilities"""
+    """Demonstrate revolutionary quantum-assisted multi-LLM intelligent synthesis capabilities"""
     
-    st.markdown("### **Multi-LLM Integration Status Update**")
+    st.markdown("### **🚀 Quantum-Enhanced Multi-LLM Synthesis Engine**")
+    st.markdown("*Revolutionary quantum-assisted ensemble system with superposition-based model selection*")
+    
+    # Quantum Enhancement Introduction
+    with st.expander("⚛️ **Quantum Routing Technology Overview**", expanded=True):
+        st.markdown("""
+        **GUARDIAN now features quantum-assisted LLM routing using IBM Qiskit:**
+        
+        **🔬 Quantum Superposition Model Selection:**
+        - 2-qubit and 3-qubit quantum circuits for probabilistic routing
+        - Content-aware quantum state preparation
+        - Entangled decision-making for correlated model selection
+        
+        **🎯 Enhanced Routing Capabilities:**
+        - Task-specific quantum biasing (AI/Quantum/Ethics content detection)
+        - Quantum confidence weighting using measurement probabilities
+        - Dynamic circuit adaptation based on document characteristics
+        
+        **⚡ Advanced Synthesis Features:**
+        - Quantum-weighted consensus formation
+        - Multi-dimensional perspective fusion
+        - Superposition-enhanced quality assurance
+        """)
+    
+    # Quantum Routing Demonstration
+    st.markdown("#### **🔬 Quantum Routing Demonstration**")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Test Content for Quantum Routing:**")
+        test_content = st.text_area(
+            "Enter content to analyze:",
+            value="AI ethics policy for quantum cybersecurity implementation with machine learning governance frameworks",
+            height=100
+        )
+    
+    with col2:
+        st.markdown("**Document Type:**")
+        doc_type = st.selectbox(
+            "Select document type:",
+            ["policy", "technical", "research", "regulatory"],
+            index=0
+        )
+    
+    if st.button("🚀 Execute Quantum Routing"):
+        with st.spinner("Initializing quantum circuits..."):
+            try:
+                from utils.quantum_enhanced_scoring import QuantumEnhancedScoringEngine
+                
+                # Initialize quantum engine
+                quantum_engine = QuantumEnhancedScoringEngine()
+                
+                # Execute quantum-enhanced scoring
+                results = quantum_engine.quantum_score_document(
+                    content=test_content,
+                    title="Test Document",
+                    document_type=doc_type
+                )
+                
+                # Display quantum routing results
+                if 'quantum_routing' in results:
+                    st.success("Quantum routing completed successfully!")
+                    
+                    routing_info = results['quantum_routing']
+                    
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        st.metric(
+                            "Selected Models", 
+                            len(routing_info.get('selected_models', [])),
+                            help="Number of LLMs selected by quantum circuit"
+                        )
+                    
+                    with col2:
+                        quantum_weights = routing_info.get('quantum_weights', {})
+                        avg_confidence = sum(quantum_weights.values()) / len(quantum_weights) if quantum_weights else 0
+                        st.metric(
+                            "Quantum Confidence", 
+                            f"{avg_confidence:.2f}",
+                            help="Average quantum measurement confidence"
+                        )
+                    
+                    with col3:
+                        enhanced_scores = results.get('enhanced_scores', {})
+                        ensemble_diversity = enhanced_scores.get('ensemble_diversity', 0)
+                        st.metric(
+                            "Ensemble Diversity", 
+                            ensemble_diversity,
+                            help="Number of models in quantum ensemble"
+                        )
+                    
+                    # Quantum Routing Details
+                    st.markdown("##### **Quantum Routing Analysis:**")
+                    
+                    selected_models = routing_info.get('selected_models', [])
+                    st.write(f"**Selected Models:** {', '.join(selected_models)}")
+                    
+                    if 'routing_reasoning' in routing_info:
+                        st.info(f"**Quantum Reasoning:** {routing_info['routing_reasoning']}")
+                    
+                    # Quantum Weights Visualization
+                    if quantum_weights:
+                        st.markdown("##### **Quantum Measurement Weights:**")
+                        
+                        weight_data = []
+                        for model, weight in quantum_weights.items():
+                            weight_data.append({'Model': model, 'Quantum Weight': weight})
+                        
+                        if weight_data:
+                            import pandas as pd
+                            df = pd.DataFrame(weight_data)
+                            st.bar_chart(df.set_index('Model'))
+                    
+                    # Individual LLM Results
+                    if 'individual_llm_results' in results:
+                        st.markdown("##### **Individual LLM Analysis:**")
+                        
+                        llm_results = results['individual_llm_results']
+                        
+                        for model, result in llm_results.items():
+                            with st.expander(f"**{model.upper()} Analysis**"):
+                                
+                                # Model confidence and reasoning
+                                confidence = result.get('confidence', 0)
+                                reasoning = result.get('reasoning', 'No reasoning provided')
+                                
+                                st.write(f"**Confidence:** {confidence:.2f}")
+                                st.write(f"**Selection Reasoning:** {reasoning}")
+                                
+                                # Model-specific scores
+                                scores = result.get('scores', {})
+                                if scores:
+                                    score_cols = st.columns(len(scores))
+                                    for i, (framework, score) in enumerate(scores.items()):
+                                        if isinstance(score, (int, float)):
+                                            with score_cols[i]:
+                                                st.metric(
+                                                    framework.replace('_', ' ').title(),
+                                                    f"{score:.1f}"
+                                                )
+                    
+                    # Quantum Consensus Scores
+                    if 'quantum_consensus_scores' in results:
+                        st.markdown("##### **Quantum Consensus Results:**")
+                        
+                        consensus = results['quantum_consensus_scores']
+                        consensus_cols = st.columns(len(consensus))
+                        
+                        for i, (framework, score) in enumerate(consensus.items()):
+                            if isinstance(score, (int, float)):
+                                with consensus_cols[i]:
+                                    st.metric(
+                                        framework.replace('_', ' ').title(),
+                                        f"{score:.1f}",
+                                        help="Quantum-weighted consensus score"
+                                    )
+                
+                else:
+                    st.warning("Quantum routing not available - using fallback scoring")
+                    
+            except Exception as e:
+                st.error(f"Quantum routing demonstration failed: {str(e)}")
+                st.info("This demonstrates the quantum routing concept. Full implementation requires API keys for external LLMs.")
+    
+    st.markdown("---")
+    
+    # Quantum Analytics
+    st.markdown("#### **🔬 Quantum Routing Analytics**")
+    
+    if st.button("📊 View Quantum Analytics"):
+        try:
+            from utils.quantum_enhanced_scoring import QuantumEnhancedScoringEngine
+            
+            quantum_engine = QuantumEnhancedScoringEngine()
+            analytics = quantum_engine.get_routing_analytics()
+            
+            if 'message' in analytics:
+                st.info(analytics['message'])
+            else:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.markdown("**Routing Statistics:**")
+                    st.write(f"Total Decisions: {analytics.get('total_routing_decisions', 0)}")
+                    st.write(f"Routing Diversity: {analytics.get('routing_diversity', 0)}")
+                
+                with col2:
+                    st.markdown("**Model Usage Frequency:**")
+                    usage = analytics.get('model_usage_frequency', {})
+                    for model, count in usage.items():
+                        st.write(f"{model}: {count}")
+        
+        except Exception as e:
+            st.error(f"Analytics unavailable: {str(e)}")
     
     # Success announcement
     st.success("🎉 **Multi-LLM Scoring System Successfully Fixed and Integrated!**")
