@@ -272,7 +272,7 @@ def render_llm_tab():
 
 def render_about_tab():
     """Simple about tab"""
-    st.header("ℹ️ About GUARDIAN")
+    st.header("About GUARDIAN")
     
     st.markdown("""
     ### System Information

@@ -2540,7 +2540,7 @@ def render_patent_scoring_management():
                         st.error(f"Error during scoring: {e}")
         
         with action_col2:
-            if st.button("📊 Refresh Statistics", type="secondary"):
+            if st.button("Refresh Statistics", type="secondary"):
                 st.rerun()
         
         # Patent formulas information
@@ -2594,7 +2594,7 @@ def render_patent_scoring_management():
     st.markdown("---")
     
     # Repository Statistics
-    st.markdown("#### 📊 Repository Statistics")
+    st.markdown("#### Repository Statistics")
     
     try:
         from all_docs_tab import fetch_documents_cached, get_document_topic

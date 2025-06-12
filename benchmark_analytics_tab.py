@@ -24,7 +24,7 @@ def render():
     report = multi_llm_benchmarker.generate_benchmark_report()
     
     if report.get("no_data"):
-        st.info("📊 **Getting Started with Benchmarking**")
+        st.info("**Getting Started with Benchmarking**")
         st.markdown("""
         To see Multi-LLM performance improvements:
         
@@ -49,7 +49,7 @@ def render():
         
         with col2:
             st.markdown("""
-            **🎯 Key metrics to watch:**
+            **Key metrics to watch:**
             - Confidence improvement
             - Consensus strength
             - Processing time impact
@@ -59,7 +59,7 @@ def render():
         return
     
     # Display overall performance summary
-    st.success(f"📈 **Analysis Complete**: {report['total_comparisons']} document comparisons available")
+    st.success(f"**Analysis Complete**: {report['total_comparisons']} document comparisons available")
     
     improvements = report["average_improvements"]
     quality = report["quality_indicators"]
@@ -101,29 +101,29 @@ def render():
         )
     
     # Quality indicators
-    st.markdown("### 🎯 Quality Assessment")
+    st.markdown("### Quality Assessment")
     
     quality_col1, quality_col2, quality_col3 = st.columns(3)
     
     with quality_col1:
         if quality["multi_llm_advantage"]:
-            st.success("✅ **Multi-LLM Advantage Confirmed**")
+            st.success("**Multi-LLM Advantage Confirmed**")
             st.caption("Ensemble analysis consistently outperforms single models")
         else:
-            st.warning("⚠️ **Mixed Results**")
+            st.warning("**Mixed Results**")
             st.caption("Some variations in performance detected")
     
     with quality_col2:
         if quality["consensus_reliability"]:
-            st.success("✅ **High Consensus Reliability**")
+            st.success("**High Consensus Reliability**")
             st.caption("Strong agreement between multiple LLMs")
         else:
-            st.info("ℹ️ **Moderate Consensus**")
+            st.info("**Moderate Consensus**")
             st.caption("LLMs show some disagreement on complex topics")
     
     with quality_col3:
         if quality["improved_accuracy"]:
-            st.success("✅ **Enhanced Accuracy**")
+            st.success("**Enhanced Accuracy**")
             st.caption("Measurable improvements in scoring accuracy")
         else:
             st.info("ℹ️ **Comparable Accuracy**")
