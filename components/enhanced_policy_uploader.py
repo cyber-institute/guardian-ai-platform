@@ -350,18 +350,22 @@ def display_gap_analysis_results(report: GapAnalysisReport):
                 # AI Cybersecurity Gauge
                 ai_cyber_score = int(report.framework_scores['ai_cybersecurity_score'])
                 if topic_detection['is_ai_related'] and ai_cyber_score > 0:
+                    st.markdown("<div style='text-align: center; margin-bottom: 15px;'>", unsafe_allow_html=True)
                     gauge_html = create_speedometer_dial(ai_cyber_score, 100)
                     st.markdown(gauge_html, unsafe_allow_html=True)
-                    st.markdown(f"<div style='text-align: center; margin-top: -10px;'><small><strong>AI Cybersecurity</strong><br>{ai_cyber_score}/100</small></div>", unsafe_allow_html=True)
+                    st.markdown(f"<div style='text-align: center; margin-top: 5px;'><strong>AI Cybersecurity</strong><br><span style='font-size: 14px; color: #666;'>{ai_cyber_score}/100</span></div>", unsafe_allow_html=True)
+                    st.markdown("</div>", unsafe_allow_html=True)
                 else:
                     st.markdown("<div style='text-align: center; padding: 20px; background-color: #f8f9fa; border-radius: 10px;'><strong>AI Cybersecurity</strong><br><span style='color: #6c757d;'>N/A - Not AI-Related</span></div>", unsafe_allow_html=True)
                 
                 # AI Ethics Gauge
                 ai_ethics_score = int(report.framework_scores['ai_ethics_score'])
                 if topic_detection['is_ai_related'] and ai_ethics_score > 0:
+                    st.markdown("<div style='text-align: center; margin-bottom: 15px;'>", unsafe_allow_html=True)
                     gauge_html = create_speedometer_dial(ai_ethics_score, 100)
                     st.markdown(gauge_html, unsafe_allow_html=True)
-                    st.markdown(f"<div style='text-align: center; margin-top: -10px;'><small><strong>AI Ethics</strong><br>{ai_ethics_score}/100</small></div>", unsafe_allow_html=True)
+                    st.markdown(f"<div style='text-align: center; margin-top: 5px;'><strong>AI Ethics</strong><br><span style='font-size: 14px; color: #666;'>{ai_ethics_score}/100</span></div>", unsafe_allow_html=True)
+                    st.markdown("</div>", unsafe_allow_html=True)
                 else:
                     st.markdown("<div style='text-align: center; padding: 20px; background-color: #f8f9fa; border-radius: 10px;'><strong>AI Ethics</strong><br><span style='color: #6c757d;'>N/A - Not AI-Related</span></div>", unsafe_allow_html=True)
             
@@ -369,18 +373,22 @@ def display_gap_analysis_results(report: GapAnalysisReport):
                 # Quantum Cybersecurity Tier Bubbles
                 quantum_cyber_score = int(report.framework_scores['quantum_cybersecurity_score'])
                 if topic_detection['is_quantum_related'] and quantum_cyber_score > 0:
+                    st.markdown("<div style='text-align: center; margin-bottom: 15px;'>", unsafe_allow_html=True)
                     tier_html = create_tier_bubbles(quantum_cyber_score, 5)
                     st.markdown(tier_html, unsafe_allow_html=True)
-                    st.markdown(f"<div style='text-align: center; margin-top: -10px;'><small><strong>Quantum Cybersecurity</strong><br>Tier {quantum_cyber_score}/5</small></div>", unsafe_allow_html=True)
+                    st.markdown(f"<div style='text-align: center; margin-top: 5px;'><strong>Quantum Cybersecurity</strong><br><span style='font-size: 14px; color: #666;'>Tier {quantum_cyber_score}/5</span></div>", unsafe_allow_html=True)
+                    st.markdown("</div>", unsafe_allow_html=True)
                 else:
                     st.markdown("<div style='text-align: center; padding: 20px; background-color: #f8f9fa; border-radius: 10px;'><strong>Quantum Cybersecurity</strong><br><span style='color: #6c757d;'>N/A - Not Quantum-Related</span></div>", unsafe_allow_html=True)
                 
                 # Quantum Ethics Gauge
                 quantum_ethics_score = int(report.framework_scores['quantum_ethics_score'])
                 if topic_detection['is_quantum_related'] and quantum_ethics_score > 0:
+                    st.markdown("<div style='text-align: center; margin-bottom: 15px;'>", unsafe_allow_html=True)
                     gauge_html = create_speedometer_dial(quantum_ethics_score, 100)
                     st.markdown(gauge_html, unsafe_allow_html=True)
-                    st.markdown(f"<div style='text-align: center; margin-top: -10px;'><small><strong>Quantum Ethics</strong><br>{quantum_ethics_score}/100</small></div>", unsafe_allow_html=True)
+                    st.markdown(f"<div style='text-align: center; margin-top: 5px;'><strong>Quantum Ethics</strong><br><span style='font-size: 14px; color: #666;'>{quantum_ethics_score}/100</span></div>", unsafe_allow_html=True)
+                    st.markdown("</div>", unsafe_allow_html=True)
                 else:
                     st.markdown("<div style='text-align: center; padding: 20px; background-color: #f8f9fa; border-radius: 10px;'><strong>Quantum Ethics</strong><br><span style='color: #6c757d;'>N/A - Not Quantum-Related</span></div>", unsafe_allow_html=True)
         else:
