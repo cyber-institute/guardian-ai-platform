@@ -1359,7 +1359,7 @@ def render_phase_3_architecture():
     
     # Current capabilities
     st.markdown("---")
-    st.markdown("#### **⚡ Current Multi-LLM Capabilities**")
+    st.markdown("#### **Current Multi-LLM Capabilities**")
     
     cap_cols = st.columns(3)
     
@@ -1977,7 +1977,7 @@ def render_phase_5_autonomous_platform():
     
     # Development timeline
     st.markdown("---")
-    st.markdown("#### **🚀 Phase 5 Development Timeline**")
+    st.markdown("#### **Phase 5 Development Timeline**")
     
     phase5_years = st.tabs(["Year 1: Foundation", "Year 2: Intelligence", "Year 3: Autonomy", "Year 4: Global Scale"])
     
@@ -2301,7 +2301,7 @@ def render_document_management():
     st.markdown("#### Document Management & Deletion")
     
     # Add bulk deletion options
-    with st.expander("⚡ Quick Bulk Deletion", expanded=False):
+    with st.expander("Quick Bulk Deletion", expanded=False):
         st.markdown("**Delete multiple documents by criteria (faster than individual selection)**")
         
         col1, col2 = st.columns(2)
@@ -2415,13 +2415,13 @@ def render_document_management():
                 
                 # Show preview of documents to be deleted
                 preview_docs = get_deletion_preview(target_docs)
-                with st.expander(f"📋 Preview {len(preview_docs)} documents to delete", expanded=True):
+                with st.expander(f"Preview {len(preview_docs)} documents to delete", expanded=True):
                     for doc in preview_docs:
                         st.markdown(f"- **{doc['title']}** ({doc['document_type']}) - {doc['created_at']}")
                 
                 col1, col2, col3 = st.columns([1, 1, 1])
                 with col1:
-                    if st.button("✅ Yes, Delete Forever", type="primary", key="confirm_delete_btn"):
+                    if st.button("Yes, Delete Forever", type="primary", key="confirm_delete_btn"):
                         # Perform optimized batch deletion
                         with st.spinner("Deleting documents..."):
                             result = batch_delete_documents(target_docs)
@@ -2440,7 +2440,7 @@ def render_document_management():
                             st.session_state['confirm_deletion'] = False
                             
                 with col3:
-                    if st.button("❌ Cancel", key="cancel_delete_btn"):
+                    if st.button("Cancel", key="cancel_delete_btn"):
                         st.session_state['confirm_deletion'] = False
                         st.session_state['deletion_target_docs'] = []
                         st.rerun()
@@ -2539,7 +2539,7 @@ def render_system_configuration():
         confidence_threshold = st.slider("Confidence Threshold:", 0.0, 1.0, 0.8)
         max_tokens = st.number_input("Max Tokens per Request:", 100, 4000, 2000)
         
-        st.markdown("**Current Model Status:** ✅ Active and responsive")
+        st.markdown("**Current Model Status:** Active and responsive")
         
     elif config_section == "Database Configuration":
         st.markdown("#### Database Configuration")
@@ -2548,7 +2548,7 @@ def render_system_configuration():
         connection_pool = st.slider("Connection Pool Size:", 5, 50, 20)
         query_timeout = st.number_input("Query Timeout (seconds):", 5, 300, 30)
         
-        st.markdown("**Database Status:** ✅ Connected and operational")
+        st.markdown("**Database Status:** Connected and operational")
         
     else:
         st.markdown(f"#### {config_section}")
@@ -2743,7 +2743,7 @@ def render_patent_scoring_management():
     
     with col1:
         st.markdown("**Quick Duplicate Check**")
-        if st.button("🔍 Scan for Duplicates", type="secondary"):
+        if st.button("Scan for Duplicates", type="secondary"):
             try:
                 from utils.db import fetch_documents
                 docs = fetch_documents()
@@ -2821,7 +2821,7 @@ def render_patent_scoring_management():
                 st.error(f"Removal failed: {str(e)[:100]}")
     
     # Instructions for users
-    st.info("💡 **How to use:** First click 'Scan for Duplicates' to check, then click 'Remove Title Duplicates' to clean them.")
+    st.info("**How to use:** First click 'Scan for Duplicates' to check, then click 'Remove Title Duplicates' to clean them.")
     
     st.markdown("---")
     

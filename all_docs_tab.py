@@ -540,16 +540,25 @@ def render():
         
         if url_input:
             # Import URL processing functionality
-            from utils.fast_admin_loader import process_url_content
+            try:
+                from utils.fast_admin_loader import process_url_content
+            except ImportError:
+                from utils.url_content_extractor import extract_url_content as process_url_content
             
-            if st.button("🔗 Process URL", type="primary", use_container_width=True):
+            if st.button("Process URL", type="primary", use_container_width=True):
                 with st.spinner("Processing URL content..."):
                     try:
                         # Use the enhanced URL processing from admin loader
                         import requests
                         import trafilatura
-                        from utils.patent_scoring_engine import comprehensive_document_scoring
-                        from utils.database import get_db_connection
+                        try:
+                            from utils.patent_scoring_engine import comprehensive_document_scoring
+                        except ImportError:
+                            from utils.comprehensive_scoring import comprehensive_document_scoring
+                        try:
+                            from utils.database import get_db_connection
+                        except ImportError:
+                            from utils.db import get_db_connection
                         import uuid
                         
                         # Fetch and process URL content
