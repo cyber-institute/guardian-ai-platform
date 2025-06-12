@@ -312,14 +312,11 @@ class ComprehensivePatentScoringEngine:
         
         return posteriors
     
-    # === COMPREHENSIVE DOCUMENT ASSESSMENT ===
-    def assess_document_comprehensive(self, content: str, title: str = "") -> Dict[str, float]:
+    # === LEGACY COMPREHENSIVE DOCUMENT ASSESSMENT (DEPRECATED) ===
+    def assess_document_comprehensive_legacy(self, content: str, title: str = "") -> Dict[str, float]:
         """
-        Apply all patent formulas to assess a document across all four frameworks:
-        1. AI Cybersecurity Maturity (0-100)
-        2. Quantum Cybersecurity Maturity (1-5) 
-        3. AI Ethics (0-100)
-        4. Quantum Ethics (0-100)
+        DEPRECATED: Apply all patent formulas without topic detection.
+        Use assess_document_comprehensive() instead for intelligent topic-aware scoring.
         """
         # Calculate all assessment scores
         ai_cyber_results = self.calculate_ai_cybersecurity_score(content, title)
@@ -965,6 +962,8 @@ class ComprehensivePatentScoringEngine:
         # First, detect what topics this document actually covers
         topic_detection = self.detect_document_topics(content, title)
         
+        print(f"DEBUG: Topic detection for '{title[:50]}...': AI={topic_detection['is_ai_related']}, Quantum={topic_detection['is_quantum_related']}")
+        
         # Initialize scores with N/A values (0)
         scores = {
             'ai_cybersecurity_score': 0,
@@ -979,8 +978,12 @@ class ComprehensivePatentScoringEngine:
             ai_cyber_result = self.calculate_ai_cybersecurity_score(content, title)
             ai_ethics_result = self.calculate_ai_ethics_score(content, title)
             
-            scores['ai_cybersecurity_score'] = ai_cyber_result['total_score']
-            scores['ai_ethics_score'] = ai_ethics_result['total_score']
+            scores['ai_cybersecurity_score'] = round(ai_cyber_result['total_score'])
+            scores['ai_ethics_score'] = round(ai_ethics_result['total_score'])
+            
+            print(f"DEBUG: AI scoring applied - Cyber: {scores['ai_cybersecurity_score']}, Ethics: {scores['ai_ethics_score']}")
+        else:
+            print(f"DEBUG: AI scoring skipped - document not AI-related")
         
         # Only apply Quantum frameworks if document is quantum-related
         if topic_detection['is_quantum_related']:
@@ -988,8 +991,13 @@ class ComprehensivePatentScoringEngine:
             quantum_ethics_result = self.calculate_quantum_ethics_score(content, title)
             
             scores['quantum_cybersecurity_score'] = quantum_cyber_result['qcmea_level']
-            scores['quantum_ethics_score'] = quantum_ethics_result['total_score']
+            scores['quantum_ethics_score'] = round(quantum_ethics_result['total_score'])
+            
+            print(f"DEBUG: Quantum scoring applied - Cyber: {scores['quantum_cybersecurity_score']}, Ethics: {scores['quantum_ethics_score']}")
+        else:
+            print(f"DEBUG: Quantum scoring skipped - document not quantum-related")
         
+        print(f"DEBUG: Final scores: {scores}")
         return scores
 
 # Global instance for use across the application
