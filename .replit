@@ -3,7 +3,8 @@ language = "python3"
 modules = ["python-3.11"]
 
 [nix]
-packages = ["nano"]
+packages = ["cairo", "catch2", "ffmpeg-full", "fmt", "freetype", "ghostscript", "glibcLocales", "gobject-introspection", "gtk3", "lcms2", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "muparserx", "nano", "nlohmann_json", "openjpeg", "pkg-config", "poppler_utils", "qhull", "spdlog", "tcl", "tk", "zlib"]
+channel = "stable-24_05"
 
 [[ports]]
 localPort = 5000

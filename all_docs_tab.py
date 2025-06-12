@@ -512,9 +512,12 @@ def render():
         
         if uploaded_file is not None:
             # Import enhanced policy uploader
-            from components.enhanced_policy_uploader import process_uploaded_file
+            try:
+                from components.enhanced_policy_uploader import process_uploaded_file
+            except ImportError:
+                from utils.pdf_ingestion_thumbnails import process_pdf_with_thumbnail as process_uploaded_file
             
-            if st.button("🚀 Process Upload", type="primary", use_container_width=True):
+            if st.button("Process Upload", type="primary", use_container_width=True):
                 with st.spinner("Processing uploaded document..."):
                     try:
                         result = process_uploaded_file(uploaded_file)
@@ -632,7 +635,7 @@ def render():
     analyze_col1, analyze_col2 = st.columns([1, 2])
     
     with analyze_col1:
-        if st.button("📋 Open Policy Analyzer", type="secondary", use_container_width=True):
+        if st.button("Open Policy Analyzer", type="secondary", use_container_width=True):
             st.session_state.show_policy_analyzer = True
             st.rerun()
     
@@ -682,7 +685,7 @@ def render_policy_analyzer_modal():
             st.markdown("""
             <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); 
                         color: white; padding: 1rem 2rem; border-radius: 12px; margin-bottom: 2rem;">
-                <h2 style="margin: 0; color: white;">📋 Policy Analyzer</h2>
+                <h2 style="margin: 0; color: white;">Policy Analyzer</h2>
                 <p style="margin: 0.5rem 0 0 0; color: #bfdbfe; font-size: 0.9rem;">
                     Comprehensive policy analysis with gap detection and recommendations
                 </p>
