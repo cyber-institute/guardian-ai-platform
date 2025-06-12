@@ -394,7 +394,7 @@ def main():
     
     # Sidebar hamburger menu for navigation
     with st.sidebar:
-        st.markdown("### 🍔 Navigation")
+        st.markdown("### Navigation")
         
         # Initialize session state for navigation
         if 'nav_selection' not in st.session_state:
@@ -413,7 +413,7 @@ def main():
         
         # Add Refresh Analysis button below navigation
         st.markdown("---")
-        if st.button("🔄 Refresh Analysis", help="Update all documents with comprehensive patent-based scoring", use_container_width=True):
+        if st.button("Refresh Analysis", help="Update all documents with comprehensive patent-based scoring", use_container_width=True):
             with st.spinner("Applying comprehensive patent-based scoring to all documents..."):
                 try:
                     # Apply comprehensive patent scoring to all documents
