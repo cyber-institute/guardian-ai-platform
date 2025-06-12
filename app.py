@@ -8,7 +8,10 @@ from components.chatbot_widget import render_chatbot_widget, inject_chatbot_css
 def get_cached_analytics():
     """Cache analytics data to reduce database load"""
     try:
-        from utils.database import get_db_connection
+        try:
+            from utils.database import get_db_connection
+        except ImportError:
+            from utils.db import get_db_connection
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM documents")
@@ -2837,7 +2840,10 @@ def render_patent_scoring_management():
     with col2:
         if st.button("Export Data", help="Export all documents as JSON"):
             try:
-                from utils.database import get_db_connection
+                try:
+                    from utils.database import get_db_connection
+                except ImportError:
+                    from utils.db import get_db_connection
                 conn = get_db_connection()
                 cursor = conn.cursor()
                 cursor.execute("SELECT * FROM documents")
@@ -2857,7 +2863,10 @@ def render_patent_scoring_management():
     # Database schema info
     with st.expander("Database Schema"):
         try:
-            from utils.database import get_db_connection
+            try:
+                from utils.database import get_db_connection
+            except ImportError:
+                from utils.db import get_db_connection
             conn = get_db_connection()
             cursor = conn.cursor()
             cursor.execute("""

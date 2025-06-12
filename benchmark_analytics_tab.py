@@ -13,7 +13,7 @@ from utils.benchmarking_system import multi_llm_benchmarker
 def render():
     """Render the benchmarking analytics dashboard"""
     
-    st.title("🔬 Multi-LLM Performance Analytics")
+    st.title("Multi-LLM Performance Analytics")
     st.markdown("""
     **Measure the impact of Multi-LLM ensemble analysis vs standard single-model processing**
     

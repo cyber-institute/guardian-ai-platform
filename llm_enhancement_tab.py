@@ -618,11 +618,11 @@ def render_multi_llm_ensemble_tab():
     st.markdown("*Revolutionary quantum-assisted ensemble system with superposition-based model selection*")
     
     # Quantum Enhancement Introduction
-    with st.expander("⚛️ **Quantum Routing Technology Overview**", expanded=True):
+    with st.expander("**Quantum Routing Technology Overview**", expanded=True):
         st.markdown("""
         **GUARDIAN now features quantum-assisted LLM routing using IBM Qiskit:**
         
-        **🔬 Quantum Superposition Model Selection:**
+        **Quantum Superposition Model Selection:**
         - 2-qubit and 3-qubit quantum circuits for probabilistic routing
         - Content-aware quantum state preparation
         - Entangled decision-making for correlated model selection
@@ -639,7 +639,7 @@ def render_multi_llm_ensemble_tab():
         """)
     
     # Quantum Routing Demonstration
-    st.markdown("#### **🔬 Quantum Routing Demonstration**")
+    st.markdown("#### **Quantum Routing Demonstration**")
     
     col1, col2 = st.columns(2)
     
@@ -783,7 +783,7 @@ def render_multi_llm_ensemble_tab():
     st.markdown("---")
     
     # Quantum Analytics
-    st.markdown("#### **🔬 Quantum Routing Analytics**")
+    st.markdown("#### **Quantum Routing Analytics**")
     
     if st.button("View Quantum Analytics"):
         try:
