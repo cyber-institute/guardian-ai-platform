@@ -4,9 +4,24 @@ Identifies and manages duplicate documents in the repository
 """
 
 import hashlib
+import psycopg2
+import os
 from typing import List, Dict, Tuple
 from utils.db import fetch_documents
-from utils.database import get_db_connection
+
+def get_db_connection():
+    """Get database connection using environment variables."""
+    try:
+        return psycopg2.connect(
+            host=os.getenv('PGHOST'),
+            database=os.getenv('PGDATABASE'),
+            user=os.getenv('PGUSER'),
+            password=os.getenv('PGPASSWORD'),
+            port=os.getenv('PGPORT')
+        )
+    except Exception as e:
+        print(f"Database connection error: {e}")
+        return None
 
 def identify_duplicate_groups() -> List[Dict]:
     """Identify groups of duplicate documents in the repository."""
@@ -80,23 +95,26 @@ def remove_duplicates(duplicate_group: Dict, keep_document_id: str) -> bool:
     
     try:
         conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        # Get IDs of documents to remove
-        docs_to_remove = [
-            doc.get('id') for doc in duplicate_group['documents'] 
-            if doc.get('id') != keep_document_id
-        ]
-        
-        if not docs_to_remove:
+        if not conn:
+            print("Failed to establish database connection")
             return False
+            
+        with conn.cursor() as cursor:
+            # Get IDs of documents to remove
+            docs_to_remove = [
+                doc.get('id') for doc in duplicate_group['documents'] 
+                if doc.get('id') != keep_document_id
+            ]
+            
+            if not docs_to_remove:
+                return False
+            
+            # Remove duplicate documents
+            for doc_id in docs_to_remove:
+                cursor.execute("DELETE FROM documents WHERE id = %s", (doc_id,))
+            
+            conn.commit()
         
-        # Remove duplicate documents
-        for doc_id in docs_to_remove:
-            cursor.execute("DELETE FROM documents WHERE id = %s", (doc_id,))
-        
-        conn.commit()
-        cursor.close()
         conn.close()
         
         return True
