@@ -2609,6 +2609,7 @@ def render_document_management():
     
     from components.document_uploader import render_document_uploader, render_bulk_upload
     from utils.database import DatabaseManager
+    from utils.optimized_deletions import get_documents_for_deletion, batch_delete_documents, get_deletion_preview
     
     db_manager = DatabaseManager()
     
@@ -2627,17 +2628,55 @@ def render_document_management():
     # Document deletion interface
     st.markdown("#### Document Management & Deletion")
     
-    # Get all documents for selection
-    try:
-        all_documents = db_manager.execute_query("""
-            SELECT id, title, document_type, created_at, source
-            FROM documents 
-            ORDER BY created_at DESC
-        """)
-        if not isinstance(all_documents, list):
-            all_documents = []
-    except:
-        all_documents = []
+    # Add bulk deletion options
+    with st.expander("⚡ Quick Bulk Deletion", expanded=False):
+        st.markdown("**Delete multiple documents by criteria (faster than individual selection)**")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Get document types for filtering
+            doc_types = []
+            try:
+                type_query = db_manager.execute_query("SELECT DISTINCT document_type FROM documents WHERE document_type IS NOT NULL")
+                if isinstance(type_query, list):
+                    doc_types = [row.get('document_type', '') for row in type_query if row.get('document_type')]
+            except:
+                pass
+            
+            bulk_doc_type = st.selectbox("Delete by Document Type", ["None"] + doc_types, key="bulk_type")
+            
+        with col2:
+            bulk_before_date = st.date_input("Delete documents created before", key="bulk_date")
+        
+        delete_empty = st.checkbox("Delete documents with empty content", key="bulk_empty")
+        
+        if st.button("🗑️ Execute Bulk Deletion", type="secondary", key="bulk_delete_btn"):
+            criteria = {}
+            if bulk_doc_type != "None":
+                criteria['document_type'] = bulk_doc_type
+            if bulk_before_date:
+                criteria['before_date'] = bulk_before_date
+            if delete_empty:
+                criteria['content_empty'] = True
+            
+            if criteria:
+                with st.spinner("Executing bulk deletion..."):
+                    from utils.optimized_deletions import bulk_delete_by_criteria
+                    result = bulk_delete_by_criteria(criteria)
+                
+                if result['success']:
+                    st.success(f"Bulk deletion completed: {result['deleted_count']} documents deleted")
+                    st.rerun()
+                else:
+                    st.error(f"Bulk deletion failed: {'; '.join(result['errors'])}")
+            else:
+                st.warning("Please select at least one deletion criterion")
+    
+    st.markdown("#### Individual Document Deletion")
+    
+    # Get all documents for selection using optimized loader
+    all_documents = get_documents_for_deletion()
     
     if all_documents and len(all_documents) > 0:
         st.markdown("**Select documents to delete:**")
@@ -2701,25 +2740,22 @@ def render_document_management():
             if st.session_state.get('confirm_deletion', False):
                 st.error("⚠️ **CONFIRM DELETION** - This action cannot be undone!")
                 target_docs = st.session_state.get('deletion_target_docs', [])
-                st.info(f"About to delete {len(target_docs)} documents: {target_docs}")
+                
+                # Show preview of documents to be deleted
+                preview_docs = get_deletion_preview(target_docs)
+                with st.expander(f"📋 Preview {len(preview_docs)} documents to delete", expanded=True):
+                    for doc in preview_docs:
+                        st.markdown(f"- **{doc['title']}** ({doc['document_type']}) - {doc['created_at']}")
                 
                 col1, col2, col3 = st.columns([1, 1, 1])
                 with col1:
                     if st.button("✅ Yes, Delete Forever", type="primary", key="confirm_delete_btn"):
-                        # Perform actual deletion
-                        try:
-                            deleted_count = 0
-                            
-                            for doc_id in target_docs:
-                                # Execute deletion with simple parameter format
-                                result = db_manager.execute_query(
-                                    f"DELETE FROM documents WHERE id = {doc_id}"
-                                )
-                                # Check if deletion was successful
-                                if isinstance(result, int) and result > 0:
-                                    deleted_count += 1
-                            
-                            st.success(f"Successfully deleted {deleted_count} documents")
+                        # Perform optimized batch deletion
+                        with st.spinner("Deleting documents..."):
+                            result = batch_delete_documents(target_docs)
+                        
+                        if result['success']:
+                            st.success(f"Successfully deleted {result['deleted_count']} documents in {result.get('execution_time', 0):.2f} seconds")
                             # Clear all states
                             for doc_id in target_docs:
                                 if f"delete_{doc_id}" in st.session_state:
@@ -2727,9 +2763,8 @@ def render_document_management():
                             st.session_state['confirm_deletion'] = False
                             st.session_state['deletion_target_docs'] = []
                             st.rerun()
-                            
-                        except Exception as e:
-                            st.error(f"Error during deletion: {str(e)}")
+                        else:
+                            st.error(f"Deletion failed: {'; '.join(result['errors'])}")
                             st.session_state['confirm_deletion'] = False
                             
                 with col3:
