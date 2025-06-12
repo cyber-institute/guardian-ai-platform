@@ -600,11 +600,9 @@ def main():
         url_input = st.text_input("Enter URL:", placeholder="https://example.com/document")
         
         # Enhanced URL analysis options
-        url_col1, url_col2 = st.columns(2)
-        with url_col1:
-            url_use_multi_llm = st.checkbox("🔬 Multi-LLM URL Analysis", value=True, help="Apply advanced multi-LLM ensemble to URL content")
-        with url_col2:
-            url_analysis_depth = st.selectbox("URL Analysis Depth", ["Standard", "Comprehensive", "Expert"], index=1, key="url_depth")
+        url_use_multi_llm = st.checkbox("🔬 Multi-LLM URL Analysis", value=True, help="Apply advanced multi-LLM ensemble to URL content")
+        
+        st.info("ℹ️ For advanced URL analysis configuration including depth settings, use Repository Admin → MultiLLM URL Analysis")
         
         if st.button("Submit URL", use_container_width=True):
             if url_input:
