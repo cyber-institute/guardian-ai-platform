@@ -503,6 +503,32 @@ def render():
     
     with upload_col1:
         st.markdown("#### Browse Files")
+        
+        # Custom CSS to make file uploader compact like text input
+        st.markdown("""
+        <style>
+        .stFileUploader > div > div {
+            padding: 0.5rem !important;
+            min-height: 40px !important;
+            max-height: 40px !important;
+        }
+        .stFileUploader > div > div > div {
+            min-height: 40px !important;
+            max-height: 40px !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        .stFileUploader > div > div > div > div {
+            display: none !important;
+        }
+        .stFileUploader > div > div > button {
+            height: 40px !important;
+            padding: 0.5rem 1rem !important;
+            font-size: 0.9rem !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
         uploaded_file = st.file_uploader(
             "Choose a file",
             type=['pdf', 'txt', 'docx'],
