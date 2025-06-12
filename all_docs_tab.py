@@ -3,7 +3,7 @@ import re
 from utils.db import fetch_documents
 from utils.hf_ai_scoring import evaluate_quantum_maturity_hf
 from utils.comprehensive_scoring import comprehensive_document_scoring, format_score_display, get_score_badge_color
-from utils.performance_cache import get_cached_comprehensive_scores
+# Performance caching will be handled directly in functions
 from utils.document_metadata_extractor import extract_document_metadata
 from utils.multi_llm_metadata_extractor import extract_clean_metadata
 from utils.html_artifact_interceptor import clean_documents, clean_field
