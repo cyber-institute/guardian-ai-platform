@@ -640,43 +640,57 @@ def render():
     # Policy Analyzer Modal Button
     st.markdown("---")
     
-    analyze_col1, analyze_col2 = st.columns([1, 2])
+    # Create inline layout for button and description
+    st.markdown("""
+    <style>
+    .policy-analyzer-row {
+        display: flex !important;
+        align-items: center !important;
+        gap: 1rem !important;
+        margin: 1rem 0 !important;
+    }
+    .custom-policy-button {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 6px !important;
+        padding: 0.5rem 1rem !important;
+        font-size: 0.9rem !important;
+        font-weight: 500 !important;
+        text-align: center !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 2px 4px rgba(30, 64, 175, 0.2) !important;
+        width: 180px !important;
+        height: 38px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+    }
+    .custom-policy-button:hover {
+        background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 8px rgba(30, 64, 175, 0.3) !important;
+    }
+    .policy-description {
+        color: #6b7280 !important;
+        font-style: italic !important;
+        font-size: 0.9rem !important;
+        line-height: 1.4 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
     
-    with analyze_col1:
-        st.markdown("""
-        <style>
-        .custom-policy-button {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
-            color: white !important;
-            border: none !important;
-            border-radius: 6px !important;
-            padding: 0.5rem 1rem !important;
-            font-size: 0.9rem !important;
-            font-weight: 500 !important;
-            text-align: center !important;
-            cursor: pointer !important;
-            transition: all 0.2s ease !important;
-            box-shadow: 0 2px 4px rgba(30, 64, 175, 0.2) !important;
-            width: 180px !important;
-            height: 38px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-        }
-        .custom-policy-button:hover {
-            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%) !important;
-            transform: translateY(-1px) !important;
-            box-shadow: 0 4px 8px rgba(30, 64, 175, 0.3) !important;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-        
+    col1, col2 = st.columns([1, 4])
+    
+    with col1:
         if st.button("Policy Analyzer", key="policy_analyzer_btn", help="Open comprehensive policy analysis tool"):
             st.session_state.show_policy_analyzer = True
             st.rerun()
     
-    with analyze_col2:
-        st.markdown("*Comprehensive policy analysis with emerging technologies gap detection and recommendations and Report Generation*")
+    with col2:
+        st.markdown('<span class="policy-description">Comprehensive policy analysis with emerging technologies gap detection and recommendations and Report Generation</span>', unsafe_allow_html=True)
     
     # Policy Gap Analysis Modal
     if st.session_state.get('show_policy_analyzer', False):
