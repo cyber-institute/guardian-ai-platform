@@ -586,7 +586,7 @@ def render_table_view(docs):
         pub_date = doc.get('publish_date') or 'N/A'
         doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
         
-        scores = get_cached_comprehensive_scores(content, str(title))
+        scores = comprehensive_document_scoring(content, str(title))
         
         table_data.append({
             'Title': title[:45],
