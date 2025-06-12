@@ -629,23 +629,69 @@ class PolicyGapAnalyzer:
         return insights
     
     def _calculate_overall_maturity(self, scores: Dict[str, float]) -> float:
-        """Calculate overall policy maturity score."""
-        # Weighted scoring based on patent formulations
-        weights = {
-            'ai_cybersecurity_score': 0.3,
-            'quantum_cybersecurity_score': 0.25,  # Convert 5-scale to 100-scale
-            'ai_ethics_score': 0.25,
-            'quantum_ethics_score': 0.2
-        }
+        """Calculate overall policy maturity score based on applicable frameworks only."""
         
-        weighted_score = (
-            scores['ai_cybersecurity_score'] * weights['ai_cybersecurity_score'] +
-            scores['quantum_cybersecurity_score'] * 20 * weights['quantum_cybersecurity_score'] +
-            scores['ai_ethics_score'] * weights['ai_ethics_score'] +
-            scores['quantum_ethics_score'] * weights['quantum_ethics_score']
-        )
+        # Get topic detection results to determine applicable frameworks
+        topic_detection = scores.get('topic_detection', {})
+        is_ai_related = topic_detection.get('is_ai_related', True)
+        is_quantum_related = topic_detection.get('is_quantum_related', False)
         
-        return round(weighted_score, 1)
+        # Define framework weights
+        ai_cyber_weight = 0.55  # Higher weight when only AI frameworks apply
+        ai_ethics_weight = 0.45
+        quantum_cyber_weight = 0.3
+        quantum_ethics_weight = 0.25
+        
+        applicable_weights = {}
+        weighted_score = 0
+        total_weight = 0
+        
+        # Only include applicable frameworks in calculation
+        if is_ai_related:
+            if is_quantum_related:
+                # Both AI and Quantum - use balanced weights
+                applicable_weights = {
+                    'ai_cybersecurity_score': 0.3,
+                    'ai_ethics_score': 0.25,
+                    'quantum_cybersecurity_score': 0.25,
+                    'quantum_ethics_score': 0.2
+                }
+            else:
+                # AI only - redistribute weights between AI frameworks
+                applicable_weights = {
+                    'ai_cybersecurity_score': ai_cyber_weight,
+                    'ai_ethics_score': ai_ethics_weight
+                }
+        elif is_quantum_related:
+            # Quantum only - redistribute weights between quantum frameworks
+            applicable_weights = {
+                'quantum_cybersecurity_score': 0.55,
+                'quantum_ethics_score': 0.45
+            }
+        else:
+            # Fallback - include all frameworks with original weights
+            applicable_weights = {
+                'ai_cybersecurity_score': 0.3,
+                'quantum_cybersecurity_score': 0.25,
+                'ai_ethics_score': 0.25,
+                'quantum_ethics_score': 0.2
+            }
+        
+        # Calculate weighted score for applicable frameworks only
+        for framework, weight in applicable_weights.items():
+            if framework in scores:
+                score_value = scores[framework]
+                # Convert quantum cybersecurity 1-5 scale to 100 scale
+                if framework == 'quantum_cybersecurity_score':
+                    score_value = score_value * 20
+                
+                weighted_score += score_value * weight
+                total_weight += weight
+        
+        # Normalize to 100-point scale
+        final_score = (weighted_score / total_weight) * 100 if total_weight > 0 else 0
+        
+        return round(final_score, 1)
 
 # Global instance for use across the application
 policy_gap_analyzer = PolicyGapAnalyzer()
