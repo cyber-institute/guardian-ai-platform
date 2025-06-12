@@ -318,6 +318,33 @@ def main():
         background-color: #e5e7eb !important;
     }
     
+    /* Cyber Institute Credit Styling - Proportional to GUARDIAN banner */
+    .cyber-credit-container {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin-bottom: clamp(1rem, 3vw, 2rem) !important;
+        gap: clamp(0.25rem, 1.5vw, 0.5rem) !important;
+        flex-wrap: wrap !important;
+    }
+    
+    .cyber-logo {
+        height: clamp(1.5rem, 4vw, 3rem) !important;
+        width: clamp(1.5rem, 4vw, 3rem) !important;
+        border-radius: 50% !important;
+        flex-shrink: 0 !important;
+        filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.2)) !important;
+    }
+    
+    .cyber-credit-text {
+        font-size: clamp(0.75rem, 2.5vw, 1rem) !important;
+        color: #6b7280 !important;
+        white-space: nowrap !important;
+        font-weight: 400 !important;
+        font-family: 'Inter', sans-serif !important;
+        letter-spacing: 0.01em !important;
+    }
+
     @media (max-width: 768px) {
         .category-grid {
             grid-template-columns: 1fr;
@@ -339,6 +366,25 @@ def main():
         .score-section {
             margin-top: 1rem;
             justify-content: space-around;
+        }
+        
+        .cyber-credit-container {
+            margin-bottom: 1rem !important;
+        }
+        
+        .cyber-credit-text {
+            font-size: 0.8rem !important;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .cyber-credit-container {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .cyber-credit-text {
+            font-size: 0.75rem !important;
         }
     }
     </style>
@@ -372,22 +418,22 @@ def main():
         </div>
         """, unsafe_allow_html=True)
     
-    # Cyber Institute credit with logo inline
+    # Cyber Institute credit with proportional logo scaling
     try:
         import base64
         with open("assets/cyber_institute_logo.jpg", "rb") as f:
             logo_data = base64.b64encode(f.read()).decode()
         
         st.markdown(f"""
-        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 2rem;">
-            <img src="data:image/jpeg;base64,{logo_data}" width="40" height="40" style="border-radius: 50%; margin-right: 0.5rem;">
-            <span style="font-size: 0.9rem; color: #6b7280; white-space: nowrap;">Developed by Cyber Institute</span>
+        <div class="cyber-credit-container">
+            <img src="data:image/jpeg;base64,{logo_data}" class="cyber-logo" alt="Cyber Institute Logo">
+            <span class="cyber-credit-text">Developed by Cyber Institute</span>
         </div>
         """, unsafe_allow_html=True)
     except:
         st.markdown("""
-        <div style="text-align: center; font-size: 0.9rem; color: #6b7280; margin-bottom: 2rem;">
-            Developed by Cyber Institute
+        <div class="cyber-credit-container">
+            <span class="cyber-credit-text">Developed by Cyber Institute</span>
         </div>
         """, unsafe_allow_html=True)
     
