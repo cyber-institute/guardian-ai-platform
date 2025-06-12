@@ -677,16 +677,36 @@ def render_minimal_list(docs):
             </div>
             """, unsafe_allow_html=True)
         
-        if st.button("View Details", key=f"view_{idx}"):
-            with st.expander("Document Details", expanded=True):
-                st.write("**Intelligent Preview:**")
-                st.write(content_preview)
-                st.write("**Raw Content:**")
-                # Clean the raw content for display
-                clean_content = re.sub(r'<[^>]+>', '', content)  # Remove HTML tags
-                clean_content = re.sub(r"style='[^']*'", '', clean_content)  # Remove style attributes
-                clean_content = re.sub(r'\s+', ' ', clean_content).strip()  # Normalize whitespace
-                st.write(clean_content[:500] + "..." if len(clean_content) > 500 else clean_content)
+        # Action buttons
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            if st.button("View Details", key=f"view_{idx}"):
+                with st.expander("Document Details", expanded=True):
+                    st.write("**Intelligent Preview:**")
+                    st.write(content_preview)
+                    st.write("**Raw Content:**")
+                    # Clean the raw content for display
+                    clean_content = re.sub(r'<[^>]+>', '', content)  # Remove HTML tags
+                    clean_content = re.sub(r"style='[^']*'", '', clean_content)  # Remove style attributes
+                    clean_content = re.sub(r'\s+', ' ', clean_content).strip()  # Normalize whitespace
+                    st.write(clean_content[:500] + "..." if len(clean_content) > 500 else clean_content)
+        
+        with col2:
+            # Quick report generation
+            has_scores = any([scores[key] > 0 for key in scores.keys()])
+            if has_scores:
+                if st.button("📊 Quick Report", key=f"quick_report_{idx}"):
+                    from components.risk_report_interface import RiskReportInterface
+                    interface = RiskReportInterface()
+                    interface._generate_quick_report(doc)
+            else:
+                st.caption("Risk scoring required")
+        
+        with col3:
+            if has_scores:
+                if st.button("📧 Email Report", key=f"email_report_{idx}"):
+                    st.info("Email functionality available in Risk Reports section")
 
 def render_card_view(docs):
     """Render documents in full card format."""

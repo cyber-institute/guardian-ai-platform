@@ -809,8 +809,8 @@ def main():
     # Create main navigation with true lazy loading
     selected_tab = st.selectbox(
         "Navigate:",
-        ["Policy Repository", "Repository Admin", "About GUARDIAN"],
-        index=["Policy Repository", "Repository Admin", "About GUARDIAN"].index(st.session_state.active_main_tab),
+        ["Policy Repository", "Repository Admin", "Risk Reports", "About GUARDIAN"],
+        index=["Policy Repository", "Repository Admin", "Risk Reports", "About GUARDIAN"].index(st.session_state.active_main_tab) if st.session_state.active_main_tab in ["Policy Repository", "Repository Admin", "Risk Reports", "About GUARDIAN"] else 0,
         key="main_nav_selector"
     )
     
@@ -842,6 +842,11 @@ def main():
     elif selected_tab == "Repository Admin":
         # Only render when actually selected - true lazy loading
         render_repository_admin_section()
+    
+    elif selected_tab == "Risk Reports":
+        # Risk Report Generator section
+        from components.risk_report_interface import render_risk_report_generator
+        render_risk_report_generator()
     
     elif selected_tab == "About GUARDIAN":
         # About tab with Patent Technology and Prototype Phased Plan as subtabs
