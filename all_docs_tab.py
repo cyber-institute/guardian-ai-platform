@@ -504,27 +504,53 @@ def render():
     with upload_col1:
         st.markdown("#### Browse Files")
         
-        # Custom CSS to make file uploader compact like text input
+        # Custom CSS to make file uploader compact and single line
         st.markdown("""
         <style>
         .stFileUploader > div > div {
             padding: 0.5rem !important;
             min-height: 40px !important;
             max-height: 40px !important;
+            border: 1px solid #d1d5db !important;
+            border-radius: 6px !important;
+            background: #ffffff !important;
         }
         .stFileUploader > div > div > div {
             min-height: 40px !important;
             max-height: 40px !important;
             display: flex !important;
             align-items: center !important;
+            justify-content: space-between !important;
+            flex-direction: row !important;
         }
-        .stFileUploader > div > div > div > div {
+        .stFileUploader > div > div > div > div:first-child {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            font-size: 0.9rem !important;
+            color: #6b7280 !important;
+        }
+        .stFileUploader > div > div > div > div:first-child::before {
+            content: none !important;
+        }
+        .stFileUploader > div > div > div > div:first-child svg {
             display: none !important;
         }
+        .stFileUploader > div > div > div > div:first-child::after {
+            content: "Drag and drop file here • Limit 200MB per file • PDF, TXT, DOCX" !important;
+        }
         .stFileUploader > div > div > button {
-            height: 40px !important;
-            padding: 0.5rem 1rem !important;
-            font-size: 0.9rem !important;
+            height: 32px !important;
+            padding: 0.25rem 0.75rem !important;
+            font-size: 0.85rem !important;
+            background: #f3f4f6 !important;
+            border: 1px solid #d1d5db !important;
+            border-radius: 4px !important;
+            color: #374151 !important;
+            flex-shrink: 0 !important;
+        }
+        .stFileUploader > div > div > button:hover {
+            background: #e5e7eb !important;
         }
         </style>
         """, unsafe_allow_html=True)
