@@ -563,7 +563,7 @@ def generate_standalone_report(title: str, content: str, document_type: str,
         - Detailed Framework Scoring (AI Cyber, Quantum Cyber, AI Ethics, Quantum Ethics)
         - Comprehensive Gap Analysis ({len(gap_report.identified_gaps)} gaps identified)
         - Compliance Assessment ({len(gap_report.compliance_status)} frameworks evaluated)
-        - Intelligent Recommendations ({len(gap_report.recommendations)} action items)
+        - Intelligent Recommendations ({len(gap_report.strategic_recommendations)} action items)
         - Risk Visualizations and Professional Formatting
         
         **File:** {filename}

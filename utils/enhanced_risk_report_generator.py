@@ -310,7 +310,7 @@ class EnhancedRiskReportGenerator(RiskReportGenerator):
         
         # Score arc
         score_theta = np.linspace(0, np.pi * (percentage / 100), 50)
-        color = self._get_score_color(score, framework)
+        color = self._get_framework_score_color(score, framework)
         ax.plot(r * np.cos(score_theta), r * np.sin(score_theta), color=color, linewidth=8)
         
         # Center text
@@ -381,7 +381,7 @@ class EnhancedRiskReportGenerator(RiskReportGenerator):
         priority_order = ['High', 'Medium', 'Low']
         recommendations_by_priority = {}
         
-        for rec in gap_report.recommendations:
+        for rec in gap_report.strategic_recommendations:
             priority = getattr(rec, 'priority', 'Medium')
             if priority not in recommendations_by_priority:
                 recommendations_by_priority[priority] = []
@@ -421,7 +421,7 @@ class EnhancedRiskReportGenerator(RiskReportGenerator):
         else:
             return self.colors['low_risk']
     
-    def _get_score_color(self, score: int, framework: str) -> str:
+    def _get_framework_score_color(self, score: int, framework: str) -> str:
         """Get color for framework score"""
         if 'Quantum Cybersecurity' in framework:
             # 5-point scale
