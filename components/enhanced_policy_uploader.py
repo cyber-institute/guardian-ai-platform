@@ -24,8 +24,8 @@ def create_speedometer_dial(value, max_value=100):
     # Calculate angle for the value (full circle: 0 to 360 degrees)
     angle = (value / max_value) * 360
     
-    # Create color zones
-    colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#16a34a']  # Red to Green
+    # Create color zones - vibrant primary colors
+    colors = ['#dc2626', '#ea580c', '#ca8a04', '#16a34a', '#15803d']  # Red to Green
     zone_size = 360 / 5  # Each zone is 72 degrees
     
     # Draw colored zones
@@ -72,8 +72,8 @@ def create_tier_bubbles(value, max_value=5):
     """Create tier bubble visualization for 1-5 scale."""
     fig, ax = plt.subplots(figsize=(2, 0.8), facecolor='white')
     
-    # Define tier colors
-    tier_colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#16a34a']
+    # Define tier colors - vibrant primary colors
+    tier_colors = ['#dc2626', '#ea580c', '#ca8a04', '#16a34a', '#15803d']
     
     # Draw bubbles
     for i in range(max_value):

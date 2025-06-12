@@ -5,7 +5,7 @@ About Tab for GUARDIAN System - Clean, Compact Layout
 import streamlit as st
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from matplotlib.patches import Wedge
+from matplotlib.patches import Wedge, Circle
 import numpy as np
 import io
 import base64
@@ -17,8 +17,8 @@ def create_speedometer_dial(value, max_value=100):
     # Calculate angle for the value (full circle: 0 to 360 degrees)
     angle = (value / max_value) * 360
     
-    # Create color zones
-    colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#16a34a']  # Red to Green
+    # Create color zones - vibrant primary colors
+    colors = ['#dc2626', '#ea580c', '#ca8a04', '#16a34a', '#15803d']  # Red to Green
     zone_size = 360 / 5  # Each zone is 72 degrees
     
     # Draw colored zones
@@ -37,7 +37,7 @@ def create_speedometer_dial(value, max_value=100):
     ax.plot([0, needle_x], [0, needle_y], color='#B91C2C', linewidth=3, zorder=10)
     
     # Center dot
-    center_circle = plt.Circle((0, 0), 0.08, color='#B91C2C', zorder=15)
+    center_circle = Circle((0, 0), 0.08, color='#B91C2C', zorder=15)
     ax.add_patch(center_circle)
     
     # Add value text in center
