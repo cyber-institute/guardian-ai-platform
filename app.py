@@ -819,11 +819,10 @@ def main():
     
     # Only render the selected tab content
     if selected_tab == "Policy Repository":
-        # Policy Repository with subtabs for Analyzer and Recommendations
-        policy_subtab1, policy_subtab2, policy_subtab3 = st.tabs([
+        # Policy Repository with subtabs for Analyzer
+        policy_subtab1, policy_subtab2 = st.tabs([
             "Repository", 
-            "Policy Analyzer", 
-            "Repository Insights"
+            "Policy Analyzer"
         ])
         
         with policy_subtab1:
@@ -833,11 +832,6 @@ def main():
             # Enhanced Policy Analysis with Gap Detection
             from components.enhanced_policy_uploader import render_enhanced_policy_uploader
             render_enhanced_policy_uploader()
-        
-        with policy_subtab3:
-            # Repository Insights (AI-powered learning system)
-            from recommendation_tab import render as render_recommendations
-            render_recommendations()
     
     elif selected_tab == "Repository Admin":
         # Only render when actually selected - true lazy loading
