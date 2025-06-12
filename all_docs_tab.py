@@ -285,6 +285,8 @@ def render():
     topic_col, view_col = st.columns([1, 1])
     
     with topic_col:
+        # Add margin to move Topic Filter buttons down to align with View Mode
+        st.markdown('<div style="margin-top: 0.75rem;">', unsafe_allow_html=True)
         topic_filter = st.radio(
             "**Topic Filter:**",
             ["AI", "Quantum", "Both"],
@@ -293,6 +295,7 @@ def render():
             key="topic_filter_radio"
         )
         st.session_state["filters"]["topic_filter"] = topic_filter
+        st.markdown('</div>', unsafe_allow_html=True)
     
     with view_col:
         # Create container that aligns perfectly with Topic Filter baseline
