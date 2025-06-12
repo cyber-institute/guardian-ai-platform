@@ -6,7 +6,7 @@ Implements GUARDIAN patent's policy reinforcement learning and recommendation ca
 import streamlit as st
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from matplotlib.patches import Wedge
+from matplotlib.patches import Wedge, Circle
 import numpy as np
 import base64
 import io
@@ -16,6 +16,92 @@ from utils.document_recommendation_engine import recommendation_engine
 from utils.db import save_document
 from utils.pdf_ingestion_thumbnails import process_uploaded_pdf_with_thumbnail
 import time
+
+def create_speedometer_dial(value, max_value=100):
+    """Create a full circular speedometer dial gauge using matplotlib."""
+    fig, ax = plt.subplots(figsize=(1.2, 1.2), facecolor='white')
+    
+    # Calculate angle for the value (full circle: 0 to 360 degrees)
+    angle = (value / max_value) * 360
+    
+    # Create color zones
+    colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#16a34a']  # Red to Green
+    zone_size = 360 / 5  # Each zone is 72 degrees
+    
+    # Draw colored zones
+    for i, color in enumerate(colors):
+        start_angle = i * zone_size
+        wedge = Wedge((0, 0), 0.8, start_angle, start_angle + zone_size,
+                     facecolor=color, alpha=0.3, edgecolor='white', linewidth=1)
+        ax.add_patch(wedge)
+    
+    # Draw the needle
+    needle_angle_rad = np.radians(angle - 90)  # Adjust for matplotlib's coordinate system
+    needle_x = 0.6 * np.cos(needle_angle_rad)
+    needle_y = 0.6 * np.sin(needle_angle_rad)
+    
+    # Needle line
+    ax.plot([0, needle_x], [0, needle_y], color='#B91C2C', linewidth=3, zorder=10)
+    
+    # Center dot
+    center_circle = Circle((0, 0), 0.08, color='#B91C2C', zorder=15)
+    ax.add_patch(center_circle)
+    
+    # Add value text in center
+    ax.text(0, -0.3, f'{value}', ha='center', va='center', fontsize=10, 
+            fontweight='bold', color='#B91C2C')
+    
+    # Set equal aspect ratio and remove axes
+    ax.set_xlim(-1, 1)
+    ax.set_ylim(-1, 1)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    
+    # Convert to base64 for embedding
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png', bbox_inches='tight', dpi=100, 
+                facecolor='white', transparent=True)
+    buffer.seek(0)
+    image_base64 = base64.b64encode(buffer.getvalue()).decode()
+    plt.close(fig)
+    
+    # Return with fixed dimensions (square for circular gauge)
+    return f'<img src="data:image/png;base64,{image_base64}" style="width: 90px; height: 90px; display: block; margin: 0 auto; object-fit: contain;">'
+
+def create_tier_bubbles(value, max_value=5):
+    """Create tier bubble visualization for 1-5 scale."""
+    fig, ax = plt.subplots(figsize=(2, 0.8), facecolor='white')
+    
+    # Define tier colors
+    tier_colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#16a34a']
+    
+    # Draw bubbles
+    for i in range(max_value):
+        x = i * 0.4
+        color = tier_colors[i] if i < value else '#e5e7eb'
+        alpha = 1.0 if i < value else 0.3
+        
+        circle = Circle((x, 0), 0.15, color=color, alpha=alpha)
+        ax.add_patch(circle)
+        
+        # Add tier number
+        ax.text(x, 0, str(i+1), ha='center', va='center', 
+               fontsize=8, fontweight='bold', color='white' if i < value else '#9ca3af')
+    
+    ax.set_xlim(-0.2, (max_value-1) * 0.4 + 0.2)
+    ax.set_ylim(-0.3, 0.3)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    
+    # Convert to base64
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png', bbox_inches='tight', dpi=100, 
+                facecolor='white', transparent=True)
+    buffer.seek(0)
+    image_base64 = base64.b64encode(buffer.getvalue()).decode()
+    plt.close(fig)
+    
+    return f'<img src="data:image/png;base64,{image_base64}" style="width: 160px; height: 64px; display: block; margin: 0 auto;">'
 
 def render_enhanced_policy_uploader():
     """Render enhanced document uploader with intelligent gap analysis and recommendations."""
@@ -233,22 +319,41 @@ def display_gap_analysis_results(report: GapAnalysisReport):
         )
     
     with col3:
-        # Framework scores visualization
-        frameworks = ["AI Cyber", "Quantum Cyber", "AI Ethics", "Quantum Ethics"]
-        scores = [
-            report.framework_scores['ai_cybersecurity_score'],
-            report.framework_scores['quantum_cybersecurity_score'] * 20,  # Convert to 100 scale
-            report.framework_scores['ai_ethics_score'],
-            report.framework_scores['quantum_ethics_score']
-        ]
+        st.markdown("**Framework Scores:**")
         
-        score_text = " | ".join([f"{fw}: {score:.0f}" for fw, score in zip(frameworks, scores)])
-        st.markdown(f"**Framework Scores:** {score_text}")
+        # Create 2x2 grid for gauges
+        gauge_col1, gauge_col2 = st.columns(2)
+        
+        with gauge_col1:
+            # AI Cybersecurity Gauge
+            ai_cyber_score = int(report.framework_scores['ai_cybersecurity_score'])
+            gauge_html = create_speedometer_dial(ai_cyber_score, 100)
+            st.markdown(gauge_html, unsafe_allow_html=True)
+            st.markdown(f"<div style='text-align: center; margin-top: -10px;'><small><strong>AI Cybersecurity</strong><br>{ai_cyber_score}/100</small></div>", unsafe_allow_html=True)
+            
+            # AI Ethics Gauge
+            ai_ethics_score = int(report.framework_scores['ai_ethics_score'])
+            gauge_html = create_speedometer_dial(ai_ethics_score, 100)
+            st.markdown(gauge_html, unsafe_allow_html=True)
+            st.markdown(f"<div style='text-align: center; margin-top: -10px;'><small><strong>AI Ethics</strong><br>{ai_ethics_score}/100</small></div>", unsafe_allow_html=True)
+        
+        with gauge_col2:
+            # Quantum Cybersecurity Tier Bubbles
+            quantum_cyber_score = int(report.framework_scores['quantum_cybersecurity_score'])
+            tier_html = create_tier_bubbles(quantum_cyber_score, 5)
+            st.markdown(tier_html, unsafe_allow_html=True)
+            st.markdown(f"<div style='text-align: center; margin-top: -10px;'><small><strong>Quantum Cybersecurity</strong><br>Tier {quantum_cyber_score}/5</small></div>", unsafe_allow_html=True)
+            
+            # Quantum Ethics Gauge
+            quantum_ethics_score = int(report.framework_scores['quantum_ethics_score'])
+            gauge_html = create_speedometer_dial(quantum_ethics_score, 100)
+            st.markdown(gauge_html, unsafe_allow_html=True)
+            st.markdown(f"<div style='text-align: center; margin-top: -10px;'><small><strong>Quantum Ethics</strong><br>{quantum_ethics_score}/100</small></div>", unsafe_allow_html=True)
     
     # Detailed framework analysis
-    st.markdown("### 🎯 **Framework Assessment**")
+    st.markdown("### **Framework Assessment**")
     
-    tab1, tab2, tab3, tab4 = st.tabs(["🤖 AI Cybersecurity", "⚛️ Quantum Cybersecurity", "🎯 AI Ethics", "🔬 Quantum Ethics"])
+    tab1, tab2, tab3, tab4 = st.tabs(["AI Cybersecurity", "Quantum Cybersecurity", "AI Ethics", "Quantum Ethics"])
     
     with tab1:
         display_framework_analysis("AI Cybersecurity", report, "ai_cybersecurity_score")
@@ -264,7 +369,7 @@ def display_gap_analysis_results(report: GapAnalysisReport):
     
     # Identified gaps
     if report.identified_gaps:
-        st.markdown("### 🔍 **Identified Policy Gaps**")
+        st.markdown("### **Identified Policy Gaps**")
         
         # Group gaps by severity
         gaps_by_severity = {}
@@ -354,7 +459,7 @@ def display_gap_details(gap):
 def display_intelligent_recommendations(report: GapAnalysisReport, content: str):
     """Display AI-powered intelligent recommendations."""
     
-    st.markdown("### 💡 **Intelligent Recommendations**")
+    st.markdown("### **Intelligent Recommendations**")
     
     # Strategic recommendations
     if report.strategic_recommendations:
