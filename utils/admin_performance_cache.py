@@ -62,18 +62,18 @@ def get_database_stats():
         from utils.database import DatabaseManager
         db_manager = DatabaseManager()
         
-        # Table statistics
+        # Table statistics with correct column names
         table_stats = db_manager.execute_query("""
             SELECT 
                 schemaname,
-                tablename,
+                relname as tablename,
                 n_tup_ins as inserts,
                 n_tup_upd as updates,
                 n_tup_del as deletes,
                 n_live_tup as live_rows
             FROM pg_stat_user_tables 
             WHERE schemaname = 'public'
-            ORDER BY tablename
+            ORDER BY relname
         """)
         
         return table_stats if isinstance(table_stats, list) else []
@@ -212,6 +212,26 @@ def render_optimized_recent_activity():
             st.markdown(f"**{timestamp}** | {title} | {doc_type} | {score_indicator}")
     else:
         st.info("No recent activity found")
+
+@st.cache_data(ttl=300)  # Cache for 5 minutes
+def get_document_types():
+    """Cached list of document types for admin filtering"""
+    try:
+        from utils.database import DatabaseManager
+        db_manager = DatabaseManager()
+        
+        doc_types = db_manager.execute_query("""
+            SELECT DISTINCT document_type, COUNT(*) as count
+            FROM documents 
+            WHERE document_type IS NOT NULL 
+            GROUP BY document_type 
+            ORDER BY count DESC, document_type
+        """)
+        
+        return doc_types if isinstance(doc_types, list) else []
+        
+    except Exception as e:
+        return []
 
 def clear_admin_caches():
     """Clear all admin-related caches"""

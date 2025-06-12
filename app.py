@@ -2605,6 +2605,11 @@ def render_repository_admin_section():
 def render_document_management():
     """Document ingestion and upload management."""
     
+    # Use optimized fast deletion interface to prevent slowdowns
+    from utils.fast_deletion_interface import render_optimized_document_management
+    render_optimized_document_management()
+    return  # Skip the old slow implementation below
+    
     st.markdown("### Document Ingestion & Upload Management")
     
     from components.document_uploader import render_document_uploader, render_bulk_upload
