@@ -2839,147 +2839,15 @@ def render_system_monitoring():
     
     st.markdown("### System Logs & Monitoring")
     
-    # Get real system metrics
-    from datetime import datetime, timedelta
-    from utils.database import DatabaseManager
+    # Use cached system metrics
+    from utils.admin_performance_cache import render_optimized_system_metrics, render_optimized_recent_activity
     
-    db_manager = DatabaseManager()
+    render_optimized_system_metrics()
     
-    # System health metrics from database
-    col1, col2, col3 = st.columns(3)
+    st.markdown("---")
     
-    with col1:
-        # Get document count from today
-        try:
-            today_docs = db_manager.execute_query("""
-                SELECT COUNT(*) as count FROM documents 
-                WHERE created_at >= CURRENT_DATE
-            """)
-            today_count = today_docs[0]['count'] if today_docs and isinstance(today_docs, list) and len(today_docs) > 0 else 0
-        except:
-            today_count = 0
-        st.metric("Documents Today", today_count)
-    
-    with col2:
-        # Get total documents
-        try:
-            total_docs = db_manager.execute_query("SELECT COUNT(*) as count FROM documents")
-            total_count = total_docs[0]['count'] if total_docs and isinstance(total_docs, list) and len(total_docs) > 0 else 0
-        except:
-            total_count = 0
-        st.metric("Total Documents", total_count)
-    
-    with col3:
-        # Get recent analysis count
-        try:
-            recent_analysis = db_manager.execute_query("""
-                SELECT COUNT(*) as count FROM documents 
-                WHERE created_at >= NOW() - INTERVAL '1 hour'
-            """)
-            recent_count = recent_analysis[0]['count'] if recent_analysis and isinstance(recent_analysis, list) and len(recent_analysis) > 0 else 0
-        except:
-            recent_count = 0
-        st.metric("Last Hour Activity", recent_count)
-    
-    # Real activity logs from database
-    st.markdown("#### Recent System Activity")
-    
-    log_type = st.selectbox("Activity Type:", ["Document Uploads", "Multi-LLM Analysis", "Database Operations", "All Activity"])
-    
-    # Get real logs based on selection
-    if log_type == "Document Uploads":
-        recent_uploads = db_manager.execute_query("""
-            SELECT title, created_at, document_type, source
-            FROM documents 
-            ORDER BY created_at DESC 
-            LIMIT 10
-        """)
-        
-        if recent_uploads:
-            st.markdown("**Recent Document Uploads:**")
-            for doc in recent_uploads:
-                timestamp = doc['created_at'].strftime("%Y-%m-%d %H:%M:%S") if doc['created_at'] else "Unknown"
-                source_info = doc['source'] if doc['source'] else "Direct upload"
-                st.text(f"{timestamp} INFO: Document uploaded - '{doc['title']}' ({doc['document_type']}) via {source_info}")
-        else:
-            st.info("No recent document uploads found")
-    
-    elif log_type == "Multi-LLM Analysis":
-        # Check for Multi-LLM enhanced documents
-        multi_llm_docs = db_manager.execute_query("""
-            SELECT title, created_at, ensemble_confidence, ensemble_services
-            FROM documents 
-            WHERE multi_llm_analysis = true
-            ORDER BY created_at DESC 
-            LIMIT 10
-        """)
-        
-        if multi_llm_docs:
-            st.markdown("**Recent Multi-LLM Analysis:**")
-            for doc in multi_llm_docs:
-                timestamp = doc['created_at'].strftime("%Y-%m-%d %H:%M:%S") if doc['created_at'] else "Unknown"
-                confidence = doc.get('ensemble_confidence', 'N/A')
-                services = doc.get('ensemble_services', 'N/A')
-                st.text(f"{timestamp} INFO: Multi-LLM analysis completed - '{doc['title']}' (Confidence: {confidence}, Services: {services})")
-        else:
-            st.info("No Multi-LLM analyses found")
-    
-    elif log_type == "Database Operations":
-        # Database operation logs
-        st.markdown("**Database Operations:**")
-        current_time = datetime.now()
-        
-        # Connection status
-        try:
-            db_status = db_manager.execute_query("SELECT NOW() as current_time")
-            if db_status:
-                st.text(f"{current_time.strftime('%Y-%m-%d %H:%M:%S')} INFO: Database connection active")
-                st.text(f"{current_time.strftime('%Y-%m-%d %H:%M:%S')} INFO: Last query executed successfully")
-        except Exception as e:
-            st.text(f"{current_time.strftime('%Y-%m-%d %H:%M:%S')} ERROR: Database connection issue - {str(e)}")
-        
-        # Table status
-        table_counts = db_manager.execute_query("""
-            SELECT 
-                schemaname,
-                tablename,
-                n_tup_ins as inserts,
-                n_tup_upd as updates,
-                n_tup_del as deletes
-            FROM pg_stat_user_tables 
-            WHERE schemaname = 'public'
-        """)
-        
-        if table_counts:
-            for table in table_counts:
-                st.text(f"{current_time.strftime('%Y-%m-%d %H:%M:%S')} INFO: Table {table['tablename']} - Inserts: {table['inserts']}, Updates: {table['updates']}, Deletes: {table['deletes']}")
-    
-    else:  # All Activity
-        st.markdown("**Combined System Activity:**")
-        
-        # Recent documents with enhanced info
-        all_activity = db_manager.execute_query("""
-            SELECT 
-                title, 
-                created_at, 
-                document_type, 
-                source,
-                multi_llm_analysis,
-                ensemble_confidence
-            FROM documents 
-            ORDER BY created_at DESC 
-            LIMIT 15
-        """)
-        
-        if all_activity:
-            for doc in all_activity:
-                timestamp = doc['created_at'].strftime("%Y-%m-%d %H:%M:%S") if doc['created_at'] else "Unknown"
-                analysis_type = "Multi-LLM" if doc.get('multi_llm_analysis') else "Standard"
-                confidence_info = f" (Confidence: {doc.get('ensemble_confidence', 'N/A')})" if doc.get('multi_llm_analysis') else ""
-                
-                st.text(f"{timestamp} INFO: {analysis_type} analysis - '{doc['title']}'{confidence_info}")
-        else:
-            st.info("No recent activity found")
+    # Use optimized recent activity display
+    render_optimized_recent_activity()
 
 def render_system_configuration():
     """System configuration and settings."""
@@ -3016,67 +2884,8 @@ def render_system_configuration():
 
 def render_database_status():
     """Render database status and management interface."""
-    from utils.database import db_manager
-    from utils.db import fetch_documents
-    
-    st.markdown("### Database Management")
-    
-    # Connection status
-    if db_manager.engine:
-        st.success("✅ Connected to PostgreSQL database")
-    else:
-        st.error("❌ Database connection failed")
-        return
-    
-    # Database statistics
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        # Document count
-        doc_count = db_manager.execute_query("SELECT COUNT(*) as count FROM documents")
-        count = 0
-        if doc_count and isinstance(doc_count, list) and len(doc_count) > 0:
-            count = doc_count[0]['count']
-        st.metric("Total Documents", count)
-    
-    with col2:
-        # Assessment count
-        assessment_count = db_manager.execute_query("SELECT COUNT(*) as count FROM assessments")
-        a_count = 0
-        if assessment_count and isinstance(assessment_count, list) and len(assessment_count) > 0:
-            a_count = assessment_count[0]['count']
-        st.metric("Total Assessments", a_count)
-    
-    with col3:
-        # Average score
-        avg_score = db_manager.execute_query("SELECT AVG(quantum_score) as avg FROM documents WHERE quantum_score > 0")
-        avg = 0
-        if avg_score and isinstance(avg_score, list) and len(avg_score) > 0 and avg_score[0]['avg']:
-            avg = round(avg_score[0]['avg'], 1)
-        st.metric("Average Score", f"{avg}/100")
-    
-    st.markdown("---")
-    
-    # Recent documents
-    st.markdown("#### 📋 Recent Documents")
-    recent_docs = db_manager.execute_query("""
-        SELECT title, quantum_score, document_type, created_at 
-        FROM documents 
-        ORDER BY created_at DESC 
-        LIMIT 5
-    """)
-    
-    if recent_docs and isinstance(recent_docs, list):
-        for doc in recent_docs:
-            col1, col2, col3 = st.columns([3, 1, 1])
-            with col1:
-                st.write(f"**{doc['title']}**")
-            with col2:
-                st.write(f"Score: {doc['quantum_score']}")
-            with col3:
-                st.write(doc['document_type'])
-    else:
-        st.info("No documents found")
+    from utils.admin_performance_cache import render_optimized_database_status
+    render_optimized_database_status()
 
 def render_patent_scoring_management():
     """Patent Scoring System Management interface."""
