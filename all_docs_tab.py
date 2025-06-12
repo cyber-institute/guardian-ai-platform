@@ -507,50 +507,62 @@ def render():
         # Custom CSS to make file uploader compact and single line
         st.markdown("""
         <style>
-        .stFileUploader > div > div {
-            padding: 0.5rem !important;
-            min-height: 40px !important;
-            max-height: 40px !important;
-            border: 1px solid #d1d5db !important;
+        /* Target the file uploader container more specifically */
+        [data-testid="stFileUploader"] > div > div > div {
+            min-height: 45px !important;
+            max-height: 45px !important;
+            padding: 8px 12px !important;
+            border: 1px dashed #d1d5db !important;
             border-radius: 6px !important;
-            background: #ffffff !important;
-        }
-        .stFileUploader > div > div > div {
-            min-height: 40px !important;
-            max-height: 40px !important;
+            background: #fafafa !important;
             display: flex !important;
             align-items: center !important;
             justify-content: space-between !important;
-            flex-direction: row !important;
+            gap: 1rem !important;
         }
-        .stFileUploader > div > div > div > div:first-child {
-            display: flex !important;
-            align-items: center !important;
-            gap: 0.5rem !important;
-            font-size: 0.9rem !important;
-            color: #6b7280 !important;
-        }
-        .stFileUploader > div > div > div > div:first-child::before {
-            content: none !important;
-        }
-        .stFileUploader > div > div > div > div:first-child svg {
+        
+        /* Hide the cloud icon */
+        [data-testid="stFileUploader"] svg {
             display: none !important;
         }
-        .stFileUploader > div > div > div > div:first-child::after {
-            content: "Drag and drop file here • Limit 200MB per file • PDF, TXT, DOCX" !important;
+        
+        /* Style the text area */
+        [data-testid="stFileUploader"] > div > div > div > div:first-child {
+            flex: 1 !important;
+            display: flex !important;
+            align-items: center !important;
+            font-size: 14px !important;
+            color: #6b7280 !important;
+            white-space: nowrap !important;
         }
-        .stFileUploader > div > div > button {
+        
+        /* Replace default text with our custom text */
+        [data-testid="stFileUploader"] > div > div > div > div:first-child > div {
+            display: none !important;
+        }
+        
+        [data-testid="stFileUploader"] > div > div > div > div:first-child::before {
+            content: "Drag and drop file here • Limit 200MB per file • PDF, TXT, DOCX" !important;
+            font-size: 14px !important;
+            color: #6b7280 !important;
+        }
+        
+        /* Style the browse button */
+        [data-testid="stFileUploader"] button {
             height: 32px !important;
-            padding: 0.25rem 0.75rem !important;
-            font-size: 0.85rem !important;
-            background: #f3f4f6 !important;
+            padding: 6px 12px !important;
+            font-size: 13px !important;
+            background: #f8f9fa !important;
             border: 1px solid #d1d5db !important;
             border-radius: 4px !important;
             color: #374151 !important;
+            cursor: pointer !important;
             flex-shrink: 0 !important;
         }
-        .stFileUploader > div > div > button:hover {
-            background: #e5e7eb !important;
+        
+        [data-testid="stFileUploader"] button:hover {
+            background: #e9ecef !important;
+            border-color: #adb5bd !important;
         }
         </style>
         """, unsafe_allow_html=True)
