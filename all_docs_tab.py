@@ -502,7 +502,7 @@ def render():
     upload_col1, upload_col2 = st.columns(2)
     
     with upload_col1:
-        st.markdown("#### 📄 Upload Document")
+        st.markdown("#### Browse Files")
         uploaded_file = st.file_uploader(
             "Choose a file",
             type=['pdf', 'txt', 'docx'],
@@ -682,7 +682,7 @@ def render():
     </style>
     """, unsafe_allow_html=True)
     
-    col1, col2 = st.columns([1, 4])
+    col1, col2 = st.columns([1, 6])
     
     with col1:
         if st.button("Policy Analyzer", key="policy_analyzer_btn", help="Open comprehensive policy analysis tool"):
@@ -690,7 +690,7 @@ def render():
             st.rerun()
     
     with col2:
-        st.markdown('<span class="policy-description">Comprehensive policy analysis with emerging technologies gap detection and recommendations and Report Generation</span>', unsafe_allow_html=True)
+        st.markdown('<div style="margin-left: -1rem; padding-top: 0.5rem;"><span class="policy-description">Comprehensive policy analysis with emerging technologies gap detection and recommendations and Report Generation</span></div>', unsafe_allow_html=True)
     
     # Policy Gap Analysis Modal
     if st.session_state.get('show_policy_analyzer', False):
