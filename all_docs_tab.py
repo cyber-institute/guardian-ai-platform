@@ -501,6 +501,110 @@ def render():
     with col4:
         high_scoring = len([d for d in docs if d.get("quantum_score", 0) >= 75])
         st.metric("High Scoring (75+)", high_scoring)
+    
+    # Document Upload and URL Input Section
+    st.markdown("---")
+    st.markdown("### Add New Documents")
+    
+    upload_col1, upload_col2 = st.columns(2)
+    
+    with upload_col1:
+        st.markdown("#### 📄 Upload Document")
+        uploaded_file = st.file_uploader(
+            "Choose a file",
+            type=['pdf', 'txt', 'docx'],
+            help="Upload PDF, TXT, or DOCX files for analysis",
+            label_visibility="collapsed"
+        )
+        
+        if uploaded_file is not None:
+            # Import enhanced policy uploader
+            from components.enhanced_policy_uploader import process_uploaded_file
+            
+            if st.button("🚀 Process Upload", type="primary", use_container_width=True):
+                with st.spinner("Processing uploaded document..."):
+                    try:
+                        result = process_uploaded_file(uploaded_file)
+                        if result:
+                            st.success("Document processed successfully!")
+                            st.info("Refresh the page to see the new document in your collection")
+                        else:
+                            st.error("Failed to process document")
+                    except Exception as e:
+                        st.error(f"Error processing document: {str(e)}")
+    
+    with upload_col2:
+        st.markdown("#### 🌐 Add from URL")
+        url_input = st.text_input(
+            "Enter document URL",
+            placeholder="https://example.com/document.pdf",
+            help="Enter a URL to a document for analysis",
+            label_visibility="collapsed"
+        )
+        
+        if url_input:
+            # Import URL processing functionality
+            from utils.fast_admin_loader import process_url_content
+            
+            if st.button("🔗 Process URL", type="primary", use_container_width=True):
+                with st.spinner("Processing URL content..."):
+                    try:
+                        # Use the enhanced URL processing from admin loader
+                        import requests
+                        import trafilatura
+                        from utils.patent_scoring_engine import comprehensive_document_scoring
+                        from utils.database import get_db_connection
+                        import uuid
+                        
+                        # Fetch and process URL content
+                        headers = {
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                        }
+                        response = requests.get(url_input, headers=headers, timeout=30)
+                        response.raise_for_status()
+                        
+                        # Extract content
+                        content = trafilatura.extract(response.text, include_comments=False, include_tables=True)
+                        
+                        if content and len(content.strip()) > 100:
+                            # Generate document ID and basic metadata
+                            doc_id = str(uuid.uuid4())
+                            title = url_input.split('/')[-1] or "URL Document"
+                            
+                            # Score the document
+                            scores = comprehensive_document_scoring(content, title)
+                            
+                            # Save to database
+                            conn = get_db_connection()
+                            cursor = conn.cursor()
+                            
+                            cursor.execute("""
+                                INSERT INTO documents (
+                                    id, title, content, source_url, document_type,
+                                    ai_cybersecurity_score, quantum_cybersecurity_score,
+                                    ai_ethics_score, quantum_ethics_score,
+                                    upload_date
+                                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                            """, (
+                                doc_id, title, content, url_input, "URL Document",
+                                scores.get('ai_cybersecurity', 0),
+                                scores.get('quantum_cybersecurity', 0), 
+                                scores.get('ai_ethics', 0),
+                                scores.get('quantum_ethics', 0)
+                            ))
+                            
+                            conn.commit()
+                            cursor.close()
+                            conn.close()
+                            
+                            st.success("URL content processed successfully!")
+                            st.info("Refresh the page to see the new document in your collection")
+                        else:
+                            st.error("Could not extract sufficient content from URL")
+                            
+                    except Exception as e:
+                        st.error(f"Error processing URL: {str(e)}")
+                        st.info("Please verify the URL is accessible and contains readable content")
 
 def render_compact_cards(docs):
     """Render documents in compact card format."""
