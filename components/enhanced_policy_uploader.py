@@ -24,8 +24,8 @@ def create_speedometer_dial(value, max_value=100):
     # Calculate angle for the value (full circle: 0 to 360 degrees)
     angle = (value / max_value) * 360
     
-    # Create color zones - vibrant primary colors
-    colors = ['#dc2626', '#ea580c', '#ca8a04', '#16a34a', '#15803d']  # Red to Green
+    # Create color zones - bold vibrant primary colors
+    colors = ['#ff0000', '#ff8000', '#ffff00', '#00ff00', '#008000']  # Red to Green
     zone_size = 360 / 5  # Each zone is 72 degrees
     
     # Draw colored zones
@@ -41,15 +41,15 @@ def create_speedometer_dial(value, max_value=100):
     needle_y = 0.6 * np.sin(needle_angle_rad)
     
     # Needle line
-    ax.plot([0, needle_x], [0, needle_y], color='#B91C2C', linewidth=3, zorder=10)
+    ax.plot([0, needle_x], [0, needle_y], color='#000000', linewidth=3, zorder=10)
     
     # Center dot
-    center_circle = Circle((0, 0), 0.08, color='#B91C2C', zorder=15)
+    center_circle = Circle((0, 0), 0.08, color='#000000', zorder=15)
     ax.add_patch(center_circle)
     
     # Add value text in center
     ax.text(0, -0.3, f'{value}', ha='center', va='center', fontsize=10, 
-            fontweight='bold', color='#B91C2C')
+            fontweight='bold', color='#000000')
     
     # Set equal aspect ratio and remove axes
     ax.set_xlim(-1, 1)
@@ -72,8 +72,8 @@ def create_tier_bubbles(value, max_value=5):
     """Create tier bubble visualization for 1-5 scale."""
     fig, ax = plt.subplots(figsize=(2, 0.8), facecolor='white')
     
-    # Define tier colors - vibrant primary colors
-    tier_colors = ['#dc2626', '#ea580c', '#ca8a04', '#16a34a', '#15803d']
+    # Define tier colors - bold vibrant primary colors
+    tier_colors = ['#ff0000', '#ff8000', '#ffff00', '#00ff00', '#008000']
     
     # Draw bubbles
     for i in range(max_value):
