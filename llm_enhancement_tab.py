@@ -109,7 +109,7 @@ def render_service_testing_tab():
                             **{service['name'].title()}**
                             - Cost: {service['cost']}
                             - Specialization: {service['specialization']}
-                            - Status: ✅ {service['status']}
+                            - Status: {service['status']}
                             """)
                     
                     # Services needing setup
@@ -267,7 +267,7 @@ def render_data_architecture_tab():
     st.markdown("Recommended data storage and processing architecture for GUARDIAN's LLM enhancement")
     
     # Revolutionary Multi-LLM Ensemble Introduction
-    st.markdown("#### **🚀 Revolutionary Multi-LLM Ensemble System**")
+    st.markdown("#### **Revolutionary Multi-LLM Ensemble System**")
     
     with st.expander("**Current Achievement: Concurrent Processing Framework**", expanded=True):
         st.markdown("""
@@ -614,7 +614,7 @@ def render_enhancement_demo_tab():
 def render_multi_llm_ensemble_tab():
     """Demonstrate revolutionary quantum-assisted multi-LLM intelligent synthesis capabilities"""
     
-    st.markdown("### **🚀 Quantum-Enhanced Multi-LLM Synthesis Engine**")
+    st.markdown("### **Quantum-Enhanced Multi-LLM Synthesis Engine**")
     st.markdown("*Revolutionary quantum-assisted ensemble system with superposition-based model selection*")
     
     # Quantum Enhancement Introduction
@@ -627,12 +627,12 @@ def render_multi_llm_ensemble_tab():
         - Content-aware quantum state preparation
         - Entangled decision-making for correlated model selection
         
-        **🎯 Enhanced Routing Capabilities:**
+        **Enhanced Routing Capabilities:**
         - Task-specific quantum biasing (AI/Quantum/Ethics content detection)
         - Quantum confidence weighting using measurement probabilities
         - Dynamic circuit adaptation based on document characteristics
         
-        **⚡ Advanced Synthesis Features:**
+        **Advanced Synthesis Features:**
         - Quantum-weighted consensus formation
         - Multi-dimensional perspective fusion
         - Superposition-enhanced quality assurance
@@ -659,7 +659,7 @@ def render_multi_llm_ensemble_tab():
             index=0
         )
     
-    if st.button("🚀 Execute Quantum Routing"):
+    if st.button("Execute Quantum Routing"):
         with st.spinner("Initializing quantum circuits..."):
             try:
                 from utils.quantum_enhanced_scoring import QuantumEnhancedScoringEngine
@@ -785,7 +785,7 @@ def render_multi_llm_ensemble_tab():
     # Quantum Analytics
     st.markdown("#### **🔬 Quantum Routing Analytics**")
     
-    if st.button("📊 View Quantum Analytics"):
+    if st.button("View Quantum Analytics"):
         try:
             from utils.quantum_enhanced_scoring import QuantumEnhancedScoringEngine
             
@@ -812,7 +812,7 @@ def render_multi_llm_ensemble_tab():
             st.error(f"Analytics unavailable: {str(e)}")
     
     # Success announcement
-    st.success("🎉 **Multi-LLM Scoring System Successfully Fixed and Integrated!**")
+    st.success("**Multi-LLM Scoring System Successfully Fixed and Integrated!**")
     
     # Key improvements section
     col1, col2 = st.columns([2, 1])
@@ -820,10 +820,10 @@ def render_multi_llm_ensemble_tab():
     with col1:
         st.markdown("""
         **Critical Fixes Implemented:**
-        - ✅ Multi-LLM now serves as **primary scoring method** (not fallback)
-        - ✅ Intelligent synthesis engine properly integrated into comprehensive scoring
-        - ✅ Bypasses OpenAI rate limits through hybrid analysis approach
-        - ✅ Dramatically improved scoring accuracy and contextual understanding
+        - Multi-LLM now serves as **primary scoring method** (not fallback)
+        - Intelligent synthesis engine properly integrated into comprehensive scoring
+        - Bypasses OpenAI rate limits through hybrid analysis approach
+        - Dramatically improved scoring accuracy and contextual understanding
         
         **Technical Architecture:**
         - Enhanced pattern analysis combined with contextual understanding
