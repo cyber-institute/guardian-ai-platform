@@ -315,18 +315,7 @@ def render():
     )
     st.session_state["filters"]["topic_filter"] = topic_filter
     
-    # Show document counts for each topic filter option
-    ai_docs = len([d for d in all_docs if get_document_topic(d) in ["AI", "Both"]])
-    quantum_docs = len([d for d in all_docs if get_document_topic(d) in ["Quantum", "Both"]])
-    total_docs = len(all_docs)
-    
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.markdown(f"<small style='color: #6b7280;'>AI: {ai_docs} docs</small>", unsafe_allow_html=True)
-    with col2:
-        st.markdown(f"<small style='color: #6b7280;'>Quantum: {quantum_docs} docs</small>", unsafe_allow_html=True)
-    with col3:
-        st.markdown(f"<small style='color: #6b7280;'>Total: {total_docs} docs</small>", unsafe_allow_html=True)
+
     
     st.markdown("---")  # Separator line
     

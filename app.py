@@ -2564,6 +2564,49 @@ def render_patent_scoring_management():
     
     st.markdown("---")
     
+    # Repository Statistics
+    st.markdown("#### 📊 Repository Statistics")
+    
+    try:
+        from all_docs_tab import fetch_documents_cached, get_document_topic
+        all_docs = fetch_documents_cached()
+        
+        if all_docs:
+            # Correct document counting logic
+            ai_only_docs = len([d for d in all_docs if get_document_topic(d) == "AI"])
+            quantum_only_docs = len([d for d in all_docs if get_document_topic(d) == "Quantum"])
+            both_docs = len([d for d in all_docs if get_document_topic(d) == "Both"])
+            total_docs = len(all_docs)
+            
+            # Display corrected statistics
+            stats_col1, stats_col2, stats_col3, stats_col4 = st.columns(4)
+            
+            with stats_col1:
+                st.metric("Total Documents", total_docs)
+            
+            with stats_col2:
+                st.metric("AI Only", ai_only_docs)
+            
+            with stats_col3:
+                st.metric("Quantum Only", quantum_only_docs)
+            
+            with stats_col4:
+                st.metric("Both Topics", both_docs)
+            
+            # Verification that math adds up
+            calculated_total = ai_only_docs + quantum_only_docs + both_docs
+            if calculated_total != total_docs:
+                st.warning(f"Math verification: {ai_only_docs} + {quantum_only_docs} + {both_docs} = {calculated_total}, but total is {total_docs}")
+            else:
+                st.success(f"✓ Math verified: {ai_only_docs} + {quantum_only_docs} + {both_docs} = {total_docs}")
+        else:
+            st.info("No documents found in repository")
+            
+    except Exception as e:
+        st.error(f"Error loading repository statistics: {e}")
+    
+    st.markdown("---")
+    
     # Database actions
     st.markdown("#### ⚙️ Database Actions")
     
