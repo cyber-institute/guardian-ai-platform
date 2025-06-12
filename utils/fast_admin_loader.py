@@ -39,6 +39,7 @@ def render_fast_repository_admin():
     admin_section = st.selectbox(
         "Select Administrative Function:",
         [
+            "MultiLLM URL Analysis",
             "Database Status & Management",
             "Document Ingestion & Upload", 
             "Patent Scoring System Management",
@@ -49,7 +50,10 @@ def render_fast_repository_admin():
     )
     
     # Only load the selected section (lazy loading)
-    if admin_section == "Database Status & Management":
+    if admin_section == "MultiLLM URL Analysis":
+        render_multillm_url_analysis()
+        
+    elif admin_section == "Database Status & Management":
         render_fast_database_status()
         
     elif admin_section == "Document Ingestion & Upload":
@@ -179,3 +183,198 @@ def render_fast_system_configuration():
         st.success("✅ API endpoints protected")
         st.info("🔒 Administrative access controlled")
         st.info("🛡️ Input validation active")
+
+def render_multillm_url_analysis():
+    """Enhanced MultiLLM URL Analysis - Primary Repository Admin Feature"""
+    
+    # Enhanced header for URL Analysis
+    st.markdown(
+        """<div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
+            <h2 style="color: white; margin-bottom: 1rem; font-size: 1.8rem; font-weight: 700; text-align: center;">
+                🔬 MultiLLM URL Analysis Engine
+            </h2>
+            <p style="color: #e0f2fe; text-align: center; font-size: 1.1rem; line-height: 1.5; margin: 0;">
+                Advanced document extraction and analysis using intelligent ensemble processing
+            </p>
+        </div>""", 
+        unsafe_allow_html=True
+    )
+    
+    # URL input section
+    st.markdown("### Document URL Analysis")
+    
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        url_input = st.text_input(
+            "Enter Document URL:", 
+            placeholder="https://example.com/policy-document.pdf",
+            help="Supports PDF, web pages, and document repositories"
+        )
+    
+    with col2:
+        st.markdown("<br>", unsafe_allow_html=True)  # Spacing
+        if st.button("🔍 Analyze URL", type="primary", use_container_width=True):
+            if url_input:
+                analyze_url_with_multillm(url_input)
+            else:
+                st.error("Please enter a valid URL")
+    
+    # Analysis configuration
+    st.markdown("#### Analysis Configuration")
+    
+    config_col1, config_col2, config_col3 = st.columns(3)
+    
+    with config_col1:
+        analysis_depth = st.selectbox(
+            "Analysis Depth:",
+            ["Standard", "Comprehensive", "Expert"],
+            index=1,
+            help="Expert mode uses daisy-chain LLM processing"
+        )
+    
+    with config_col2:
+        enable_multillm = st.checkbox(
+            "Enable MultiLLM Ensemble",
+            value=True,
+            help="Use multiple AI models for enhanced accuracy"
+        )
+    
+    with config_col3:
+        auto_save = st.checkbox(
+            "Auto-save to Repository",
+            value=True,
+            help="Automatically save analyzed documents"
+        )
+    
+    # Recent analysis results
+    st.markdown("---")
+    st.markdown("#### Recent URL Analyses")
+    
+    if st.button("🔄 Refresh Analysis History"):
+        st.rerun()
+    
+    # Display recent URL analysis results (placeholder for now)
+    with st.expander("📊 Analysis History", expanded=False):
+        st.info("URL analysis history will be displayed here once analyses are performed.")
+
+def analyze_url_with_multillm(url_input):
+    """Perform comprehensive URL analysis with MultiLLM processing"""
+    
+    with st.spinner(f"Extracting content from {url_input}..."):
+        try:
+            import trafilatura
+            import requests
+            import io
+            from urllib.parse import urlparse
+            from utils.direct_db import save_document_direct
+            from utils.document_analyzer import analyze_document_metadata
+            from utils.comprehensive_scoring import comprehensive_document_scoring
+            
+            # Determine file type from URL
+            parsed_url = urlparse(url_input.lower())
+            file_extension = parsed_url.path.split('.')[-1] if '.' in parsed_url.path else ''
+            
+            text_content = None
+            document_title = None
+            
+            # Check if it's a direct file download
+            if file_extension in ['pdf', 'txt']:
+                st.info(f"Detected {file_extension.upper()} file, downloading and processing...")
+                
+                # Download the file
+                response = requests.get(url_input, timeout=30)
+                response.raise_for_status()
+                
+                if file_extension == 'pdf':
+                    try:
+                        from pypdf import PdfReader
+                        pdf_file = io.BytesIO(response.content)
+                        pdf_reader = PdfReader(pdf_file)
+                        text_content = ""
+                        for page in pdf_reader.pages:
+                            text_content += page.extract_text()
+                        document_title = f"Document from {parsed_url.netloc}"
+                    except Exception as e:
+                        st.error(f"Error processing PDF: {str(e)}")
+                        return
+                
+                elif file_extension == 'txt':
+                    text_content = response.text
+                    document_title = f"Text Document from {parsed_url.netloc}"
+            
+            else:
+                # Extract from web page
+                st.info("Extracting content from web page...")
+                downloaded = trafilatura.fetch_url(url_input)
+                if downloaded:
+                    text_content = trafilatura.extract(downloaded)
+                    document_title = trafilatura.extract_metadata(downloaded).title if trafilatura.extract_metadata(downloaded) else f"Web Document from {parsed_url.netloc}"
+            
+            if text_content and len(text_content.strip()) > 100:
+                st.success("✅ Content extraction successful!")
+                
+                # Enhanced metadata extraction
+                try:
+                    metadata = analyze_document_metadata(text_content, document_title or url_input)
+                except:
+                    from utils.enhanced_metadata_extractor import extract_metadata_fallback
+                    metadata = extract_metadata_fallback(text_content, url_input)
+                
+                # Comprehensive scoring
+                scores = comprehensive_document_scoring(text_content, metadata.get('title', document_title))
+                
+                # Display results
+                st.markdown("### Analysis Results")
+                
+                result_col1, result_col2 = st.columns(2)
+                
+                with result_col1:
+                    st.markdown("**Extracted Metadata:**")
+                    st.json({
+                        "Title": metadata.get('title', document_title),
+                        "Organization": metadata.get('organization', 'Unknown'),
+                        "Document Type": metadata.get('document_type', 'Policy Document'),
+                        "Content Length": f"{len(text_content):,} characters"
+                    })
+                
+                with result_col2:
+                    st.markdown("**Framework Scores:**")
+                    if scores:
+                        score_col1, score_col2 = st.columns(2)
+                        with score_col1:
+                            if scores.get('ai_cybersecurity_score', 0) > 0:
+                                st.metric("AI Cybersecurity", f"{scores['ai_cybersecurity_score']}/100")
+                            if scores.get('ai_ethics_score', 0) > 0:
+                                st.metric("AI Ethics", f"{scores['ai_ethics_score']}/100")
+                        with score_col2:
+                            if scores.get('quantum_cybersecurity_score', 0) > 0:
+                                st.metric("Quantum Cybersecurity", f"Tier {scores['quantum_cybersecurity_score']}/5")
+                            if scores.get('quantum_ethics_score', 0) > 0:
+                                st.metric("Quantum Ethics", f"{scores['quantum_ethics_score']}/100")
+                
+                # Prepare document data
+                document_data = {
+                    'title': metadata.get('title', document_title or f"Document from {url_input}"),
+                    'content': text_content,
+                    'organization': metadata.get('organization', 'Unknown'),
+                    'document_type': metadata.get('document_type', 'Report'),
+                    'source': f"URL: {url_input}",
+                    'text_content': text_content,
+                    'analyzed_metadata': metadata,
+                    'comprehensive_scores': scores
+                }
+                
+                # Auto-save option
+                if st.session_state.get('auto_save_url_analysis', True):
+                    if save_document_direct(document_data):
+                        st.success(f"Successfully saved: {metadata.get('title', document_title)}")
+                        st.info("Document added to repository. Check Repository tab to view it.")
+                    else:
+                        st.error("Failed to save document to database.")
+                
+            else:
+                st.error("Could not extract sufficient content from the URL. Please verify the URL is accessible and contains readable content.")
+                
+        except Exception as e:
+            st.error(f"Error processing URL: {str(e)}")
+            st.info("Please verify the URL is valid and accessible.")
