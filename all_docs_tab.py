@@ -505,8 +505,13 @@ def render_compact_cards(docs):
             # Use simple placeholder thumbnail for performance
             thumbnail_html = f'<div style="width:60px;height:75px;background:#f0f0f0;border:1px solid #ddd;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#666;">Doc</div>'
             
-            # Calculate comprehensive scores with caching
-            scores = comprehensive_document_scoring_cached(content, str(title))
+            # Use actual database scores instead of recalculating
+            scores = {
+                'ai_cybersecurity': doc.get('ai_cybersecurity_score', 0) or 0,
+                'quantum_cybersecurity': doc.get('quantum_cybersecurity_score', 0) or 0,
+                'ai_ethics': doc.get('ai_ethics_score', 0) or 0,
+                'quantum_ethics': doc.get('quantum_ethics_score', 0) or 0
+            }
             
             # Properly escape all HTML content for compact cards
             import html
@@ -556,8 +561,13 @@ def render_grid_view(docs):
             doc_type = ultra_clean_metadata(doc.get('document_type', 'Unknown'))
             content_preview = ultra_clean_metadata(doc.get('content_preview', 'No preview available') or 'No preview available')
             
-            # Calculate comprehensive scores with caching
-            scores = comprehensive_document_scoring_cached(content, str(title))
+            # Use actual database scores instead of recalculating
+            scores = {
+                'ai_cybersecurity': doc.get('ai_cybersecurity_score', 0) or 0,
+                'quantum_cybersecurity': doc.get('quantum_cybersecurity_score', 0) or 0,
+                'ai_ethics': doc.get('ai_ethics_score', 0) or 0,
+                'quantum_ethics': doc.get('quantum_ethics_score', 0) or 0
+            }
             
             # Properly escape all HTML content for grid view
             import html
@@ -598,7 +608,13 @@ def render_table_view(docs):
         pub_date = doc.get('publish_date') or 'N/A'
         doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
         
-        scores = comprehensive_document_scoring_cached(content, str(title))
+        # Use actual database scores instead of recalculating
+        scores = {
+            'ai_cybersecurity': doc.get('ai_cybersecurity_score', 0) or 0,
+            'quantum_cybersecurity': doc.get('quantum_cybersecurity_score', 0) or 0,
+            'ai_ethics': doc.get('ai_ethics_score', 0) or 0,
+            'quantum_ethics': doc.get('quantum_ethics_score', 0) or 0
+        }
         
         table_data.append({
             'Title': title[:45],
