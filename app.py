@@ -418,34 +418,69 @@ def main():
             status_text = st.empty()
             
             try:
-                # Step 1: Quick Duplicate Check
-                status_text.text("Step 1/4: Quick duplicate scan...")
+                # Step 1: Duplicate Detection and Removal
+                status_text.text("Step 1/4: Removing duplicate documents...")
                 progress_bar.progress(0.1)
                 
-                # Simple duplicate check without heavy processing
                 duplicates_removed = 0
+                potential_duplicates = 0
+                
                 try:
-                    # Use a lightweight approach to check for obvious duplicates
+                    # Inline duplicate removal to avoid timeout issues
                     from utils.db import fetch_documents
+                    import psycopg2
+                    import os
+                    
+                    # Get database connection
+                    conn = psycopg2.connect(
+                        host=os.getenv('PGHOST'),
+                        database=os.getenv('PGDATABASE'),
+                        user=os.getenv('PGUSER'),
+                        password=os.getenv('PGPASSWORD'),
+                        port=os.getenv('PGPORT')
+                    )
+                    
                     docs = fetch_documents()
+                    if len(docs) > 50:
+                        docs = docs[:50]  # Process only recent 50 documents to avoid timeout
                     
-                    # Quick title-based duplicate detection for recent documents
-                    recent_docs = docs[:50] if len(docs) > 50 else docs
-                    title_counts = {}
-                    potential_duplicates = 0
-                    
-                    for doc in recent_docs:
+                    # Find exact title duplicates
+                    title_groups = {}
+                    for doc in docs:
                         title = doc.get('title', '').strip().lower()
-                        if title and len(title) > 10:
-                            title_counts[title] = title_counts.get(title, 0) + 1
+                        if title and len(title) > 20:
+                            if title not in title_groups:
+                                title_groups[title] = []
+                            title_groups[title].append(doc)
                     
-                    potential_duplicates = sum(1 for count in title_counts.values() if count > 1)
+                    # Remove duplicates
+                    with conn.cursor() as cursor:
+                        for title, group_docs in title_groups.items():
+                            if len(group_docs) > 1:
+                                potential_duplicates += 1
+                                # Keep document with highest ID (most recent)
+                                sorted_docs = sorted(group_docs, key=lambda x: int(x.get('id', 0)), reverse=True)
+                                
+                                for doc in sorted_docs[1:]:  # Remove all except the first (most recent)
+                                    doc_id = doc.get('id')
+                                    cursor.execute("DELETE FROM documents WHERE id = %s", (doc_id,))
+                                    duplicates_removed += 1
+                        
+                        conn.commit()
                     
-                    if potential_duplicates > 0:
-                        st.info(f"Found {potential_duplicates} potential duplicate title groups")
+                    conn.close()
+                    
+                    if duplicates_removed > 0:
+                        st.success(f"Removed {duplicates_removed} duplicate documents")
+                    elif potential_duplicates > 0:
+                        st.info(f"Found {potential_duplicates} potential duplicate groups")
+                    else:
+                        st.info("No duplicates detected in recent documents")
                     
                 except Exception as e:
-                    st.warning(f"Duplicate check skipped: {str(e)[:100]}")
+                    st.warning(f"Duplicate removal skipped: {str(e)[:100]}")
+                    duplicates_removed = 0
+                    potential_duplicates = 0
                 
                 progress_bar.progress(0.3)
                 
@@ -2703,65 +2738,90 @@ def render_patent_scoring_management():
     # Duplicate Management Section
     st.markdown("#### Duplicate Document Management")
     
-    try:
-        from utils.duplicate_cleanup import get_duplicate_summary, auto_cleanup_exact_duplicates, identify_duplicate_groups, remove_duplicates
-        
-        # Get duplicate summary
-        duplicate_summary = get_duplicate_summary()
-        
-        if duplicate_summary['total_duplicate_groups'] > 0:
-            st.warning(f"Found {duplicate_summary['total_duplicate_groups']} duplicate groups affecting {duplicate_summary['total_duplicate_documents']} documents")
-            
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                if st.button("Auto-Clean Exact Duplicates", help="Automatically remove documents with identical content"):
-                    with st.spinner("Cleaning exact duplicates..."):
-                        cleanup_result = auto_cleanup_exact_duplicates()
-                        if cleanup_result['documents_removed'] > 0:
-                            st.success(f"Removed {cleanup_result['documents_removed']} duplicate documents from {cleanup_result['groups_processed']} groups")
-                            st.rerun()
-                        else:
-                            st.info("No exact duplicates found to clean")
-            
-            with col2:
-                if st.button("View All Duplicates", help="Review all duplicate groups manually"):
-                    st.session_state.show_duplicates = True
-            
-            # Manual duplicate review
-            if st.session_state.get('show_duplicates', False):
-                st.markdown("##### Manual Duplicate Review")
+    # Simple duplicate management without heavy imports
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Quick Duplicate Check**")
+        if st.button("🔍 Scan for Duplicates", type="secondary"):
+            try:
+                from utils.db import fetch_documents
+                docs = fetch_documents()
                 
-                duplicate_groups = identify_duplicate_groups()
+                # Quick title-based duplicate detection
+                title_counts = {}
+                for doc in docs[:100]:  # Check recent 100 documents
+                    title = doc.get('title', '').strip().lower()
+                    if title and len(title) > 20:
+                        title_counts[title] = title_counts.get(title, 0) + 1
                 
-                for i, group in enumerate(duplicate_groups):
-                    with st.expander(f"{group['type'].replace('_', ' ').title()} - {group['count']} documents (Confidence: {group['confidence']:.1%})"):
-                        
-                        st.markdown("**Documents in this group:**")
-                        for j, doc in enumerate(group['documents']):
-                            col_doc, col_action = st.columns([3, 1])
+                duplicates = sum(1 for count in title_counts.values() if count > 1)
+                
+                if duplicates > 0:
+                    st.warning(f"Found {duplicates} potential duplicate title groups")
+                else:
+                    st.success("No obvious duplicates detected")
+                    
+            except Exception as e:
+                st.error(f"Scan failed: {str(e)[:100]}")
+    
+    with col2:
+        st.markdown("**Remove Duplicates**")
+        if st.button("🗑️ Remove Title Duplicates", type="primary"):
+            try:
+                from utils.db import fetch_documents
+                import psycopg2
+                import os
+                
+                # Connect to database
+                conn = psycopg2.connect(
+                    host=os.getenv('PGHOST'),
+                    database=os.getenv('PGDATABASE'),
+                    user=os.getenv('PGUSER'),
+                    password=os.getenv('PGPASSWORD'),
+                    port=os.getenv('PGPORT')
+                )
+                
+                docs = fetch_documents()
+                
+                # Group by exact title matches
+                title_groups = {}
+                for doc in docs[:100]:  # Process recent 100 documents
+                    title = doc.get('title', '').strip().lower()
+                    if title and len(title) > 20:
+                        if title not in title_groups:
+                            title_groups[title] = []
+                        title_groups[title].append(doc)
+                
+                removed_count = 0
+                groups_found = 0
+                
+                with conn.cursor() as cursor:
+                    for title, group_docs in title_groups.items():
+                        if len(group_docs) > 1:
+                            groups_found += 1
+                            # Keep document with highest ID (most recent)
+                            sorted_docs = sorted(group_docs, key=lambda x: int(x.get('id', 0)), reverse=True)
                             
-                            with col_doc:
-                                st.markdown(f"**{doc.get('title', 'Unknown')}**")
-                                st.caption(f"ID: {doc.get('id')} | Type: {doc.get('document_type', 'Unknown')} | Date: {doc.get('upload_date', 'Unknown')}")
-                                
-                                # Show content preview
-                                content_preview = doc.get('content', '')[:200] + "..." if len(doc.get('content', '')) > 200 else doc.get('content', '')
-                                st.text(content_preview)
-                            
-                            with col_action:
-                                if st.button(f"Keep This", key=f"keep_{i}_{j}"):
-                                    with st.spinner("Removing duplicates..."):
-                                        if remove_duplicates(group, doc.get('id')):
-                                            st.success("Duplicates removed successfully!")
-                                            st.rerun()
-                                        else:
-                                            st.error("Failed to remove duplicates")
-        else:
-            st.success("No duplicate documents detected in your repository")
-            
-    except Exception as e:
-        st.error(f"Duplicate detection error: {e}")
+                            for doc in sorted_docs[1:]:  # Remove all except the first
+                                doc_id = doc.get('id')
+                                cursor.execute("DELETE FROM documents WHERE id = %s", (doc_id,))
+                                removed_count += 1
+                    
+                    conn.commit()
+                
+                conn.close()
+                
+                if removed_count > 0:
+                    st.success(f"Removed {removed_count} duplicate documents from {groups_found} groups")
+                else:
+                    st.info("No duplicates found to remove")
+                    
+            except Exception as e:
+                st.error(f"Removal failed: {str(e)[:100]}")
+    
+    # Instructions for users
+    st.info("💡 **How to use:** First click 'Scan for Duplicates' to check, then click 'Remove Title Duplicates' to clean them.")
     
     st.markdown("---")
     
