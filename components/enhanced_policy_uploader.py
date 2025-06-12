@@ -59,23 +59,8 @@ def create_tier_bubbles(value, max_value=5):
 def render_enhanced_policy_uploader():
     """Render enhanced document uploader with intelligent gap analysis and recommendations."""
     
-    # Enhanced header matching Cyber Institute style
-    st.markdown(
-        """<div style="background: linear-gradient(135deg, #082454 0%, #10244D 50%, #133169 100%); padding: 2.5rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
-            <h1 style="color: white; margin-bottom: 1.2rem; font-size: 2.2rem; font-weight: 700; text-align: center;">
-                Intelligent Policy Analysis & Upload
-            </h1>
-            <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0; border: 1px solid rgba(255,255,255,0.2);">
-                <h3 style="color: #3D9BE9; margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600; text-align: center;">
-                    AI-Powered Gap Analysis & Recommendation Engine
-                </h3>
-                <p style="color: #e5e7eb; text-align: center; font-size: 1.1rem; line-height: 1.6; margin: 0;">
-                    Upload your draft policies, standards, regulations, or product specifications for comprehensive gap analysis and intelligent recommendations.
-                </p>
-            </div>
-        </div>""", 
-        unsafe_allow_html=True
-    )
+    # Compact header - removed the large banner
+    pass
     
     # Standalone report generation button (outside form)
     if 'latest_gap_report' in st.session_state:
