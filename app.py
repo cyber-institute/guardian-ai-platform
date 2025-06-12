@@ -413,28 +413,88 @@ def main():
         
         # Add Refresh Analysis button below navigation
         st.markdown("---")
-        if st.button("Refresh Analysis", help="Update all documents with comprehensive patent-based scoring", use_container_width=True):
-            with st.spinner("Applying comprehensive patent-based scoring to all documents..."):
-                try:
-                    # Apply comprehensive patent scoring to all documents
-                    from utils.comprehensive_patent_scoring import apply_comprehensive_patent_scoring
-                    from all_docs_tab import update_document_metadata
+        if st.button("Refresh Analysis", help="Update all documents with comprehensive patent-based scoring and duplicate cleanup", use_container_width=True):
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            
+            try:
+                # Step 1: Duplicate Detection and Cleanup
+                status_text.text("Step 1/4: Scanning for duplicate documents...")
+                progress_bar.progress(0.1)
+                
+                from utils.duplicate_cleanup import get_duplicate_summary, auto_cleanup_exact_duplicates
+                
+                duplicate_summary = get_duplicate_summary()
+                duplicates_removed = 0
+                
+                if duplicate_summary['total_duplicate_groups'] > 0:
+                    status_text.text(f"Found {duplicate_summary['total_duplicate_groups']} duplicate groups - cleaning...")
+                    progress_bar.progress(0.2)
                     
-                    processed = apply_comprehensive_patent_scoring()
+                    cleanup_result = auto_cleanup_exact_duplicates()
+                    duplicates_removed = cleanup_result['documents_removed']
                     
-                    # Also update metadata for improved extraction
-                    metadata_updated = update_document_metadata()
-                    
-                    if processed > 0:
-                        st.success(f"Applied patent-based scoring to {processed} documents with {metadata_updated} metadata updates")
-                    else:
-                        st.info("All documents are already up to date")
-                    
-                    # Clear session state to force refresh of displayed data
-                    st.session_state.clear()
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"Error updating documents: {e}")
+                    if duplicates_removed > 0:
+                        st.success(f"Removed {duplicates_removed} duplicate documents from {cleanup_result['groups_processed']} groups")
+                
+                progress_bar.progress(0.3)
+                
+                # Step 2: Apply comprehensive patent scoring
+                status_text.text("Step 2/4: Applying comprehensive patent-based scoring...")
+                progress_bar.progress(0.4)
+                
+                from utils.comprehensive_patent_scoring import apply_comprehensive_patent_scoring
+                processed = apply_comprehensive_patent_scoring()
+                
+                progress_bar.progress(0.6)
+                
+                # Step 3: Update metadata for improved extraction
+                status_text.text("Step 3/4: Updating document metadata...")
+                progress_bar.progress(0.7)
+                
+                from all_docs_tab import update_document_metadata
+                metadata_updated = update_document_metadata()
+                
+                progress_bar.progress(0.9)
+                
+                # Step 4: Final content scanning for remaining duplicates
+                status_text.text("Step 4/4: Final duplicate content scan...")
+                
+                # Check again for any content-based duplicates that might have been missed
+                final_duplicate_summary = get_duplicate_summary()
+                remaining_duplicates = final_duplicate_summary['total_duplicate_groups']
+                
+                progress_bar.progress(1.0)
+                status_text.text("Analysis complete!")
+                
+                # Summary results
+                results = []
+                if duplicates_removed > 0:
+                    results.append(f"Removed {duplicates_removed} duplicate documents")
+                if processed > 0:
+                    results.append(f"Updated scoring for {processed} documents")
+                if metadata_updated > 0:
+                    results.append(f"Enhanced metadata for {metadata_updated} documents")
+                if remaining_duplicates > 0:
+                    results.append(f"Found {remaining_duplicates} remaining duplicate groups for manual review")
+                
+                if results:
+                    st.success("Refresh Analysis Complete:\n" + "\n".join(f"• {result}" for result in results))
+                else:
+                    st.info("All documents are already up to date with no duplicates detected")
+                
+                if remaining_duplicates > 0:
+                    st.warning("Some duplicate groups remain and may require manual review in Repository Admin")
+                
+                # Clear session state to force refresh of displayed data
+                st.session_state.clear()
+                st.rerun()
+                
+            except Exception as e:
+                st.error(f"Error during refresh analysis: {e}")
+            finally:
+                progress_bar.empty()
+                status_text.empty()
     
     # Render content based on sidebar selection
     if st.session_state.nav_selection == "Policy Repository":
