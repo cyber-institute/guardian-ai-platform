@@ -643,7 +643,35 @@ def render():
     analyze_col1, analyze_col2 = st.columns([1, 2])
     
     with analyze_col1:
-        if st.button("Open Policy Analyzer", type="secondary", use_container_width=True):
+        st.markdown("""
+        <style>
+        .custom-policy-button {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 6px !important;
+            padding: 0.5rem 1rem !important;
+            font-size: 0.9rem !important;
+            font-weight: 500 !important;
+            text-align: center !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            box-shadow: 0 2px 4px rgba(30, 64, 175, 0.2) !important;
+            width: 180px !important;
+            height: 38px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        .custom-policy-button:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 8px rgba(30, 64, 175, 0.3) !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        if st.button("Policy Analyzer", key="policy_analyzer_btn", help="Open comprehensive policy analysis tool"):
             st.session_state.show_policy_analyzer = True
             st.rerun()
     
