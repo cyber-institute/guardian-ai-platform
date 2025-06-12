@@ -317,8 +317,6 @@ def render():
         st.session_state["display_mode"] = display_mode
         st.markdown('</div>', unsafe_allow_html=True)
     
-
-    
     st.markdown("---")  # Separator line
     
     # Create compact filter row
