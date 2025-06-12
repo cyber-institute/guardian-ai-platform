@@ -886,7 +886,7 @@ def render_minimal_list(docs):
             # Quick report generation
             has_scores = any([scores[key] > 0 for key in scores.keys()])
             if has_scores:
-                if st.button("📊 Quick Report", key=f"quick_report_{idx}"):
+                if st.button("Quick Report", key=f"quick_report_{idx}"):
                     from components.risk_report_interface import RiskReportInterface
                     interface = RiskReportInterface()
                     interface._generate_quick_report(doc)

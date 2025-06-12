@@ -5,7 +5,7 @@ import time
 def main():
     st.set_page_config(
         page_title="GUARDIAN - AI Risk Analysis Navigator",
-        page_icon="🛡️",
+        page_icon="",
         layout="wide",
         initial_sidebar_state="collapsed"
     )
@@ -42,7 +42,7 @@ def main():
     # Simple header
     st.markdown("""
     <div class="guardian-header">
-        <h1>🛡️ GUARDIAN</h1>
+        <h1>GUARDIAN</h1>
         <p>AI Risk Analysis Navigator</p>
     </div>
     """, unsafe_allow_html=True)
@@ -53,11 +53,11 @@ def main():
     
     # Simplified navigation
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
-        "📊 All Documents", 
-        "🛡️ Patent Systems", 
-        "🎯 AI Recommendations", 
-        "📈 LLM Enhancement",
-        "ℹ️ About"
+        "All Documents", 
+        "Patent Systems", 
+        "AI Recommendations", 
+        "LLM Enhancement",
+        "About"
     ])
     
     with tab1:
@@ -115,7 +115,7 @@ def get_analytics_cached():
 
 def render_documents_tab():
     """Optimized documents tab with pagination"""
-    st.header("📊 Document Repository")
+    st.header("Document Repository")
     
     # Quick stats
     with st.spinner("Loading analytics..."):
@@ -171,7 +171,7 @@ def render_documents_tab():
 
 def render_patent_tab():
     """Simplified patent tab"""
-    st.header("🛡️ Patent-Based Scoring Systems")
+    st.header("Patent-Based Scoring Systems")
     
     st.markdown("""
     ### GUARDIAN Patent Framework
@@ -205,7 +205,7 @@ def render_patent_tab():
 
 def render_recommendations_tab():
     """Simplified recommendations tab"""
-    st.header("🎯 AI-Powered Recommendations")
+    st.header("AI-Powered Recommendations")
     
     st.markdown("""
     ### Intelligent Document Discovery
@@ -235,7 +235,7 @@ def render_recommendations_tab():
 
 def render_llm_tab():
     """Simplified LLM enhancement tab"""
-    st.header("📈 LLM Enhancement System")
+    st.header("LLM Enhancement System")
     
     st.markdown("""
     ### Multi-LLM Ensemble Intelligence
