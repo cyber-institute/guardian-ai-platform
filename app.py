@@ -52,18 +52,20 @@ def main():
         background-color: #ffffff;
         padding-top: 0rem;
         padding-bottom: 2rem;
-        margin-top: -2rem;
+        margin-top: -4rem;
     }
     
     .quantum-header {
         background: transparent !important;
-        padding: 0.5rem clamp(1rem, 4vw, 3rem) !important;
-        margin-top: -1rem !important;
+        padding: 0.25rem clamp(1rem, 4vw, 3rem) !important;
+        margin-top: -3rem !important;
         margin-bottom: 0rem !important;
         text-align: center !important;
         width: 100% !important;
         display: block !important;
         overflow: hidden !important;
+        position: relative !important;
+        z-index: 10 !important;
     }
     
     .quantum-header-content {
