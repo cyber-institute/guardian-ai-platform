@@ -2609,7 +2609,7 @@ def render_document_management():
     
     from components.document_uploader import render_document_uploader, render_bulk_upload
     from utils.database import DatabaseManager
-    from utils.optimized_deletions import get_documents_for_deletion, batch_delete_documents, get_deletion_preview
+    from utils.optimized_deletions_fixed import get_documents_for_deletion, batch_delete_documents, get_deletion_preview
     
     db_manager = DatabaseManager()
     
@@ -2662,7 +2662,7 @@ def render_document_management():
             
             if criteria:
                 with st.spinner("Executing bulk deletion..."):
-                    from utils.optimized_deletions import bulk_delete_by_criteria
+                    from utils.optimized_deletions_fixed import bulk_delete_by_criteria
                     result = bulk_delete_by_criteria(criteria)
                 
                 if result['success']:

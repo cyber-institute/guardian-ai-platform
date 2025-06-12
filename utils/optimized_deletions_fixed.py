@@ -1,6 +1,6 @@
 """
-Optimized Bulk Deletion Operations for GUARDIAN
-Implements batch deletions and efficient database operations
+Optimized Bulk Deletion Operations for GUARDIAN - Fixed Version
+Implements batch deletions using the existing DatabaseManager
 """
 
 import streamlit as st
@@ -14,7 +14,7 @@ def get_documents_for_deletion():
         from utils.database import DatabaseManager
         db_manager = DatabaseManager()
         
-        # Use the execute_query method instead of direct connection
+        # Use the execute_query method
         documents = db_manager.execute_query("""
             SELECT id, title, document_type, created_at, source, 
                    COALESCE(CHAR_LENGTH(text_content), 0) as content_length
@@ -27,61 +27,36 @@ def get_documents_for_deletion():
             return documents
         else:
             return []
-        
-        cursor.execute("""
-            SELECT id, title, document_type, created_at, source, 
-                   COALESCE(CHAR_LENGTH(text_content), 0) as content_length
-            FROM documents 
-            ORDER BY created_at DESC
-            LIMIT 1000
-        """)
-        
-        documents = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        
-        return [dict(doc) for doc in documents]
-        
+            
     except Exception as e:
         st.error(f"Error loading documents: {e}")
         return []
 
 def batch_delete_documents(document_ids: List[int]) -> Dict[str, Any]:
     """
-    Optimized batch deletion of documents
+    Optimized batch deletion of documents using DatabaseManager
     Returns: {'success': bool, 'deleted_count': int, 'errors': List[str]}
     """
     if not document_ids:
         return {'success': False, 'deleted_count': 0, 'errors': ['No documents selected']}
     
     start_time = time.time()
-    deleted_count = 0
     errors = []
     
     try:
-        from utils.database import get_db_connection
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        from utils.database import DatabaseManager
+        db_manager = DatabaseManager()
         
-        # Start transaction for atomic operation
-        conn.autocommit = False
+        deleted_count = 0
         
-        # Create parameterized query for batch deletion
-        if len(document_ids) == 1:
-            # Single document deletion
-            cursor.execute("DELETE FROM documents WHERE id = %s", (document_ids[0],))
-        else:
-            # Batch deletion using IN clause
-            placeholders = ','.join(['%s'] * len(document_ids))
-            query = f"DELETE FROM documents WHERE id IN ({placeholders})"
-            cursor.execute(query, document_ids)
-        
-        deleted_count = cursor.rowcount
-        
-        # Commit the transaction
-        conn.commit()
-        cursor.close()
-        conn.close()
+        # Delete documents one by one using the DatabaseManager
+        for doc_id in document_ids:
+            try:
+                result = db_manager.execute_query(f"DELETE FROM documents WHERE id = {doc_id}")
+                if isinstance(result, int) and result > 0:
+                    deleted_count += 1
+            except Exception as e:
+                errors.append(f"Failed to delete document {doc_id}: {str(e)}")
         
         # Clear caches
         st.cache_data.clear()
@@ -91,18 +66,12 @@ def batch_delete_documents(document_ids: List[int]) -> Dict[str, Any]:
         return {
             'success': True,
             'deleted_count': deleted_count,
-            'errors': [],
+            'errors': errors,
             'execution_time': execution_time
         }
         
     except Exception as e:
         errors.append(f"Database error: {str(e)}")
-        try:
-            if 'conn' in locals():
-                conn.rollback()
-                conn.close()
-        except:
-            pass
         
         return {
             'success': False,
@@ -113,25 +82,20 @@ def batch_delete_documents(document_ids: List[int]) -> Dict[str, Any]:
 
 def bulk_delete_by_criteria(criteria: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Delete documents based on criteria (type, date range, etc.)
-    More efficient than individual selections for large datasets
+    Delete documents based on criteria using DatabaseManager
     """
     try:
-        from utils.database import get_db_connection
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        from utils.database import DatabaseManager
+        db_manager = DatabaseManager()
         
         # Build WHERE clause based on criteria
         where_clauses = []
-        params = []
         
         if criteria.get('document_type'):
-            where_clauses.append("document_type = %s")
-            params.append(criteria['document_type'])
+            where_clauses.append(f"document_type = '{criteria['document_type']}'")
         
         if criteria.get('before_date'):
-            where_clauses.append("created_at < %s")
-            params.append(criteria['before_date'])
+            where_clauses.append(f"created_at < '{criteria['before_date']}'")
         
         if criteria.get('content_empty'):
             where_clauses.append("(text_content IS NULL OR text_content = '')")
@@ -139,19 +103,12 @@ def bulk_delete_by_criteria(criteria: Dict[str, Any]) -> Dict[str, Any]:
         if not where_clauses:
             return {'success': False, 'deleted_count': 0, 'errors': ['No criteria specified']}
         
-        # Start transaction
-        conn.autocommit = False
-        
         # Execute deletion
         where_clause = " AND ".join(where_clauses)
         query = f"DELETE FROM documents WHERE {where_clause}"
         
-        cursor.execute(query, params)
-        deleted_count = cursor.rowcount
-        
-        conn.commit()
-        cursor.close()
-        conn.close()
+        result = db_manager.execute_query(query)
+        deleted_count = result if isinstance(result, int) else 0
         
         # Clear caches
         st.cache_data.clear()
@@ -163,13 +120,6 @@ def bulk_delete_by_criteria(criteria: Dict[str, Any]) -> Dict[str, Any]:
         }
         
     except Exception as e:
-        try:
-            if 'conn' in locals():
-                conn.rollback()
-                conn.close()
-        except:
-            pass
-        
         return {
             'success': False,
             'deleted_count': 0,
@@ -182,24 +132,24 @@ def get_deletion_preview(document_ids: List[int]) -> List[Dict[str, Any]]:
         return []
     
     try:
-        from utils.database import get_db_connection
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        from utils.database import DatabaseManager
+        db_manager = DatabaseManager()
         
-        placeholders = ','.join(['%s'] * len(document_ids))
+        # Create IN clause for multiple IDs
+        ids_str = ','.join(map(str, document_ids))
         query = f"""
             SELECT id, title, document_type, created_at
             FROM documents 
-            WHERE id IN ({placeholders})
+            WHERE id IN ({ids_str})
             ORDER BY created_at DESC
         """
         
-        cursor.execute(query, document_ids)
-        documents = cursor.fetchall()
-        cursor.close()
-        conn.close()
+        documents = db_manager.execute_query(query)
         
-        return [dict(doc) for doc in documents]
+        if isinstance(documents, list):
+            return documents
+        else:
+            return []
         
     except Exception as e:
         st.error(f"Error loading deletion preview: {e}")
