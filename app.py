@@ -2558,49 +2558,9 @@ def render_quantum_ethics_assessment():
 def render_repository_admin_section():
     """Render the Repository Admin section with all administrative functions."""
     
-    # Enhanced header matching Cyber Institute style
-    st.markdown(
-        """<div style="background: linear-gradient(135deg, #082454 0%, #10244D 50%, #133169 100%); padding: 2.5rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
-            <h1 style="color: white; margin-bottom: 1.2rem; font-size: 2.2rem; font-weight: 700; text-align: center;">
-                Repository Administration
-            </h1>
-            <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0; border: 1px solid rgba(255,255,255,0.2);">
-                <h3 style="color: #3D9BE9; margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600; text-align: center;">
-                    System Management & Configuration Hub
-                </h3>
-                <p style="color: #e5e7eb; text-align: center; font-size: 1.1rem; line-height: 1.6; margin: 0;">
-                    Administrative tools and system monitoring for GUARDIAN platform management
-                </p>
-            </div>
-        </div>""", 
-        unsafe_allow_html=True
-    )
-    
-    admin_section = st.selectbox(
-        "Select Administrative Function:",
-        [
-            "Database Status & Management",
-            "Document Ingestion & Upload",
-            "Patent Scoring System Management",
-            "System Logs & Monitoring",
-            "Configuration & Settings"
-        ]
-    )
-    
-    if admin_section == "Database Status & Management":
-        render_database_status()
-        
-    elif admin_section == "Document Ingestion & Upload":
-        render_document_management()
-        
-    elif admin_section == "Patent Scoring System Management":
-        render_patent_scoring_management()
-        
-    elif admin_section == "System Logs & Monitoring":
-        render_system_monitoring()
-        
-    else:  # Configuration & Settings
-        render_system_configuration()
+    # Use ultra-fast admin loader that eliminates database queries during page load
+    from utils.fast_admin_loader import render_fast_repository_admin
+    render_fast_repository_admin()
 
 def render_document_management():
     """Document ingestion and upload management."""
