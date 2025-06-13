@@ -404,7 +404,7 @@ def main():
         <div class="quantum-header">
             <div class="quantum-header-content">
                 <img src="data:image/png;base64,{owl_data}" class="guardian-logo" alt="GUARDIAN Logo">
-                <h1>GUARDIAN</h1>
+                <h1 title="GUARDIAN (Global Unified Assessment for Risk Detection, Intelligence, Analysis, and Notification) represents the world's first implementation of a complete patent-pending trilogy for emerging technology governance. The system integrates three revolutionary assessment frameworks through an intelligent multi-LLM ensemble architecture that processes documents with unprecedented accuracy and consistency.">GUARDIAN</h1>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -413,7 +413,7 @@ def main():
         st.markdown("""
         <div class="quantum-header">
             <div class="quantum-header-content">
-                <h1>GUARDIAN</h1>
+                <h1 title="GUARDIAN (Global Unified Assessment for Risk Detection, Intelligence, Analysis, and Notification) represents the world's first implementation of a complete patent-pending trilogy for emerging technology governance. The system integrates three revolutionary assessment frameworks through an intelligent multi-LLM ensemble architecture that processes documents with unprecedented accuracy and consistency.">GUARDIAN</h1>
             </div>
         </div>
         """, unsafe_allow_html=True)
