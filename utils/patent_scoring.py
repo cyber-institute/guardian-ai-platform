@@ -81,32 +81,40 @@ def draw_qcmea_scorecard(title, score):
                 {i}
             </div>"""
     
-    # Display scorecard
+    # Display scorecard using Streamlit's native components to avoid HTML rendering issues
     with st.container():
-        st.markdown(f"**{title}**")
+        st.subheader(title)
         
-        # Current level badges
-        st.markdown(f"""
-        <div style='text-align: center; margin: 1rem 0;'>
-            {badges_html}
-        </div>
-        """, unsafe_allow_html=True)
+        # Display maturity level with colored indicators
+        cols = st.columns(5)
+        for i in range(1, 6):
+            with cols[i-1]:
+                level_def = level_definitions[i]
+                if i <= maturity_level:
+                    st.markdown(f"""
+                    <div style='text-align: center; padding: 10px; background-color: {level_def["color"]}; 
+                                color: white; border-radius: 50%; width: 40px; height: 40px; 
+                                line-height: 20px; font-weight: bold; margin: 0 auto;'>
+                        {i}
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.markdown(f"""
+                    <div style='text-align: center; padding: 10px; background-color: #f3f4f6; 
+                                color: #9ca3af; border-radius: 50%; width: 40px; height: 40px; 
+                                line-height: 20px; border: 2px dashed #d1d5db; margin: 0 auto;'>
+                        {i}
+                    </div>
+                    """, unsafe_allow_html=True)
         
-        # Current level details
+        st.markdown("---")
+        
+        # Current level details using native Streamlit components
         current_level = level_definitions[maturity_level]
-        st.markdown(f"""
-        <div style='background: #f8fafc; padding: 1rem; border-radius: 8px; border-left: 4px solid {current_level["color"]};'>
-            <h4 style='color: {current_level["color"]}; margin: 0 0 0.5rem 0;'>
-                Level {maturity_level}: {current_level["name"]}
-            </h4>
-            <p style='margin: 0 0 0.5rem 0; font-size: 0.9rem; color: #374151;'>
-                <strong>Description:</strong> {current_level["description"]}
-            </p>
-            <p style='margin: 0; font-size: 0.9rem; color: #374151;'>
-                <strong>Recommended Actions:</strong> {current_level["actions"]}
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
+        
+        st.markdown(f"### Level {maturity_level}: {current_level['name']}")
+        st.info(f"**Description:** {current_level['description']}")
+        st.success(f"**Recommended Actions:** {current_level['actions']}")
 
 def draw_ai_ethics_scorecard(title, ecs_score, as_score, las_score, ifs_score):
     """
