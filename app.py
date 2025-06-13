@@ -667,23 +667,12 @@ def render_maturity_subsection():
 def render_convergence_ai_mathematical_framework():
     """Render the Convergence AI Mathematical Framework section with detailed implementation."""
     
-    # Enhanced header matching patent documentation style
-    st.markdown(
-        """<div style="background: linear-gradient(135deg, #1a365d 0%, #2c5282 50%, #3182ce 100%); padding: 2.5rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
-            <h1 style="color: white; margin-bottom: 1.2rem; font-size: 2.2rem; font-weight: 700; text-align: center;">
-                🛡️ CONVERGENCE AI Mathematical Framework
-            </h1>
-            <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0; border: 1px solid rgba(255,255,255,0.2);">
-                <h3 style="color: #63b3ed; margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600; text-align: center;">
-                    Patent-Protected Anti-Bias & Anti-Poisoning Mathematical Implementation
-                </h3>
-                <p style="color: #bee3f8; text-align: center; font-size: 1.1rem; line-height: 1.6; margin: 0;">
-                    Advanced multi-core, quantum-ready orchestration with graduate-level mathematical sophistication for high-confidence, bias-resilient AI inference.
-                </p>
-            </div>
-        </div>""", 
-        unsafe_allow_html=True
-    )
+    from utils.theme_config import get_compact_header_style
+    
+    st.markdown(get_compact_header_style(
+        "CONVERGENCE AI Mathematical Framework",
+        "Patent-Protected Anti-Bias & Anti-Poisoning Mathematical Implementation with Advanced Multi-Core Quantum-Ready Orchestration"
+    ), unsafe_allow_html=True)
     
     # Main framework sections
     framework_tabs = st.tabs([
@@ -807,7 +796,9 @@ def render_innovation_overview():
 def render_mathematical_pipeline():
     """Render the complete mathematical pipeline from ingestion to scoring."""
     
-    st.markdown("### 🔢 Complete Mathematical Pipeline")
+    from utils.theme_config import get_section_header_style
+    
+    st.markdown(get_section_header_style("Complete Mathematical Pipeline"), unsafe_allow_html=True)
     
     st.markdown("""
     The Convergence AI system implements a sophisticated mathematical pipeline that processes documents 
@@ -825,22 +816,23 @@ def render_mathematical_pipeline():
         "Final Synthesis"
     ]
     
-    # Create visual pipeline
+    # Create visual pipeline with professional styling
     cols = st.columns(len(pipeline_stages))
     for i, (col, stage) in enumerate(zip(cols, pipeline_stages)):
         with col:
             st.markdown(f"""
-            <div style="background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%); 
-                        padding: 1rem; border-radius: 8px; text-align: center; margin: 0.5rem 0;">
-                <div style="color: white; font-weight: bold; font-size: 0.9rem;">{i+1}</div>
-                <div style="color: #bee3f8; font-size: 0.8rem; margin-top: 0.5rem;">{stage}</div>
+            <div style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); 
+                        padding: 1rem; border-radius: 6px; text-align: center; margin: 0.25rem;
+                        border: 1px solid #e5e7eb;">
+                <div style="color: white; font-weight: 600; font-size: 0.9rem;">{i+1}</div>
+                <div style="color: #e5e7eb; font-size: 0.75rem; margin-top: 0.5rem;">{stage}</div>
             </div>
             """, unsafe_allow_html=True)
     
     st.markdown("---")
     
     # Detailed mathematical formulations
-    st.markdown("### 📊 Core Mathematical Formulations")
+    st.markdown(get_section_header_style("Core Mathematical Formulations"), unsafe_allow_html=True)
     
     # Generate formulas once for the entire section
     from utils.formula_generator import generate_convergence_ai_formulas, display_formula_png
@@ -854,7 +846,7 @@ def render_mathematical_pipeline():
     math_sections = st.tabs(["Feature Extraction", "Bias Scoring", "Similarity Analysis", "Consensus Algorithm"])
     
     with math_sections[0]:
-        st.markdown("#### 🔍 Feature Vector Generation")
+        st.markdown("#### Feature Vector Generation")
         st.markdown("**100-Dimensional Feature Space:**")
         
         if formulas:
@@ -887,7 +879,7 @@ def render_mathematical_pipeline():
         """)
     
     with math_sections[1]:
-        st.markdown("#### 🎯 Multi-Layered Bias Detection")
+        st.markdown("#### Multi-Layered Bias Detection")
         
         if formulas:
             try:
