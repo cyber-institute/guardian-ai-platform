@@ -576,28 +576,38 @@ def render():
             if st.button("Process URL", type="primary", use_container_width=True):
                 with st.spinner("Processing URL content..."):
                     try:
-                        # Use the enhanced URL processing from admin loader
+                        st.info(f"Processing URL: {url_input}")
+                        
+                        # Import required modules
                         import requests
                         import trafilatura
                         from utils.comprehensive_scoring import comprehensive_document_scoring
                         from utils.database import db_manager
                         import uuid
                         
+                        st.info("✓ Modules imported successfully")
+                        
                         # Fetch and process URL content
                         headers = {
                             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
                         }
+                        st.info("🌐 Fetching URL content...")
                         response = requests.get(url_input, headers=headers, timeout=30)
                         response.raise_for_status()
+                        st.info(f"✓ URL fetched successfully (Status: {response.status_code})")
                         
                         # Extract content
+                        st.info("📄 Extracting text content...")
                         content = trafilatura.extract(response.text, include_comments=False, include_tables=True)
+                        st.info(f"✓ Content extracted ({len(content) if content else 0} characters)")
                         
                         if content and len(content.strip()) > 100:
                             # Generate basic metadata
                             title = url_input.split('/')[-1] or "URL Document"
+                            st.info(f"📝 Document title: {title}")
                             
                             # Check for duplicates first
+                            st.info("🔍 Checking for duplicates...")
                             try:
                                 from utils.duplicate_detector import check_document_duplicates
                                 
@@ -624,8 +634,10 @@ def render():
                                 st.warning(f"Duplicate check failed: {str(e)}")
                             
                             # Generate document ID and score the document
+                            st.info("📊 Calculating comprehensive scores...")
                             doc_id = str(uuid.uuid4())
                             scores = comprehensive_document_scoring(content, title)
+                            st.info(f"✓ Scoring complete: AI={scores.get('ai_cybersecurity', 0)}, Quantum={scores.get('quantum_cybersecurity', 0)}")
                             
                             # Save to database using db_manager
                             document_data = {
@@ -641,13 +653,13 @@ def render():
                                 'quantum_ethics_score': scores.get('quantum_ethics', 0)
                             }
                             
+                            st.info("💾 Saving document to database...")
                             result = db_manager.save_document(document_data)
                             
                             if result:
-                                # Clear document cache to show new document immediately
-                                fetch_documents_cached.clear()
                                 st.success("URL content processed successfully!")
                                 st.info("Document added to collection. Refresh to see it in the list.")
+                                st.balloons()
                             else:
                                 st.error("Failed to save document to database")
                         else:
