@@ -2034,7 +2034,22 @@ def render_grid_view(docs):
             
             # Use database metadata with comprehensive HTML cleaning
             title = ultra_clean_metadata(doc.get('title', 'Untitled Document'))
-            author_org = ultra_clean_metadata(doc.get('author_organization', 'Unknown'))
+            
+            # Extract author from metadata JSONB field if available
+            metadata = doc.get('metadata', {})
+            if isinstance(metadata, str):
+                import json
+                try:
+                    metadata = json.loads(metadata)
+                except:
+                    metadata = {}
+            
+            # Get author from metadata or fallback to organization
+            author = metadata.get('author', '') if metadata else ''
+            if not author or author == 'Unknown':
+                author_org = ultra_clean_metadata(doc.get('author_organization', 'Unknown'))
+            else:
+                author_org = ultra_clean_metadata(author)
             
             # Clean date field safely to prevent </div> artifacts
             pub_date = clean_date_safely(doc)
