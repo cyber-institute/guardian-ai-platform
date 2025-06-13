@@ -840,10 +840,18 @@ def render_mathematical_pipeline():
     formulas = None
     try:
         formulas = generate_convergence_ai_formulas()
+        st.success("Mathematical formulas rendered as high-quality PNG images for enhanced professional presentation")
     except Exception as e:
-        st.warning("Formula PNGs unavailable, using text fallback")
+        st.error("Formula rendering system temporarily unavailable - displaying LaTeX fallback")
     
-    math_sections = st.tabs(["Feature Extraction", "Bias Scoring", "Similarity Analysis", "Consensus Algorithm"])
+    math_sections = st.tabs([
+        "Feature Extraction", 
+        "Bias Detection", 
+        "Poisoning Analysis", 
+        "Similarity Metrics", 
+        "Consensus Algorithm",
+        "Quantum Orchestration"
+    ])
     
     with math_sections[0]:
         st.markdown("#### Feature Vector Generation")
@@ -879,17 +887,23 @@ def render_mathematical_pipeline():
         """)
     
     with math_sections[1]:
-        st.markdown("#### Multi-Layered Bias Detection")
+        st.markdown("#### Advanced Multi-Layered Bias Detection")
         
         if formulas:
             try:
                 st.markdown("**Composite Bias Score:**")
-                display_formula_png(formulas["bias_composite"], "Three-layer bias detection system")
+                display_formula_png(formulas["bias_composite"], "Three-layer bias detection system with weighted components")
                 
-                st.markdown("**Statistical Layer:**")
-                display_formula_png(formulas["bias_statistical"], "Z-score based frequency analysis")
-                display_formula_png(formulas["z_score"], "Standard deviation threshold detection")
-            except:
+                st.markdown("**Pattern Recognition Layer:**")
+                display_formula_png(formulas["bias_pattern"], "Binary pattern matching with comprehensive bias indicators")
+                
+                st.markdown("**Statistical Analysis Layer:**")
+                display_formula_png(formulas["bias_statistical"], "Z-score based frequency distribution analysis")
+                display_formula_png(formulas["z_score"], "Standard deviation threshold detection for outliers")
+                
+                st.markdown("**Contextual Mapping Layer:**")
+                display_formula_png(formulas["bias_contextual"], "Semantic embedding similarity with bias reference vectors")
+            except Exception as e:
                 st.markdown("**Composite Bias Score:**")
                 st.latex(r"B(text) = 0.4 \times B_{pattern} + 0.3 \times B_{statistical} + 0.3 \times B_{contextual}")
                 st.markdown("**Statistical Analysis:**")
@@ -901,14 +915,42 @@ def render_mathematical_pipeline():
             st.latex(r"B_{statistical} = \min\left(2.0 \times \frac{\sum(Z > 2.0)}{n_{words}}, 1.0\right)")
         
         st.markdown("""
-        **Detection Layers:**
-        - **Pattern Recognition:** 50+ bias indicators across categories
-        - **Statistical Analysis:** Z-score frequency distribution analysis  
-        - **Contextual Mapping:** Semantic relationship bias detection
-        - **Threshold:** 2.0σ for 97.5% confidence intervals
+        **Advanced Detection Framework:**
+        - **Pattern Recognition:** 50+ bias indicators across demographic, cultural, and ideological categories
+        - **Statistical Analysis:** Multi-sigma frequency distribution analysis with 97.5% confidence intervals
+        - **Contextual Mapping:** Deep semantic relationship bias detection using embedding similarity
+        - **Validation Threshold:** Triple-layer consensus with 2.0σ statistical significance
         """)
     
     with math_sections[2]:
+        st.markdown("#### Advanced Poisoning Detection & Analysis")
+        
+        if formulas:
+            try:
+                st.markdown("**Composite Poisoning Score:**")
+                display_formula_png(formulas["poisoning_score"], "Two-layer poisoning detection with adversarial and anomaly components")
+                
+                st.markdown("**Adversarial Attack Detection:**")
+                display_formula_png(formulas["adversarial_detection"], "Trigger pattern similarity matching")
+                
+                st.markdown("**Statistical Anomaly Detection:**")
+                display_formula_png(formulas["anomaly_detection"], "Mahalanobis distance threshold analysis")
+            except Exception as e:
+                st.markdown("**Composite Poisoning Score:**")
+                st.latex(r"P(text) = 0.6 \times P_{adversarial} + 0.4 \times P_{anomaly}")
+        else:
+            st.markdown("**Composite Poisoning Score:**")
+            st.latex(r"P(text) = 0.6 \times P_{adversarial} + 0.4 \times P_{anomaly}")
+        
+        st.markdown("""
+        **Advanced Poisoning Protection:**
+        - **Adversarial Detection:** Pattern matching against known attack vectors and trigger phrases
+        - **Statistical Anomaly:** Multivariate outlier detection using Mahalanobis distance
+        - **Threshold Analysis:** Dynamic threshold adjustment based on content domain
+        - **Resistance Level:** 75% poisoning resistance requirement for validation
+        """)
+    
+    with math_sections[3]:
         st.markdown("#### Advanced Similarity Analysis")
         
         if formulas:
