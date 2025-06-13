@@ -8,23 +8,13 @@ import streamlit as st
 def render_fast_repository_admin():
     """Ultra-fast repository admin that loads instantly without any database queries"""
     
-    # Enhanced header (no database calls)
-    st.markdown(
-        """<div style="background: linear-gradient(135deg, #082454 0%, #10244D 50%, #133169 100%); padding: 2.5rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
-            <h1 style="color: white; margin-bottom: 1.2rem; font-size: 2.2rem; font-weight: 700; text-align: center;">
-                Repository Administration
-            </h1>
-            <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0; border: 1px solid rgba(255,255,255,0.2);">
-                <h3 style="color: #3D9BE9; margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600; text-align: center;">
-                    System Management & Configuration Hub
-                </h3>
-                <p style="color: #e5e7eb; text-align: center; font-size: 1.1rem; line-height: 1.6; margin: 0;">
-                    Administrative tools and system monitoring for GUARDIAN platform management
-                </p>
-            </div>
-        </div>""", 
-        unsafe_allow_html=True
-    )
+    # Professional header with unified theme
+    from utils.theme_config import get_compact_header_style
+    
+    st.markdown(get_compact_header_style(
+        "Repository Administration",
+        "System Management & Configuration Hub for GUARDIAN Platform"
+    ), unsafe_allow_html=True)
     
     # Quick status indicator (no database calls)
     col1, col2, col3 = st.columns(3)
@@ -199,18 +189,14 @@ def render_fast_system_configuration():
 def render_multillm_url_analysis():
     """Enhanced MultiLLM URL Analysis - Primary Repository Admin Feature"""
     
-    # Enhanced header for URL Analysis
-    st.markdown(
-        """<div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
-            <h2 style="color: white; margin-bottom: 1rem; font-size: 1.8rem; font-weight: 700; text-align: center;">
-                🔬 MultiLLM URL Analysis Engine
-            </h2>
-            <p style="color: #e0f2fe; text-align: center; font-size: 1.1rem; line-height: 1.5; margin: 0;">
-                Advanced document extraction and analysis using intelligent ensemble processing
-            </p>
-        </div>""", 
-        unsafe_allow_html=True
-    )
+    # Professional header for URL Analysis
+    from utils.theme_config import get_compact_header_style
+    
+    st.markdown(get_compact_header_style(
+        "MultiLLM URL Analysis Engine",
+        "Advanced Document Extraction and Analysis Using Intelligent Ensemble Processing",
+        bg_color="primary_blue"
+    ), unsafe_allow_html=True)
     
     # URL input section
     st.markdown("### Document URL Analysis")
@@ -225,7 +211,7 @@ def render_multillm_url_analysis():
     
     with col2:
         st.markdown("<br>", unsafe_allow_html=True)  # Spacing
-        if st.button("🔍 Analyze URL", type="primary", use_container_width=True):
+        if st.button("Analyze URL", type="primary", use_container_width=True):
             if url_input:
                 analyze_url_with_multillm(url_input)
             else:
@@ -262,11 +248,11 @@ def render_multillm_url_analysis():
     st.markdown("---")
     st.markdown("#### Recent URL Analyses")
     
-    if st.button("🔄 Refresh Analysis History"):
+    if st.button("Refresh Analysis History"):
         st.rerun()
     
     # Display recent URL analysis results (placeholder for now)
-    with st.expander("📊 Analysis History", expanded=False):
+    with st.expander("Analysis History", expanded=False):
         st.info("URL analysis history will be displayed here once analyses are performed.")
 
 def analyze_url_with_multillm(url_input):

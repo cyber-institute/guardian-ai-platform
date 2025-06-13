@@ -909,7 +909,7 @@ def render_mathematical_pipeline():
         """)
     
     with math_sections[2]:
-        st.markdown("#### 📐 Advanced Similarity Analysis")
+        st.markdown("#### Advanced Similarity Analysis")
         
         if formulas:
             try:
@@ -945,7 +945,7 @@ def render_mathematical_pipeline():
         """)
     
     with math_sections[3]:
-        st.markdown("#### ⚖️ Weighted Consensus Algorithm")
+        st.markdown("#### Weighted Consensus Algorithm")
         
         if formulas:
             try:
