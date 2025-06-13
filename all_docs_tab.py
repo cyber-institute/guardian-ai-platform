@@ -635,10 +635,43 @@ def render():
     
     with upload_col2:
         st.markdown('<div class="upload-section"><h4>🌐 Add from URL</h4></div>', unsafe_allow_html=True)
+        
+        # Metadata Verification History Viewer
+        if st.session_state.get('metadata_verification_history'):
+            with st.expander("📋 Metadata Verification History", expanded=False):
+                st.markdown("**Recent metadata verifications:**")
+                
+                for i, entry in enumerate(reversed(st.session_state.metadata_verification_history[-5:])):
+                    with st.container():
+                        col1, col2, col3 = st.columns([3, 2, 1])
+                        
+                        with col1:
+                            title_preview = entry['verified_metadata']['title'][:60]
+                            if len(entry['verified_metadata']['title']) > 60:
+                                title_preview += "..."
+                            st.write(f"**{title_preview}**")
+                            url_preview = entry['url'][:50]
+                            if len(entry['url']) > 50:
+                                url_preview += "..."
+                            st.caption(f"URL: {url_preview}")
+                        
+                        with col2:
+                            st.write(f"Type: {entry['verified_metadata']['document_type']}")
+                            st.caption(f"Verified: {entry['timestamp'][:16]}")
+                        
+                        with col3:
+                            if st.button(f"View Details", key=f"history_{i}"):
+                                st.json(entry)
+                        
+                        st.divider()
+                
+                if len(st.session_state.metadata_verification_history) > 5:
+                    st.info(f"Showing 5 most recent verifications. Total: {len(st.session_state.metadata_verification_history)}")
+        
         url_input = st.text_input(
             "Enter document URL",
             placeholder="https://example.com/document.pdf",
-            help="URL processing is automatic - just paste and press Enter",
+            help="URL processing with interactive metadata verification",
             label_visibility="collapsed"
         )
         
