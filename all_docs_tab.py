@@ -1093,23 +1093,25 @@ def render_card_view(docs):
                 </div>
             """, unsafe_allow_html=True)
             
-            # ISOLATED STEP 3: Calculate scores separately (after metadata display)
-            try:
-                scores = comprehensive_document_scoring_cached(raw_content, str(title))
-                
-                # Display scores in completely separate section
-                st.markdown(f"""
-                    <div style='margin:8px;padding:8px;background:#f8f9fa;border-radius:6px'>
-                        <div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px'>
-                            <div><strong>AI Cybersecurity Maturity:</strong> {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity')}</div>
-                            <div><strong>Quantum Cybersecurity Maturity:</strong> {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity')}</div>
-                            <div><strong>AI Ethics:</strong> {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics')}</div>
-                            <div><strong>Quantum Ethics:</strong> {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics')}</div>
-                        </div>
+            # Use actual database scores instead of recalculating (consistent with other views)
+            scores = {
+                'ai_cybersecurity': doc.get('ai_cybersecurity_score', 0) or 0,
+                'quantum_cybersecurity': doc.get('quantum_cybersecurity_score', 0) or 0,
+                'ai_ethics': doc.get('ai_ethics_score', 0) or 0,
+                'quantum_ethics': doc.get('quantum_ethics_score', 0) or 0
+            }
+            
+            # Display scores using database values
+            st.markdown(f"""
+                <div style='margin:8px;padding:8px;background:#f8f9fa;border-radius:6px'>
+                    <div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px'>
+                        <div><strong>AI Cybersecurity Maturity:</strong> {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity', raw_content, title)}</div>
+                        <div><strong>Quantum Cybersecurity Maturity:</strong> {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity', raw_content, title)}</div>
+                        <div><strong>AI Ethics:</strong> {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics', raw_content, title)}</div>
+                        <div><strong>Quantum Ethics:</strong> {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics', raw_content, title)}</div>
                     </div>
-                """, unsafe_allow_html=True)
-            except Exception as e:
-                st.error(f"Scoring error: {e}")
+                </div>
+            """, unsafe_allow_html=True)
             
             # ISOLATED STEP 4: Display clean content preview (completely separate from scoring)
             with st.expander("Intelligent Content Preview"):
