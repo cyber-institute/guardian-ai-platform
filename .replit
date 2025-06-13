@@ -1,6 +1,6 @@
 run = "streamlit run app.py"
 language = "python3"
-modules = ["python-3.11", "postgresql-16"]
+modules = ["python-3.11", "postgresql-16", "python3"]
 
 [nix]
 packages = ["cairo", "catch2", "ffmpeg-full", "fmt", "freetype", "ghostscript", "glibcLocales", "gobject-introspection", "gtk3", "lcms2", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "muparserx", "nano", "nlohmann_json", "openjpeg", "pkg-config", "poppler_utils", "qhull", "spdlog", "tcl", "tk", "zlib"]

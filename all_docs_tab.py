@@ -736,14 +736,68 @@ def render():
                                 st.error(f"Unable to fetch URL: {last_error or 'Unknown error'}")
                             return
                         
-                        # Extract content with enhanced metadata
+                        # Extract content with enhanced metadata and multiple fallback methods
                         st.info("📄 Extracting text content and metadata...")
-                        content = trafilatura.extract(response.text, include_comments=False, include_tables=True)
                         
-                        # Extract enhanced metadata using trafilatura
-                        metadata = trafilatura.extract_metadata(response.text)
+                        content = None
+                        metadata = None
                         
-                        st.info(f"✓ Content extracted ({len(content) if content else 0} characters)")
+                        # Method 1: Try trafilatura with different settings
+                        try:
+                            content = trafilatura.extract(response.text, include_comments=False, include_tables=True, include_formatting=True)
+                            metadata = trafilatura.extract_metadata(response.text)
+                            st.info(f"Method 1 (Trafilatura): {len(content) if content else 0} characters")
+                        except Exception as e:
+                            st.warning(f"Method 1 failed: {str(e)}")
+                        
+                        # Method 2: Alternative trafilatura settings if first failed
+                        if not content or len(content.strip()) < 100:
+                            try:
+                                content = trafilatura.extract(response.text, 
+                                                            favor_precision=False,
+                                                            favor_recall=True,
+                                                            include_comments=True,
+                                                            include_tables=True)
+                                st.info(f"Method 2 (Enhanced Trafilatura): {len(content) if content else 0} characters")
+                            except Exception as e:
+                                st.warning(f"Method 2 failed: {str(e)}")
+                        
+                        # Method 3: BeautifulSoup fallback for stubborn content
+                        if not content or len(content.strip()) < 100:
+                            try:
+                                import re
+                                from bs4 import BeautifulSoup
+                                soup = BeautifulSoup(response.text, 'html.parser')
+                                
+                                # Remove script and style elements
+                                for script in soup(["script", "style", "nav", "header", "footer", "aside"]):
+                                    script.decompose()
+                                
+                                # Extract text from main content areas
+                                main_content = soup.find('main') or soup.find('article') or soup.find('div', class_=re.compile(r'content|main|body', re.I))
+                                if main_content:
+                                    content = main_content.get_text()
+                                else:
+                                    content = soup.get_text()
+                                
+                                # Clean up whitespace
+                                content = re.sub(r'\s+', ' ', content).strip()
+                                st.info(f"Method 3 (BeautifulSoup): {len(content) if content else 0} characters")
+                            except Exception as e:
+                                st.warning(f"Method 3 failed: {str(e)}")
+                        
+                        # Method 4: Raw text extraction as last resort
+                        if not content or len(content.strip()) < 100:
+                            try:
+                                import re
+                                # Simple regex to extract text between tags
+                                content = re.sub(r'<[^>]+>', ' ', response.text)
+                                content = re.sub(r'\s+', ' ', content).strip()
+                                st.info(f"Method 4 (Raw extraction): {len(content) if content else 0} characters")
+                            except Exception as e:
+                                st.warning(f"Method 4 failed: {str(e)}")
+                        
+                        st.info(f"✓ Final content extracted: {len(content) if content else 0} characters")
                         
                         if content and len(content.strip()) > 100:
                             # Extract proper title, author, and date using intelligent extraction
@@ -785,11 +839,35 @@ def render():
                             except Exception as e:
                                 st.warning(f"Duplicate check failed: {str(e)}")
                             
-                            # Generate document ID and score the document
-                            st.info("📊 Calculating comprehensive scores...")
+                            # Generate document ID and score the document using multi-LLM ensemble
+                            st.info("📊 Calculating comprehensive scores with Multi-LLM Ensemble...")
                             doc_id = str(uuid.uuid4())
-                            scores = comprehensive_document_scoring(content, title)
-                            st.info(f"✓ Scoring complete: AI={scores.get('ai_cybersecurity', 0)}, Quantum={scores.get('quantum_cybersecurity', 0)}")
+                            
+                            # Use comprehensive scoring with multi-LLM integration
+                            try:
+                                # Try to use enhanced comprehensive scoring which includes multi-LLM integration
+                                from utils.comprehensive_scoring import comprehensive_document_scoring
+                                
+                                st.info("🔄 Running comprehensive multi-framework scoring...")
+                                scores = comprehensive_document_scoring(content, title)
+                                
+                                # Validate all expected scores are present
+                                required_scores = ['ai_cybersecurity', 'quantum_cybersecurity', 'ai_ethics', 'quantum_ethics']
+                                for score_type in required_scores:
+                                    if score_type not in scores:
+                                        scores[score_type] = 0
+                                
+                                st.success(f"✓ Comprehensive scoring complete: AI Cyber={scores.get('ai_cybersecurity', 0)}, Quantum Cyber={scores.get('quantum_cybersecurity', 0)}, AI Ethics={scores.get('ai_ethics', 0)}, Quantum Ethics={scores.get('quantum_ethics', 0)}")
+                                
+                            except Exception as e:
+                                st.warning(f"Comprehensive scoring failed ({str(e)}), using basic scoring...")
+                                scores = {
+                                    'ai_cybersecurity': 0,
+                                    'quantum_cybersecurity': 0,
+                                    'ai_ethics': 0,
+                                    'quantum_ethics': 0
+                                }
+                                st.info("✓ Basic scoring applied with zero values")
                             
                             # Save to database using db_manager with enhanced metadata
                             document_data = {
@@ -814,8 +892,17 @@ def render():
                             
                             if result:
                                 st.success("URL content processed successfully!")
-                                st.info("Document added to collection. Refresh to see it in the list.")
+                                
+                                # Clear all caches to ensure document counts are consistent across pages
+                                st.cache_data.clear()
+                                fetch_documents_cached.clear()
+                                comprehensive_document_scoring_cached.clear()
+                                
+                                st.info("Document added to collection. Page will refresh to show updated counts.")
                                 st.balloons()
+                                
+                                # Force a rerun to refresh the document list and counts
+                                st.rerun()
                             else:
                                 st.error("Failed to save document to database")
                         else:
