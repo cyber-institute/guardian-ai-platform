@@ -1278,6 +1278,14 @@ def render():
                                 if 'quantum' in title_lower:
                                     quantum_score = min(quantum_score * 1.5, 100)
                                 
+                                # Special boost for quantum policy documents
+                                if any(phrase in combined_text for phrase in ['quantum policy', 'quantum approach', 'quantum strategy']):
+                                    quantum_score = min(quantum_score + 25, 100)
+                                
+                                # Boost for government quantum initiatives
+                                if any(phrase in combined_text for phrase in ['national quantum initiative', 'quantum security', 'quantum framework']):
+                                    quantum_score = min(quantum_score + 20, 100)
+                                
                                 # Calculate final scores with proper scaling
                                 return {
                                     'ai_cybersecurity': min(int((ai_score + cyber_score) * 1.2), 100),
@@ -1288,6 +1296,41 @@ def render():
                             
                             scores = enhanced_quantum_scoring(clean_content, clean_title)
                             st.success(f"✓ Enhanced quantum scoring complete: AI Cyber={scores.get('ai_cybersecurity', 0)}, Quantum Cyber={scores.get('quantum_cybersecurity', 0)}, AI Ethics={scores.get('ai_ethics', 0)}, Quantum Ethics={scores.get('quantum_ethics', 0)}")
+                            
+                            # Determine topic based on content analysis
+                            def determine_document_topic(content, title):
+                                combined_text = (content + " " + title).lower()
+                                
+                                # Enhanced quantum detection
+                                quantum_indicators = [
+                                    'quantum policy', 'quantum approach', 'quantum technology', 'quantum computing', 
+                                    'quantum cryptography', 'quantum security', 'post-quantum', 'quantum-safe',
+                                    'quantum initiative', 'quantum strategy', 'quantum framework', 'qkd',
+                                    'quantum key distribution', 'quantum resistant', 'quantum threat'
+                                ]
+                                
+                                # Enhanced AI detection
+                                ai_indicators = [
+                                    'artificial intelligence', 'machine learning', 'ai policy', 'ai framework',
+                                    'ai strategy', 'ai governance', 'neural network', 'deep learning',
+                                    'ai ethics', 'ai safety', 'ai risk', 'generative ai'
+                                ]
+                                
+                                quantum_count = sum(1 for indicator in quantum_indicators if indicator in combined_text)
+                                ai_count = sum(1 for indicator in ai_indicators if indicator in combined_text)
+                                
+                                # Determine primary topic
+                                if quantum_count > ai_count and quantum_count > 0:
+                                    return "Quantum"
+                                elif ai_count > quantum_count and ai_count > 0:
+                                    return "AI"
+                                elif quantum_count > 0 and ai_count > 0:
+                                    return "Both"
+                                else:
+                                    return "General"
+                            
+                            # Determine the document topic
+                            document_topic = determine_document_topic(clean_content, clean_title)
                             
                             # Save to database using db_manager with enhanced metadata
                             document_data = {
@@ -1304,6 +1347,7 @@ def render():
                                 'publication_date': pub_date,
                                 'publish_date': pub_date,  # Ensure proper field mapping
                                 'date': pub_date,
+                                'topic': document_topic,  # Add proper topic detection
                                 'ai_cybersecurity_score': scores.get('ai_cybersecurity', 0),
                                 'quantum_cybersecurity_score': scores.get('quantum_cybersecurity', 0),
                                 'ai_ethics_score': scores.get('ai_ethics', 0),
@@ -1464,18 +1508,26 @@ def extract_title_from_url_content(content, metadata, url):
     
     # Enhanced patterns specifically for PDF and government documents
     title_patterns = [
+        # Quantum-specific document patterns
+        r'(The\s+U\.?S\.?\s+Approach\s+to\s+Quantum\s+Policy)',
+        r'(Quantum\s+(?:Computing|Technology|Security|Cryptography)\s+(?:Policy|Framework|Strategy|Guidance)[^.\n]*)',
+        r'(Post-Quantum\s+Cryptography\s+(?:Standards|Guidelines|Framework)[^.\n]*)',
+        r'(National\s+Quantum\s+Initiative[^.\n]*)',
+        r'(Quantum[^.\n]{10,100}(?:Policy|Framework|Strategy))',
+        
         # Government document patterns
         r'(?:H\.R\.|S\.|PUBLIC LAW|BILL)\s*\d+[^\n]*([^\n]{20,150})',
         r'((?:The\s+)?[A-Z][A-Za-z\s&,.-]{20,150})\s+(?:Act|Bill|Report|Policy|Framework|Strategy|Guidelines?|Document)',
         r'([A-Z][A-Za-z\s&,.-]{30,150})\s*(?:\n|$)',
         
+        # Enhanced policy document patterns
+        r'(The\s+[A-Z][A-Za-z\s\-:&,.-]{15,120}\s+(?:Policy|Approach|Framework|Strategy))',
+        r'([A-Z][A-Za-z\s\-:&,.-]{25,150})\s*(?:Policy|Guidelines?|Standards?|Principles|Approach)',
+        r'(?:Policy on|Guidelines for|Standards for)\s+([A-Za-z\s\-:&,.-]{15,150})',
+        
         # Academic/research patterns
         r'([A-Z][A-Za-z\s\-:&,.-]{25,150})\s*(?:Report|Analysis|Study|Research|White Paper|Framework)',
         r'(?:Report on|Analysis of|Study of)\s+([A-Za-z\s\-:&,.-]{20,150})',
-        
-        # Policy document patterns
-        r'([A-Z][A-Za-z\s\-:&,.-]{25,150})\s*(?:Policy|Guidelines?|Standards?|Principles)',
-        r'(?:Policy on|Guidelines for|Standards for)\s+([A-Za-z\s\-:&,.-]{15,150})',
         
         # General document title patterns
         r'^([A-Z][A-Za-z\s\-:&,.-]{20,200})(?:\s*\n|\s*$)',
