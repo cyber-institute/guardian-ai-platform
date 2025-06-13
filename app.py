@@ -394,48 +394,14 @@ def main():
     from components.color_palette_selector import apply_current_theme
     apply_current_theme()
     
-    # Main header with owl logo - responsive design
-    try:
-        import base64
-        with open("assets/owl_logo.png", "rb") as f:
-            owl_data = base64.b64encode(f.read()).decode()
-        
-        st.markdown(f"""
-        <div class="quantum-header">
-            <div class="quantum-header-content">
-                <img src="data:image/png;base64,{owl_data}" class="guardian-logo" alt="GUARDIAN Logo">
-                <h1>GUARDIAN</h1>
-            </div>
+    # Simple header without logo
+    st.markdown("""
+    <div class="quantum-header">
+        <div class="quantum-header-content">
+            <h1>GUARDIAN</h1>
         </div>
-        """, unsafe_allow_html=True)
-    except:
-        # Fallback without logo if file not found
-        st.markdown("""
-        <div class="quantum-header">
-            <div class="quantum-header-content">
-                <h1>GUARDIAN</h1>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Cyber Institute credit with proportional logo scaling
-    try:
-        import base64
-        with open("assets/cyber_institute_logo.jpg", "rb") as f:
-            logo_data = base64.b64encode(f.read()).decode()
-        
-        st.markdown(f"""
-        <div class="cyber-credit-container">
-            <img src="data:image/jpeg;base64,{logo_data}" class="cyber-logo" alt="Cyber Institute Logo">
-            <span class="cyber-credit-text">Developed by Cyber Institute</span>
-        </div>
-        """, unsafe_allow_html=True)
-    except:
-        st.markdown("""
-        <div class="cyber-credit-container">
-            <span class="cyber-credit-text">Developed by Cyber Institute</span>
-        </div>
-        """, unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
     
 
     
@@ -614,6 +580,9 @@ def main():
         
         with about_subtab4:
             render_prototype_phased_plan_section()
+    
+    # Add footer with logo and credit at bottom of page
+    render_footer_section()
 
 def render_patent_technology_section():
     """Render the hierarchical Patent Technology section."""
@@ -4378,6 +4347,98 @@ P_advanced = weighted_combination(
         - Consensus quality metrics
         - Quantum enhancement statistics
         """)
+
+def render_footer_section():
+    """Render footer with logo and credit at bottom of page."""
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    
+    # Footer with logo and credit
+    try:
+        import base64
+        
+        # Try to load both logos
+        owl_data = None
+        cyber_data = None
+        
+        try:
+            with open("assets/owl_logo.png", "rb") as f:
+                owl_data = base64.b64encode(f.read()).decode()
+        except:
+            pass
+            
+        try:
+            with open("assets/cyber_institute_logo.jpg", "rb") as f:
+                cyber_data = base64.b64encode(f.read()).decode()
+        except:
+            pass
+        
+        # Render footer with available logos
+        footer_html = """
+        <div style="
+            margin-top: 3rem;
+            padding: 2rem 0;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            background-color: #f8f9fa;
+        ">
+        """
+        
+        if owl_data:
+            footer_html += f"""
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <img src="data:image/png;base64,{owl_data}" 
+                     style="height: 60px; width: auto;" alt="GUARDIAN Logo">
+                <span style="font-size: 1.5rem; font-weight: 600; color: #2c3e50;">GUARDIAN</span>
+            </div>
+            """
+        else:
+            footer_html += """
+            <div style="display: flex; align-items: center;">
+                <span style="font-size: 1.5rem; font-weight: 600; color: #2c3e50;">GUARDIAN</span>
+            </div>
+            """
+        
+        if cyber_data:
+            footer_html += f"""
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <img src="data:image/jpeg;base64,{cyber_data}" 
+                     style="height: 40px; width: auto;" alt="Cyber Institute Logo">
+                <span style="font-size: 1rem; color: #666;">Developed by Cyber Institute</span>
+            </div>
+            """
+        else:
+            footer_html += """
+            <div style="display: flex; align-items: center;">
+                <span style="font-size: 1rem; color: #666;">Developed by Cyber Institute</span>
+            </div>
+            """
+        
+        footer_html += "</div>"
+        
+        st.markdown(footer_html, unsafe_allow_html=True)
+        
+    except Exception as e:
+        # Simple fallback footer
+        st.markdown("""
+        <div style="
+            margin-top: 3rem;
+            padding: 2rem 0;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            background-color: #f8f9fa;
+        ">
+            <div style="font-size: 1.5rem; font-weight: 600; color: #2c3e50; margin-bottom: 0.5rem;">
+                GUARDIAN
+            </div>
+            <div style="font-size: 1rem; color: #666;">
+                Developed by Cyber Institute
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
