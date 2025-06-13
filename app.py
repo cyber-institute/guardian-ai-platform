@@ -433,8 +433,8 @@ def main():
         # Navigation menu
         nav_option = st.selectbox(
             "Select page:",
-            ["Policy Repository", "Repository Admin", "About GUARDIAN"],
-            index=["Policy Repository", "Repository Admin", "About GUARDIAN"].index(st.session_state.nav_selection) if st.session_state.nav_selection in ["Policy Repository", "Repository Admin", "About GUARDIAN"] else 0,
+            ["Policy Repository", "ML Training Dashboard", "Repository Admin", "About GUARDIAN"],
+            index=["Policy Repository", "ML Training Dashboard", "Repository Admin", "About GUARDIAN"].index(st.session_state.nav_selection) if st.session_state.nav_selection in ["Policy Repository", "ML Training Dashboard", "Repository Admin", "About GUARDIAN"] else 0,
             key="sidebar_nav"
         )
         
@@ -569,6 +569,11 @@ def main():
     if st.session_state.nav_selection == "Policy Repository":
         # Single page Policy Repository
         render()
+    
+    elif st.session_state.nav_selection == "ML Training Dashboard":
+        # ML Training Dashboard
+        import ml_training_tab
+        ml_training_tab.render()
     
     elif st.session_state.nav_selection == "Repository Admin":
         # Only render when actually selected - true lazy loading
