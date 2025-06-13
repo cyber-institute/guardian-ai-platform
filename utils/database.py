@@ -115,46 +115,86 @@ class DatabaseManager:
         return documents
     
     def save_document(self, document):
-        """Save a new document to the database with enhanced metadata extraction."""
-        # Extract enhanced metadata during ingestion
-        from utils.fallback_analyzer import extract_metadata_fallback
-        
-        text_content = document.get('text_content', '') or document.get('text', '')
-        source_hint = document.get('source', 'manual')
-        
-        # Extract intelligent metadata
-        enhanced_metadata = extract_metadata_fallback(text_content, source_hint)
-        
-        # Use enhanced metadata, fallback to provided values
-        final_title = enhanced_metadata.get('title') or document.get('title', 'Untitled')
-        final_org = enhanced_metadata.get('author_organization', 'Unknown')
-        final_doc_type = enhanced_metadata.get('document_type') or document.get('document_type', 'unknown')
-        final_preview = enhanced_metadata.get('content_preview', document.get('content', ''))
-        final_date = enhanced_metadata.get('publish_date')
-        final_topic = enhanced_metadata.get('topic', 'General')
-        
-        query = """
-        INSERT INTO documents (title, content, text_content, quantum_score, document_type, source,
-                             author_organization, publish_date, topic)
-        VALUES (:title, :content, :text_content, :quantum_score, :document_type, :source,
-                :author_organization, :publish_date, :topic)
-        RETURNING id
-        """
-        
-        params = {
-            'title': final_title,
-            'content': final_preview,
-            'text_content': text_content,
-            'quantum_score': document.get('quantum_score', 0) or document.get('quantum_q', 0),
-            'document_type': final_doc_type,
-            'source': source_hint,
-            'author_organization': final_org,
-            'publish_date': final_date,
-            'topic': final_topic
-        }
-        
-        result = self.execute_query(query, params)
-        return result is not None
+        """Save a new document to the database with enhanced metadata support."""
+        try:
+            # Use verified metadata if available, otherwise extract metadata
+            if document.get('metadata_verified'):
+                # Use verified metadata directly
+                final_title = document.get('title', 'Untitled')
+                final_org = document.get('author_organization') or document.get('organization', 'Unknown')
+                final_author = document.get('author', 'Unknown')
+                final_doc_type = document.get('document_type', 'unknown')
+                final_date = document.get('publish_date') or document.get('publication_date')
+                final_topic = 'General'  # Will be determined by content analysis
+            else:
+                # Extract enhanced metadata during ingestion
+                try:
+                    from utils.fallback_analyzer import extract_metadata_fallback
+                    text_content = document.get('text_content', '') or document.get('text', '')
+                    source_hint = document.get('source', 'manual')
+                    
+                    # Extract intelligent metadata
+                    enhanced_metadata = extract_metadata_fallback(text_content, source_hint)
+                    
+                    # Use enhanced metadata, fallback to provided values
+                    final_title = enhanced_metadata.get('title') or document.get('title', 'Untitled')
+                    final_org = enhanced_metadata.get('author_organization') or document.get('organization', 'Unknown')
+                    final_author = document.get('author', 'Unknown')
+                    final_doc_type = enhanced_metadata.get('document_type') or document.get('document_type', 'unknown')
+                    final_date = enhanced_metadata.get('publish_date')
+                    final_topic = enhanced_metadata.get('topic', 'General')
+                except ImportError:
+                    # Fallback if analyzer not available
+                    final_title = document.get('title', 'Untitled')
+                    final_org = document.get('author_organization') or document.get('organization', 'Unknown')
+                    final_author = document.get('author', 'Unknown')
+                    final_doc_type = document.get('document_type', 'unknown')
+                    final_date = document.get('publish_date') or document.get('publication_date')
+                    final_topic = 'General'
+            
+            text_content = document.get('text_content', '') or document.get('content', '')
+            content_preview = document.get('content', text_content[:1000] if text_content else '')
+            
+            # Enhanced query to support all verification fields
+            query = """
+            INSERT INTO documents (
+                id, title, content, text_content, document_type, source,
+                author, author_organization, publish_date, topic,
+                ai_cybersecurity_score, quantum_cybersecurity_score, 
+                ai_ethics_score, quantum_ethics_score, source_url
+            )
+            VALUES (
+                :id, :title, :content, :text_content, :document_type, :source,
+                :author, :author_organization, :publish_date, :topic,
+                :ai_cybersecurity_score, :quantum_cybersecurity_score,
+                :ai_ethics_score, :quantum_ethics_score, :source_url
+            )
+            """
+            
+            params = {
+                'id': document.get('id'),
+                'title': final_title,
+                'content': content_preview,
+                'text_content': text_content,
+                'document_type': final_doc_type,
+                'source': document.get('source', 'manual'),
+                'author': final_author,
+                'author_organization': final_org,
+                'publish_date': final_date,
+                'topic': final_topic,
+                'ai_cybersecurity_score': document.get('ai_cybersecurity_score', 0),
+                'quantum_cybersecurity_score': document.get('quantum_cybersecurity_score', 0),
+                'ai_ethics_score': document.get('ai_ethics_score', 0),
+                'quantum_ethics_score': document.get('quantum_ethics_score', 0),
+                'source_url': document.get('source_url', '')
+            }
+            
+            result = self.execute_query(query, params)
+            return result is not None
+            
+        except Exception as e:
+            logger.error(f"Error saving document: {e}")
+            return False
     
     def save_assessment(self, document_id, assessment_data):
         """Save assessment results to the database."""
