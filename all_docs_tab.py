@@ -367,7 +367,7 @@ def render():
         st.markdown("""
         <style>
         .stButton > button[data-testid="clear_filters"] {
-            font-size: 0.7rem !important;
+            font-size: 0.35rem !important;
             padding: 0.25rem 0.5rem !important;
             height: 1.8rem !important;
             min-height: 1.8rem !important;
@@ -375,7 +375,7 @@ def render():
         }
         /* Target by key for more specificity */
         div[data-testid="stButton"] button {
-            font-size: 0.7rem !important;
+            font-size: 0.35rem !important;
             padding: 0.25rem 0.5rem !important;
             height: 1.8rem !important;
             min-height: 1.8rem !important;
