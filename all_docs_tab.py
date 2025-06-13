@@ -364,8 +364,11 @@ def render():
         st.markdown("<br>", unsafe_allow_html=True)  # Spacing
         st.markdown("""
         <style>
-        div[data-testid="stButton"] > button[kind="secondary"] {
-            font-size: 0.25rem !important;
+        div[data-testid="stButton"] button {
+            font-size: 0.7rem !important;
+            padding: 0.2rem 0.5rem !important;
+            height: auto !important;
+            min-height: 1.5rem !important;
         }
         </style>
         """, unsafe_allow_html=True)
