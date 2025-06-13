@@ -878,10 +878,10 @@ def render_compact_cards(docs):
                         </div>
                     </div>
                     <div style='font-size:8px;line-height:1.3;margin-bottom:6px'>
-                        <div>AI Cyber: <span style='background:#e8f5e8;padding:2px 6px;border-radius:8px;color:#2e7d32'>{scores['ai_cybersecurity']}</span></div>
-                        <div>Q Cyber: <span style='background:#e3f2fd;padding:2px 6px;border-radius:8px;color:#1976d2'>{scores['quantum_cybersecurity']}</span></div>
-                        <div>AI Ethics: <span style='background:#fff3e0;padding:2px 6px;border-radius:8px;color:#f57c00'>{scores['ai_ethics']}</span></div>
-                        <div>Q Ethics: <span style='background:#fce4ec;padding:2px 6px;border-radius:8px;color:#c2185b'>{scores['quantum_ethics']}</span></div>
+                        <div>AI Cyber: <span style='background:#e8f5e8;padding:2px 6px;border-radius:8px;color:#2e7d32'>{scores.get('ai_cybersecurity', 'N/A')}</span></div>
+                        <div>Q Cyber: <span style='background:#e3f2fd;padding:2px 6px;border-radius:8px;color:#1976d2'>{scores.get('quantum_cybersecurity', 'N/A')}</span></div>
+                        <div>AI Ethics: <span style='background:#fff3e0;padding:2px 6px;border-radius:8px;color:#f57c00'>{scores.get('ai_ethics', 'N/A')}</span></div>
+                        <div>Q Ethics: <span style='background:#fce4ec;padding:2px 6px;border-radius:8px;color:#c2185b'>{scores.get('quantum_ethics', 'N/A')}</span></div>
                     </div>
                     <div style='font-size:8px;color:#888'>{safe_pub_date if safe_pub_date != 'Date not available' else 'Date not available'}</div>
                 </div>
@@ -928,10 +928,10 @@ def render_grid_view(docs):
                     <h4 style='margin:0 0 6px 0;font-size:15px'>{safe_title[:40]}{'...' if len(safe_title) > 40 else ''}</h4>
                     <div style='font-size:10px;color:#666;margin-bottom:8px'>{safe_doc_type} • {safe_author_org} • {safe_pub_date}</div>
                     <div style='display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px;font-size:10px'>
-                        <div>AI Cyber: <span style='background:#e8f5e8;padding:2px 6px;border-radius:8px;color:#2e7d32'>{scores['ai_cybersecurity']}</span></div>
-                        <div>Q Cyber: <span style='background:#e3f2fd;padding:2px 6px;border-radius:8px;color:#1976d2'>{scores['quantum_cybersecurity']}</span></div>
-                        <div>AI Ethics: <span style='background:#fff3e0;padding:2px 6px;border-radius:8px;color:#f57c00'>{scores['ai_ethics']}</span></div>
-                        <div>Q Ethics: <span style='background:#fce4ec;padding:2px 6px;border-radius:8px;color:#c2185b'>{scores['quantum_ethics']}</span></div>
+                        <div>AI Cyber: <span style='background:#e8f5e8;padding:2px 6px;border-radius:8px;color:#2e7d32'>{scores.get('ai_cybersecurity', 'N/A')}</span></div>
+                        <div>Q Cyber: <span style='background:#e3f2fd;padding:2px 6px;border-radius:8px;color:#1976d2'>{scores.get('quantum_cybersecurity', 'N/A')}</span></div>
+                        <div>AI Ethics: <span style='background:#fff3e0;padding:2px 6px;border-radius:8px;color:#f57c00'>{scores.get('ai_ethics', 'N/A')}</span></div>
+                        <div>Q Ethics: <span style='background:#fce4ec;padding:2px 6px;border-radius:8px;color:#c2185b'>{scores.get('quantum_ethics', 'N/A')}</span></div>
                     </div>
                     <p style='font-size:11px;color:#666;margin:0'>{safe_content_preview[:120]}{'...' if len(safe_content_preview) > 120 else ''}</p>
                 </div>

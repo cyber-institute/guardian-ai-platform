@@ -66,6 +66,7 @@ class DatabaseManager:
         """Fetch all documents from the database."""
         query = """
         SELECT id, title, content, text_content as text, quantum_score as quantum_q,
+               ai_cybersecurity_score, quantum_cybersecurity_score, ai_ethics_score, quantum_ethics_score,
                document_type, source, author_organization, publish_date, content_preview,
                detected_region, region_confidence, region_reasoning, topic,
                created_at, updated_at
@@ -92,6 +93,11 @@ class DatabaseManager:
                     'text': row['text'],
                     'text_content': clean_field(row['text']),  # Add cleaned version
                     'quantum_q': float(row['quantum_q']) if row['quantum_q'] else 0,
+                    # Add score fields for multi-LLM ensemble scoring
+                    'ai_cybersecurity_score': int(row.get('ai_cybersecurity_score', 0)) if row.get('ai_cybersecurity_score') else 0,
+                    'quantum_cybersecurity_score': int(row.get('quantum_cybersecurity_score', 0)) if row.get('quantum_cybersecurity_score') else 0,
+                    'ai_ethics_score': int(row.get('ai_ethics_score', 0)) if row.get('ai_ethics_score') else 0,
+                    'quantum_ethics_score': int(row.get('quantum_ethics_score', 0)) if row.get('quantum_ethics_score') else 0,
                     'document_type': clean_field(row['document_type'] or 'Report'),
                     'source': row['source'] or '',
                     'author_organization': clean_field(row.get('author_organization', 'Unknown')),
