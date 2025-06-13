@@ -42,12 +42,13 @@ class MultiLLMEnsemble:
     def __init__(self):
         self.available_services = []
         self.processing_weights = {
-            'ollama': 1.0,      # Local, always available
-            'groq': 0.9,        # Fast inference
-            'openai': 0.95,     # High quality
-            'anthropic': 0.95,  # High quality
-            'huggingface': 0.7, # Specialized models
-            'together_ai': 0.8, # Open models
+            'convergence_ai': 1.0,   # Your patent-protected anti-bias system
+            'ollama': 0.9,           # Local, always available
+            'groq': 0.85,            # Fast inference
+            'openai': 0.9,           # High quality
+            'anthropic': 0.9,        # High quality
+            'huggingface': 0.65,     # Specialized models
+            'together_ai': 0.75,     # Open models
             'perplexity': 0.85  # Real-time research
         }
         self.timeout_seconds = 30
