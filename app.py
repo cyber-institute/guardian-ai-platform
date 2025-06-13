@@ -846,125 +846,136 @@ def render_mathematical_pipeline():
     
     with math_sections[0]:
         st.markdown("#### 🔍 Feature Vector Generation")
+        st.markdown("**100-Dimensional Feature Space:**")
+        
+        # Generate and display formula PNGs
+        from utils.formula_generator import generate_convergence_ai_formulas, display_formula_png
+        
+        formulas = None
+        try:
+            formulas = generate_convergence_ai_formulas()
+            display_formula_png(formulas["feature_vector"], "Primary feature vector representation")
+            
+            st.markdown("**Feature Components:**")
+            display_formula_png(formulas["feature_components"], "Core feature calculations")
+            
+            st.markdown("**Normalization Process:**")
+            display_formula_png(formulas["normalization"], "L2 normalization with epsilon regularization")
+            
+        except Exception as e:
+            # Fallback to text if PNG generation fails
+            st.markdown("""
+            ```
+            F(text) = [f₁, f₂, ..., f₁₀₀]
+            F_normalized = F / (||F||₂ + ε)
+            ```
+            """)
+        
         st.markdown("""
-        **100-Dimensional Feature Space:**
-        
-        ```
-        F(text) = [f₁, f₂, ..., f₁₀₀]
-        
-        Where:
-        - f₁ = μ(word_frequencies)           # Mean word frequency
-        - f₂ = σ(word_frequencies)           # Standard deviation  
-        - f₃ = max(word_frequencies)         # Maximum frequency
-        - f₄ = |unique_words| / |total_words| # Vocabulary diversity
-        - f₅ = μ(sentence_lengths)           # Mean sentence length
-        - f₆ = σ(sentence_lengths)           # Sentence variation
-        - f₇₋₁₁ = complexity_markers         # Logical connectors
-        - f₁₂₋₂₀ = punctuation_statistics    # Structural analysis
-        - f₂₁₋₁₀₀ = normalized_features      # L2 normalization
-        ```
-        
-        **Normalization Formula:**
-        ```
-        F_normalized = F / (||F||₂ + ε)
-        
-        Where ε = 1e-8 prevents division by zero
-        ```
+        **Feature Definitions:**
+        - f₁-f₆: Statistical word and sentence metrics
+        - f₇-f₁₁: Complexity and logical structure markers  
+        - f₁₂-f₂₀: Punctuation and formatting statistics
+        - f₂₁-f₁₀₀: Normalized semantic features
         """)
     
     with math_sections[1]:
         st.markdown("#### 🎯 Multi-Layered Bias Detection")
+        
+        try:
+            if formulas:
+                st.markdown("**Composite Bias Score:**")
+                display_formula_png(formulas["bias_composite"], "Three-layer bias detection system")
+                
+                st.markdown("**Statistical Layer:**")
+                display_formula_png(formulas["bias_statistical"], "Z-score based frequency analysis")
+                display_formula_png(formulas["z_score"], "Standard deviation threshold detection")
+            else:
+                raise Exception("Formulas not available")
+                
+        except:
+            st.markdown("""
+            ```
+            B(text) = 0.4 × B_pattern + 0.3 × B_statistical + 0.3 × B_contextual
+            B_statistical = min(2.0 × Σ(Z > 2.0) / n_words, 1.0)
+            ```
+            """)
+        
         st.markdown("""
-        **Composite Bias Score:**
-        
-        ```
-        B(text) = 0.4 × B_pattern + 0.3 × B_statistical + 0.3 × B_contextual
-        ```
-        
-        **Statistical Bias Detection:**
-        ```
-        B_statistical = min(2.0 × Σ(Z > 2.0) / n_words, 1.0)
-        
-        Where:
-        Z = |freq_i - μ| / σ    # Z-score for word frequency
-        Threshold = 2.0σ        # Two standard deviations
-        ```
-        
-        **Pattern Recognition:**
-        ```
-        B_pattern = min(Σ pattern_matches / total_words, 1.0)
-        
-        Categories: [gender, racial, political, religious]
-        ```
-        
-        **Contextual Analysis:**
-        ```
-        B_contextual = min(Σ bias_context_pairs / n_sentences, 1.0)
-        
-        Examples: (man→leader), (woman→assistant)
-        ```
+        **Detection Layers:**
+        - **Pattern Recognition:** 50+ bias indicators across categories
+        - **Statistical Analysis:** Z-score frequency distribution analysis  
+        - **Contextual Mapping:** Semantic relationship bias detection
+        - **Threshold:** 2.0σ for 97.5% confidence intervals
         """)
     
     with math_sections[2]:
         st.markdown("#### 📐 Advanced Similarity Analysis")
+        
+        try:
+            if formulas:
+                st.markdown("**Cosine Similarity:**")
+                display_formula_png(formulas["cosine_similarity"], "Vector similarity measurement (0-1 range)")
+                
+                st.markdown("**Mahalanobis Distance:**")
+                display_formula_png(formulas["mahalanobis"], "Multivariate outlier detection with covariance")
+                
+                st.markdown("**Jensen-Shannon Divergence:**")
+                display_formula_png(formulas["jensen_shannon"], "Symmetric probability distribution comparison")
+            else:
+                raise Exception("Formulas not available")
+            
+        except:
+            st.markdown("""
+            ```
+            cosine_sim(v₁, v₂) = (v₁ · v₂) / (||v₁|| × ||v₂||)
+            D_M(x) = √((x - μ)ᵀ Σ⁻¹ (x - μ))
+            JS(P, Q) = ½ KL(P || M) + ½ KL(Q || M)
+            ```
+            """)
+        
         st.markdown("""
-        **Cosine Similarity:**
-        ```
-        cosine_sim(v₁, v₂) = (v₁ · v₂) / (||v₁|| × ||v₂||)
-        
-        Range: [0, 1] where 1 = perfect similarity
-        ```
-        
-        **Mahalanobis Distance:**
-        ```
-        D_M(x) = √((x - μ)ᵀ Σ⁻¹ (x - μ))
-        
-        Where:
-        - x = feature vector
-        - μ = mean vector across all responses  
-        - Σ = regularized covariance matrix
-        - Σ_reg = Σ + λI (λ = 1e-6)
-        ```
-        
-        **Jensen-Shannon Divergence:**
-        ```
-        JS(P, Q) = ½ KL(P || M) + ½ KL(Q || M)
-        
-        Where:
-        - M = ½(P + Q)                    # Average distribution
-        - KL(P || Q) = Σ p_i log(p_i/q_i) # Kullback-Leibler divergence
-        - P, Q = word frequency distributions
-        ```
+        **Analysis Components:**
+        - **Cosine Similarity:** Response vector alignment measurement
+        - **Mahalanobis Distance:** Statistical outlier detection with regularization (λ = 1e-6)
+        - **Jensen-Shannon Divergence:** Word frequency distribution comparison
+        - **Combined Analysis:** Multi-metric consensus validation
         """)
     
     with math_sections[3]:
         st.markdown("#### ⚖️ Weighted Consensus Algorithm")
+        
+        try:
+            if 'formulas' in locals():
+                st.markdown("**Multi-Metric Consensus:**")
+                display_formula_png(formulas["consensus"], "Weighted multi-metric consensus calculation")
+                
+                st.markdown("**Response Weighting:**")
+                display_formula_png(formulas["weight_calculation"], "Quality-based response selection")
+                
+                st.markdown("**Validation Criteria:**")
+                display_formula_png(formulas["validation_threshold"], "Triple threshold validation system")
+                
+                st.markdown("**Final Quality Score:**")
+                display_formula_png(formulas["quality_score"], "Combined quality assessment")
+            else:
+                raise Exception("Formulas not available")
+                
+        except:
+            st.markdown("""
+            ```
+            consensus = 0.5 × μ(cosine_similarities) + 0.3 × (1 - min(μ(mahalanobis)/3, 1)) + 0.2 × (1 - μ(divergence_scores))
+            weight_i = confidence_i × (1 - bias_i) × (1 - poisoning_i)
+            validated = (consensus ≥ 0.7) ∧ (bias_mitigation ≥ 0.7) ∧ (poisoning_resistance ≥ 0.75)
+            ```
+            """)
+        
         st.markdown("""
-        **Multi-Metric Consensus:**
-        ```
-        consensus = 0.5 × μ(cosine_similarities) + 
-                   0.3 × (1 - min(μ(mahalanobis)/3, 1)) +
-                   0.2 × (1 - μ(divergence_scores))
-        ```
-        
-        **Response Weight Calculation:**
-        ```
-        weight_i = confidence_i × (1 - bias_i) × (1 - poisoning_i)
-        
-        best_response = argmax(weight_i) for i ∈ clean_responses
-        ```
-        
-        **Validation Threshold:**
-        ```
-        validated = (consensus ≥ 0.7) ∧ 
-                   (bias_mitigation ≥ 0.7) ∧ 
-                   (poisoning_resistance ≥ 0.75)
-        ```
-        
-        **Quality Score:**
-        ```
-        quality = consensus × bias_mitigation × poisoning_resistance
-        ```
+        **Algorithm Components:**
+        - **Multi-Metric Consensus:** Combines similarity, distance, and divergence measures
+        - **Weight Calculation:** Confidence-based response selection with bias filtering
+        - **Validation Thresholds:** Triple criteria for quality assurance (70%, 70%, 75%)
+        - **Quality Score:** Multiplicative quality assessment for training data selection
         """)
 
 def render_bias_detection_algorithms():
