@@ -10,23 +10,12 @@ from utils.patent_scoring import draw_qcmea_scorecard, draw_ai_ethics_scorecard,
 def render():
     """Render the Patent-Based Scoring Systems tab."""
     
-    st.markdown("""
-    <div style="
-        background: linear-gradient(135deg, #082454 0%, #10244D 50%, #133169 100%);
-        padding: 2rem;
-        border-radius: 12px;
-        margin-bottom: 2rem;
-        border: 1px solid rgba(255,255,255,0.2);
-        color: white;
-    ">
-        <h2 style="color: white; margin-bottom: 1rem; font-size: 2.2rem; text-align: center;">
-            Patent-Based Scoring Frameworks
-        </h2>
-        <p style="font-size: 1.1rem; line-height: 1.7; color: #e5e7eb; text-align: center;">
-            Demonstrating the specific assessment frameworks defined in GUARDIAN's three foundational patents
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+    from utils.theme_config import get_compact_header_style
+    
+    st.markdown(get_compact_header_style(
+        "Patent-Based Scoring Frameworks",
+        "Demonstrating the Specific Assessment Frameworks Defined in GUARDIAN's Three Foundational Patents"
+    ), unsafe_allow_html=True)
     
     # Framework selection
     framework_choice = st.selectbox(

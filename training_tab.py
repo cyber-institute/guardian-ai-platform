@@ -15,17 +15,12 @@ import plotly.graph_objects as go
 def render():
     """Render the LLM Training Management tab"""
     
-    st.markdown("""
-    <div style="background: linear-gradient(135deg, #2d3748 0%, #4a5568 50%, #718096 100%); 
-                padding: 2rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
-        <h1 style="color: white; margin-bottom: 1rem; font-size: 2rem; font-weight: 700; text-align: center;">
-            🎯 LLM Training Management
-        </h1>
-        <p style="color: #e2e8f0; text-align: center; font-size: 1.1rem; margin: 0;">
-            Train custom models using bias-free, validated data from Convergence AI
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+    from utils.theme_config import get_compact_header_style
+    
+    st.markdown(get_compact_header_style(
+        "LLM Training Management",
+        "Train Custom Models Using Bias-Free, Validated Data from Convergence AI"
+    ), unsafe_allow_html=True)
     
     # Main training sections
     training_tabs = st.tabs([

@@ -15,29 +15,21 @@ from utils.multi_llm_ensemble import multi_llm_ensemble
 def render():
     """Render the Convergence AI tab showcasing the patent-protected anti-bias system"""
     
-    # Header with patent branding
-    st.markdown("""
-    <div style="background: linear-gradient(135deg, #1a365d 0%, #2c5282 50%, #3182ce 100%); 
-                padding: 2rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
-        <h1 style="color: white; margin-bottom: 1rem; font-size: 2.5rem; font-weight: 700; text-align: center;">
-            🛡️ CONVERGENCE AI
-        </h1>
-        <h3 style="color: #63b3ed; margin-bottom: 1rem; font-size: 1.3rem; font-weight: 600; text-align: center;">
-            Patent-Protected Anti-Bias & Anti-Poisoning LLM System
-        </h3>
-        <p style="color: #bee3f8; text-align: center; font-size: 1.1rem; line-height: 1.6; margin: 0;">
-            Quantum-Ready Multi-Core Architecture for High-Confidence AI Inference
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+    # Professional header with unified theme
+    from utils.theme_config import get_compact_header_style
+    
+    st.markdown(get_compact_header_style(
+        "CONVERGENCE AI",
+        "Patent-Protected Anti-Bias & Anti-Poisoning LLM System with Quantum-Ready Multi-Core Architecture"
+    ), unsafe_allow_html=True)
     
     # Main tabs for different aspects of Convergence AI
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
-        "🧠 Live Demo", 
-        "📊 Analytics Dashboard", 
-        "⚙️ Patent Architecture", 
-        "🔬 Research Lab", 
-        "📈 Performance Metrics"
+        "Live Demo", 
+        "Analytics Dashboard", 
+        "Patent Architecture", 
+        "Research Lab", 
+        "Performance Metrics"
     ])
     
     with tab1:

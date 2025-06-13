@@ -13,23 +13,12 @@ from utils.knowledge_base_integrator import knowledge_integrator
 def render():
     """Render the LLM Enhancement tab"""
     
-    # Enhanced header matching Cyber Institute style
-    st.markdown(
-        """<div style="background: linear-gradient(135deg, #082454 0%, #10244D 50%, #133169 100%); padding: 2.5rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
-            <h1 style="color: white; margin-bottom: 1.2rem; font-size: 2.2rem; font-weight: 700; text-align: center;">
-                GUARDIAN LLM Intelligence Enhancement
-            </h1>
-            <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0; border: 1px solid rgba(255,255,255,0.2);">
-                <h3 style="color: #3D9BE9; margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600; text-align: center;">
-                    Multi-LLM Integration for Enhanced AI Ethics & Quantum Security Intelligence
-                </h3>
-                <p style="color: #e5e7eb; text-align: center; font-size: 1.1rem; line-height: 1.6; margin: 0;">
-                    Connect GUARDIAN to free and open-source LLM services to enhance understanding of AI ethics norms, quantum security best practices, and cybersecurity frameworks before ingesting large policy document datasets.
-                </p>
-            </div>
-        </div>""", 
-        unsafe_allow_html=True
-    )
+    from utils.theme_config import get_compact_header_style
+    
+    st.markdown(get_compact_header_style(
+        "GUARDIAN LLM Intelligence Enhancement",
+        "Multi-LLM Integration for Enhanced AI Ethics & Quantum Security Intelligence"
+    ), unsafe_allow_html=True)
     
     # Main tabs for different aspects of LLM enhancement
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
