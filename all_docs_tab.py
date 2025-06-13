@@ -362,6 +362,13 @@ def render():
     
     with filter_col5:
         st.markdown("<br>", unsafe_allow_html=True)  # Spacing
+        st.markdown("""
+        <style>
+        div[data-testid="stButton"] > button[kind="secondary"] {
+            font-size: 0.8rem !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
         if st.button("Clear Filters", key="clear_filters", help="Reset all filters"):
             st.session_state["filters"] = {
                 "selected_types": [],
@@ -1427,10 +1434,10 @@ def render_card_view(docs):
                 transition:transform 0.2s ease;border-left:5px solid #3B82F6'>
                     <h3 style='margin:0 0 12px 0;color:#333;line-height:1.3;font-size:1rem'>{safe_title}</h3>
                     <div style='margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap'>
-                        <span style='background:#e3f2fd;padding:4px 10px;border-radius:12px;font-size:12px;color:#1565c0'>{safe_topic}</span>
-                        <span style='background:#bbdefb;padding:4px 10px;border-radius:12px;font-size:12px;color:#0d47a1'>{safe_doc_type}</span>
-                        <span style='background:#e1f5fe;padding:4px 10px;border-radius:12px;font-size:12px;color:#01579b'>{safe_author_org}</span>
-                        {f"<span style='background:#e8f4fd;padding:4px 10px;border-radius:12px;font-size:12px;color:#0277bd'>{safe_pub_date}</span>" if pub_date and pub_date != 'Date not available' else "<span style='background:#e3f2fd;padding:4px 10px;border-radius:12px;font-size:12px;color:#1976d2'>Date not available</span>"}
+                        <span style='background:#eceff1;padding:4px 10px;border-radius:12px;font-size:12px;color:#455a64'>{safe_topic}</span>
+                        <span style='background:#e1e8ed;padding:4px 10px;border-radius:12px;font-size:12px;color:#37474f'>{safe_doc_type}</span>
+                        <span style='background:#e8eaf6;padding:4px 10px;border-radius:12px;font-size:12px;color:#3f51b5'>{safe_author_org}</span>
+                        {f"<span style='background:#e7ebf0;padding:4px 10px;border-radius:12px;font-size:12px;color:#546e7a'>{safe_pub_date}</span>" if pub_date and pub_date != 'Date not available' else "<span style='background:#eceff1;padding:4px 10px;border-radius:12px;font-size:12px;color:#607d8b'>Date not available</span>"}
                     </div>
                 </div>
             """, unsafe_allow_html=True)
