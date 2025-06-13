@@ -862,15 +862,184 @@ def render():
                             organization = extract_organization_from_url_content(content, metadata, url_input)
                             st.success(f"🏢 Organization extracted: {organization}")
                             
-                            # Show detailed metadata summary
-                            st.info("📋 **Metadata Summary**")
-                            col1, col2 = st.columns(2)
-                            with col1:
-                                st.write(f"**Title:** {title}")
-                                st.write(f"**Author:** {author}")
-                            with col2:
-                                st.write(f"**Date:** {pub_date if pub_date else 'Not available'}")
-                                st.write(f"**Organization:** {organization}")
+                            # Interactive Metadata Verification UI
+                            st.info("🔍 **Metadata Verification & Editing**")
+                            st.markdown("Review and edit the extracted metadata before saving:")
+                            
+                            with st.expander("📝 Edit Document Metadata", expanded=True):
+                                col1, col2 = st.columns(2)
+                                
+                                with col1:
+                                    verified_title = st.text_input(
+                                        "Document Title",
+                                        value=title,
+                                        help="Edit the document title if needed"
+                                    )
+                                    
+                                    verified_author = st.text_input(
+                                        "Author",
+                                        value=author,
+                                        help="Edit the author name if needed"
+                                    )
+                                
+                                with col2:
+                                    # Date input with proper handling
+                                    if pub_date:
+                                        verified_date = st.date_input(
+                                            "Publication Date",
+                                            value=pub_date,
+                                            help="Edit the publication date if needed"
+                                        )
+                                    else:
+                                        verified_date = st.date_input(
+                                            "Publication Date",
+                                            value=None,
+                                            help="Enter the publication date"
+                                        )
+                                    
+                                    verified_organization = st.text_input(
+                                        "Organization",
+                                        value=organization,
+                                        help="Edit the organization name if needed"
+                                    )
+                                
+                                # Document type selection
+                                doc_types = [
+                                    "Policy Document", "Research Report", "Technical Paper",
+                                    "White Paper", "Analysis", "Framework", "Guidelines",
+                                    "Strategy Document", "Academic Paper", "Government Report",
+                                    "Industry Report", "Other"
+                                ]
+                                
+                                verified_doc_type = st.selectbox(
+                                    "Document Type",
+                                    doc_types,
+                                    index=0 if "policy" in title.lower() else 1,
+                                    help="Select the appropriate document type"
+                                )
+                                
+                                # Content preview and editing
+                                st.markdown("**Content Preview & Validation**")
+                                content_preview = st.text_area(
+                                    "Content Preview (first 500 characters)",
+                                    value=content[:500] + ("..." if len(content) > 500 else ""),
+                                    height=100,
+                                    help="Preview of extracted content - verify it looks correct"
+                                )
+                                
+                                # Metadata confidence indicators
+                                st.markdown("**Extraction Confidence**")
+                                conf_col1, conf_col2, conf_col3, conf_col4 = st.columns(4)
+                                
+                                with conf_col1:
+                                    title_conf = "High" if len(title) > 20 and title != "Document from URL" else "Low"
+                                    st.metric("Title", title_conf, help="Confidence in title extraction")
+                                
+                                with conf_col2:
+                                    author_conf = "High" if author != "Web Content" and len(author) > 5 else "Low"
+                                    st.metric("Author", author_conf, help="Confidence in author extraction")
+                                
+                                with conf_col3:
+                                    date_conf = "High" if pub_date else "Low"
+                                    st.metric("Date", date_conf, help="Confidence in date extraction")
+                                
+                                with conf_col4:
+                                    org_conf = "High" if organization != "Unknown" and len(organization) > 5 else "Low"
+                                    st.metric("Organization", org_conf, help="Confidence in organization extraction")
+                            
+                            # Action buttons
+                            st.markdown("---")
+                            action_col1, action_col2, action_col3 = st.columns([2, 1, 1])
+                            
+                            with action_col1:
+                                proceed_save = st.button(
+                                    "✅ Save Document with Verified Metadata",
+                                    type="primary",
+                                    use_container_width=True,
+                                    help="Save the document with the verified metadata"
+                                )
+                            
+                            with action_col2:
+                                if st.button("🔄 Re-extract Metadata", use_container_width=True):
+                                    st.info("Re-extracting metadata...")
+                                    # Trigger re-extraction by removing from processed URLs
+                                    if url_input in st.session_state.processed_urls:
+                                        st.session_state.processed_urls.remove(url_input)
+                                    st.rerun()
+                            
+                            with action_col3:
+                                if st.button("❌ Cancel", use_container_width=True):
+                                    st.warning("Document processing cancelled")
+                                    return
+                            
+                            # Only proceed if user clicks save
+                            if not proceed_save:
+                                st.info("👆 Review the metadata above and click 'Save Document' when ready")
+                                return
+                            
+                            # Use verified metadata for saving
+                            title = verified_title
+                            author = verified_author
+                            pub_date = verified_date
+                            organization = verified_organization
+                            doc_type = verified_doc_type
+                            
+                            # Update document type in document_data
+                            doc_type_mapping = {
+                                "Policy Document": "Policy",
+                                "Research Report": "Research",
+                                "Technical Paper": "Technical",
+                                "White Paper": "Whitepaper",
+                                "Analysis": "Analysis",
+                                "Framework": "Framework",
+                                "Guidelines": "Guidelines",
+                                "Strategy Document": "Strategy",
+                                "Academic Paper": "Academic",
+                                "Government Report": "Government",
+                                "Industry Report": "Industry",
+                                "Other": "Document"
+                            }
+                            
+                            # Show saving progress
+                            st.info("💾 Saving document with verified metadata...")
+                            
+                            # Create enhanced metadata summary for storage
+                            import json
+                            from datetime import datetime
+                            
+                            metadata_summary = {
+                                "title": title,
+                                "author": author,
+                                "organization": organization,
+                                "document_type": doc_type,
+                                "extraction_method": "URL_VERIFIED",
+                                "verification_timestamp": datetime.now().isoformat(),
+                                "url_source": url_input,
+                                "content_length": len(content),
+                                "metadata_confidence": {
+                                    "title": "High" if len(title) > 20 and title != "Document from URL" else "Low",
+                                    "author": "High" if author != "Web Content" and len(author) > 5 else "Low",
+                                    "date": "High" if pub_date else "Low",
+                                    "organization": "High" if organization != "Unknown" and len(organization) > 5 else "Low"
+                                }
+                            }
+                            
+                            # Store verification history in session state
+                            if 'metadata_verification_history' not in st.session_state:
+                                st.session_state.metadata_verification_history = []
+                            
+                            verification_entry = {
+                                "url": url_input,
+                                "timestamp": datetime.now().isoformat(),
+                                "verified_metadata": metadata_summary,
+                                "original_extraction": {
+                                    "title": extract_title_from_url_content(content, metadata, url_input),
+                                    "author": extract_author_from_url_content(content, metadata, url_input),
+                                    "organization": extract_organization_from_url_content(content, metadata, url_input),
+                                    "date": extract_date_from_url_content(content, metadata)
+                                }
+                            }
+                            st.session_state.metadata_verification_history.append(verification_entry)
                             
                             # Check for duplicates first (simplified due to OpenAI quota limits)
                             st.info("🔍 Checking for duplicates...")
@@ -981,7 +1150,7 @@ def render():
                                 'clean_content': clean_content,
                                 'text_content': clean_content,
                                 'source_url': url_input,
-                                'document_type': "URL Document",
+                                'document_type': doc_type_mapping.get(doc_type, "Document"),
                                 'author': clean_author,
                                 'organization': clean_organization,
                                 'publication_date': pub_date,
