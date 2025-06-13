@@ -579,14 +579,8 @@ def render():
                         # Use the enhanced URL processing from admin loader
                         import requests
                         import trafilatura
-                        try:
-                            from utils.patent_scoring_engine import comprehensive_document_scoring
-                        except ImportError:
-                            from utils.comprehensive_scoring import comprehensive_document_scoring
-                        try:
-                            from utils.database import get_db_connection
-                        except ImportError:
-                            from utils.db import get_db_connection
+                        from utils.comprehensive_scoring import comprehensive_document_scoring
+                        from utils.database import db_manager
                         import uuid
                         
                         # Fetch and process URL content
@@ -633,31 +627,29 @@ def render():
                             doc_id = str(uuid.uuid4())
                             scores = comprehensive_document_scoring(content, title)
                             
-                            # Save to database
-                            conn = get_db_connection()
-                            cursor = conn.cursor()
+                            # Save to database using db_manager
+                            document_data = {
+                                'id': doc_id,
+                                'title': title,
+                                'content': content,
+                                'text_content': content,
+                                'source_url': url_input,
+                                'document_type': "URL Document",
+                                'ai_cybersecurity_score': scores.get('ai_cybersecurity', 0),
+                                'quantum_cybersecurity_score': scores.get('quantum_cybersecurity', 0),
+                                'ai_ethics_score': scores.get('ai_ethics', 0),
+                                'quantum_ethics_score': scores.get('quantum_ethics', 0)
+                            }
                             
-                            cursor.execute("""
-                                INSERT INTO documents (
-                                    id, title, content, source_url, document_type,
-                                    ai_cybersecurity_score, quantum_cybersecurity_score,
-                                    ai_ethics_score, quantum_ethics_score,
-                                    upload_date
-                                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
-                            """, (
-                                doc_id, title, content, url_input, "URL Document",
-                                scores.get('ai_cybersecurity', 0),
-                                scores.get('quantum_cybersecurity', 0), 
-                                scores.get('ai_ethics', 0),
-                                scores.get('quantum_ethics', 0)
-                            ))
+                            result = db_manager.save_document(document_data)
                             
-                            conn.commit()
-                            cursor.close()
-                            conn.close()
-                            
-                            st.success("URL content processed successfully!")
-                            st.info("Refresh the page to see the new document in your collection")
+                            if result:
+                                # Clear document cache to show new document immediately
+                                fetch_documents_cached.clear()
+                                st.success("URL content processed successfully!")
+                                st.info("Document added to collection. Refresh to see it in the list.")
+                            else:
+                                st.error("Failed to save document to database")
                         else:
                             st.error("Could not extract sufficient content from URL")
                             
@@ -1017,10 +1009,10 @@ def render_table_view(docs):
             'Title': title[:45],
             'Author/Org': author_org[:25],
             'Type': doc_type,
-            'AI Cybersecurity Maturity': format_score_display(scores['ai_cybersecurity'], 'ai_cybersecurity'),
-            'Quantum Cybersecurity Maturity': format_score_display(scores['quantum_cybersecurity'], 'quantum_cybersecurity'),
-            'AI Ethics': format_score_display(scores['ai_ethics'], 'ai_ethics'),
-            'Q Ethics': format_score_display(scores['quantum_ethics'], 'quantum_ethics'),
+            'AI Cybersecurity Maturity': str(scores['ai_cybersecurity']) if scores['ai_cybersecurity'] != 'N/A' else 'N/A',
+            'Quantum Cybersecurity Maturity': str(scores['quantum_cybersecurity']) if scores['quantum_cybersecurity'] != 'N/A' else 'N/A',
+            'AI Ethics': str(scores['ai_ethics']) if scores['ai_ethics'] != 'N/A' else 'N/A',
+            'Q Ethics': str(scores['quantum_ethics']) if scores['quantum_ethics'] != 'N/A' else 'N/A',
             'Date': str(pub_date) if pub_date else 'N/A'
         })
     
