@@ -877,11 +877,11 @@ def render_compact_cards(docs):
                             <div style='font-size:9px;color:#666;margin-bottom:6px'>{safe_doc_type} • {safe_author_org[:15]}{'...' if len(safe_author_org) > 15 else ''}</div>
                         </div>
                     </div>
-                    <div style='font-size:8px;line-height:1.3;margin-bottom:6px'>
-                        <div>AI Cyber: <span style='background:#e8f5e8;padding:2px 6px;border-radius:8px;color:#2e7d32'>{scores.get('ai_cybersecurity', 'N/A')}</span></div>
-                        <div>Q Cyber: <span style='background:#e3f2fd;padding:2px 6px;border-radius:8px;color:#1976d2'>{scores.get('quantum_cybersecurity', 'N/A')}</span></div>
-                        <div>AI Ethics: <span style='background:#fff3e0;padding:2px 6px;border-radius:8px;color:#f57c00'>{scores.get('ai_ethics', 'N/A')}</span></div>
-                        <div>Q Ethics: <span style='background:#fce4ec;padding:2px 6px;border-radius:8px;color:#c2185b'>{scores.get('quantum_ethics', 'N/A')}</span></div>
+                    <div style='font-size:12px;line-height:1.4;margin-bottom:8px'>
+                        <div style='margin-bottom:2px'>AI Cyber: <span style='background:#e8f5e8;padding:4px 12px;border-radius:10px;color:#2e7d32;font-weight:600'>{scores.get('ai_cybersecurity', 'N/A')}</span></div>
+                        <div style='margin-bottom:2px'>Q Cyber: <span style='background:#e3f2fd;padding:4px 12px;border-radius:10px;color:#1976d2;font-weight:600'>{scores.get('quantum_cybersecurity', 'N/A')}</span></div>
+                        <div style='margin-bottom:2px'>AI Ethics: <span style='background:#fff3e0;padding:4px 12px;border-radius:10px;color:#f57c00;font-weight:600'>{scores.get('ai_ethics', 'N/A')}</span></div>
+                        <div>Q Ethics: <span style='background:#fce4ec;padding:4px 12px;border-radius:10px;color:#c2185b;font-weight:600'>{scores.get('quantum_ethics', 'N/A')}</span></div>
                     </div>
                     <div style='font-size:8px;color:#888'>{safe_pub_date if safe_pub_date != 'Date not available' else 'Date not available'}</div>
                 </div>
