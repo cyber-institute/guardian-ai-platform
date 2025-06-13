@@ -362,17 +362,28 @@ def render():
     
     with filter_col5:
         st.markdown("<br>", unsafe_allow_html=True)  # Spacing
+        
+        # Apply specific styling to this button only
         st.markdown("""
         <style>
+        .stButton > button[data-testid="clear_filters"] {
+            font-size: 0.7rem !important;
+            padding: 0.25rem 0.5rem !important;
+            height: 1.8rem !important;
+            min-height: 1.8rem !important;
+            width: auto !important;
+        }
+        /* Target by key for more specificity */
         div[data-testid="stButton"] button {
             font-size: 0.7rem !important;
-            padding: 0.2rem 0.5rem !important;
-            height: auto !important;
-            min-height: 1.5rem !important;
+            padding: 0.25rem 0.5rem !important;
+            height: 1.8rem !important;
+            min-height: 1.8rem !important;
         }
         </style>
         """, unsafe_allow_html=True)
-        if st.button("Clear Filters", key="clear_filters", help="Reset all filters"):
+        
+        if st.button("Clear", key="clear_filters", help="Reset all filters"):
             st.session_state["filters"] = {
                 "selected_types": [],
                 "selected_orgs": [],
