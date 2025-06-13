@@ -596,15 +596,27 @@ def render():
                         response.raise_for_status()
                         st.info(f"✓ URL fetched successfully (Status: {response.status_code})")
                         
-                        # Extract content
-                        st.info("📄 Extracting text content...")
+                        # Extract content with enhanced metadata
+                        st.info("📄 Extracting text content and metadata...")
                         content = trafilatura.extract(response.text, include_comments=False, include_tables=True)
+                        
+                        # Extract enhanced metadata using trafilatura
+                        metadata = trafilatura.extract_metadata(response.text)
+                        
                         st.info(f"✓ Content extracted ({len(content) if content else 0} characters)")
                         
                         if content and len(content.strip()) > 100:
-                            # Generate basic metadata
-                            title = url_input.split('/')[-1] or "URL Document"
-                            st.info(f"📝 Document title: {title}")
+                            # Extract proper title, author, and date using intelligent extraction
+                            title = extract_title_from_url_content(content, metadata, url_input)
+                            author = extract_author_from_url_content(content, metadata, url_input)
+                            pub_date = extract_date_from_url_content(content, metadata)
+                            organization = extract_organization_from_url_content(content, metadata, url_input)
+                            
+                            st.info(f"📝 Extracted metadata:")
+                            st.info(f"  Title: {title}")
+                            st.info(f"  Author: {author}")
+                            st.info(f"  Date: {pub_date}")
+                            st.info(f"  Organization: {organization}")
                             
                             # Check for duplicates first
                             st.info("🔍 Checking for duplicates...")
@@ -639,14 +651,18 @@ def render():
                             scores = comprehensive_document_scoring(content, title)
                             st.info(f"✓ Scoring complete: AI={scores.get('ai_cybersecurity', 0)}, Quantum={scores.get('quantum_cybersecurity', 0)}")
                             
-                            # Save to database using db_manager
+                            # Save to database using db_manager with enhanced metadata
                             document_data = {
                                 'id': doc_id,
                                 'title': title,
                                 'content': content,
+                                'clean_content': content,
                                 'text_content': content,
                                 'source_url': url_input,
                                 'document_type': "URL Document",
+                                'author': author,
+                                'organization': organization,
+                                'publication_date': pub_date,
                                 'ai_cybersecurity_score': scores.get('ai_cybersecurity', 0),
                                 'quantum_cybersecurity_score': scores.get('quantum_cybersecurity', 0),
                                 'ai_ethics_score': scores.get('ai_ethics', 0),
@@ -730,6 +746,123 @@ def render():
     # Policy Gap Analysis Modal
     if st.session_state.get('show_policy_analyzer', False):
         render_policy_analyzer_modal()
+
+def extract_title_from_url_content(content, metadata, url):
+    """Extract title from URL content using multiple strategies."""
+    import re
+    from urllib.parse import urlparse
+    
+    # Try trafilatura metadata first
+    if metadata and hasattr(metadata, 'title') and metadata.title:
+        return metadata.title.strip()
+    
+    # Extract from content using patterns
+    title_patterns = [
+        r'<title[^>]*>([^<]+)</title>',
+        r'<h1[^>]*>([^<]+)</h1>',
+        r'# ([^\n]+)',
+        r'^([^\n]+)\n=+',
+        r'^([^\n]+)\n-+',
+    ]
+    
+    for pattern in title_patterns:
+        match = re.search(pattern, content, re.IGNORECASE | re.MULTILINE)
+        if match:
+            title = match.group(1).strip()
+            if len(title) > 10 and len(title) < 200:
+                return title
+    
+    # Extract first meaningful line from content
+    lines = content.split('\n')
+    for line in lines:
+        line = line.strip()
+        if len(line) > 10 and len(line) < 200 and not line.startswith(('http', 'www')):
+            return line
+    
+    # Fall back to URL-based title
+    parsed_url = urlparse(url)
+    return parsed_url.path.split('/')[-1] or parsed_url.netloc or "URL Document"
+
+def extract_author_from_url_content(content, metadata, url):
+    """Extract author from URL content using multiple strategies."""
+    import re
+    
+    # Try trafilatura metadata first
+    if metadata and hasattr(metadata, 'author') and metadata.author:
+        return metadata.author.strip()
+    
+    # Extract from content using patterns
+    author_patterns = [
+        r'(?:by|author|written by)[:\s]+([^\n,]+)',
+        r'(?:author|writer)[:\s]*([^\n,]+)',
+        r'@([a-zA-Z0-9_]+)',
+    ]
+    
+    for pattern in author_patterns:
+        match = re.search(pattern, content, re.IGNORECASE)
+        if match:
+            author = match.group(1).strip()
+            if len(author) > 2 and len(author) < 100:
+                return author
+    
+    # Extract from URL domain
+    from urllib.parse import urlparse
+    parsed_url = urlparse(url)
+    return parsed_url.netloc or "Web Content"
+
+def extract_date_from_url_content(content, metadata):
+    """Extract publication date from URL content."""
+    import re
+    from datetime import datetime
+    
+    # Try trafilatura metadata first
+    if metadata and hasattr(metadata, 'date') and metadata.date:
+        return metadata.date
+    
+    # Extract from content using date patterns
+    date_patterns = [
+        r'(\d{4}-\d{2}-\d{2})',
+        r'(\d{1,2}/\d{1,2}/\d{4})',
+        r'(\d{1,2}-\d{1,2}-\d{4})',
+        r'(?:published|date)[:\s]*(\d{4}-\d{2}-\d{2})',
+        r'(?:published|date)[:\s]*(\d{1,2}/\d{1,2}/\d{4})',
+    ]
+    
+    for pattern in date_patterns:
+        match = re.search(pattern, content, re.IGNORECASE)
+        if match:
+            try:
+                date_str = match.group(1)
+                if '-' in date_str and len(date_str) == 10:
+                    return datetime.strptime(date_str, '%Y-%m-%d').date()
+                elif '/' in date_str:
+                    return datetime.strptime(date_str, '%m/%d/%Y').date()
+            except:
+                continue
+    
+    return None
+
+def extract_organization_from_url_content(content, metadata, url):
+    """Extract organization from URL content."""
+    import re
+    from urllib.parse import urlparse
+    
+    # Try trafilatura metadata first
+    if metadata and hasattr(metadata, 'sitename') and metadata.sitename:
+        return metadata.sitename.strip()
+    
+    # Extract from URL domain
+    parsed_url = urlparse(url)
+    domain = parsed_url.netloc
+    
+    # Clean up common domain patterns
+    if domain.startswith('www.'):
+        domain = domain[4:]
+    
+    # Convert domain to organization name
+    org_name = domain.split('.')[0].title()
+    
+    return org_name or "Unknown"
 
 def render_policy_analyzer_modal():
     """Render the Policy Gap Analysis in a modal-style container"""

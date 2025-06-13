@@ -11,6 +11,49 @@ from pdf2image import convert_from_bytes, convert_from_path
 from PIL import Image
 import hashlib
 
+def process_pdf_with_thumbnail(pdf_bytes, filename=""):
+    """
+    Process PDF file with thumbnail extraction for upload.
+    
+    Args:
+        pdf_bytes: Raw PDF file bytes
+        filename: Original filename
+        
+    Returns:
+        Dictionary with content and thumbnail data
+    """
+    import PyPDF2
+    from io import BytesIO
+    
+    try:
+        # Extract text content from PDF
+        pdf_reader = PyPDF2.PdfReader(BytesIO(pdf_bytes))
+        text_content = ""
+        for page in pdf_reader.pages:
+            text_content += page.extract_text() + "\n"
+        
+        # Generate thumbnail
+        doc_id = hashlib.md5(pdf_bytes).hexdigest()[:8]
+        thumbnail = extract_pdf_thumbnail_during_ingestion(pdf_bytes, doc_id, filename)
+        
+        return {
+            'content': text_content,
+            'text_content': text_content,
+            'clean_content': text_content,
+            'thumbnail': thumbnail,
+            'success': True
+        }
+        
+    except Exception as e:
+        return {
+            'content': '',
+            'text_content': '',
+            'clean_content': '',
+            'thumbnail': None,
+            'success': False,
+            'error': str(e)
+        }
+
 def extract_pdf_thumbnail_during_ingestion(pdf_bytes, doc_id, filename=""):
     """
     Extract thumbnail from PDF bytes during document ingestion.
