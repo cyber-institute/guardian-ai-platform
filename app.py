@@ -842,34 +842,41 @@ def render_mathematical_pipeline():
     # Detailed mathematical formulations
     st.markdown("### 📊 Core Mathematical Formulations")
     
+    # Generate formulas once for the entire section
+    from utils.formula_generator import generate_convergence_ai_formulas, display_formula_png
+    
+    formulas = None
+    try:
+        formulas = generate_convergence_ai_formulas()
+    except Exception as e:
+        st.warning("Formula PNGs unavailable, using text fallback")
+    
     math_sections = st.tabs(["Feature Extraction", "Bias Scoring", "Similarity Analysis", "Consensus Algorithm"])
     
     with math_sections[0]:
         st.markdown("#### 🔍 Feature Vector Generation")
         st.markdown("**100-Dimensional Feature Space:**")
         
-        # Generate and display formula PNGs
-        from utils.formula_generator import generate_convergence_ai_formulas, display_formula_png
-        
-        formulas = None
-        try:
-            formulas = generate_convergence_ai_formulas()
-            display_formula_png(formulas["feature_vector"], "Primary feature vector representation")
-            
-            st.markdown("**Feature Components:**")
-            display_formula_png(formulas["feature_components"], "Core feature calculations")
-            
-            st.markdown("**Normalization Process:**")
-            display_formula_png(formulas["normalization"], "L2 normalization with epsilon regularization")
-            
-        except Exception as e:
-            # Fallback to text if PNG generation fails
-            st.markdown("""
-            ```
-            F(text) = [f₁, f₂, ..., f₁₀₀]
-            F_normalized = F / (||F||₂ + ε)
-            ```
-            """)
+        if formulas:
+            try:
+                display_formula_png(formulas["feature_vector"], "Primary feature vector representation")
+                
+                st.markdown("**Feature Components:**")
+                display_formula_png(formulas["feature_components"], "Core feature calculations")
+                
+                st.markdown("**Normalization Process:**")
+                display_formula_png(formulas["normalization"], "L2 normalization with epsilon regularization")
+                
+            except Exception as e:
+                st.markdown("**Primary Feature Vector:**")
+                st.latex(r"F(text) = [f_1, f_2, \ldots, f_{100}]")
+                st.markdown("**Normalization:**")
+                st.latex(r"F_{normalized} = \frac{F}{||F||_2 + \epsilon}")
+        else:
+            st.markdown("**Primary Feature Vector:**")
+            st.latex(r"F(text) = [f_1, f_2, \ldots, f_{100}]")
+            st.markdown("**Normalization:**")
+            st.latex(r"F_{normalized} = \frac{F}{||F||_2 + \epsilon}")
         
         st.markdown("""
         **Feature Definitions:**
@@ -882,24 +889,24 @@ def render_mathematical_pipeline():
     with math_sections[1]:
         st.markdown("#### 🎯 Multi-Layered Bias Detection")
         
-        try:
-            if formulas:
+        if formulas:
+            try:
                 st.markdown("**Composite Bias Score:**")
                 display_formula_png(formulas["bias_composite"], "Three-layer bias detection system")
                 
                 st.markdown("**Statistical Layer:**")
                 display_formula_png(formulas["bias_statistical"], "Z-score based frequency analysis")
                 display_formula_png(formulas["z_score"], "Standard deviation threshold detection")
-            else:
-                raise Exception("Formulas not available")
-                
-        except:
-            st.markdown("""
-            ```
-            B(text) = 0.4 × B_pattern + 0.3 × B_statistical + 0.3 × B_contextual
-            B_statistical = min(2.0 × Σ(Z > 2.0) / n_words, 1.0)
-            ```
-            """)
+            except:
+                st.markdown("**Composite Bias Score:**")
+                st.latex(r"B(text) = 0.4 \times B_{pattern} + 0.3 \times B_{statistical} + 0.3 \times B_{contextual}")
+                st.markdown("**Statistical Analysis:**")
+                st.latex(r"B_{statistical} = \min\left(2.0 \times \frac{\sum(Z > 2.0)}{n_{words}}, 1.0\right)")
+        else:
+            st.markdown("**Composite Bias Score:**")
+            st.latex(r"B(text) = 0.4 \times B_{pattern} + 0.3 \times B_{statistical} + 0.3 \times B_{contextual}")
+            st.markdown("**Statistical Analysis:**")
+            st.latex(r"B_{statistical} = \min\left(2.0 \times \frac{\sum(Z > 2.0)}{n_{words}}, 1.0\right)")
         
         st.markdown("""
         **Detection Layers:**
@@ -912,8 +919,8 @@ def render_mathematical_pipeline():
     with math_sections[2]:
         st.markdown("#### 📐 Advanced Similarity Analysis")
         
-        try:
-            if formulas:
+        if formulas:
+            try:
                 st.markdown("**Cosine Similarity:**")
                 display_formula_png(formulas["cosine_similarity"], "Vector similarity measurement (0-1 range)")
                 
@@ -922,17 +929,20 @@ def render_mathematical_pipeline():
                 
                 st.markdown("**Jensen-Shannon Divergence:**")
                 display_formula_png(formulas["jensen_shannon"], "Symmetric probability distribution comparison")
-            else:
-                raise Exception("Formulas not available")
-            
-        except:
-            st.markdown("""
-            ```
-            cosine_sim(v₁, v₂) = (v₁ · v₂) / (||v₁|| × ||v₂||)
-            D_M(x) = √((x - μ)ᵀ Σ⁻¹ (x - μ))
-            JS(P, Q) = ½ KL(P || M) + ½ KL(Q || M)
-            ```
-            """)
+            except:
+                st.markdown("**Cosine Similarity:**")
+                st.latex(r"\text{cosine\_sim}(v_1, v_2) = \frac{v_1 \cdot v_2}{||v_1|| \times ||v_2||}")
+                st.markdown("**Mahalanobis Distance:**")
+                st.latex(r"D_M(x) = \sqrt{(x - \mu)^T \Sigma^{-1} (x - \mu)}")
+                st.markdown("**Jensen-Shannon Divergence:**")
+                st.latex(r"JS(P, Q) = \frac{1}{2} KL(P || M) + \frac{1}{2} KL(Q || M)")
+        else:
+            st.markdown("**Cosine Similarity:**")
+            st.latex(r"\text{cosine\_sim}(v_1, v_2) = \frac{v_1 \cdot v_2}{||v_1|| \times ||v_2||}")
+            st.markdown("**Mahalanobis Distance:**")
+            st.latex(r"D_M(x) = \sqrt{(x - \mu)^T \Sigma^{-1} (x - \mu)}")
+            st.markdown("**Jensen-Shannon Divergence:**")
+            st.latex(r"JS(P, Q) = \frac{1}{2} KL(P || M) + \frac{1}{2} KL(Q || M)")
         
         st.markdown("""
         **Analysis Components:**
@@ -945,8 +955,8 @@ def render_mathematical_pipeline():
     with math_sections[3]:
         st.markdown("#### ⚖️ Weighted Consensus Algorithm")
         
-        try:
-            if 'formulas' in locals():
+        if formulas:
+            try:
                 st.markdown("**Multi-Metric Consensus:**")
                 display_formula_png(formulas["consensus"], "Weighted multi-metric consensus calculation")
                 
@@ -958,17 +968,24 @@ def render_mathematical_pipeline():
                 
                 st.markdown("**Final Quality Score:**")
                 display_formula_png(formulas["quality_score"], "Combined quality assessment")
-            else:
-                raise Exception("Formulas not available")
-                
-        except:
-            st.markdown("""
-            ```
-            consensus = 0.5 × μ(cosine_similarities) + 0.3 × (1 - min(μ(mahalanobis)/3, 1)) + 0.2 × (1 - μ(divergence_scores))
-            weight_i = confidence_i × (1 - bias_i) × (1 - poisoning_i)
-            validated = (consensus ≥ 0.7) ∧ (bias_mitigation ≥ 0.7) ∧ (poisoning_resistance ≥ 0.75)
-            ```
-            """)
+            except:
+                st.markdown("**Multi-Metric Consensus:**")
+                st.latex(r"\text{consensus} = 0.5 \times \mu(\text{cosine similarities}) + 0.3 \times \left(1 - \min\left(\frac{\mu(\text{mahalanobis})}{3}, 1\right)\right) + 0.2 \times (1 - \mu(\text{divergence scores}))")
+                st.markdown("**Weight Calculation:**")
+                st.latex(r"\text{weight}_i = \text{confidence}_i \times (1 - \text{bias}_i) \times (1 - \text{poisoning}_i)")
+                st.markdown("**Validation Threshold:**")
+                st.latex(r"\text{validated} = (\text{consensus} \geq 0.7) \land (\text{bias mitigation} \geq 0.7) \land (\text{poisoning resistance} \geq 0.75)")
+                st.markdown("**Quality Score:**")
+                st.latex(r"\text{quality} = \text{consensus} \times \text{bias mitigation} \times \text{poisoning resistance}")
+        else:
+            st.markdown("**Multi-Metric Consensus:**")
+            st.latex(r"\text{consensus} = 0.5 \times \mu(\text{cosine similarities}) + 0.3 \times \left(1 - \min\left(\frac{\mu(\text{mahalanobis})}{3}, 1\right)\right) + 0.2 \times (1 - \mu(\text{divergence scores}))")
+            st.markdown("**Weight Calculation:**")
+            st.latex(r"\text{weight}_i = \text{confidence}_i \times (1 - \text{bias}_i) \times (1 - \text{poisoning}_i)")
+            st.markdown("**Validation Threshold:**")
+            st.latex(r"\text{validated} = (\text{consensus} \geq 0.7) \land (\text{bias mitigation} \geq 0.7) \land (\text{poisoning resistance} \geq 0.75)")
+            st.markdown("**Quality Score:**")
+            st.latex(r"\text{quality} = \text{consensus} \times \text{bias mitigation} \times \text{poisoning resistance}")
         
         st.markdown("""
         **Algorithm Components:**
