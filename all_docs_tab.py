@@ -638,18 +638,28 @@ def render():
         url_input = st.text_input(
             "Enter document URL",
             placeholder="https://example.com/document.pdf",
-            help="Enter a URL to a document for analysis",
+            help="URL processing is automatic - just paste and press Enter",
             label_visibility="collapsed"
         )
         
-        if url_input:
+        if not url_input:
+            st.info("💡 Simply paste a URL above - processing happens automatically!")
+        elif url_input and not url_input.strip():
+            st.warning("Please enter a valid URL")
+        
+        if url_input and url_input.strip():
             # Import URL processing functionality
             try:
                 from utils.fast_admin_loader import process_url_content
             except ImportError:
                 from utils.url_content_extractor import extract_url_content as process_url_content
             
-            if st.button("Process URL", type="primary", use_container_width=True):
+            # Use session state to track processed URLs to avoid reprocessing
+            if "processed_urls" not in st.session_state:
+                st.session_state.processed_urls = set()
+            
+            # Auto-process URL when entered (one-step process)
+            if url_input not in st.session_state.processed_urls:
                 with st.spinner("Processing URL content..."):
                     try:
                         st.info(f"Processing URL: {url_input}")
@@ -891,6 +901,9 @@ def render():
                             result = db_manager.save_document(document_data)
                             
                             if result:
+                                # Mark URL as processed to avoid reprocessing
+                                st.session_state.processed_urls.add(url_input)
+                                
                                 st.success("URL content processed successfully!")
                                 
                                 # Clear all caches to ensure document counts are consistent across pages
@@ -910,12 +923,32 @@ def render():
                                 st.rerun()
                             else:
                                 st.error("Failed to save document to database")
+                                # Don't mark as processed if save failed
+                                pass
                         else:
                             st.error("Could not extract sufficient content from URL")
                             
                     except Exception as e:
                         st.error(f"Error processing URL: {str(e)}")
                         st.info("Please verify the URL is accessible and contains readable content")
+            else:
+                # URL already processed
+                st.info(f"✓ URL already processed: {url_input}")
+                if st.button("Process Again", type="secondary", use_container_width=True):
+                    # Remove from processed URLs to allow reprocessing
+                    st.session_state.processed_urls.discard(url_input)
+                    st.rerun()
+        
+        # Show status and controls for processed URLs
+        if hasattr(st.session_state, 'processed_urls') and st.session_state.processed_urls:
+            with st.expander(f"📝 Processed URLs ({len(st.session_state.processed_urls)})", expanded=False):
+                for processed_url in list(st.session_state.processed_urls):
+                    st.text(processed_url)
+                
+                if st.button("Clear All Processed URLs", type="secondary"):
+                    st.session_state.processed_urls.clear()
+                    st.success("Processed URLs list cleared")
+                    st.rerun()
     
     # Policy Analyzer Modal Button
     st.markdown("---")
