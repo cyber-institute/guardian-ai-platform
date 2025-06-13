@@ -330,7 +330,8 @@ def render():
             "Document Type", 
             doc_types,
             default=st.session_state["filters"]["selected_types"],
-            key="type_multiselect"
+            key="type_multiselect",
+            help="Policy: Government/organizational policies. Standard: Industry standards (NIST, ISO). Regulation: Legal regulations and laws. Guidance: Best practice documents. Research: Academic papers and studies."
         )
     
     with filter_col2:
@@ -341,7 +342,8 @@ def render():
             top_orgs,
             default=st.session_state["filters"]["selected_orgs"],
             key="org_multiselect",
-            format_func=lambda x: x[:25] + "..." if len(x) > 25 else x
+            format_func=lambda x: x[:25] + "..." if len(x) > 25 else x,
+            help="The organization, agency, or entity that published or authored the document (e.g., NIST, ISO, government agencies, research institutions)."
         )
     
     with filter_col3:
@@ -349,7 +351,8 @@ def render():
             "Year", 
             years,
             default=st.session_state["filters"]["selected_years"],
-            key="year_multiselect"
+            key="year_multiselect",
+            help="Publication year of the document (when it was officially released or last updated)."
         )
     
     with filter_col4:
@@ -1185,14 +1188,14 @@ def render_compact_cards(docs):
                         </div>
                         <div style='flex:1;min-width:0'>
                             <div style='font-weight:bold;font-size:12px;margin-bottom:4px;line-height:1.2'>{safe_title[:32]}{'...' if len(safe_title) > 32 else ''}</div>
-                            <div style='font-size:9px;color:#666;margin-bottom:6px'>{safe_doc_type} • {safe_author_org[:15]}{'...' if len(safe_author_org) > 15 else ''}</div>
+                            <div style='font-size:9px;color:#666;margin-bottom:6px' title='Document Type: {safe_doc_type} • Author/Organization: {safe_author_org}'>{safe_doc_type} • {safe_author_org[:15]}{'...' if len(safe_author_org) > 15 else ''}</div>
                         </div>
                     </div>
                     <div style='font-size:12px;line-height:1.4;margin-bottom:8px'>
-                        <div style='margin-bottom:2px'>AI Cyber: <span style='background:#e8f5e8;padding:4px 12px;border-radius:10px;color:#2e7d32;font-weight:600'>{scores.get('ai_cybersecurity', 'N/A')}</span></div>
-                        <div style='margin-bottom:2px'>Q Cyber: <span style='background:#e3f2fd;padding:4px 12px;border-radius:10px;color:#1976d2;font-weight:600'>{scores.get('quantum_cybersecurity', 'N/A')}</span></div>
-                        <div style='margin-bottom:2px'>AI Ethics: <span style='background:#fff3e0;padding:4px 12px;border-radius:10px;color:#f57c00;font-weight:600'>{scores.get('ai_ethics', 'N/A')}</span></div>
-                        <div>Q Ethics: <span style='background:#fce4ec;padding:4px 12px;border-radius:10px;color:#c2185b;font-weight:600'>{scores.get('quantum_ethics', 'N/A')}</span></div>
+                        <div style='margin-bottom:2px' title='AI Cybersecurity Maturity (0-100): Evaluates AI security risks and defensive measures. N/A means not AI-related.'>AI Cyber: <span style='background:#e8f5e8;padding:4px 12px;border-radius:10px;color:#2e7d32;font-weight:600'>{scores.get('ai_cybersecurity', 'N/A')}</span></div>
+                        <div style='margin-bottom:2px' title='Quantum Cybersecurity Maturity (Tier 1-5): Assesses quantum-safe cryptography readiness. N/A means not quantum-related.'>Q Cyber: <span style='background:#e3f2fd;padding:4px 12px;border-radius:10px;color:#1976d2;font-weight:600'>{scores.get('quantum_cybersecurity', 'N/A')}</span></div>
+                        <div style='margin-bottom:2px' title='AI Ethics Score (0-100): Measures ethical AI considerations and bias mitigation. N/A means not AI-related.'>AI Ethics: <span style='background:#fff3e0;padding:4px 12px;border-radius:10px;color:#f57c00;font-weight:600'>{scores.get('ai_ethics', 'N/A')}</span></div>
+                        <div title='Quantum Ethics Score (0-100): Evaluates ethical implications of quantum technology. N/A means not quantum-related.'>Q Ethics: <span style='background:#fce4ec;padding:4px 12px;border-radius:10px;color:#c2185b;font-weight:600'>{scores.get('quantum_ethics', 'N/A')}</span></div>
                     </div>
                     <div style='font-size:8px;color:#888'>{safe_pub_date if safe_pub_date != 'Date not available' else 'Date not available'}</div>
                 </div>
@@ -1255,12 +1258,12 @@ def render_grid_view(docs):
                 background:white;box-shadow:0 2px 4px rgba(0,0,0,0.08);
                 border-left:4px solid #3B82F6'>
                     <h4 style='margin:0 0 6px 0;font-size:15px'>{safe_title[:40]}{'...' if len(safe_title) > 40 else ''}</h4>
-                    <div style='font-size:10px;color:#666;margin-bottom:8px'>{safe_doc_type} • {safe_author_org} • {safe_pub_date}</div>
+                    <div style='font-size:10px;color:#666;margin-bottom:8px' title='Type: {safe_doc_type} • Author/Org: {safe_author_org} • Published: {safe_pub_date}'>{safe_doc_type} • {safe_author_org} • {safe_pub_date}</div>
                     <div style='display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px;font-size:10px'>
-                        <div>AI Cyber: <span style='background:#e8f5e8;padding:2px 6px;border-radius:8px;color:#2e7d32'>{scores.get('ai_cybersecurity', 'N/A')}</span></div>
-                        <div>Q Cyber: <span style='background:#e3f2fd;padding:2px 6px;border-radius:8px;color:#1976d2'>{scores.get('quantum_cybersecurity', 'N/A')}</span></div>
-                        <div>AI Ethics: <span style='background:#fff3e0;padding:2px 6px;border-radius:8px;color:#f57c00'>{scores.get('ai_ethics', 'N/A')}</span></div>
-                        <div>Q Ethics: <span style='background:#fce4ec;padding:2px 6px;border-radius:8px;color:#c2185b'>{scores.get('quantum_ethics', 'N/A')}</span></div>
+                        <div title='AI Cybersecurity Maturity (0-100): Evaluates AI security risks and defensive measures. N/A means not AI-related.'>AI Cyber: <span style='background:#e8f5e8;padding:2px 6px;border-radius:8px;color:#2e7d32'>{scores.get('ai_cybersecurity', 'N/A')}</span></div>
+                        <div title='Quantum Cybersecurity Maturity (Tier 1-5): Assesses quantum-safe cryptography readiness. N/A means not quantum-related.'>Q Cyber: <span style='background:#e3f2fd;padding:2px 6px;border-radius:8px;color:#1976d2'>{scores.get('quantum_cybersecurity', 'N/A')}</span></div>
+                        <div title='AI Ethics Score (0-100): Measures ethical AI considerations and bias mitigation. N/A means not AI-related.'>AI Ethics: <span style='background:#fff3e0;padding:2px 6px;border-radius:8px;color:#f57c00'>{scores.get('ai_ethics', 'N/A')}</span></div>
+                        <div title='Quantum Ethics Score (0-100): Evaluates ethical implications of quantum technology. N/A means not quantum-related.'>Q Ethics: <span style='background:#fce4ec;padding:2px 6px;border-radius:8px;color:#c2185b'>{scores.get('quantum_ethics', 'N/A')}</span></div>
                     </div>
                     <p style='font-size:11px;color:#666;margin:0'>{safe_content_preview[:120]}{'...' if len(safe_content_preview) > 120 else ''}</p>
                 </div>
@@ -1432,10 +1435,10 @@ def render_card_view(docs):
                 transition:transform 0.2s ease;border-left:5px solid #3B82F6'>
                     <h3 style='margin:0 0 12px 0;color:#333;line-height:1.3;font-size:1rem'>{safe_title}</h3>
                     <div style='margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap'>
-                        <span style='background:#eceff1;padding:4px 10px;border-radius:12px;font-size:12px;color:#455a64'>{safe_topic}</span>
-                        <span style='background:#e1e8ed;padding:4px 10px;border-radius:12px;font-size:12px;color:#37474f'>{safe_doc_type}</span>
-                        <span style='background:#e8eaf6;padding:4px 10px;border-radius:12px;font-size:12px;color:#3f51b5'>{safe_author_org}</span>
-                        {f"<span style='background:#e7ebf0;padding:4px 10px;border-radius:12px;font-size:12px;color:#546e7a'>{safe_pub_date}</span>" if pub_date and pub_date != 'Date not available' else "<span style='background:#eceff1;padding:4px 10px;border-radius:12px;font-size:12px;color:#607d8b'>Date not available</span>"}
+                        <span style='background:#eceff1;padding:4px 10px;border-radius:12px;font-size:12px;color:#455a64' title='Topic Classification: AI (Artificial Intelligence related), Quantum (Quantum technology/cryptography related), General (Other technology governance)'>{safe_topic}</span>
+                        <span style='background:#e1e8ed;padding:4px 10px;border-radius:12px;font-size:12px;color:#37474f' title='Document Type: Policy (Government/organizational policies), Standard (Industry standards like NIST), Regulation (Legal regulations), Guidance (Best practice documents), Research (Academic papers)'>{safe_doc_type}</span>
+                        <span style='background:#e8eaf6;padding:4px 10px;border-radius:12px;font-size:12px;color:#3f51b5' title='Author/Organization: The entity that published or authored this document (government agency, standards body, research institution, etc.)'>{safe_author_org}</span>
+                        {f"<span style='background:#e7ebf0;padding:4px 10px;border-radius:12px;font-size:12px;color:#546e7a' title='Publication Date: When this document was officially published or last updated'>{safe_pub_date}</span>" if pub_date and pub_date != 'Date not available' else "<span style='background:#eceff1;padding:4px 10px;border-radius:12px;font-size:12px;color:#607d8b' title='Publication Date: Document date information was not available in the source'>Date not available</span>"}
                     </div>
                 </div>
             """, unsafe_allow_html=True)
@@ -1470,10 +1473,10 @@ def render_card_view(docs):
             st.markdown(f"""
                 <div style='margin:8px;padding:8px;background:#f8f9fa;border-radius:6px'>
                     <div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px'>
-                        <div><strong>AI Cybersecurity Maturity:</strong> <strong>{get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity', raw_content, title)}</strong></div>
-                        <div><strong>Quantum Cybersecurity Maturity:</strong> <strong>{get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity', raw_content, title)}</strong></div>
-                        <div><strong>AI Ethics:</strong> <strong>{get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics', raw_content, title)}</strong></div>
-                        <div><strong>Quantum Ethics:</strong> <strong>{get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics', raw_content, title)}</strong></div>
+                        <div title='AI Cybersecurity Maturity (0-100): Evaluates how well the document addresses AI security risks, threat modeling, and defensive measures. N/A means document is not AI-related.'><strong>AI Cybersecurity Maturity:</strong> <strong>{get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity', raw_content, title)}</strong></div>
+                        <div title='Quantum Cybersecurity Maturity (Tier 1-5): Assesses quantum-safe cryptography readiness and post-quantum security measures. N/A means document is not quantum-related.'><strong>Quantum Cybersecurity Maturity:</strong> <strong>{get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity', raw_content, title)}</strong></div>
+                        <div title='AI Ethics Score (0-100): Measures ethical AI considerations including fairness, transparency, accountability, and bias mitigation. N/A means document is not AI-related.'><strong>AI Ethics:</strong> <strong>{get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics', raw_content, title)}</strong></div>
+                        <div title='Quantum Ethics Score (0-100): Evaluates ethical implications of quantum technology deployment and governance. N/A means document is not quantum-related.'><strong>Quantum Ethics:</strong> <strong>{get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics', raw_content, title)}</strong></div>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
