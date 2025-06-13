@@ -986,47 +986,77 @@ def render_mathematical_pipeline():
         - **Combined Analysis:** Multi-metric consensus validation
         """)
     
-    with math_sections[3]:
-        st.markdown("#### Weighted Consensus Algorithm")
+    with math_sections[4]:
+        st.markdown("#### Advanced Multi-LLM Consensus Algorithm")
         
         if formulas:
             try:
-                st.markdown("**Multi-Metric Consensus:**")
-                display_formula_png(formulas["consensus"], "Weighted multi-metric consensus calculation")
+                st.markdown("**Weighted Consensus Framework:**")
+                display_formula_png(formulas["consensus_algorithm"], "Dynamic weighted averaging across multiple LLM responses")
                 
-                st.markdown("**Response Weighting:**")
-                display_formula_png(formulas["weight_calculation"], "Quality-based response selection")
+                st.markdown("**Response Weighting Calculation:**")
+                display_formula_png(formulas["weight_calculation"], "Quality-based response selection with bias and poisoning factors")
+                
+                st.markdown("**Confidence Score Computation:**")
+                display_formula_png(formulas["confidence_score"], "Model accuracy and response certainty combination")
                 
                 st.markdown("**Validation Criteria:**")
                 display_formula_png(formulas["validation_threshold"], "Triple threshold validation system")
                 
-                st.markdown("**Final Quality Score:**")
-                display_formula_png(formulas["quality_score"], "Combined quality assessment")
-            except:
-                st.markdown("**Multi-Metric Consensus:**")
-                st.latex(r"\text{consensus} = 0.5 \times \mu(\text{cosine similarities}) + 0.3 \times \left(1 - \min\left(\frac{\mu(\text{mahalanobis})}{3}, 1\right)\right) + 0.2 \times (1 - \mu(\text{divergence scores}))")
+                st.markdown("**Final Quality Assessment:**")
+                display_formula_png(formulas["quality_score"], "Comprehensive quality score with coherence factor")
+            except Exception as e:
+                st.markdown("**Multi-LLM Consensus:**")
+                st.latex(r"\text{consensus} = \sum_{i=1}^{k} w_i \times \text{score}_i")
                 st.markdown("**Weight Calculation:**")
-                st.latex(r"\text{weight}_i = \text{confidence}_i \times (1 - \text{bias}_i) \times (1 - \text{poisoning}_i)")
-                st.markdown("**Validation Threshold:**")
-                st.latex(r"\text{validated} = (\text{consensus} \geq 0.7) \land (\text{bias mitigation} \geq 0.7) \land (\text{poisoning resistance} \geq 0.75)")
-                st.markdown("**Quality Score:**")
-                st.latex(r"\text{quality} = \text{consensus} \times \text{bias mitigation} \times \text{poisoning resistance}")
+                st.latex(r"w_i = \frac{\text{confidence}_i \times (1 - B_i) \times (1 - P_i)}{\sum_{j=1}^{k} \text{confidence}_j \times (1 - B_j) \times (1 - P_j)}")
         else:
-            st.markdown("**Multi-Metric Consensus:**")
-            st.latex(r"\text{consensus} = 0.5 \times \mu(\text{cosine similarities}) + 0.3 \times \left(1 - \min\left(\frac{\mu(\text{mahalanobis})}{3}, 1\right)\right) + 0.2 \times (1 - \mu(\text{divergence scores}))")
+            st.markdown("**Multi-LLM Consensus:**")
+            st.latex(r"\text{consensus} = \sum_{i=1}^{k} w_i \times \text{score}_i")
             st.markdown("**Weight Calculation:**")
-            st.latex(r"\text{weight}_i = \text{confidence}_i \times (1 - \text{bias}_i) \times (1 - \text{poisoning}_i)")
-            st.markdown("**Validation Threshold:**")
-            st.latex(r"\text{validated} = (\text{consensus} \geq 0.7) \land (\text{bias mitigation} \geq 0.7) \land (\text{poisoning resistance} \geq 0.75)")
-            st.markdown("**Quality Score:**")
-            st.latex(r"\text{quality} = \text{consensus} \times \text{bias mitigation} \times \text{poisoning resistance}")
+            st.latex(r"w_i = \frac{\text{confidence}_i \times (1 - B_i) \times (1 - P_i)}{\sum_{j=1}^{k} \text{confidence}_j \times (1 - B_j) \times (1 - P_j)}")
         
         st.markdown("""
-        **Algorithm Components:**
-        - **Multi-Metric Consensus:** Combines similarity, distance, and divergence measures
-        - **Weight Calculation:** Confidence-based response selection with bias filtering
-        - **Validation Thresholds:** Triple criteria for quality assurance (70%, 70%, 75%)
-        - **Quality Score:** Multiplicative quality assessment for training data selection
+        **Advanced Consensus Framework:**
+        - **Weighted Averaging:** Dynamic weights normalized across all participating LLMs
+        - **Multi-Factor Scoring:** Confidence, bias mitigation, and poisoning resistance
+        - **Quality Thresholds:** 70% consensus, 30% maximum bias, 25% maximum poisoning
+        - **Coherence Integration:** Response consistency and logical flow assessment
+        """)
+    
+    with math_sections[5]:
+        st.markdown("#### Quantum-Ready Orchestration System")
+        
+        if formulas:
+            try:
+                st.markdown("**Quantum Superposition State:**")
+                display_formula_png(formulas["quantum_superposition"], "LLM response superposition with normalized probability amplitudes")
+                
+                st.markdown("**Quantum Entanglement Protocol:**")
+                display_formula_png(formulas["quantum_entanglement"], "Bell state representation for correlated LLM responses")
+                
+                st.markdown("**Quantum Measurement Process:**")
+                display_formula_png(formulas["quantum_measurement"], "Born rule application for response selection")
+                
+                st.markdown("**Training Parameter Update:**")
+                display_formula_png(formulas["training_update"], "Gradient descent with quality-based loss function")
+            except Exception as e:
+                st.markdown("**Quantum Superposition:**")
+                st.latex(r"|\psi\rangle = \sum_{i=1}^{n} \alpha_i |s_i\rangle")
+                st.markdown("**Quantum Measurement:**")
+                st.latex(r"P(|s_i\rangle) = |\alpha_i|^2")
+        else:
+            st.markdown("**Quantum Superposition:**")
+            st.latex(r"|\psi\rangle = \sum_{i=1}^{n} \alpha_i |s_i\rangle")
+            st.markdown("**Quantum Measurement:**")
+            st.latex(r"P(|s_i\rangle) = |\alpha_i|^2")
+        
+        st.markdown("""
+        **Quantum-Ready Architecture:**
+        - **Superposition Processing:** Multiple LLM responses exist in quantum superposition
+        - **Entanglement Protocols:** Correlated response analysis using Bell states
+        - **Measurement Selection:** Born rule probability for optimal response selection
+        - **Future Compatibility:** Ready for quantum computing hardware integration
         """)
 
 def render_bias_detection_algorithms():
