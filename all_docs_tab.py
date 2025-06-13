@@ -360,7 +360,8 @@ def render():
             "Region", 
             regions,
             default=st.session_state["filters"]["selected_regions"],
-            key="region_multiselect"
+            key="region_multiselect",
+            help="Geographic region or jurisdiction that issued the document (e.g., US, EU, International, specific countries or regions)."
         )
     
     with filter_col5:
