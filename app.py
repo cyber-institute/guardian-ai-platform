@@ -394,14 +394,29 @@ def main():
     from components.color_palette_selector import apply_current_theme
     apply_current_theme()
     
-    # Simple header without logo
-    st.markdown("""
-    <div class="quantum-header">
-        <div class="quantum-header-content">
-            <h1>GUARDIAN</h1>
+    # Main header with owl logo - responsive design
+    try:
+        import base64
+        with open("assets/owl_logo.png", "rb") as f:
+            owl_data = base64.b64encode(f.read()).decode()
+        
+        st.markdown(f"""
+        <div class="quantum-header">
+            <div class="quantum-header-content">
+                <img src="data:image/png;base64,{owl_data}" class="guardian-logo" alt="GUARDIAN Logo">
+                <h1>GUARDIAN</h1>
+            </div>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
+    except:
+        # Fallback without logo if file not found
+        st.markdown("""
+        <div class="quantum-header">
+            <div class="quantum-header-content">
+                <h1>GUARDIAN</h1>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
     
 
     
