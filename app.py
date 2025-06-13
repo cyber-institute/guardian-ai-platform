@@ -596,7 +596,7 @@ def main():
         with about_subtab4:
             render_prototype_phased_plan_section()
     
-    # Add footer with logo and credit at bottom of page
+    # Add footer with logo and credit at bottom of page - appears on all pages
     render_footer_section()
 
 def render_patent_technology_section():
