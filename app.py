@@ -4078,40 +4078,92 @@ P_advanced = weighted_combination(
         """)
     
     with math_tabs[3]:
-        st.markdown("#### 🎯 Automated Training Pipeline")
+        st.markdown("#### 🎯 GUARDIAN LLM Automated Training Pipeline")
         
         st.markdown("""
-        **Recursive Self-Training System:**
+        **Real-Time Training with Every Policy Analysis:**
         
-        Convergence AI automatically builds high-quality training data from every interaction:
+        Your GUARDIAN LLM trains automatically with each document you process - no manual baseline required.
+        The system uses mathematical validation instead of human-labeled data.
         
         ```python
-        # Automatic validation and training data collection
-        if (confidence_level >= 0.7 and 
-            bias_mitigation_score >= 0.7 and 
-            poisoning_resistance_score >= 0.75):
+        # Automatic training occurs during every policy analysis
+        def process_policy_document(policy_text):
+            # 1. Multi-LLM analysis with bias detection
+            responses = convergence_ai.analyze(policy_text)
             
-            validated_output = {
-                "input": input_text,
-                "output": synthesized_response,
-                "quality_scores": {
-                    "confidence": confidence_level,
-                    "bias_mitigation": bias_mitigation_score,
-                    "poisoning_resistance": poisoning_resistance_score
+            # 2. Mathematical validation (no human labels needed)
+            if (consensus_score >= 0.7 and 
+                bias_mitigation >= 0.7 and 
+                poisoning_resistance >= 0.75):
+                
+                # 3. Becomes training data automatically
+                training_data = {
+                    "input": policy_text,
+                    "output": validated_analysis,
+                    "domain": "ai_governance" | "cybersecurity" | "quantum",
+                    "quality_metrics": mathematical_validation_scores
                 }
-            }
-            self.validated_outputs.append(validated_output)
+                guardian_llm.add_training_example(training_data)
         ```
-        
-        **Training Data Quality Guarantees:**
-        - **Bias-Free:** All data passes triple-layered bias detection
-        - **Poison-Resistant:** Zero adversarial content in training set
-        - **High-Confidence:** Only top 30% of outputs by quality score
-        - **Diverse Coverage:** Balanced across domains and use cases
         """)
         
         st.markdown("""
-        **Export Capabilities:**
+        **What Triggers GUARDIAN LLM Training:**
+        
+        **Every Document Analysis:**
+        - Policy document uploads and analysis
+        - URL content ingestion and scoring
+        - Document categorization and scoring
+        - Multi-LLM consensus generation
+        
+        **Real-Time Quality Assessment:**
+        - Each analysis gets scored mathematically
+        - Only high-quality outputs become training data
+        - System learns from successful policy analyses
+        - Builds domain expertise automatically
+        """)
+        
+        st.markdown("""
+        **Self-Bootstrapping Training Process:**
+        
+        **No Manual Baseline Required:**
+        - Mathematical validation replaces human labeling
+        - System determines quality through statistical convergence
+        - Triple-layered bias detection ensures data quality
+        - Quantum-enhanced consensus provides validation
+        
+        **Training Data Examples:**
+        
+        ✅ **Good Analysis (Becomes Training Data):**
+        - Input: "Analyze AI governance framework compliance"
+        - Output: Comprehensive unbiased analysis with specific scores
+        - Quality: 89% consensus, 94% bias-free, 97% poison-resistant
+        
+        ❌ **Poor Analysis (Rejected):**
+        - Input: Same policy document
+        - Output: Biased or low-confidence response  
+        - Quality: 45% consensus, 60% bias issues, below thresholds
+        """)
+        
+        st.markdown("""
+        **Current Training Status:**
+        
+        Your GUARDIAN LLM is already learning from:
+        - Every policy document you've uploaded and analyzed
+        - All document scoring and categorization operations
+        - Multi-LLM consensus processes and bias detection
+        - Real-time quantum routing decisions
+        
+        **Domain Expertise Building:**
+        - **AI Governance:** Learning policy frameworks, compliance patterns
+        - **Cybersecurity:** Understanding threat assessments, risk matrices
+        - **Quantum Computing:** Analyzing quantum readiness, technical standards
+        - **Cross-Domain:** Identifying relationships between policy areas
+        """)
+        
+        st.markdown("""
+        **Export Capabilities for External Training:**
         
         | Platform | Format | Cost Estimate | Use Case |
         |----------|--------|---------------|----------|
@@ -4120,11 +4172,12 @@ P_advanced = weighted_combination(
         | Ollama | Local training | Hardware only | Privacy-focused |
         | Custom | Full metadata | Included | Specialized frameworks |
         
-        **Continuous Improvement Features:**
-        - Zero manual labeling required
-        - Domain-specific adaptation over time
-        - User-context learning
-        - Performance improvement with each interaction
+        **Continuous Learning Features:**
+        - **Zero Manual Effort:** No labeling or baseline creation needed
+        - **Mathematical Validation:** Graduate-level statistical quality assessment
+        - **Domain Adaptation:** Specialized expertise in policy analysis
+        - **Performance Growth:** Improves with every document processed
+        - **Quality Assurance:** Only top 30% of analyses become training data
         """)
     
     st.markdown("---")
