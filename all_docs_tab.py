@@ -848,13 +848,31 @@ def render_compact_cards(docs):
             # Use simple placeholder thumbnail for performance
             thumbnail_html = f'<div style="width:60px;height:75px;background:#f0f0f0;border:1px solid #ddd;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#666;">Doc</div>'
             
-            # Use actual database scores instead of recalculating
-            scores = {
+            # Use actual database scores with intelligent N/A detection
+            raw_scores = {
                 'ai_cybersecurity': doc.get('ai_cybersecurity_score', 0) or 0,
                 'quantum_cybersecurity': doc.get('quantum_cybersecurity_score', 0) or 0,
                 'ai_ethics': doc.get('ai_ethics_score', 0) or 0,
                 'quantum_ethics': doc.get('quantum_ethics_score', 0) or 0
             }
+            
+            # Apply intelligent N/A logic based on document topic relevance
+            scores = {}
+            content_text = (content + " " + title).lower()
+            
+            # AI-related frameworks
+            ai_keywords = ['artificial intelligence', 'machine learning', 'ai ', ' ai', 'neural network', 'algorithm', 'deep learning', 'llm', 'generative ai']
+            is_ai_related = any(keyword in content_text for keyword in ai_keywords)
+            
+            scores['ai_cybersecurity'] = raw_scores['ai_cybersecurity'] if raw_scores['ai_cybersecurity'] > 0 else ('N/A' if not is_ai_related else 0)
+            scores['ai_ethics'] = raw_scores['ai_ethics'] if raw_scores['ai_ethics'] > 0 else ('N/A' if not is_ai_related else 0)
+            
+            # Quantum-related frameworks
+            quantum_keywords = ['quantum', 'post-quantum', 'quantum-safe', 'qkd', 'quantum computing', 'cryptography', 'encryption']
+            is_quantum_related = any(keyword in content_text for keyword in quantum_keywords)
+            
+            scores['quantum_cybersecurity'] = raw_scores['quantum_cybersecurity'] if raw_scores['quantum_cybersecurity'] > 0 else ('N/A' if not is_quantum_related else 0)
+            scores['quantum_ethics'] = raw_scores['quantum_ethics'] if raw_scores['quantum_ethics'] > 0 else ('N/A' if not is_quantum_related else 0)
             
             # Properly escape all HTML content for compact cards
             import html
@@ -904,13 +922,31 @@ def render_grid_view(docs):
             doc_type = ultra_clean_metadata(doc.get('document_type', 'Unknown'))
             content_preview = ultra_clean_metadata(doc.get('content_preview', 'No preview available') or 'No preview available')
             
-            # Use actual database scores instead of recalculating
-            scores = {
+            # Use actual database scores with intelligent N/A detection
+            raw_scores = {
                 'ai_cybersecurity': doc.get('ai_cybersecurity_score', 0) or 0,
                 'quantum_cybersecurity': doc.get('quantum_cybersecurity_score', 0) or 0,
                 'ai_ethics': doc.get('ai_ethics_score', 0) or 0,
                 'quantum_ethics': doc.get('quantum_ethics_score', 0) or 0
             }
+            
+            # Apply intelligent N/A logic based on document topic relevance
+            scores = {}
+            content_text = (content + " " + title).lower()
+            
+            # AI-related frameworks
+            ai_keywords = ['artificial intelligence', 'machine learning', 'ai ', ' ai', 'neural network', 'algorithm', 'deep learning', 'llm', 'generative ai']
+            is_ai_related = any(keyword in content_text for keyword in ai_keywords)
+            
+            scores['ai_cybersecurity'] = raw_scores['ai_cybersecurity'] if raw_scores['ai_cybersecurity'] > 0 else ('N/A' if not is_ai_related else 0)
+            scores['ai_ethics'] = raw_scores['ai_ethics'] if raw_scores['ai_ethics'] > 0 else ('N/A' if not is_ai_related else 0)
+            
+            # Quantum-related frameworks
+            quantum_keywords = ['quantum', 'post-quantum', 'quantum-safe', 'qkd', 'quantum computing', 'cryptography', 'encryption']
+            is_quantum_related = any(keyword in content_text for keyword in quantum_keywords)
+            
+            scores['quantum_cybersecurity'] = raw_scores['quantum_cybersecurity'] if raw_scores['quantum_cybersecurity'] > 0 else ('N/A' if not is_quantum_related else 0)
+            scores['quantum_ethics'] = raw_scores['quantum_ethics'] if raw_scores['quantum_ethics'] > 0 else ('N/A' if not is_quantum_related else 0)
             
             # Properly escape all HTML content for grid view
             import html
@@ -951,13 +987,31 @@ def render_table_view(docs):
         pub_date = doc.get('publish_date') or 'N/A'
         doc_type = doc.get('document_type', 'Unknown') or 'Unknown'
         
-        # Use actual database scores instead of recalculating
-        scores = {
+        # Use actual database scores with intelligent N/A detection
+        raw_scores = {
             'ai_cybersecurity': doc.get('ai_cybersecurity_score', 0) or 0,
             'quantum_cybersecurity': doc.get('quantum_cybersecurity_score', 0) or 0,
             'ai_ethics': doc.get('ai_ethics_score', 0) or 0,
             'quantum_ethics': doc.get('quantum_ethics_score', 0) or 0
         }
+        
+        # Apply intelligent N/A logic based on document topic relevance
+        scores = {}
+        content_text = (content + " " + title).lower()
+        
+        # AI-related frameworks
+        ai_keywords = ['artificial intelligence', 'machine learning', 'ai ', ' ai', 'neural network', 'algorithm', 'deep learning', 'llm', 'generative ai']
+        is_ai_related = any(keyword in content_text for keyword in ai_keywords)
+        
+        scores['ai_cybersecurity'] = raw_scores['ai_cybersecurity'] if raw_scores['ai_cybersecurity'] > 0 else ('N/A' if not is_ai_related else 0)
+        scores['ai_ethics'] = raw_scores['ai_ethics'] if raw_scores['ai_ethics'] > 0 else ('N/A' if not is_ai_related else 0)
+        
+        # Quantum-related frameworks
+        quantum_keywords = ['quantum', 'post-quantum', 'quantum-safe', 'qkd', 'quantum computing', 'cryptography', 'encryption']
+        is_quantum_related = any(keyword in content_text for keyword in quantum_keywords)
+        
+        scores['quantum_cybersecurity'] = raw_scores['quantum_cybersecurity'] if raw_scores['quantum_cybersecurity'] > 0 else ('N/A' if not is_quantum_related else 0)
+        scores['quantum_ethics'] = raw_scores['quantum_ethics'] if raw_scores['quantum_ethics'] > 0 else ('N/A' if not is_quantum_related else 0)
         
         table_data.append({
             'Title': title[:45],
@@ -1093,13 +1147,31 @@ def render_card_view(docs):
                 </div>
             """, unsafe_allow_html=True)
             
-            # Use actual database scores instead of recalculating (consistent with other views)
-            scores = {
+            # Use actual database scores with intelligent N/A detection (consistent with other views)
+            raw_scores = {
                 'ai_cybersecurity': doc.get('ai_cybersecurity_score', 0) or 0,
                 'quantum_cybersecurity': doc.get('quantum_cybersecurity_score', 0) or 0,
                 'ai_ethics': doc.get('ai_ethics_score', 0) or 0,
                 'quantum_ethics': doc.get('quantum_ethics_score', 0) or 0
             }
+            
+            # Apply intelligent N/A logic based on document topic relevance
+            scores = {}
+            content_text = (raw_content + " " + title).lower()
+            
+            # AI-related frameworks
+            ai_keywords = ['artificial intelligence', 'machine learning', 'ai ', ' ai', 'neural network', 'algorithm', 'deep learning', 'llm', 'generative ai']
+            is_ai_related = any(keyword in content_text for keyword in ai_keywords)
+            
+            scores['ai_cybersecurity'] = raw_scores['ai_cybersecurity'] if raw_scores['ai_cybersecurity'] > 0 else ('N/A' if not is_ai_related else 0)
+            scores['ai_ethics'] = raw_scores['ai_ethics'] if raw_scores['ai_ethics'] > 0 else ('N/A' if not is_ai_related else 0)
+            
+            # Quantum-related frameworks
+            quantum_keywords = ['quantum', 'post-quantum', 'quantum-safe', 'qkd', 'quantum computing', 'cryptography', 'encryption']
+            is_quantum_related = any(keyword in content_text for keyword in quantum_keywords)
+            
+            scores['quantum_cybersecurity'] = raw_scores['quantum_cybersecurity'] if raw_scores['quantum_cybersecurity'] > 0 else ('N/A' if not is_quantum_related else 0)
+            scores['quantum_ethics'] = raw_scores['quantum_ethics'] if raw_scores['quantum_ethics'] > 0 else ('N/A' if not is_quantum_related else 0)
             
             # Display scores using database values
             st.markdown(f"""
