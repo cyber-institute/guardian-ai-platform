@@ -363,35 +363,19 @@ def render():
     with filter_col5:
         st.markdown("<br>", unsafe_allow_html=True)  # Spacing
         
-        # Apply specific styling to this button only
-        st.markdown("""
-        <style>
-        .stButton > button[data-testid="clear_filters"] {
-            font-size: 0.35rem !important;
-            padding: 0.25rem 0.5rem !important;
-            height: 1.8rem !important;
-            min-height: 1.8rem !important;
-            width: auto !important;
-        }
-        /* Target by key for more specificity */
-        div[data-testid="stButton"] button {
-            font-size: 0.35rem !important;
-            padding: 0.25rem 0.5rem !important;
-            height: 1.8rem !important;
-            min-height: 1.8rem !important;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-        
-        if st.button("Clear", key="clear_filters", help="Reset all filters"):
-            st.session_state["filters"] = {
-                "selected_types": [],
-                "selected_orgs": [],
-                "selected_years": [],
-                "selected_regions": [],
-                "topic_filter": "Both"
-            }
-            st.rerun()
+        # Create a very small button using nested columns
+        col_a, col_b, col_c = st.columns([2, 1, 2])
+        with col_b:
+            # Small button with minimal styling
+            if st.button("✕", key="clear_filters", help="Clear all filters", use_container_width=True):
+                st.session_state["filters"] = {
+                    "selected_types": [],
+                    "selected_orgs": [],
+                    "selected_years": [],
+                    "selected_regions": [],
+                    "topic_filter": "Both"
+                }
+                st.rerun()
         
         # Show active filter count
         active_filters = (len(st.session_state["filters"]["selected_types"]) + 
