@@ -636,6 +636,23 @@ def render():
     with upload_col2:
         st.markdown('<div class="upload-section"><h4>🌐 Add from URL</h4></div>', unsafe_allow_html=True)
         
+        # Metadata Processing Mode Toggle
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            st.markdown("**Metadata Processing Mode:**")
+        with col2:
+            auto_mode = st.toggle(
+                "Auto Save",
+                value=st.session_state.get('auto_metadata_mode', False),
+                help="Enable to skip manual verification and save automatically"
+            )
+            st.session_state.auto_metadata_mode = auto_mode
+        
+        if auto_mode:
+            st.info("🤖 Auto mode: Documents will be saved automatically with extracted metadata")
+        else:
+            st.info("🔍 Verification mode: You can review and edit metadata before saving")
+        
         # Metadata Verification History Viewer
         if st.session_state.get('metadata_verification_history'):
             with st.expander("📋 Metadata Verification History", expanded=False):
@@ -946,46 +963,59 @@ def render():
                             organization = extract_organization_from_url_content(content, metadata, url_input)
                             st.success(f"🏢 Organization extracted: {organization}")
                             
-                            # Interactive Metadata Verification UI
-                            st.info("🔍 **Metadata Verification & Editing**")
-                            st.markdown("Review and edit the extracted metadata before saving:")
+                            # Check if we're in auto mode or verification mode
+                            auto_mode = st.session_state.get('auto_metadata_mode', False)
                             
-                            with st.expander("📝 Edit Document Metadata", expanded=True):
-                                col1, col2 = st.columns(2)
+                            if auto_mode:
+                                # Auto mode - save automatically without verification
+                                st.info("🤖 **Auto Save Mode** - Saving document with extracted metadata...")
+                                verified_title = title
+                                verified_author = author
+                                verified_date = pub_date
+                                verified_organization = organization
+                                verified_doc_type = "Policy Document" if "policy" in title.lower() else "Research Report"
+                                proceed_save = True
+                            else:
+                                # Manual verification mode
+                                st.info("🔍 **Metadata Verification & Editing**")
+                                st.markdown("Review and edit the extracted metadata before saving:")
                                 
-                                with col1:
-                                    verified_title = st.text_input(
-                                        "Document Title",
-                                        value=title,
-                                        help="Edit the document title if needed"
-                                    )
+                                with st.expander("📝 Edit Document Metadata", expanded=True):
+                                    col1, col2 = st.columns(2)
                                     
-                                    verified_author = st.text_input(
-                                        "Author",
-                                        value=author,
-                                        help="Edit the author name if needed"
-                                    )
-                                
-                                with col2:
-                                    # Date input with proper handling
-                                    if pub_date:
-                                        verified_date = st.date_input(
-                                            "Publication Date",
-                                            value=pub_date,
-                                            help="Edit the publication date if needed"
+                                    with col1:
+                                        verified_title = st.text_input(
+                                            "Document Title",
+                                            value=title,
+                                            help="Edit the document title if needed"
                                         )
-                                    else:
-                                        verified_date = st.date_input(
-                                            "Publication Date",
-                                            value=None,
-                                            help="Enter the publication date"
+                                        
+                                        verified_author = st.text_input(
+                                            "Author",
+                                            value=author,
+                                            help="Edit the author name if needed"
                                         )
                                     
-                                    verified_organization = st.text_input(
-                                        "Organization",
-                                        value=organization,
-                                        help="Edit the organization name if needed"
-                                    )
+                                    with col2:
+                                        # Date input with proper handling
+                                        if pub_date:
+                                            verified_date = st.date_input(
+                                                "Publication Date",
+                                                value=pub_date,
+                                                help="Edit the publication date if needed"
+                                            )
+                                        else:
+                                            verified_date = st.date_input(
+                                                "Publication Date",
+                                                value=None,
+                                                help="Enter the publication date"
+                                            )
+                                        
+                                        verified_organization = st.text_input(
+                                            "Organization",
+                                            value=organization,
+                                            help="Edit the organization name if needed"
+                                        )
                                 
                                 # Document type selection
                                 doc_types = [
@@ -1056,10 +1086,10 @@ def render():
                                     st.warning("Document processing cancelled")
                                     return
                             
-                            # Only proceed if user clicks save
-                            if not proceed_save:
-                                st.info("👆 Review the metadata above and click 'Save Document' when ready")
-                                return
+                                # Only proceed if user clicks save in manual mode
+                                if not proceed_save:
+                                    st.info("👆 Review the metadata above and click 'Save Document' when ready")
+                                    return
                             
                             # Use verified metadata for saving
                             title = verified_title
