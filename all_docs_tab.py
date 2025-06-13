@@ -822,74 +822,118 @@ def render():
                             st.info(f"  Date: {pub_date}")
                             st.info(f"  Organization: {organization}")
                             
-                            # Check for duplicates first
+                            # Check for duplicates first (simplified due to OpenAI quota limits)
                             st.info("🔍 Checking for duplicates...")
                             try:
-                                from utils.duplicate_detector import check_document_duplicates
+                                from utils.database import db_manager
                                 
-                                duplicate_result = check_document_duplicates(
-                                    title=title,
-                                    content=content,
-                                    url=url_input,
-                                    filename=""
-                                )
+                                # Simple duplicate check using SQL query
+                                import psycopg2
+                                import os
                                 
-                                if duplicate_result["is_duplicate"]:
+                                conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+                                cursor = conn.cursor()
+                                
+                                # Check for title duplicates
+                                cursor.execute("SELECT COUNT(*) FROM documents WHERE title = %s", (title,))
+                                title_count = cursor.fetchone()[0]
+                                
+                                if title_count > 0:
+                                    cursor.close()
+                                    conn.close()
                                     st.error("Duplicate document detected!")
-                                    st.warning(f"Confidence: {duplicate_result['confidence']:.1%} - {duplicate_result.get('match_type', 'Unknown')}")
-                                    
-                                    if duplicate_result.get("matches"):
-                                        st.info("Similar to existing documents:")
-                                        for match in duplicate_result["matches"][:2]:
-                                            st.markdown(f"• **{match.get('title', 'Unknown')}** (ID: {match.get('id')}) - {match.get('reason', 'Similar content')}")
-                                    
-                                    st.warning("Document not saved to prevent duplicates. Please check if this document already exists in your repository.")
+                                    st.warning(f"Document with title '{title}' already exists")
+                                    st.warning("Document not saved to prevent duplicates.")
+                                    return
+                                
+                                # Check for URL duplicates
+                                cursor.execute("SELECT COUNT(*) FROM documents WHERE source_url = %s", (url_input,))
+                                url_count = cursor.fetchone()[0]
+                                
+                                cursor.close()
+                                conn.close()
+                                
+                                if url_count > 0:
+                                    st.error("Duplicate URL detected!")
+                                    st.warning(f"This URL has already been processed")
+                                    st.warning("Document not saved to prevent duplicates.")
                                     return
                                     
                             except Exception as e:
-                                st.warning(f"Duplicate check failed: {str(e)}")
+                                st.warning(f"Duplicate check failed: {str(e)} - proceeding with save")
                             
-                            # Generate document ID and score the document using multi-LLM ensemble
-                            st.info("📊 Calculating comprehensive scores with Multi-LLM Ensemble...")
+                            # Clean content to remove null bytes and other problematic characters first
+                            def clean_text_for_db(text):
+                                if not text:
+                                    return ""
+                                # Remove null bytes and other control characters
+                                cleaned = text.replace('\x00', '').replace('\0', '')
+                                # Remove other problematic unicode control characters
+                                import re
+                                cleaned = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]', '', cleaned)
+                                return cleaned.strip()
+                            
+                            # Clean all text fields
+                            clean_title = clean_text_for_db(title)
+                            clean_content = clean_text_for_db(content)
+                            clean_author = clean_text_for_db(author)
+                            clean_organization = clean_text_for_db(organization)
+                            
+                            # Generate document ID and score the document
+                            st.info("📊 Calculating document scores...")
                             doc_id = str(uuid.uuid4())
                             
-                            # Use comprehensive scoring with multi-LLM integration
-                            try:
-                                # Try to use enhanced comprehensive scoring which includes multi-LLM integration
-                                from utils.comprehensive_scoring import comprehensive_document_scoring
+                            # Use basic scoring to avoid OpenAI quota issues
+                            st.info("🔄 Running basic document scoring...")
+                            
+                            # Simple rule-based scoring for now
+                            def basic_scoring(content, title):
+                                content_lower = content.lower()
+                                title_lower = title.lower()
                                 
-                                st.info("🔄 Running comprehensive multi-framework scoring...")
-                                scores = comprehensive_document_scoring(content, title)
+                                # AI keywords
+                                ai_keywords = ['artificial intelligence', 'machine learning', 'neural network', 'deep learning', 
+                                             'ai', 'ml', 'algorithm', 'automation', 'chatbot', 'nlp']
                                 
-                                # Validate all expected scores are present
-                                required_scores = ['ai_cybersecurity', 'quantum_cybersecurity', 'ai_ethics', 'quantum_ethics']
-                                for score_type in required_scores:
-                                    if score_type not in scores:
-                                        scores[score_type] = 0
+                                # Quantum keywords  
+                                quantum_keywords = ['quantum', 'qubit', 'quantum computing', 'quantum algorithm',
+                                                  'quantum supremacy', 'quantum entanglement', 'quantum state']
                                 
-                                st.success(f"✓ Comprehensive scoring complete: AI Cyber={scores.get('ai_cybersecurity', 0)}, Quantum Cyber={scores.get('quantum_cybersecurity', 0)}, AI Ethics={scores.get('ai_ethics', 0)}, Quantum Ethics={scores.get('quantum_ethics', 0)}")
+                                # Cybersecurity keywords
+                                cyber_keywords = ['cybersecurity', 'security', 'privacy', 'encryption', 'threat',
+                                                'vulnerability', 'attack', 'defense', 'protection', 'risk']
                                 
-                            except Exception as e:
-                                st.warning(f"Comprehensive scoring failed ({str(e)}), using basic scoring...")
-                                scores = {
-                                    'ai_cybersecurity': 0,
-                                    'quantum_cybersecurity': 0,
-                                    'ai_ethics': 0,
-                                    'quantum_ethics': 0
+                                # Ethics keywords
+                                ethics_keywords = ['ethics', 'bias', 'fairness', 'transparency', 'accountability',
+                                                 'responsible', 'trust', 'explainable', 'interpretable']
+                                
+                                # Calculate basic scores
+                                ai_score = sum(1 for kw in ai_keywords if kw in content_lower or kw in title_lower) * 5
+                                quantum_score = sum(1 for kw in quantum_keywords if kw in content_lower or kw in title_lower) * 8
+                                cyber_score = sum(1 for kw in cyber_keywords if kw in content_lower or kw in title_lower) * 6
+                                ethics_score = sum(1 for kw in ethics_keywords if kw in content_lower or kw in title_lower) * 7
+                                
+                                return {
+                                    'ai_cybersecurity': min(ai_score + cyber_score, 100),
+                                    'quantum_cybersecurity': min(quantum_score + cyber_score, 100),
+                                    'ai_ethics': min(ai_score + ethics_score, 100),
+                                    'quantum_ethics': min(quantum_score + ethics_score, 100)
                                 }
-                                st.info("✓ Basic scoring applied with zero values")
+                            
+                            scores = basic_scoring(clean_content, clean_title)
+                            st.success(f"✓ Basic scoring complete: AI Cyber={scores.get('ai_cybersecurity', 0)}, Quantum Cyber={scores.get('quantum_cybersecurity', 0)}, AI Ethics={scores.get('ai_ethics', 0)}, Quantum Ethics={scores.get('quantum_ethics', 0)}")
                             
                             # Save to database using db_manager with enhanced metadata
                             document_data = {
                                 'id': doc_id,
-                                'title': title,
-                                'content': content,
-                                'clean_content': content,
-                                'text_content': content,
+                                'title': clean_title,
+                                'content': clean_content,
+                                'clean_content': clean_content,
+                                'text_content': clean_content,
                                 'source_url': url_input,
                                 'document_type': "URL Document",
-                                'author': author,
-                                'organization': organization,
+                                'author': clean_author,
+                                'organization': clean_organization,
                                 'publication_date': pub_date,
                                 'ai_cybersecurity_score': scores.get('ai_cybersecurity', 0),
                                 'quantum_cybersecurity_score': scores.get('quantum_cybersecurity', 0),
