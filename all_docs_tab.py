@@ -539,23 +539,90 @@ def render():
         )
         
         if uploaded_file is not None:
+            st.success(f"File selected: {uploaded_file.name} ({uploaded_file.size} bytes)")
+            
             # Import enhanced policy uploader
             try:
                 from components.enhanced_policy_uploader import process_uploaded_file
-            except ImportError:
-                from utils.pdf_ingestion_thumbnails import process_pdf_with_thumbnail as process_uploaded_file
+                st.info("Using enhanced policy uploader")
+            except ImportError as e:
+                st.warning(f"Enhanced uploader not available: {e}")
+                try:
+                    from utils.pdf_ingestion_thumbnails import process_pdf_with_thumbnail as process_uploaded_file
+                    st.info("Using PDF thumbnail processor")
+                except ImportError as e2:
+                    st.error(f"No file processors available: {e2}")
+                    process_uploaded_file = None
             
-            if st.button("Process Upload", type="primary", use_container_width=True):
-                with st.spinner("Processing uploaded document..."):
-                    try:
-                        result = process_uploaded_file(uploaded_file)
-                        if result:
-                            st.success("Document processed successfully!")
-                            st.info("Refresh the page to see the new document in your collection")
-                        else:
-                            st.error("Failed to process document")
-                    except Exception as e:
-                        st.error(f"Error processing document: {str(e)}")
+            if process_uploaded_file is not None:
+                if st.button("Process Upload", type="primary", use_container_width=True):
+                    with st.spinner("Processing uploaded document..."):
+                        try:
+                            st.info(f"Processing file: {uploaded_file.name}")
+                            
+                            # Reset file position and process
+                            uploaded_file.seek(0)
+                            result = process_uploaded_file(uploaded_file)
+                            st.info("File processing completed")
+                            
+                            if result and result.get('success'):
+                                st.info("Content extracted successfully")
+                                
+                                # Extract content and metadata
+                                content = result.get('content', '')
+                                title = result.get('metadata', {}).get('title') or uploaded_file.name
+                                author = result.get('metadata', {}).get('author', 'Unknown')
+                                
+                                if len(content.strip()) > 50:
+                                    st.info("Calculating comprehensive scores...")
+                                    
+                                    # Import required modules
+                                    from utils.comprehensive_scoring import comprehensive_document_scoring
+                                    from utils.database import db_manager
+                                    import uuid
+                                    
+                                    # Generate scores
+                                    scores = comprehensive_document_scoring(content, title)
+                                    st.info(f"Scoring complete: AI={scores.get('ai_cybersecurity', 0)}, Quantum={scores.get('quantum_cybersecurity', 0)}")
+                                    
+                                    # Prepare document data
+                                    doc_id = str(uuid.uuid4())
+                                    document_data = {
+                                        'id': doc_id,
+                                        'title': title,
+                                        'content': content,
+                                        'clean_content': content,
+                                        'text_content': content,
+                                        'document_type': result.get('file_type', 'Unknown'),
+                                        'author': author,
+                                        'filename': uploaded_file.name,
+                                        'ai_cybersecurity_score': scores.get('ai_cybersecurity', 0),
+                                        'quantum_cybersecurity_score': scores.get('quantum_cybersecurity', 0),
+                                        'ai_ethics_score': scores.get('ai_ethics', 0),
+                                        'quantum_ethics_score': scores.get('quantum_ethics', 0)
+                                    }
+                                    
+                                    st.info("Saving document to database...")
+                                    save_result = db_manager.save_document(document_data)
+                                    
+                                    if save_result:
+                                        st.success("Document processed successfully!")
+                                        st.info("Document added to collection. Refresh to see it in the list.")
+                                        st.balloons()
+                                    else:
+                                        st.error("Failed to save document to database")
+                                else:
+                                    st.error("Could not extract sufficient content from file")
+                            else:
+                                error_msg = result.get('error', 'Unknown error') if result else 'Processing failed'
+                                st.error(f"Failed to process document: {error_msg}")
+                                
+                        except Exception as e:
+                            st.error(f"Error processing document: {str(e)}")
+                            import traceback
+                            st.code(traceback.format_exc())
+            else:
+                st.error("File processor not available. Please contact support.")
     
     with upload_col2:
         st.markdown('<div class="upload-section"><h4>🌐 Add from URL</h4></div>', unsafe_allow_html=True)
