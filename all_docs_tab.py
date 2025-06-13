@@ -1332,6 +1332,47 @@ def render():
                             # Determine the document topic
                             document_topic = determine_document_topic(clean_content, clean_title)
                             
+                            # Capture verification event for ML training
+                            if auto_mode:
+                                st.info("🔄 Auto mode enabled - skipping ML training capture")
+                            else:
+                                st.info("📚 Capturing verification patterns for ML training...")
+                                try:
+                                    from utils.ml_training_system import ml_training_system
+                                    
+                                    # Prepare original extraction data
+                                    original_extraction = {
+                                        'title': extract_title_from_url_content(content, metadata, url_input),
+                                        'author': extract_author_from_url_content(content, metadata, url_input),
+                                        'organization': extract_organization_from_url_content(content, metadata, url_input),
+                                        'topic': 'General',  # Default before verification
+                                        'date': extract_date_from_url_content(content, metadata)
+                                    }
+                                    
+                                    # Prepare verified extraction data
+                                    verified_extraction = {
+                                        'title': clean_title,
+                                        'author': clean_author,
+                                        'organization': clean_organization,
+                                        'topic': document_topic,
+                                        'date': pub_date
+                                    }
+                                    
+                                    # Capture the verification event
+                                    pattern_id = ml_training_system.capture_verification_event(
+                                        document_id=doc_id,
+                                        original_extraction=original_extraction,
+                                        verified_extraction=verified_extraction,
+                                        content=clean_content,
+                                        document_type=doc_type,
+                                        source_type='url'
+                                    )
+                                    
+                                    st.success(f"✓ ML training pattern captured: {pattern_id[:8]}...")
+                                    
+                                except Exception as e:
+                                    st.warning(f"ML training capture failed (non-critical): {str(e)}")
+                            
                             # Save to database using db_manager with enhanced metadata
                             document_data = {
                                 'id': doc_id,
@@ -1562,6 +1603,24 @@ def extract_title_from_url_content(content, metadata, url):
     
     # Try patterns on clean content
     full_content = '\n'.join(clean_lines)
+    
+    # Apply ML-learned patterns first
+    try:
+        from utils.ml_training_system import ml_training_system
+        
+        # Create initial extraction
+        initial_metadata = {'title': ''}
+        
+        # Apply learned patterns
+        improved_metadata = ml_training_system.apply_learned_patterns(
+            full_content, initial_metadata
+        )
+        
+        if improved_metadata.get('title') and improved_metadata['title'] != initial_metadata['title']:
+            return improved_metadata['title']
+            
+    except Exception as e:
+        pass  # Continue with traditional extraction if ML fails
     
     for pattern in title_patterns:
         matches = re.findall(pattern, full_content, re.IGNORECASE | re.MULTILINE)
