@@ -362,7 +362,7 @@ def render():
     
     with filter_col5:
         st.markdown("<br>", unsafe_allow_html=True)  # Spacing
-        if st.button("🗑️ Clear", key="clear_filters", help="Reset all filters"):
+        if st.button("Clear Filters", key="clear_filters", help="Reset all filters"):
             st.session_state["filters"] = {
                 "selected_types": [],
                 "selected_orgs": [],
@@ -1425,12 +1425,12 @@ def render_card_view(docs):
                 <div style='border:1px solid #ddd;padding:20px;border-radius:12px;margin:8px;
                 background:white;box-shadow:0 4px 6px rgba(0,0,0,0.1);
                 transition:transform 0.2s ease;border-left:5px solid #3B82F6'>
-                    <h3 style='margin:0 0 12px 0;color:#333;line-height:1.3'>{safe_title}</h3>
+                    <h3 style='margin:0 0 12px 0;color:#333;line-height:1.3;font-size:1rem'>{safe_title}</h3>
                     <div style='margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap'>
-                        <span style='background:#e8f5e8;padding:4px 10px;border-radius:12px;font-size:12px;color:#2e7d32'>{safe_topic}</span>
-                        <span style='background:#f0f0f0;padding:4px 10px;border-radius:12px;font-size:12px'>{safe_doc_type}</span>
-                        <span style='background:#e0f2fe;padding:4px 10px;border-radius:12px;font-size:12px;color:#0277bd'>{safe_author_org}</span>
-                        {f"<span style='background:#f3e5f5;padding:4px 10px;border-radius:12px;font-size:12px;color:#7b1fa2'>{safe_pub_date}</span>" if pub_date and pub_date != 'Date not available' else "<span style='background:#ffeaa7;padding:4px 10px;border-radius:12px;font-size:12px;color:#636e72'>Date not available</span>"}
+                        <span style='background:#e3f2fd;padding:4px 10px;border-radius:12px;font-size:12px;color:#1565c0'>{safe_topic}</span>
+                        <span style='background:#bbdefb;padding:4px 10px;border-radius:12px;font-size:12px;color:#0d47a1'>{safe_doc_type}</span>
+                        <span style='background:#e1f5fe;padding:4px 10px;border-radius:12px;font-size:12px;color:#01579b'>{safe_author_org}</span>
+                        {f"<span style='background:#e8f4fd;padding:4px 10px;border-radius:12px;font-size:12px;color:#0277bd'>{safe_pub_date}</span>" if pub_date and pub_date != 'Date not available' else "<span style='background:#e3f2fd;padding:4px 10px;border-radius:12px;font-size:12px;color:#1976d2'>Date not available</span>"}
                     </div>
                 </div>
             """, unsafe_allow_html=True)
@@ -1465,10 +1465,10 @@ def render_card_view(docs):
             st.markdown(f"""
                 <div style='margin:8px;padding:8px;background:#f8f9fa;border-radius:6px'>
                     <div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px'>
-                        <div><strong>AI Cybersecurity Maturity:</strong> {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity', raw_content, title)}</div>
-                        <div><strong>Quantum Cybersecurity Maturity:</strong> {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity', raw_content, title)}</div>
-                        <div><strong>AI Ethics:</strong> {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics', raw_content, title)}</div>
-                        <div><strong>Quantum Ethics:</strong> {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics', raw_content, title)}</div>
+                        <div><strong>AI Cybersecurity Maturity:</strong> <strong>{get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity', raw_content, title)}</strong></div>
+                        <div><strong>Quantum Cybersecurity Maturity:</strong> <strong>{get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity', raw_content, title)}</strong></div>
+                        <div><strong>AI Ethics:</strong> <strong>{get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics', raw_content, title)}</strong></div>
+                        <div><strong>Quantum Ethics:</strong> <strong>{get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics', raw_content, title)}</strong></div>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
