@@ -1017,75 +1017,75 @@ def render():
                                             help="Edit the organization name if needed"
                                         )
                                 
-                                # Document type selection
-                                doc_types = [
-                                    "Policy Document", "Research Report", "Technical Paper",
-                                    "White Paper", "Analysis", "Framework", "Guidelines",
-                                    "Strategy Document", "Academic Paper", "Government Report",
-                                    "Industry Report", "Other"
-                                ]
+                                    # Document type selection
+                                    doc_types = [
+                                        "Policy Document", "Research Report", "Technical Paper",
+                                        "White Paper", "Analysis", "Framework", "Guidelines",
+                                        "Strategy Document", "Academic Paper", "Government Report",
+                                        "Industry Report", "Other"
+                                    ]
+                                    
+                                    verified_doc_type = st.selectbox(
+                                        "Document Type",
+                                        doc_types,
+                                        index=0 if "policy" in title.lower() else 1,
+                                        help="Select the appropriate document type"
+                                    )
+                                    
+                                    # Content preview and editing
+                                    st.markdown("**Content Preview & Validation**")
+                                    content_preview = st.text_area(
+                                        "Content Preview (first 500 characters)",
+                                        value=content[:500] + ("..." if len(content) > 500 else ""),
+                                        height=100,
+                                        help="Preview of extracted content - verify it looks correct"
+                                    )
+                                    
+                                    # Metadata confidence indicators
+                                    st.markdown("**Extraction Confidence**")
+                                    conf_col1, conf_col2, conf_col3, conf_col4 = st.columns(4)
+                                    
+                                    with conf_col1:
+                                        title_conf = "High" if len(title) > 20 and title != "Document from URL" else "Low"
+                                        st.metric("Title", title_conf, help="Confidence in title extraction")
+                                    
+                                    with conf_col2:
+                                        author_conf = "High" if author != "Web Content" and len(author) > 5 else "Low"
+                                        st.metric("Author", author_conf, help="Confidence in author extraction")
+                                    
+                                    with conf_col3:
+                                        date_conf = "High" if pub_date else "Low"
+                                        st.metric("Date", date_conf, help="Confidence in date extraction")
+                                    
+                                    with conf_col4:
+                                        org_conf = "High" if organization != "Unknown" and len(organization) > 5 else "Low"
+                                        st.metric("Organization", org_conf, help="Confidence in organization extraction")
                                 
-                                verified_doc_type = st.selectbox(
-                                    "Document Type",
-                                    doc_types,
-                                    index=0 if "policy" in title.lower() else 1,
-                                    help="Select the appropriate document type"
-                                )
+                                # Action buttons
+                                st.markdown("---")
+                                action_col1, action_col2, action_col3 = st.columns([2, 1, 1])
                                 
-                                # Content preview and editing
-                                st.markdown("**Content Preview & Validation**")
-                                content_preview = st.text_area(
-                                    "Content Preview (first 500 characters)",
-                                    value=content[:500] + ("..." if len(content) > 500 else ""),
-                                    height=100,
-                                    help="Preview of extracted content - verify it looks correct"
-                                )
+                                with action_col1:
+                                    proceed_save = st.button(
+                                        "✅ Save Document with Verified Metadata",
+                                        type="primary",
+                                        use_container_width=True,
+                                        help="Save the document with the verified metadata"
+                                    )
                                 
-                                # Metadata confidence indicators
-                                st.markdown("**Extraction Confidence**")
-                                conf_col1, conf_col2, conf_col3, conf_col4 = st.columns(4)
+                                with action_col2:
+                                    if st.button("🔄 Re-extract Metadata", use_container_width=True):
+                                        st.info("Re-extracting metadata...")
+                                        # Trigger re-extraction by removing from processed URLs
+                                        if url_input in st.session_state.processed_urls:
+                                            st.session_state.processed_urls.remove(url_input)
+                                        st.rerun()
                                 
-                                with conf_col1:
-                                    title_conf = "High" if len(title) > 20 and title != "Document from URL" else "Low"
-                                    st.metric("Title", title_conf, help="Confidence in title extraction")
+                                with action_col3:
+                                    if st.button("❌ Cancel", use_container_width=True):
+                                        st.warning("Document processing cancelled")
+                                        return
                                 
-                                with conf_col2:
-                                    author_conf = "High" if author != "Web Content" and len(author) > 5 else "Low"
-                                    st.metric("Author", author_conf, help="Confidence in author extraction")
-                                
-                                with conf_col3:
-                                    date_conf = "High" if pub_date else "Low"
-                                    st.metric("Date", date_conf, help="Confidence in date extraction")
-                                
-                                with conf_col4:
-                                    org_conf = "High" if organization != "Unknown" and len(organization) > 5 else "Low"
-                                    st.metric("Organization", org_conf, help="Confidence in organization extraction")
-                            
-                            # Action buttons
-                            st.markdown("---")
-                            action_col1, action_col2, action_col3 = st.columns([2, 1, 1])
-                            
-                            with action_col1:
-                                proceed_save = st.button(
-                                    "✅ Save Document with Verified Metadata",
-                                    type="primary",
-                                    use_container_width=True,
-                                    help="Save the document with the verified metadata"
-                                )
-                            
-                            with action_col2:
-                                if st.button("🔄 Re-extract Metadata", use_container_width=True):
-                                    st.info("Re-extracting metadata...")
-                                    # Trigger re-extraction by removing from processed URLs
-                                    if url_input in st.session_state.processed_urls:
-                                        st.session_state.processed_urls.remove(url_input)
-                                    st.rerun()
-                            
-                            with action_col3:
-                                if st.button("❌ Cancel", use_container_width=True):
-                                    st.warning("Document processing cancelled")
-                                    return
-                            
                                 # Only proceed if user clicks save in manual mode
                                 if not proceed_save:
                                     st.info("👆 Review the metadata above and click 'Save Document' when ready")
