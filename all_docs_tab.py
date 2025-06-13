@@ -780,18 +780,69 @@ def render():
                             return
                         
                         # Extract content with enhanced metadata and multiple fallback methods
-                        st.info("📄 Extracting text content and metadata...")
+                        st.info("📄 Analyzing content type and extracting text...")
                         
                         content = None
                         metadata = None
                         
-                        # Method 1: Try trafilatura with different settings
-                        try:
-                            content = trafilatura.extract(response.text, include_comments=False, include_tables=True, include_formatting=True)
-                            metadata = trafilatura.extract_metadata(response.text)
-                            st.info(f"Method 1 (Trafilatura): {len(content) if content else 0} characters")
-                        except Exception as e:
-                            st.warning(f"Method 1 failed: {str(e)}")
+                        # Check if this is a PDF file
+                        content_type = response.headers.get('content-type', '').lower()
+                        is_pdf = (content_type.startswith('application/pdf') or 
+                                 url_input.lower().endswith('.pdf') or
+                                 response.content[:4] == b'%PDF')
+                        
+                        if is_pdf:
+                            st.info("🔍 PDF detected - using specialized PDF extraction...")
+                            try:
+                                import io
+                                from pypdf import PdfReader
+                                
+                                # Extract text from PDF
+                                pdf_file = io.BytesIO(response.content)
+                                pdf_reader = PdfReader(pdf_file)
+                                
+                                pdf_text = ""
+                                metadata_text = ""
+                                
+                                # Extract text from all pages
+                                for i, page in enumerate(pdf_reader.pages):
+                                    page_text = page.extract_text()
+                                    pdf_text += page_text + "\n"
+                                    
+                                    # Use first few pages for metadata extraction
+                                    if i < 3:
+                                        metadata_text += page_text + "\n"
+                                
+                                content = pdf_text.strip()
+                                
+                                # Extract PDF metadata
+                                pdf_info = pdf_reader.metadata
+                                if pdf_info:
+                                    class PDFMetadata:
+                                        def __init__(self, pdf_info):
+                                            self.title = pdf_info.get('/Title', '') if pdf_info.get('/Title') else ''
+                                            self.author = pdf_info.get('/Author', '') if pdf_info.get('/Author') else ''
+                                            self.subject = pdf_info.get('/Subject', '') if pdf_info.get('/Subject') else ''
+                                            self.creator = pdf_info.get('/Creator', '') if pdf_info.get('/Creator') else ''
+                                            self.producer = pdf_info.get('/Producer', '') if pdf_info.get('/Producer') else ''
+                                    
+                                    metadata = PDFMetadata(pdf_info)
+                                
+                                st.success(f"✓ PDF extraction: {len(content)} characters from {len(pdf_reader.pages)} pages")
+                                
+                            except Exception as e:
+                                st.warning(f"PDF extraction failed: {str(e)}")
+                                # Fall back to treating as regular content
+                                is_pdf = False
+                        
+                        if not is_pdf:
+                            # Method 1: Try trafilatura with different settings for HTML content
+                            try:
+                                content = trafilatura.extract(response.text, include_comments=False, include_tables=True, include_formatting=True)
+                                metadata = trafilatura.extract_metadata(response.text)
+                                st.info(f"Method 1 (Trafilatura): {len(content) if content else 0} characters")
+                            except Exception as e:
+                                st.warning(f"Method 1 failed: {str(e)}")
                         
                         # Method 2: Alternative trafilatura settings if first failed
                         if not content or len(content.strip()) < 100:
@@ -1329,77 +1380,92 @@ def render():
         render_policy_analyzer_modal()
 
 def extract_title_from_url_content(content, metadata, url):
-    """Extract title from URL content using multiple intelligent strategies."""
+    """Extract title from URL content using multiple intelligent strategies optimized for PDFs."""
     import re
     from urllib.parse import urlparse
     
     if not content:
         return "Document from URL"
     
-    # Try trafilatura metadata first
+    # Try metadata first (PDF or trafilatura)
     if metadata and hasattr(metadata, 'title') and metadata.title:
         title = metadata.title.strip()
-        if len(title) > 3 and len(title) < 300:
+        if len(title) > 3 and len(title) < 300 and not title.lower().startswith('untitled'):
             return title
     
-    # Enhanced title extraction patterns
+    # Enhanced patterns specifically for PDF and government documents
     title_patterns = [
-        # HTML title and headers
-        r'<title[^>]*>([^<]+)</title>',
-        r'<h1[^>]*>([^<]+)</h1>',
-        r'<h2[^>]*>([^<]+)</h2>',
+        # Government document patterns
+        r'(?:H\.R\.|S\.|PUBLIC LAW|BILL)\s*\d+[^\n]*([^\n]{20,150})',
+        r'((?:The\s+)?[A-Z][A-Za-z\s&,.-]{20,150})\s+(?:Act|Bill|Report|Policy|Framework|Strategy|Guidelines?|Document)',
+        r'([A-Z][A-Za-z\s&,.-]{30,150})\s*(?:\n|$)',
         
-        # Document-style titles
-        r'(?:Policy|Report|Document|Paper|Analysis|Study|Framework|Guidelines?|Strategy|Plan|Brief|Memo)\s*[:\-]?\s*([^\n]{10,150})',
-        r'([A-Z][A-Za-z\s\-:]{15,150})\s*(?:Policy|Report|Document|Analysis|Framework|Study|Strategy)',
-        r'The\s+([A-Z][^.!?\n]{15,120})\s+(?:Policy|Report|Document|Analysis)',
+        # Academic/research patterns
+        r'([A-Z][A-Za-z\s\-:&,.-]{25,150})\s*(?:Report|Analysis|Study|Research|White Paper|Framework)',
+        r'(?:Report on|Analysis of|Study of)\s+([A-Za-z\s\-:&,.-]{20,150})',
         
-        # Capitalized title lines
-        r'^([A-Z][A-Z\s\-:]{20,150})$',
-        r'^([A-Z][^.!?\n]{20,150})(?:\n|$)',
+        # Policy document patterns
+        r'([A-Z][A-Za-z\s\-:&,.-]{25,150})\s*(?:Policy|Guidelines?|Standards?|Principles)',
+        r'(?:Policy on|Guidelines for|Standards for)\s+([A-Za-z\s\-:&,.-]{15,150})',
         
-        # Markdown and text formatting
-        r'# ([^\n]+)',
-        r'^([^\n]+)\n=+',
-        r'^([^\n]+)\n-+',
+        # General document title patterns
+        r'^([A-Z][A-Za-z\s\-:&,.-]{20,200})(?:\s*\n|\s*$)',
+        r'Title:\s*([A-Za-z\s\-:&,.-]{10,150})',
+        r'Subject:\s*([A-Za-z\s\-:&,.-]{10,150})',
         
-        # Generic patterns
-        r'^([^.!?\n]{25,150})\s*$'
+        # Fallback patterns
+        r'^([A-Z][^.!?\n]{15,150})(?:\.|$)',
+        r'([A-Z][A-Za-z\s]{10,100})',
     ]
     
+    # Clean content and get meaningful lines
     content_lines = content.split('\n')
-    
-    # Clean and filter content lines
     clean_lines = []
-    for line in content_lines[:25]:  # Check first 25 lines
+    
+    for line in content_lines[:30]:  # Check more lines for PDFs
         line = line.strip()
-        # Skip obviously non-title content
-        if (line and len(line) > 10 and len(line) < 200 and 
+        # Remove common PDF artifacts and noise
+        line = re.sub(r'[^\w\s\-:&,.\(\)]', ' ', line)
+        line = re.sub(r'\s+', ' ', line).strip()
+        
+        # Skip noise lines common in PDFs
+        if (line and len(line) > 5 and len(line) < 250 and 
             not any(skip in line.lower() for skip in [
-                'http', 'www', 'copyright', '©', 'menu', 'navigation', 
-                'login', 'search', 'home', 'skip to', 'javascript', 'cookie',
-                'privacy policy', 'terms of service', 'contact', 'about us'
-            ])):
+                'page ', 'pdf', 'http', 'www', 'copyright', '©', 'all rights reserved',
+                'menu', 'navigation', 'login', 'search', 'home', 'skip to', 'javascript', 
+                'cookie', 'privacy policy', 'terms of service', 'contact', 'about us',
+                'print', 'download', 'save as', 'bookmark', 'share'
+            ]) and 
+            not re.match(r'^\d+$|^[A-Z]+$|^\W+$|^.{1,5}$', line)):
             clean_lines.append(line)
     
-    # Try title patterns on clean content
+    # Try patterns on clean content
     full_content = '\n'.join(clean_lines)
+    
     for pattern in title_patterns:
-        match = re.search(pattern, full_content, re.IGNORECASE | re.MULTILINE)
-        if match:
-            potential_title = match.group(1) if len(match.groups()) > 0 else match.group(0)
+        matches = re.findall(pattern, full_content, re.IGNORECASE | re.MULTILINE)
+        for match in matches:
+            if isinstance(match, tuple):
+                potential_title = match[0] if match else ""
+            else:
+                potential_title = match
+            
             potential_title = potential_title.strip()
-            if 10 <= len(potential_title) <= 200:
+            
+            # Validate potential title
+            if (15 <= len(potential_title) <= 200 and 
+                not potential_title.lower().startswith(('page ', 'section ', 'chapter ')) and
+                len(potential_title.split()) >= 3):
                 return potential_title
     
-    # Take the longest meaningful line from the beginning
+    # Look for the longest meaningful line in the first 10 clean lines
     for line in clean_lines[:10]:
-        if 20 <= len(line) <= 150:
-            # Avoid lines that are clearly not titles
-            if not re.search(r'^\d+$|^[A-Z]+$|^\W+$', line):
-                return line
+        if (20 <= len(line) <= 180 and 
+            len(line.split()) >= 4 and
+            not line.lower().startswith(('page ', 'section ', 'chapter ', 'table ', 'figure '))):
+            return line
     
-    # Fallback to URL-based title
+    # URL-based fallback
     if url:
         parsed_url = urlparse(url)
         path_parts = [part for part in parsed_url.path.split('/') if part]
@@ -1412,31 +1478,103 @@ def extract_title_from_url_content(content, metadata, url):
     return "Document from URL"
 
 def extract_author_from_url_content(content, metadata, url):
-    """Extract author from URL content using multiple strategies."""
+    """Extract author from URL content using enhanced strategies for PDFs and documents."""
     import re
+    from urllib.parse import urlparse
     
-    # Try trafilatura metadata first
+    if not content:
+        return "Unknown"
+    
+    # Try metadata first (PDF or trafilatura)
     if metadata and hasattr(metadata, 'author') and metadata.author:
-        return metadata.author.strip()
+        author = metadata.author.strip()
+        if len(author) > 2 and len(author) < 150:
+            return author
     
-    # Extract from content using patterns
+    # Enhanced author extraction patterns for government/academic documents
     author_patterns = [
-        r'(?:by|author|written by)[:\s]+([^\n,]+)',
-        r'(?:author|writer)[:\s]*([^\n,]+)',
-        r'@([a-zA-Z0-9_]+)',
+        # Government document authors
+        r'(?:Prepared by|Written by|Authored by|Created by)[:\s]+([A-Za-z\s,.-]{5,100})',
+        r'(?:Committee on|Subcommittee on)\s+([A-Za-z\s,.-]{10,100})',
+        r'(?:Staff|Team|Office|Department)[:\s]+([A-Za-z\s,.-]{10,100})',
+        
+        # Academic/research authors
+        r'(?:Author|Authors?)[:\s]*([A-Za-z\s,.-]{5,100})',
+        r'(?:By|Written by)[:\s]+([A-Za-z\s,.-]{5,100})',
+        r'(?:Principal Investigator|Lead Author)[:\s]+([A-Za-z\s,.-]{5,100})',
+        
+        # Report/document attribution
+        r'(?:Submitted by|Compiled by|Developed by)[:\s]+([A-Za-z\s,.-]{5,100})',
+        r'([A-Z][a-z]+\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s*,?\s*(?:Ph\.?D\.?|M\.?D\.?|J\.?D\.?)',
+        
+        # Organization as author patterns
+        r'(?:Office of|Department of|Bureau of|Agency for)\s+([A-Za-z\s,.-]{10,80})',
+        r'([A-Z][A-Za-z\s&]{5,60})\s+(?:Office|Department|Bureau|Agency)',
+        
+        # General patterns
+        r'Contact[:\s]+([A-Za-z\s,.-]{5,100})',
+        r'@([a-zA-Z0-9_\.]+)',
     ]
     
+    content_lines = content.split('\n')
+    clean_lines = []
+    
+    # Focus on first 20 lines where author info is typically found
+    for line in content_lines[:20]:
+        line = line.strip()
+        if line and len(line) > 3 and len(line) < 200:
+            clean_lines.append(line)
+    
+    full_content = '\n'.join(clean_lines)
+    
     for pattern in author_patterns:
-        match = re.search(pattern, content, re.IGNORECASE)
-        if match:
-            author = match.group(1).strip()
-            if len(author) > 2 and len(author) < 100:
+        matches = re.findall(pattern, full_content, re.IGNORECASE)
+        for match in matches:
+            if isinstance(match, tuple):
+                author = match[0] if match else ""
+            else:
+                author = match
+                
+            author = author.strip().strip(',.')
+            
+            # Validate author
+            if (3 <= len(author) <= 100 and 
+                not any(skip in author.lower() for skip in [
+                    'http', 'www', 'email', 'phone', 'fax', 'address',
+                    'page', 'section', 'chapter', 'table', 'figure'
+                ]) and
+                not re.match(r'^\d+$|^[A-Z]+$|^\W+$', author)):
                 return author
     
-    # Extract from URL domain
-    from urllib.parse import urlparse
-    parsed_url = urlparse(url)
-    return parsed_url.netloc or "Web Content"
+    # Extract organization name from URL as fallback
+    if url:
+        parsed_url = urlparse(url)
+        domain = parsed_url.netloc
+        
+        if domain:
+            # Clean up domain to organization name
+            if domain.startswith('www.'):
+                domain = domain[4:]
+            
+            # Convert common domains to organization names
+            domain_to_org = {
+                'congress.gov': 'U.S. Congress',
+                'whitehouse.gov': 'The White House',
+                'nist.gov': 'NIST',
+                'cisa.gov': 'CISA',
+                'dhs.gov': 'Department of Homeland Security',
+                'defense.gov': 'Department of Defense',
+                'energy.gov': 'Department of Energy'
+            }
+            
+            if domain in domain_to_org:
+                return domain_to_org[domain]
+            
+            org_name = domain.split('.')[0].replace('-', ' ').title()
+            if len(org_name) > 2:
+                return org_name
+    
+    return "Unknown"
 
 def extract_date_from_url_content(content, metadata):
     """Extract publication date from URL content using comprehensive strategies."""
@@ -1518,79 +1656,122 @@ def extract_date_from_url_content(content, metadata):
     return None
 
 def extract_organization_from_url_content(content, metadata, url):
-    """Extract organization from URL content using comprehensive strategies."""
+    """Extract organization from URL content using comprehensive strategies optimized for PDFs."""
     import re
     from urllib.parse import urlparse
     
     if not content:
         return "Unknown"
     
-    # Try trafilatura metadata first
+    # Try metadata first (PDF or trafilatura)
     if metadata and hasattr(metadata, 'sitename') and metadata.sitename:
         org = metadata.sitename.strip()
-        if len(org) > 2:
+        if len(org) > 2 and len(org) < 150:
             return org
     
-    # Enhanced organization extraction patterns
+    # Enhanced organization extraction patterns for government/academic documents
     org_patterns = [
-        # Explicit organization indicators
-        r'(?:Published by|Author|Organization|Institution|Company)[:\s]+([A-Z][A-Za-z\s&,.-]{5,80})',
-        r'(?:©|Copyright)[^A-Z]*([A-Z][A-Za-z\s&,.-]{5,80})(?:\s+\d{4})?',
-        r'([A-Z][A-Z\s&]+(?:CENTER|CENTRE|INSTITUTE|FOUNDATION|ORGANIZATION|ORGANISATION|UNIVERSITY|COLLEGE|DEPARTMENT|AGENCY|BUREAU|COUNCIL|COMMITTEE|ASSOCIATION|SOCIETY|GROUP|CORPORATION|COMPANY|LLC|INC))',
-        r'(CENTER FOR [A-Z\s]+)',
-        r'([A-Z\s]+(?:CENTER|CENTRE|INSTITUTE|FOUNDATION))',
-        r'([A-Z][A-Za-z\s&,.-]{10,60})\s+(?:Policy|Report|Document|Analysis|Framework|Study)',
+        # Government agencies and departments (high priority)
+        r'(?:U\.?S\.?\s+)?(?:DEPARTMENT|DEPT\.?)\s+OF\s+([A-Z][A-Za-z\s&,-]{5,60})',
+        r'(?:OFFICE|BUREAU|AGENCY)\s+(?:OF|FOR)\s+([A-Z][A-Za-z\s&,-]{5,60})',
+        r'([A-Z][A-Za-z\s&,-]{5,60})\s+(?:DEPARTMENT|AGENCY|BUREAU|OFFICE|ADMINISTRATION)',
+        r'(?:COMMITTEE|SUBCOMMITTEE)\s+ON\s+([A-Z][A-Za-z\s&,-]{10,60})',
         
-        # Academic and research institutions
-        r'([A-Z][A-Za-z\s&,.-]{5,60})\s+(?:University|College|Institute|School)',
-        r'(?:University of|College of)\s+([A-Z][A-Za-z\s&,.-]{5,60})',
-        
-        # Government agencies
-        r'([A-Z][A-Za-z\s&,.-]{5,60})\s+(?:Department|Agency|Bureau|Office|Ministry)',
-        r'(?:Department of|Agency for|Bureau of|Office of)\s+([A-Z][A-Za-z\s&,.-]{5,60})',
+        # Research and academic institutions
+        r'(CENTER FOR [A-Z][A-Za-z\s&,-]{5,60})',
+        r'([A-Z][A-Za-z\s&,-]{5,60})\s+(?:CENTER|CENTRE|INSTITUTE|FOUNDATION)',
+        r'([A-Z][A-Za-z\s&,-]{5,60})\s+(?:UNIVERSITY|COLLEGE|SCHOOL)',
+        r'(?:UNIVERSITY|COLLEGE)\s+OF\s+([A-Z][A-Za-z\s&,-]{5,60})',
         
         # Think tanks and policy organizations
-        r'([A-Z][A-Za-z\s&,.-]{5,60})\s+(?:Policy Institute|Think Tank|Research Center)',
+        r'([A-Z][A-Za-z\s&,-]{5,60})\s+(?:POLICY INSTITUTE|THINK TANK|RESEARCH CENTER)',
+        r'([A-Z][A-Za-z\s&,-]{5,60})\s+(?:FOUNDATION|INSTITUTE|COUNCIL|ASSOCIATION)',
         
-        # General patterns for capitalized organization names
-        r'([A-Z][A-Z\s&]{5,50})',
-        r'([A-Z][A-Za-z\s&,.-]{10,50})\s*$'
+        # Corporate and organizational patterns
+        r'([A-Z][A-Za-z\s&,-]{5,60})\s+(?:CORPORATION|COMPANY|LLC|INC\.?)',
+        r'(?:©|COPYRIGHT)[^A-Z]*([A-Z][A-Za-z\s&,-]{5,80})(?:\s+\d{4})?',
+        
+        # General organization patterns
+        r'(?:PUBLISHED BY|PREPARED BY|DEVELOPED BY)[:\s]+([A-Z][A-Za-z\s&,-]{5,80})',
+        r'([A-Z][A-Z\s&]{8,50})',  # All caps organization names
+        
+        # URL-based organization extraction
+        r'([A-Z][A-Za-z\s&,-]{8,80})\s*(?:\n|$)',
     ]
     
     content_lines = content.split('\n')
+    clean_lines = []
     
-    # Look for organization names in the first 30 lines
-    for line in content_lines[:30]:
+    # Focus on first 25 lines where organization info is typically found
+    for line in content_lines[:25]:
         line = line.strip()
-        if len(line) > 5 and len(line) < 200:
-            for pattern in org_patterns:
-                match = re.search(pattern, line, re.IGNORECASE)
-                if match:
-                    org_name = match.group(1).strip()
-                    # Clean up the organization name
-                    org_name = re.sub(r'\s+', ' ', org_name)
-                    org_name = org_name.strip('.,;:')
-                    
-                    # Validate it looks like an organization
-                    if (5 <= len(org_name) <= 80 and 
-                        not re.search(r'^\d+$|^[A-Z]+$|^\W+$', org_name) and
-                        not any(skip in org_name.lower() for skip in [
-                            'http', 'www', 'page', 'document', 'content', 'menu', 'home',
-                            'search', 'login', 'cookie', 'privacy', 'terms'
-                        ])):
-                        return org_name
+        # Clean up common PDF artifacts
+        line = re.sub(r'[^\w\s\-:&,.\(\)]', ' ', line)
+        line = re.sub(r'\s+', ' ', line).strip()
+        
+        if (line and len(line) > 5 and len(line) < 250 and 
+            not any(skip in line.lower() for skip in [
+                'page ', 'pdf', 'http', 'www', 'copyright ©', 'all rights reserved',
+                'menu', 'navigation', 'print', 'download', 'save as'
+            ])):
+            clean_lines.append(line)
     
-    # Try to extract from URL domain as fallback
+    full_content = '\n'.join(clean_lines)
+    
+    # Try patterns with priority order
+    for pattern in org_patterns:
+        matches = re.findall(pattern, full_content, re.IGNORECASE)
+        for match in matches:
+            if isinstance(match, tuple):
+                org_name = match[0] if match else ""
+            else:
+                org_name = match
+                
+            org_name = org_name.strip().strip('.,;:')
+            org_name = re.sub(r'\s+', ' ', org_name)
+            
+            # Validate organization name
+            if (5 <= len(org_name) <= 100 and 
+                not re.match(r'^\d+$|^[A-Z]+$|^\W+$', org_name) and
+                len(org_name.split()) >= 2 and
+                not any(skip in org_name.lower() for skip in [
+                    'page', 'section', 'chapter', 'table', 'figure', 'document',
+                    'report', 'analysis', 'study', 'policy', 'framework'
+                ])):
+                return org_name
+    
+    # URL-based organization extraction as fallback
     if url:
         parsed_url = urlparse(url)
         domain = parsed_url.netloc
         
-        # Clean up common domain patterns
-        if domain.startswith('www.'):
-            domain = domain[4:]
-        
-        # Convert domain to organization name
         if domain:
+            # Clean up domain
+            if domain.startswith('www.'):
+                domain = domain[4:]
+            
+            # Map common government and organization domains
+            domain_to_org = {
+                'congress.gov': 'U.S. Congress',
+                'whitehouse.gov': 'The White House',
+                'nist.gov': 'National Institute of Standards and Technology',
+                'cisa.gov': 'Cybersecurity and Infrastructure Security Agency',
+                'dhs.gov': 'Department of Homeland Security',
+                'defense.gov': 'Department of Defense',
+                'energy.gov': 'Department of Energy',
+                'justice.gov': 'Department of Justice',
+                'treasury.gov': 'Department of the Treasury',
+                'state.gov': 'Department of State',
+                'commerce.gov': 'Department of Commerce',
+                'gao.gov': 'Government Accountability Office',
+                'cbo.gov': 'Congressional Budget Office',
+                'omb.gov': 'Office of Management and Budget'
+            }
+            
+            if domain in domain_to_org:
+                return domain_to_org[domain]
+            
+            # Generic domain conversion
             org_name = domain.split('.')[0].replace('-', ' ').replace('_', ' ').title()
             if len(org_name) > 2:
                 return org_name
