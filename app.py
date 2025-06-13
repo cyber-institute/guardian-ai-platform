@@ -452,8 +452,8 @@ def main():
         # Navigation menu
         nav_option = st.selectbox(
             "Select page:",
-            ["Policy Repository", "Repository Admin", "LLM Training", "About GUARDIAN"],
-            index=["Policy Repository", "Repository Admin", "LLM Training", "About GUARDIAN"].index(st.session_state.nav_selection) if st.session_state.nav_selection in ["Policy Repository", "Repository Admin", "LLM Training", "About GUARDIAN"] else 0,
+            ["Policy Repository", "Repository Admin", "About GUARDIAN"],
+            index=["Policy Repository", "Repository Admin", "About GUARDIAN"].index(st.session_state.nav_selection) if st.session_state.nav_selection in ["Policy Repository", "Repository Admin", "About GUARDIAN"] else 0,
             key="sidebar_nav"
         )
         
@@ -592,11 +592,6 @@ def main():
     elif st.session_state.nav_selection == "Repository Admin":
         # Only render when actually selected - true lazy loading
         render_repository_admin_section()
-    
-    elif st.session_state.nav_selection == "LLM Training":
-        # LLM Training Management interface
-        from training_tab import render as render_training
-        render_training()
     
     elif st.session_state.nav_selection == "About GUARDIAN":
         # About tab with Patent Technology and Prototype Phased Plan as subtabs

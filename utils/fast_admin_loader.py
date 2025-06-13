@@ -42,6 +42,7 @@ def render_fast_repository_admin():
             "MultiLLM URL Analysis",
             "Multi-API Ingest",
             "Chatbot Configuration",
+            "LLM Training Management",
             "API Logs & Monitoring",
             "Database Status & Management",
             "Document Ingestion & Upload", 
@@ -60,6 +61,9 @@ def render_fast_repository_admin():
         
     elif admin_section == "Chatbot Configuration":
         render_chatbot_configuration()
+        
+    elif admin_section == "LLM Training Management":
+        render_llm_training_management()
         
     elif admin_section == "API Logs & Monitoring":
         render_api_logs_monitoring()
@@ -545,3 +549,8 @@ def render_api_logs_monitoring():
         
     with perf_col4:
         st.metric("Uptime", "99.8%", delta="0.1%")
+
+def render_llm_training_management():
+    """Render LLM Training Management as a subpage of Repository Admin"""
+    from training_tab import render as render_training
+    render_training()
