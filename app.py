@@ -596,8 +596,96 @@ def main():
         with about_subtab4:
             render_prototype_phased_plan_section()
     
-    # Add footer with logo and credit at bottom of page - appears on all pages
-    render_footer_section()
+    # Credit at bottom of page - appears on all pages
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    
+    # Simple credit section with logos
+    try:
+        import base64
+        
+        # Try to load logos
+        owl_data = None
+        cyber_data = None
+        
+        try:
+            with open("assets/owl_logo.png", "rb") as f:
+                owl_data = base64.b64encode(f.read()).decode()
+        except:
+            pass
+            
+        try:
+            with open("assets/cyber_institute_logo.jpg", "rb") as f:
+                cyber_data = base64.b64encode(f.read()).decode()
+        except:
+            pass
+        
+        # Create credit HTML
+        credit_html = """
+        <div style="
+            margin-top: 3rem;
+            padding: 2rem 0;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            background-color: #f8f9fa;
+        ">
+        """
+        
+        if owl_data:
+            credit_html += f"""
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <img src="data:image/png;base64,{owl_data}" 
+                     style="height: 60px; width: auto;" alt="GUARDIAN Logo">
+                <span style="font-size: 1.5rem; font-weight: 600; color: #2c3e50;">GUARDIAN</span>
+            </div>
+            """
+        else:
+            credit_html += """
+            <div style="display: flex; align-items: center;">
+                <span style="font-size: 1.5rem; font-weight: 600; color: #2c3e50;">GUARDIAN</span>
+            </div>
+            """
+        
+        if cyber_data:
+            credit_html += f"""
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <img src="data:image/jpeg;base64,{cyber_data}" 
+                     style="height: 40px; width: auto;" alt="Cyber Institute Logo">
+                <span style="font-size: 1rem; color: #666;">Developed by Cyber Institute</span>
+            </div>
+            """
+        else:
+            credit_html += """
+            <div style="display: flex; align-items: center;">
+                <span style="font-size: 1rem; color: #666;">Developed by Cyber Institute</span>
+            </div>
+            """
+        
+        credit_html += "</div>"
+        
+        st.markdown(credit_html, unsafe_allow_html=True)
+        
+    except Exception as e:
+        # Simple fallback credit
+        st.markdown("""
+        <div style="
+            margin-top: 3rem;
+            padding: 2rem 0;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            background-color: #f8f9fa;
+        ">
+            <div style="font-size: 1.5rem; font-weight: 600; color: #2c3e50; margin-bottom: 0.5rem;">
+                GUARDIAN
+            </div>
+            <div style="font-size: 1rem; color: #666;">
+                Developed by Cyber Institute
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
 def render_patent_technology_section():
     """Render the hierarchical Patent Technology section."""
