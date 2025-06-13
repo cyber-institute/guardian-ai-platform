@@ -155,30 +155,39 @@ class DatabaseManager:
             text_content = document.get('text_content', '') or document.get('content', '')
             content_preview = document.get('content', text_content[:1000] if text_content else '')
             
-            # Enhanced query to support all verification fields
+            # Enhanced query to match existing schema
             query = """
             INSERT INTO documents (
-                id, title, content, text_content, document_type, source,
-                author, author_organization, publish_date, topic,
+                title, content, text_content, document_type, source,
+                author_organization, publish_date, topic,
                 ai_cybersecurity_score, quantum_cybersecurity_score, 
-                ai_ethics_score, quantum_ethics_score, source_url
+                ai_ethics_score, quantum_ethics_score, metadata
             )
             VALUES (
-                :id, :title, :content, :text_content, :document_type, :source,
-                :author, :author_organization, :publish_date, :topic,
+                :title, :content, :text_content, :document_type, :source,
+                :author_organization, :publish_date, :topic,
                 :ai_cybersecurity_score, :quantum_cybersecurity_score,
-                :ai_ethics_score, :quantum_ethics_score, :source_url
+                :ai_ethics_score, :quantum_ethics_score, :metadata
             )
+            RETURNING id
             """
             
+            # Store additional metadata in JSONB field
+            metadata_json = {
+                'author': final_author,
+                'source_url': document.get('source_url', ''),
+                'verified': document.get('metadata_verified', False),
+                'extraction_method': document.get('extraction_method', 'manual'),
+                'verification_timestamp': document.get('verification_timestamp', ''),
+                'document_id': document.get('id', '')
+            }
+            
             params = {
-                'id': document.get('id'),
                 'title': final_title,
                 'content': content_preview,
                 'text_content': text_content,
                 'document_type': final_doc_type,
-                'source': document.get('source', 'manual'),
-                'author': final_author,
+                'source': document.get('source', 'url'),
                 'author_organization': final_org,
                 'publish_date': final_date,
                 'topic': final_topic,
@@ -186,7 +195,7 @@ class DatabaseManager:
                 'quantum_cybersecurity_score': document.get('quantum_cybersecurity_score', 0),
                 'ai_ethics_score': document.get('ai_ethics_score', 0),
                 'quantum_ethics_score': document.get('quantum_ethics_score', 0),
-                'source_url': document.get('source_url', '')
+                'metadata': json.dumps(metadata_json)
             }
             
             result = self.execute_query(query, params)
