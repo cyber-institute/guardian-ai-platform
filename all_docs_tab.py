@@ -894,9 +894,14 @@ def render():
                                 st.success("URL content processed successfully!")
                                 
                                 # Clear all caches to ensure document counts are consistent across pages
-                                st.cache_data.clear()
-                                fetch_documents_cached.clear()
-                                comprehensive_document_scoring_cached.clear()
+                                try:
+                                    st.cache_data.clear()
+                                    if hasattr(fetch_documents_cached, 'clear'):
+                                        fetch_documents_cached.clear()
+                                    if hasattr(comprehensive_document_scoring_cached, 'clear'):
+                                        comprehensive_document_scoring_cached.clear()
+                                except:
+                                    pass  # Cache clearing is best effort
                                 
                                 st.info("Document added to collection. Page will refresh to show updated counts.")
                                 st.balloons()
