@@ -3774,7 +3774,7 @@ def render_patent_scoring_management():
     
     with col2:
         st.markdown("**Remove Duplicates**")
-        if st.button("🗑️ Remove Title Duplicates", type="primary"):
+        if st.button("Remove Title Duplicates", type="primary"):
             try:
                 from utils.db import fetch_documents
                 import psycopg2
