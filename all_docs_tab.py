@@ -654,14 +654,78 @@ def render():
                         
                         st.info("✓ Modules imported successfully")
                         
-                        # Fetch and process URL content
-                        headers = {
-                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-                        }
-                        st.info("🌐 Fetching URL content...")
-                        response = requests.get(url_input, headers=headers, timeout=30)
-                        response.raise_for_status()
-                        st.info(f"✓ URL fetched successfully (Status: {response.status_code})")
+                        # Check for Congress.gov URLs and suggest alternative
+                        if 'congress.gov' in url_input.lower():
+                            if '/text' not in url_input:
+                                # Extract bill identifier and suggest text version
+                                import re
+                                bill_match = re.search(r'/bill/(\d+)th-congress/([^/]+)/(\d+)', url_input)
+                                if bill_match:
+                                    congress, chamber, bill_num = bill_match.groups()
+                                    text_url = f"https://www.congress.gov/bill/{congress}th-congress/{chamber}/{bill_num}/text"
+                                    st.warning("Congress.gov often blocks automated access. Try the text version:")
+                                    st.code(text_url)
+                        
+                        # Enhanced URL fetching with session and comprehensive headers
+                        session = requests.Session()
+                        session.headers.update({
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+                            'Accept-Language': 'en-US,en;q=0.9',
+                            'Accept-Encoding': 'gzip, deflate, br',
+                            'DNT': '1',
+                            'Connection': 'keep-alive',
+                            'Upgrade-Insecure-Requests': '1',
+                            'Sec-Fetch-Dest': 'document',
+                            'Sec-Fetch-Mode': 'navigate',
+                            'Sec-Fetch-Site': 'none',
+                            'Sec-Fetch-User': '?1',
+                            'Cache-Control': 'max-age=0'
+                        })
+                        
+                        st.info("Fetching URL content...")
+                        
+                        response = None
+                        last_error = None
+                        
+                        try:
+                            # Add delay to appear more human-like
+                            import time
+                            time.sleep(1)
+                            
+                            response = session.get(url_input, timeout=30, allow_redirects=True)
+                            
+                            if response.status_code == 200:
+                                st.info(f"URL fetched successfully (Status: {response.status_code})")
+                            else:
+                                last_error = f"HTTP {response.status_code}: {response.reason}"
+                                
+                        except requests.exceptions.RequestException as e:
+                            last_error = str(e)
+                        
+                        if not response or response.status_code != 200:
+                            # Provide specific guidance for common issues
+                            if last_error and ("403" in str(last_error) or "forbidden" in str(last_error).lower()):
+                                st.error("Access Denied")
+                                st.info("This website blocks automated access. Alternative approaches:")
+                                if 'congress.gov' in url_input.lower():
+                                    # Extract bill number for specific guidance
+                                    import re
+                                    bill_match = re.search(r'/bill/(\d+)th-congress/([^/]+)/(\d+)', url_input)
+                                    if bill_match:
+                                        congress, chamber, bill_num = bill_match.groups()
+                                        text_url = f"https://www.congress.gov/bill/{congress}th-congress/{chamber}/{bill_num}/text"
+                                        st.info("Try the direct text version:")
+                                        st.code(text_url)
+                                st.info("• Look for downloadable PDF versions")
+                                st.info("• Use the file upload feature instead")
+                                st.info("• Check for alternative document sources")
+                            elif last_error and "404" in str(last_error):
+                                st.error("Page Not Found")
+                                st.info("Verify the URL is correct and accessible")
+                            else:
+                                st.error(f"Unable to fetch URL: {last_error or 'Unknown error'}")
+                            return
                         
                         # Extract content with enhanced metadata
                         st.info("📄 Extracting text content and metadata...")
