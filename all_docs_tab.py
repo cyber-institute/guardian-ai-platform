@@ -772,55 +772,105 @@ def render():
                             except Exception as e:
                                 st.warning(f"Method 2 failed: {str(e)}")
                         
-                        # Method 3: BeautifulSoup fallback for stubborn content
+                        # Method 3: BeautifulSoup fallback with proper text extraction
                         if not content or len(content.strip()) < 100:
                             try:
                                 import re
                                 from bs4 import BeautifulSoup
+                                
+                                st.info("🔧 Method 3: Using BeautifulSoup for content extraction...")
                                 soup = BeautifulSoup(response.text, 'html.parser')
                                 
-                                # Remove script and style elements
-                                for script in soup(["script", "style", "nav", "header", "footer", "aside"]):
-                                    script.decompose()
+                                # Remove unwanted elements
+                                for element in soup(["script", "style", "nav", "header", "footer", "aside", "noscript"]):
+                                    element.decompose()
                                 
-                                # Extract text from main content areas
-                                main_content = soup.find('main') or soup.find('article') or soup.find('div', class_=re.compile(r'content|main|body', re.I))
+                                # Try to find main content areas
+                                content_selectors = [
+                                    'main', 'article', '.content', '.main-content', 
+                                    '.post-content', '.entry-content', '.article-content',
+                                    '#content', '#main', '.container .row'
+                                ]
+                                
+                                main_content = None
+                                for selector in content_selectors:
+                                    try:
+                                        if selector.startswith('.') or selector.startswith('#'):
+                                            main_content = soup.select_one(selector)
+                                        else:
+                                            main_content = soup.find(selector)
+                                        if main_content:
+                                            st.info(f"Found content using selector: {selector}")
+                                            break
+                                    except:
+                                        continue
+                                
+                                # Extract text with proper encoding handling
                                 if main_content:
-                                    content = main_content.get_text()
+                                    content = main_content.get_text(separator=' ', strip=True)
                                 else:
-                                    content = soup.get_text()
+                                    content = soup.get_text(separator=' ', strip=True)
                                 
-                                # Clean up whitespace
+                                # Clean up whitespace and ensure proper encoding
                                 content = re.sub(r'\s+', ' ', content).strip()
-                                st.info(f"Method 3 (BeautifulSoup): {len(content) if content else 0} characters")
+                                
+                                # Remove any remaining problematic characters
+                                content = content.encode('utf-8', errors='ignore').decode('utf-8')
+                                
+                                st.success(f"✓ Method 3 (BeautifulSoup): {len(content) if content else 0} characters extracted")
                             except Exception as e:
-                                st.warning(f"Method 3 failed: {str(e)}")
+                                st.warning(f"❌ Method 3 failed: {str(e)}")
                         
                         # Method 4: Raw text extraction as last resort
                         if not content or len(content.strip()) < 100:
                             try:
                                 import re
+                                st.info("🔧 Method 4: Using raw text extraction...")
+                                
                                 # Simple regex to extract text between tags
-                                content = re.sub(r'<[^>]+>', ' ', response.text)
-                                content = re.sub(r'\s+', ' ', content).strip()
-                                st.info(f"Method 4 (Raw extraction): {len(content) if content else 0} characters")
+                                raw_content = re.sub(r'<[^>]+>', ' ', response.text)
+                                raw_content = re.sub(r'\s+', ' ', raw_content).strip()
+                                
+                                # Ensure proper encoding
+                                content = raw_content.encode('utf-8', errors='ignore').decode('utf-8')
+                                
+                                st.success(f"✓ Method 4 (Raw extraction): {len(content) if content else 0} characters")
                             except Exception as e:
-                                st.warning(f"Method 4 failed: {str(e)}")
+                                st.warning(f"❌ Method 4 failed: {str(e)}")
                         
-                        st.info(f"✓ Final content extracted: {len(content) if content else 0} characters")
+                        st.success(f"🎯 Final content extracted: {len(content) if content else 0} characters")
+                        
+                        # Show content preview for debugging
+                        if content and len(content) > 100:
+                            st.info("📄 Content preview (first 300 characters):")
+                            preview = content[:300] + "..." if len(content) > 300 else content
+                            st.text(preview)
                         
                         if content and len(content.strip()) > 100:
                             # Extract proper title, author, and date using intelligent extraction
-                            title = extract_title_from_url_content(content, metadata, url_input)
-                            author = extract_author_from_url_content(content, metadata, url_input)
-                            pub_date = extract_date_from_url_content(content, metadata)
-                            organization = extract_organization_from_url_content(content, metadata, url_input)
+                            st.info("🔍 Analyzing content for metadata extraction...")
                             
-                            st.info(f"📝 Extracted metadata:")
-                            st.info(f"  Title: {title}")
-                            st.info(f"  Author: {author}")
-                            st.info(f"  Date: {pub_date}")
-                            st.info(f"  Organization: {organization}")
+                            title = extract_title_from_url_content(content, metadata, url_input)
+                            st.success(f"📝 Title extracted: {title}")
+                            
+                            author = extract_author_from_url_content(content, metadata, url_input)
+                            st.success(f"👤 Author extracted: {author}")
+                            
+                            pub_date = extract_date_from_url_content(content, metadata)
+                            st.success(f"📅 Date extracted: {pub_date if pub_date else 'Not found'}")
+                            
+                            organization = extract_organization_from_url_content(content, metadata, url_input)
+                            st.success(f"🏢 Organization extracted: {organization}")
+                            
+                            # Show detailed metadata summary
+                            st.info("📋 **Metadata Summary**")
+                            col1, col2 = st.columns(2)
+                            with col1:
+                                st.write(f"**Title:** {title}")
+                                st.write(f"**Author:** {author}")
+                            with col2:
+                                st.write(f"**Date:** {pub_date if pub_date else 'Not available'}")
+                                st.write(f"**Organization:** {organization}")
                             
                             # Check for duplicates first (simplified due to OpenAI quota limits)
                             st.info("🔍 Checking for duplicates...")
@@ -1077,40 +1127,87 @@ def render():
         render_policy_analyzer_modal()
 
 def extract_title_from_url_content(content, metadata, url):
-    """Extract title from URL content using multiple strategies."""
+    """Extract title from URL content using multiple intelligent strategies."""
     import re
     from urllib.parse import urlparse
     
+    if not content:
+        return "Document from URL"
+    
     # Try trafilatura metadata first
     if metadata and hasattr(metadata, 'title') and metadata.title:
-        return metadata.title.strip()
+        title = metadata.title.strip()
+        if len(title) > 3 and len(title) < 300:
+            return title
     
-    # Extract from content using patterns
+    # Enhanced title extraction patterns
     title_patterns = [
+        # HTML title and headers
         r'<title[^>]*>([^<]+)</title>',
         r'<h1[^>]*>([^<]+)</h1>',
+        r'<h2[^>]*>([^<]+)</h2>',
+        
+        # Document-style titles
+        r'(?:Policy|Report|Document|Paper|Analysis|Study|Framework|Guidelines?|Strategy|Plan|Brief|Memo)\s*[:\-]?\s*([^\n]{10,150})',
+        r'([A-Z][A-Za-z\s\-:]{15,150})\s*(?:Policy|Report|Document|Analysis|Framework|Study|Strategy)',
+        r'The\s+([A-Z][^.!?\n]{15,120})\s+(?:Policy|Report|Document|Analysis)',
+        
+        # Capitalized title lines
+        r'^([A-Z][A-Z\s\-:]{20,150})$',
+        r'^([A-Z][^.!?\n]{20,150})(?:\n|$)',
+        
+        # Markdown and text formatting
         r'# ([^\n]+)',
         r'^([^\n]+)\n=+',
         r'^([^\n]+)\n-+',
+        
+        # Generic patterns
+        r'^([^.!?\n]{25,150})\s*$'
     ]
     
-    for pattern in title_patterns:
-        match = re.search(pattern, content, re.IGNORECASE | re.MULTILINE)
-        if match:
-            title = match.group(1).strip()
-            if len(title) > 10 and len(title) < 200:
-                return title
+    content_lines = content.split('\n')
     
-    # Extract first meaningful line from content
-    lines = content.split('\n')
-    for line in lines:
+    # Clean and filter content lines
+    clean_lines = []
+    for line in content_lines[:25]:  # Check first 25 lines
         line = line.strip()
-        if len(line) > 10 and len(line) < 200 and not line.startswith(('http', 'www')):
-            return line
+        # Skip obviously non-title content
+        if (line and len(line) > 10 and len(line) < 200 and 
+            not any(skip in line.lower() for skip in [
+                'http', 'www', 'copyright', '©', 'menu', 'navigation', 
+                'login', 'search', 'home', 'skip to', 'javascript', 'cookie',
+                'privacy policy', 'terms of service', 'contact', 'about us'
+            ])):
+            clean_lines.append(line)
     
-    # Fall back to URL-based title
-    parsed_url = urlparse(url)
-    return parsed_url.path.split('/')[-1] or parsed_url.netloc or "URL Document"
+    # Try title patterns on clean content
+    full_content = '\n'.join(clean_lines)
+    for pattern in title_patterns:
+        match = re.search(pattern, full_content, re.IGNORECASE | re.MULTILINE)
+        if match:
+            potential_title = match.group(1) if len(match.groups()) > 0 else match.group(0)
+            potential_title = potential_title.strip()
+            if 10 <= len(potential_title) <= 200:
+                return potential_title
+    
+    # Take the longest meaningful line from the beginning
+    for line in clean_lines[:10]:
+        if 20 <= len(line) <= 150:
+            # Avoid lines that are clearly not titles
+            if not re.search(r'^\d+$|^[A-Z]+$|^\W+$', line):
+                return line
+    
+    # Fallback to URL-based title
+    if url:
+        parsed_url = urlparse(url)
+        path_parts = [part for part in parsed_url.path.split('/') if part]
+        if path_parts:
+            title_part = path_parts[-1].replace('-', ' ').replace('_', ' ')
+            title_part = re.sub(r'\.(pdf|html|htm|doc|docx)$', '', title_part, flags=re.IGNORECASE)
+            if len(title_part) > 3:
+                return title_part.title()
+    
+    return "Document from URL"
 
 def extract_author_from_url_content(content, metadata, url):
     """Extract author from URL content using multiple strategies."""
@@ -1140,58 +1237,163 @@ def extract_author_from_url_content(content, metadata, url):
     return parsed_url.netloc or "Web Content"
 
 def extract_date_from_url_content(content, metadata):
-    """Extract publication date from URL content."""
+    """Extract publication date from URL content using comprehensive strategies."""
     import re
     from datetime import datetime
+    
+    if not content:
+        return None
     
     # Try trafilatura metadata first
     if metadata and hasattr(metadata, 'date') and metadata.date:
         return metadata.date
     
-    # Extract from content using date patterns
+    # Enhanced date extraction patterns
     date_patterns = [
+        # Standard formats
         r'(\d{4}-\d{2}-\d{2})',
         r'(\d{1,2}/\d{1,2}/\d{4})',
         r'(\d{1,2}-\d{1,2}-\d{4})',
-        r'(?:published|date)[:\s]*(\d{4}-\d{2}-\d{2})',
-        r'(?:published|date)[:\s]*(\d{1,2}/\d{1,2}/\d{4})',
+        
+        # Month name formats
+        r'((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4})',
+        r'((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.?\s+\d{1,2},?\s+\d{4})',
+        r'(\d{1,2}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4})',
+        r'(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.?\s+\d{4})',
+        
+        # With context
+        r'(?:Published|Date|Updated|Created|Written)[:\s]+(\d{4}-\d{2}-\d{2})',
+        r'(?:Published|Date|Updated|Created|Written)[:\s]+(\d{1,2}/\d{1,2}/\d{4})',
+        r'(?:Published|Date|Updated|Created|Written)[:\s]+((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4})',
+        r'(?:Published|Date|Updated|Created|Written)[:\s]+((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.?\s+\d{1,2},?\s+\d{4})',
+        
+        # Copyright dates as fallback
+        r'©\s*(\d{4})',
+        r'Copyright\s+(\d{4})',
+        
+        # Flexible formats
+        r'(\d{4})',  # Just the year as last resort
     ]
     
-    for pattern in date_patterns:
-        match = re.search(pattern, content, re.IGNORECASE)
-        if match:
+    content_lines = content.split('\n')
+    
+    # Look for dates in the first 25 lines where metadata is usually found
+    for line in content_lines[:25]:
+        line = line.strip()
+        if len(line) > 4 and len(line) < 200:
+            for pattern in date_patterns[:-1]:  # Skip year-only pattern for main search
+                match = re.search(pattern, line, re.IGNORECASE)
+                if match:
+                    date_str = match.group(1).strip()
+                    try:
+                        # Try to parse the date
+                        if re.match(r'\d{4}-\d{2}-\d{2}', date_str):
+                            return datetime.strptime(date_str, '%Y-%m-%d').date()
+                        elif re.match(r'\d{1,2}/\d{1,2}/\d{4}', date_str):
+                            return datetime.strptime(date_str, '%m/%d/%Y').date()
+                        elif re.match(r'\d{1,2}-\d{1,2}-\d{4}', date_str):
+                            return datetime.strptime(date_str, '%m-%d-%Y').date()
+                        else:
+                            # Try various month name formats
+                            for fmt in ['%B %d, %Y', '%B %d %Y', '%b %d, %Y', '%b %d %Y', 
+                                      '%d %B %Y', '%d %b %Y']:
+                                try:
+                                    return datetime.strptime(date_str, fmt).date()
+                                except:
+                                    continue
+                    except:
+                        continue
+    
+    # Fallback: look for recent years in the content
+    current_year = datetime.now().year
+    for year in range(current_year, current_year - 10, -1):  # Look for years within last 10 years
+        if str(year) in content:
             try:
-                date_str = match.group(1)
-                if '-' in date_str and len(date_str) == 10:
-                    return datetime.strptime(date_str, '%Y-%m-%d').date()
-                elif '/' in date_str:
-                    return datetime.strptime(date_str, '%m/%d/%Y').date()
+                return datetime(year, 1, 1).date()
             except:
                 continue
     
     return None
 
 def extract_organization_from_url_content(content, metadata, url):
-    """Extract organization from URL content."""
+    """Extract organization from URL content using comprehensive strategies."""
     import re
     from urllib.parse import urlparse
     
+    if not content:
+        return "Unknown"
+    
     # Try trafilatura metadata first
     if metadata and hasattr(metadata, 'sitename') and metadata.sitename:
-        return metadata.sitename.strip()
+        org = metadata.sitename.strip()
+        if len(org) > 2:
+            return org
     
-    # Extract from URL domain
-    parsed_url = urlparse(url)
-    domain = parsed_url.netloc
+    # Enhanced organization extraction patterns
+    org_patterns = [
+        # Explicit organization indicators
+        r'(?:Published by|Author|Organization|Institution|Company)[:\s]+([A-Z][A-Za-z\s&,.-]{5,80})',
+        r'(?:©|Copyright)[^A-Z]*([A-Z][A-Za-z\s&,.-]{5,80})(?:\s+\d{4})?',
+        r'([A-Z][A-Z\s&]+(?:CENTER|CENTRE|INSTITUTE|FOUNDATION|ORGANIZATION|ORGANISATION|UNIVERSITY|COLLEGE|DEPARTMENT|AGENCY|BUREAU|COUNCIL|COMMITTEE|ASSOCIATION|SOCIETY|GROUP|CORPORATION|COMPANY|LLC|INC))',
+        r'(CENTER FOR [A-Z\s]+)',
+        r'([A-Z\s]+(?:CENTER|CENTRE|INSTITUTE|FOUNDATION))',
+        r'([A-Z][A-Za-z\s&,.-]{10,60})\s+(?:Policy|Report|Document|Analysis|Framework|Study)',
+        
+        # Academic and research institutions
+        r'([A-Z][A-Za-z\s&,.-]{5,60})\s+(?:University|College|Institute|School)',
+        r'(?:University of|College of)\s+([A-Z][A-Za-z\s&,.-]{5,60})',
+        
+        # Government agencies
+        r'([A-Z][A-Za-z\s&,.-]{5,60})\s+(?:Department|Agency|Bureau|Office|Ministry)',
+        r'(?:Department of|Agency for|Bureau of|Office of)\s+([A-Z][A-Za-z\s&,.-]{5,60})',
+        
+        # Think tanks and policy organizations
+        r'([A-Z][A-Za-z\s&,.-]{5,60})\s+(?:Policy Institute|Think Tank|Research Center)',
+        
+        # General patterns for capitalized organization names
+        r'([A-Z][A-Z\s&]{5,50})',
+        r'([A-Z][A-Za-z\s&,.-]{10,50})\s*$'
+    ]
     
-    # Clean up common domain patterns
-    if domain.startswith('www.'):
-        domain = domain[4:]
+    content_lines = content.split('\n')
     
-    # Convert domain to organization name
-    org_name = domain.split('.')[0].title()
+    # Look for organization names in the first 30 lines
+    for line in content_lines[:30]:
+        line = line.strip()
+        if len(line) > 5 and len(line) < 200:
+            for pattern in org_patterns:
+                match = re.search(pattern, line, re.IGNORECASE)
+                if match:
+                    org_name = match.group(1).strip()
+                    # Clean up the organization name
+                    org_name = re.sub(r'\s+', ' ', org_name)
+                    org_name = org_name.strip('.,;:')
+                    
+                    # Validate it looks like an organization
+                    if (5 <= len(org_name) <= 80 and 
+                        not re.search(r'^\d+$|^[A-Z]+$|^\W+$', org_name) and
+                        not any(skip in org_name.lower() for skip in [
+                            'http', 'www', 'page', 'document', 'content', 'menu', 'home',
+                            'search', 'login', 'cookie', 'privacy', 'terms'
+                        ])):
+                        return org_name
     
-    return org_name or "Unknown"
+    # Try to extract from URL domain as fallback
+    if url:
+        parsed_url = urlparse(url)
+        domain = parsed_url.netloc
+        
+        # Clean up common domain patterns
+        if domain.startswith('www.'):
+            domain = domain[4:]
+        
+        # Convert domain to organization name
+        if domain:
+            org_name = domain.split('.')[0].replace('-', ' ').replace('_', ' ').title()
+            if len(org_name) > 2:
+                return org_name
+    
+    return "Unknown"
 
 def render_policy_analyzer_modal():
     """Render the Policy Gap Analysis in a modal-style container"""
