@@ -874,13 +874,25 @@ def render():
     # Add divider line with reduced margins
     st.markdown('<div style="margin: 0.5rem 0;"><hr style="margin: 0; padding: 0; border-top: 1px solid #e5e7eb;"></div>', unsafe_allow_html=True)
     
-    # Credit section
-    st.markdown("""
-    <div style="text-align: center; margin: 1rem 0; padding: 0.5rem; background-color: #f8f9fa; border-radius: 8px;">
-        <span style="font-size: 1.1rem; font-weight: 600; color: #2c3e50;">GUARDIAN</span>
-        <span style="font-size: 0.9rem; color: #666; margin-left: 1rem;">Developed by Cyber Institute</span>
-    </div>
-    """, unsafe_allow_html=True)
+    # Credit section with Cyber Institute logo
+    try:
+        import base64
+        with open("assets/cyber_institute_logo.jpg", "rb") as f:
+            cyber_data = base64.b64encode(f.read()).decode()
+        
+        st.markdown(f"""
+        <div style="text-align: center; margin: 1rem 0; padding: 0.5rem; background-color: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            <img src="data:image/jpeg;base64,{cyber_data}" style="height: 30px; width: auto;" alt="Cyber Institute Logo">
+            <span style="font-size: 0.9rem; color: #666;">Developed by Cyber Institute</span>
+        </div>
+        """, unsafe_allow_html=True)
+    except:
+        # Fallback without logo
+        st.markdown("""
+        <div style="text-align: center; margin: 1rem 0; padding: 0.5rem; background-color: #f8f9fa; border-radius: 8px;">
+            <span style="font-size: 0.9rem; color: #666;">Developed by Cyber Institute</span>
+        </div>
+        """, unsafe_allow_html=True)
     
     # Policy Gap Analysis Modal
     if st.session_state.get('show_policy_analyzer', False):
