@@ -2827,72 +2827,30 @@ def render_grid_view(docs):
                 </style>
                 """, unsafe_allow_html=True)
                 
-                # Create touch-optimized score sections
-                def create_touch_score_section(framework_type, framework_name, score_value, content, title, doc_id, index):
-                    """Create a touch-optimized expandable score section"""
-                    
-                    # Determine score badge class and performance level
-                    if score_value == 'N/A':
-                        badge_class = 'score-na'
-                        performance = 'Not Available'
-                    elif isinstance(score_value, (int, float)):
-                        if score_value >= 80:
-                            badge_class = 'score-excellent'
-                            performance = 'Excellent'
-                        elif score_value >= 60:
-                            badge_class = 'score-good'
-                            performance = 'Good'
-                        else:
-                            badge_class = 'score-fair'
-                            performance = 'Needs Improvement'
-                    else:
-                        badge_class = 'score-na'
-                        performance = 'Not Available'
-                    
-                    # Create expandable section with enhanced styling
-                    expand_key = f"expand_{framework_type}_{doc_id}_{index}"
-                    
-                    # Custom title with score badge
-                    title_html = f"""
-                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                        <span style="font-weight: 600;">{framework_name}</span>
-                        <span class="score-badge {badge_class}">{score_value}</span>
-                    </div>
-                    """
-                    
-                    with st.expander(
-                        f"{framework_name}: {score_value}", 
-                        expanded=False
-                    ):
-                        show_score_explanation(framework_type, score_value, content, title)
-                
+                # Touch-optimized score sections with direct implementation
                 score_col1, score_col2 = st.columns(2)
                 
                 with score_col1:
-                    create_touch_score_section(
-                        'ai_cybersecurity', 'AI Cyber', 
-                        scores.get('ai_cybersecurity', 'N/A'), 
-                        content, title, doc.get('id', i), i
-                    )
+                    # AI Cybersecurity Score
+                    ai_cyber_score = scores.get('ai_cybersecurity', 'N/A')
+                    with st.expander(f"🔒 AI Cyber: {ai_cyber_score}", expanded=False):
+                        show_score_explanation('ai_cybersecurity', ai_cyber_score, content, title)
                     
-                    create_touch_score_section(
-                        'ai_ethics', 'AI Ethics', 
-                        scores.get('ai_ethics', 'N/A'), 
-                        content, title, doc.get('id', i), i
-                    )
+                    # AI Ethics Score  
+                    ai_ethics_score = scores.get('ai_ethics', 'N/A')
+                    with st.expander(f"⚖️ AI Ethics: {ai_ethics_score}", expanded=False):
+                        show_score_explanation('ai_ethics', ai_ethics_score, content, title)
                         
                 with score_col2:
-                    create_touch_score_section(
-                        'quantum_cybersecurity', 'Q Cyber', 
-                        scores.get('quantum_cybersecurity', 'N/A'), 
-                        content, title, doc.get('id', i), i
-                    )
+                    # Quantum Cybersecurity Score
+                    q_cyber_score = scores.get('quantum_cybersecurity', 'N/A')
+                    with st.expander(f"🔐 Q Cyber: {q_cyber_score}", expanded=False):
+                        show_score_explanation('quantum_cybersecurity', q_cyber_score, content, title)
                     
-                    create_touch_score_section(
-                        'quantum_ethics', 'Q Ethics', 
-                        scores.get('quantum_ethics', 'N/A'), 
-                        content, title, doc.get('id', i), i
-                    )
+                    # Quantum Ethics Score
+                    q_ethics_score = scores.get('quantum_ethics', 'N/A')
+                    with st.expander(f"⚡ Q Ethics: {q_ethics_score}", expanded=False):
+                        show_score_explanation('quantum_ethics', q_ethics_score, content, title)
                 
                 # Content preview
                 st.markdown(f"<p style='font-size:11px;color:#666;margin:0'>{safe_content_preview[:120]}{'...' if len(safe_content_preview) > 120 else ''}</p>", unsafe_allow_html=True)
