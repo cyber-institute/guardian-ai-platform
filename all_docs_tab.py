@@ -2810,26 +2810,28 @@ def render_minimal_list(docs):
             </div>
             """, unsafe_allow_html=True)
         
-        # Ultra-small clear action buttons
+        # Minimal clear action buttons
         st.markdown("""
         <style>
         div[data-testid="column"] > div > .stButton > button {
-            height: 18px !important;
-            padding: 0px 3px !important;
-            font-size: 8px !important;
-            line-height: 1.1 !important;
-            border: 1px solid #e5e7eb !important;
-            background: transparent !important;
-            color: #6b7280 !important;
-            border-radius: 2px !important;
-            margin: 1px !important;
-            min-height: 18px !important;
-            font-weight: 400 !important;
+            height: 16px !important;
+            padding: 0px 2px !important;
+            font-size: 7px !important;
+            line-height: 1.0 !important;
+            border: 0.5px solid #f3f4f6 !important;
+            background: rgba(255,255,255,0.1) !important;
+            color: #9ca3af !important;
+            border-radius: 1px !important;
+            margin: 0.5px !important;
+            min-height: 16px !important;
+            font-weight: 300 !important;
+            opacity: 0.8 !important;
         }
         div[data-testid="column"] > div > .stButton > button:hover {
-            background: #f9fafb !important;
-            border-color: #d1d5db !important;
-            color: #374151 !important;
+            background: rgba(249,250,251,0.3) !important;
+            border-color: #e5e7eb !important;
+            color: #6b7280 !important;
+            opacity: 1.0 !important;
         }
         </style>
         """, unsafe_allow_html=True)
