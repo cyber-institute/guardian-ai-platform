@@ -2810,18 +2810,20 @@ def render_minimal_list(docs):
             </div>
             """, unsafe_allow_html=True)
         
-        # Compact action buttons
+        # Ultra-compact action buttons
         st.markdown("""
         <style>
         .stButton > button {
-            height: 28px !important;
-            padding: 2px 8px !important;
-            font-size: 11px !important;
+            height: 20px !important;
+            padding: 1px 4px !important;
+            font-size: 9px !important;
+            line-height: 1.2 !important;
             border: 1px solid #d1d5db !important;
             background: transparent !important;
             color: #374151 !important;
-            border-radius: 4px !important;
-            margin-right: 4px !important;
+            border-radius: 3px !important;
+            margin-right: 2px !important;
+            min-height: 20px !important;
         }
         .stButton > button:hover {
             background: #f3f4f6 !important;
