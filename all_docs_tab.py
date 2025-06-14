@@ -2639,53 +2639,50 @@ def render_grid_view(docs):
             else:
                 title_html = html.escape(title[:40]) + ('...' if len(title) > 40 else '')
             
-            st.markdown(f"""
-                <div style='border:2px solid #f0f0f0;padding:12px;border-radius:8px;margin:6px;
-                background:white;box-shadow:0 2px 4px rgba(0,0,0,0.08);
-                border-left:4px solid #3B82F6'>
-                    <h4 style='margin:0 0 6px 0;font-size:15px'>{title_html}</h4>
-                    <div style='font-size:10px;color:#666;margin-bottom:8px' title='Type: {safe_doc_type} • Author/Org: {safe_author_org} • Published: {safe_pub_date}'>{safe_doc_type} • {safe_author_org} • {safe_pub_date}</div>
-                    <div style='margin-bottom:8px;font-size:10px'>
-                        <div style='margin-bottom:4px;font-weight:600;color:#333'>Framework Scores (Click for explanations):</div>
-                        <div style='display:grid;grid-template-columns:1fr 1fr;gap:6px'>""")
-            
-            # Create interactive score display with explanations
-            st.markdown("**Framework Scores (Click for explanations):**")
-            
-            score_col1, score_col2 = st.columns(2)
-            
-            with score_col1:
-                if st.button(f"AI Cyber: {scores.get('ai_cybersecurity', 'N/A')}", 
-                           key=f"ai_cyber_{doc.get('id', i)}", 
-                           help="Click for detailed AI Cybersecurity scoring explanation",
-                           type="secondary"):
-                    show_score_explanation('ai_cybersecurity', scores.get('ai_cybersecurity', 'N/A'), content, title)
-                
-                if st.button(f"AI Ethics: {scores.get('ai_ethics', 'N/A')}", 
-                           key=f"ai_ethics_{doc.get('id', i)}", 
-                           help="Click for detailed AI Ethics scoring explanation",
-                           type="secondary"):
-                    show_score_explanation('ai_ethics', scores.get('ai_ethics', 'N/A'), content, title)
-                    
-            with score_col2:
-                if st.button(f"Q Cyber: {scores.get('quantum_cybersecurity', 'N/A')}", 
-                           key=f"q_cyber_{doc.get('id', i)}", 
-                           help="Click for detailed Quantum Cybersecurity scoring explanation",
-                           type="secondary"):
-                    show_score_explanation('quantum_cybersecurity', scores.get('quantum_cybersecurity', 'N/A'), content, title)
-                
-                if st.button(f"Q Ethics: {scores.get('quantum_ethics', 'N/A')}", 
-                           key=f"q_ethics_{doc.get('id', i)}", 
-                           help="Click for detailed Quantum Ethics scoring explanation",
-                           type="secondary"):
-                    show_score_explanation('quantum_ethics', scores.get('quantum_ethics', 'N/A'), content, title)
-            
-            st.markdown("""
-                        </div>
+            # Create document card container
+            with st.container():
+                st.markdown(f"""
+                    <div style='border:2px solid #f0f0f0;padding:12px;border-radius:8px;margin:6px;
+                    background:white;box-shadow:0 2px 4px rgba(0,0,0,0.08);
+                    border-left:4px solid #3B82F6'>
+                        <h4 style='margin:0 0 6px 0;font-size:15px'>{title_html}</h4>
+                        <div style='font-size:10px;color:#666;margin-bottom:8px' title='Type: {safe_doc_type} • Author/Org: {safe_author_org} • Published: {safe_pub_date}'>{safe_doc_type} • {safe_author_org} • {safe_pub_date}</div>
                     </div>
-                    <p style='font-size:11px;color:#666;margin:0'>{safe_content_preview[:120]}{'...' if len(safe_content_preview) > 120 else ''}</p>
-                </div>
-            """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
+                
+                # Interactive scoring section outside HTML
+                st.markdown("**Framework Scores (Click for explanations):**")
+                
+                score_col1, score_col2 = st.columns(2)
+                
+                with score_col1:
+                    if st.button(f"AI Cyber: {scores.get('ai_cybersecurity', 'N/A')}", 
+                               key=f"ai_cyber_{doc.get('id', i)}", 
+                               help="Click for detailed AI Cybersecurity scoring explanation",
+                               type="secondary"):
+                        show_score_explanation('ai_cybersecurity', scores.get('ai_cybersecurity', 'N/A'), content, title)
+                    
+                    if st.button(f"AI Ethics: {scores.get('ai_ethics', 'N/A')}", 
+                               key=f"ai_ethics_{doc.get('id', i)}", 
+                               help="Click for detailed AI Ethics scoring explanation",
+                               type="secondary"):
+                        show_score_explanation('ai_ethics', scores.get('ai_ethics', 'N/A'), content, title)
+                        
+                with score_col2:
+                    if st.button(f"Q Cyber: {scores.get('quantum_cybersecurity', 'N/A')}", 
+                               key=f"q_cyber_{doc.get('id', i)}", 
+                               help="Click for detailed Quantum Cybersecurity scoring explanation",
+                               type="secondary"):
+                        show_score_explanation('quantum_cybersecurity', scores.get('quantum_cybersecurity', 'N/A'), content, title)
+                    
+                    if st.button(f"Q Ethics: {scores.get('quantum_ethics', 'N/A')}", 
+                               key=f"q_ethics_{doc.get('id', i)}", 
+                               help="Click for detailed Quantum Ethics scoring explanation",
+                               type="secondary"):
+                        show_score_explanation('quantum_ethics', scores.get('quantum_ethics', 'N/A'), content, title)
+                
+                # Content preview
+                st.markdown(f"<p style='font-size:11px;color:#666;margin:0'>{safe_content_preview[:120]}{'...' if len(safe_content_preview) > 120 else ''}</p>", unsafe_allow_html=True)
 
 def render_table_view(docs):
     """Render documents in table format."""
