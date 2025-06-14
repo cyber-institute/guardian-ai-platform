@@ -349,13 +349,7 @@ def get_document_topic(doc):
 def render():
     """Render the All Documents tab with comprehensive document repository."""
     
-    # Test expandable section to debug touch issues
-    st.markdown("### Debug Test")
-    with st.expander("🔍 Test Touch - Tap Here", expanded=False):
-        st.write("If you can see this text after tapping above, the expanders work!")
-        st.write("This confirms the touch interaction is functioning.")
-    
-    st.markdown("---")
+
 
     try:
         # Force refresh documents - clear all caching mechanisms
@@ -2629,106 +2623,38 @@ def render_grid_view(docs):
                     border-left:4px solid #3B82F6'>
                         <h4 style='margin:0 0 6px 0;font-size:15px'>{title_html}</h4>
                         <div style='font-size:10px;color:#666;margin-bottom:8px' title='Type: {safe_doc_type} • Author/Org: {safe_author_org} • Published: {safe_pub_date}'>{safe_doc_type} • {safe_author_org} • {safe_pub_date}</div>
+                        <p style='font-size:11px;color:#666;margin:8px 0'>{safe_content_preview[:120]}{'...' if len(safe_content_preview) > 120 else ''}</p>
                     </div>
                 """, unsafe_allow_html=True)
+            
+            # Framework scores OUTSIDE the styled container to avoid CSS conflicts
+            st.markdown("**Framework Scores (Tap to expand):**")
+            
+            score_col1, score_col2 = st.columns(2)
+            
+            with score_col1:
+                # AI Cybersecurity Score
+                ai_cyber_score = scores.get('ai_cybersecurity', 'N/A')
+                with st.expander(f"🔒 AI Cyber: {ai_cyber_score}", expanded=False):
+                    show_score_explanation('ai_cybersecurity', ai_cyber_score, content, title)
                 
-                # Simplified mobile-friendly styling for expanders
-                st.markdown("""
-                <style>
-                /* Simple, working expander styling */
-                .stExpander {
-                    margin: 8px 0 !important;
-                    border: 1px solid #ddd !important;
-                    border-radius: 8px !important;
-                    background: white !important;
-                }
-                
-                .stExpander details summary {
-                    padding: 16px !important;
-                    font-size: 16px !important;
-                    font-weight: 600 !important;
-                    cursor: pointer !important;
-                    background: #f8f9fa !important;
-                    border-radius: 8px !important;
-                    border: none !important;
-                    outline: none !important;
-                    -webkit-tap-highlight-color: rgba(0,0,0,0.1) !important;
-                    user-select: none !important;
-                }
-                
-                .stExpander details summary:hover,
-                .stExpander details summary:focus,
-                .stExpander details summary:active {
-                    background: #e9ecef !important;
-                    color: #495057 !important;
-                }
-                
-                .stExpander details[open] summary {
-                    background: #d1ecf1 !important;
-                    border-bottom: 1px solid #bee5eb !important;
-                    border-radius: 8px 8px 0 0 !important;
-                }
-                
-                .stExpander .streamlit-expanderContent {
-                    padding: 16px !important;
-                    background: #fafbfc !important;
-                    border-radius: 0 0 8px 8px !important;
-                }
-                
-                /* Mobile specific optimizations */
-                @media (max-width: 768px) {
-                    .stExpander details summary {
-                        padding: 18px !important;
-                        font-size: 17px !important;
-                        min-height: 56px !important;
-                        display: flex !important;
-                        align-items: center !important;
-                    }
+                # AI Ethics Score  
+                ai_ethics_score = scores.get('ai_ethics', 'N/A')
+                with st.expander(f"⚖️ AI Ethics: {ai_ethics_score}", expanded=False):
+                    show_score_explanation('ai_ethics', ai_ethics_score, content, title)
                     
-                    .stExpander {
-                        margin: 12px 0 !important;
-                    }
-                }
+            with score_col2:
+                # Quantum Cybersecurity Score
+                q_cyber_score = scores.get('quantum_cybersecurity', 'N/A')
+                with st.expander(f"🔐 Q Cyber: {q_cyber_score}", expanded=False):
+                    show_score_explanation('quantum_cybersecurity', q_cyber_score, content, title)
                 
-                /* Ensure touch targets are large enough */
-                .stExpander details summary {
-                    min-height: 48px !important;
-                    display: flex !important;
-                    align-items: center !important;
-                    touch-action: manipulation !important;
-                }
-                </style>
-                """, unsafe_allow_html=True)
-                
-                st.markdown("**Framework Scores (Tap to expand):**")
-                
-                # Touch-optimized score sections with direct implementation
-                score_col1, score_col2 = st.columns(2)
-                
-                with score_col1:
-                    # AI Cybersecurity Score
-                    ai_cyber_score = scores.get('ai_cybersecurity', 'N/A')
-                    with st.expander(f"🔒 AI Cyber: {ai_cyber_score}", expanded=False):
-                        show_score_explanation('ai_cybersecurity', ai_cyber_score, content, title)
-                    
-                    # AI Ethics Score  
-                    ai_ethics_score = scores.get('ai_ethics', 'N/A')
-                    with st.expander(f"⚖️ AI Ethics: {ai_ethics_score}", expanded=False):
-                        show_score_explanation('ai_ethics', ai_ethics_score, content, title)
-                        
-                with score_col2:
-                    # Quantum Cybersecurity Score
-                    q_cyber_score = scores.get('quantum_cybersecurity', 'N/A')
-                    with st.expander(f"🔐 Q Cyber: {q_cyber_score}", expanded=False):
-                        show_score_explanation('quantum_cybersecurity', q_cyber_score, content, title)
-                    
-                    # Quantum Ethics Score
-                    q_ethics_score = scores.get('quantum_ethics', 'N/A')
-                    with st.expander(f"⚡ Q Ethics: {q_ethics_score}", expanded=False):
-                        show_score_explanation('quantum_ethics', q_ethics_score, content, title)
-                
-                # Content preview
-                st.markdown(f"<p style='font-size:11px;color:#666;margin:0'>{safe_content_preview[:120]}{'...' if len(safe_content_preview) > 120 else ''}</p>", unsafe_allow_html=True)
+                # Quantum Ethics Score
+                q_ethics_score = scores.get('quantum_ethics', 'N/A')
+                with st.expander(f"⚡ Q Ethics: {q_ethics_score}", expanded=False):
+                    show_score_explanation('quantum_ethics', q_ethics_score, content, title)
+            
+            st.markdown("---")  # Separator between documents
 
 def render_table_view(docs):
     """Render documents in table format."""
