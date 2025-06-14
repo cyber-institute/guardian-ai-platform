@@ -7,6 +7,7 @@ import re
 from datetime import datetime
 from typing import Dict, Optional, List
 import json
+from utils.organization_acronym_converter import convert_org_to_acronym
 
 class EnhancedMetadataExtractor:
     """
@@ -182,14 +183,17 @@ class EnhancedMetadataExtractor:
         
         for org, patterns in org_patterns.items():
             if any(re.search(pattern, content_lower) for pattern in patterns):
-                return org
+                return convert_org_to_acronym(org)
         
         # Strategy 3: Look for author affiliations
         affiliation_match = re.search(r'(?:affiliation|organization|institution)[:]\s*([^.\n]+)', content_lower)
         if affiliation_match:
-            return affiliation_match.group(1).strip().title()
+            extracted_org = affiliation_match.group(1).strip().title()
+            return convert_org_to_acronym(extracted_org)
         
-        return "Unknown"
+        # Convert to acronym before returning
+        extracted_org = "Unknown"
+        return convert_org_to_acronym(extracted_org)
     
     def _extract_date(self, content: str) -> Optional[str]:
         """Extract publication date with comprehensive patterns"""
