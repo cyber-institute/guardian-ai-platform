@@ -1,282 +1,302 @@
 """
-Enhanced Multi-LLM Metadata Extractor
-Comprehensive metadata extraction for all document ingestion methods
+Enhanced Metadata Extraction System for GUARDIAN
+Fixes metadata parsing issues and improves accuracy for AI/Quantum documents
 """
 
-import os
 import re
+from datetime import datetime
+from typing import Dict, Optional, List
 import json
-from typing import Dict, Optional
-from openai import OpenAI
 
 class EnhancedMetadataExtractor:
-    """Advanced metadata extraction using multi-LLM intelligence"""
+    """
+    Advanced metadata extraction with specialized patterns for technical documents
+    """
     
     def __init__(self):
-        self.client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        self.ai_indicators = [
+            'artificial intelligence', 'machine learning', 'ai model', 'neural network',
+            'generative ai', 'foundation model', 'large language model', 'deep learning',
+            'ai risk', 'ai governance', 'ai ethics', 'ai safety', 'responsible ai'
+        ]
+        
+        self.quantum_indicators = [
+            'quantum computing', 'quantum cryptography', 'post-quantum', 'quantum-safe',
+            'quantum key distribution', 'quantum algorithm', 'quantum security',
+            'quantum resistant', 'quantum threat', 'qkd'
+        ]
+        
+        self.cybersecurity_indicators = [
+            'cybersecurity', 'information security', 'cyber security', 'security framework',
+            'vulnerability', 'threat', 'risk management', 'secure development'
+        ]
+        
+        self.ethics_indicators = [
+            'ethics', 'bias', 'fairness', 'transparency', 'accountability',
+            'responsible', 'trustworthy', 'governance', 'compliance'
+        ]
     
-    def extract_comprehensive_metadata(self, title: str, content: str, url: str = "", filename: str = "") -> Dict[str, any]:
-        """Extract comprehensive metadata using multiple intelligence layers"""
+    def extract_comprehensive_metadata(self, content: str, title: str = "", url: str = "") -> Dict:
+        """Extract comprehensive metadata from document content"""
         
-        # Multi-layer extraction
-        llm_metadata = self._extract_with_llm(title, content, url, filename)
-        pattern_metadata = self._extract_with_patterns(title, content, url, filename)
-        
-        # Combine and prioritize results
-        combined_metadata = self._combine_metadata(llm_metadata, pattern_metadata)
-        
-        # Clean HTML artifacts
-        cleaned_metadata = self._clean_html_artifacts(combined_metadata)
-        
-        return cleaned_metadata
-    
-    def _extract_with_llm(self, title: str, content: str, url: str, filename: str) -> Dict[str, any]:
-        """Extract metadata using LLM intelligence"""
-        
-        try:
-            prompt = f"""
-            Extract precise metadata from this document with high accuracy:
-            
-            Title: {title[:200]}
-            URL: {url}
-            Filename: {filename}
-            Content: {content[:1500]}
-            
-            EXTRACTION REQUIREMENTS:
-            1. TITLE: Extract the EXACT document title from content, not generic descriptions
-            2. ORGANIZATION: Identify the precise authoring organization (NASA, NIST, ENISA, etc.)
-            3. DATE: Extract publication date in YYYY-MM-DD format only
-            4. DOCUMENT_TYPE: Classify as Framework, Policy, Research, Standard, Report, Guidance
-            5. AUTHOR: Extract specific author names if mentioned
-            6. DESCRIPTION: One-line summary of document purpose
-            
-            CRITICAL RULES:
-            - Use EXACT titles from document headers/covers, not generic descriptions
-            - For NASA documents, organization should be "NASA" or "National Aeronautics and Space Administration"
-            - Return actual dates only, no HTML artifacts
-            - If information is unclear, return "Unknown" rather than guessing
-            
-            Respond with JSON only:
-            {{
-                "title": "exact document title",
-                "organization": "precise organization name",
-                "author": "specific author or Unknown",
-                "publication_date": "YYYY-MM-DD or Unknown", 
-                "document_type": "classification",
-                "description": "one-line purpose summary",
-                "confidence": 0.0-1.0
-            }}
-            """
-            
-            response = self.client.chat.completions.create(
-                model="gpt-4o",
-                messages=[{"role": "user", "content": prompt}],
-                response_format={"type": "json_object"},
-                temperature=0.1,
-                max_tokens=500
-            )
-            
-            result = json.loads(response.choices[0].message.content)
-            return result
-            
-        except Exception as e:
-            print(f"LLM metadata extraction failed: {e}")
-            return self._fallback_metadata()
-    
-    def _extract_with_patterns(self, title: str, content: str, url: str, filename: str) -> Dict[str, any]:
-        """Extract metadata using pattern recognition"""
+        content_clean = self._clean_content(content)
         
         metadata = {
-            "title": "Unknown",
-            "organization": "Unknown", 
-            "author": "Unknown",
-            "publication_date": "Unknown",
-            "document_type": "Unknown",
-            "description": "Unknown",
-            "confidence": 0.3
+            'title': self._extract_title(content_clean, title),
+            'topic': self._determine_topic(content_clean, title),
+            'document_type': self._determine_document_type(content_clean, title),
+            'author_organization': self._extract_organization(content_clean, url),
+            'publish_date': self._extract_date(content_clean),
+            'content_summary': self._generate_summary(content_clean),
+            'framework_applicability': self._assess_framework_applicability(content_clean, title)
         }
-        
-        # Title extraction patterns
-        title_patterns = [
-            r"NASA'S\s+([A-Z\s]+(?:PLAN|FRAMEWORK|STRATEGY|POLICY))",
-            r"NASA'S\s+RESPONSIBLE\s+AI\s+PLAN",
-            r'(?:title|document title|subject):\s*([^\n\r]{10,100})',
-            r'^([A-Z][^\n\r]{20,80}(?:Framework|Policy|Guidelines?|Standards?|Report|Plan))',
-            r'Executive Order \d+[:\-\s]*([^\n\r]{10,80})',
-            r'(?:NASA|NIST|DHS|ENISA)[:\-\s]*([^\n\r]{10,80})',
-            r'([A-Z][A-Z\s]{15,60}(?:AI|ARTIFICIAL INTELLIGENCE|QUANTUM)[A-Z\s]{0,20}(?:PLAN|FRAMEWORK|STRATEGY))',
-        ]
-        
-        for pattern in title_patterns:
-            match = re.search(pattern, content, re.IGNORECASE | re.MULTILINE)
-            if match:
-                if pattern == r"NASA'S\s+RESPONSIBLE\s+AI\s+PLAN":
-                    metadata["title"] = "NASA'S RESPONSIBLE AI PLAN"
-                    break
-                else:
-                    extracted_title = match.group(1).strip() if match.groups() else match.group(0).strip()
-                    if len(extracted_title) > 10:
-                        metadata["title"] = extracted_title
-                        break
-        
-        # Organization extraction from URL and content
-        if 'nasa.gov' in url.lower() or 'nasa' in content[:500].lower():
-            metadata["organization"] = "NASA"
-        elif 'nist.gov' in url.lower() or 'nist' in content[:500].lower():
-            metadata["organization"] = "National Institute of Standards and Technology"
-        elif 'dhs.gov' in url.lower() or 'cisa' in content[:500].lower():
-            metadata["organization"] = "Department of Homeland Security"
-        elif 'enisa.europa.eu' in url.lower():
-            metadata["organization"] = "European Union Agency for Cybersecurity"
-        elif 'ncsc.gov.uk' in url.lower():
-            metadata["organization"] = "UK National Cyber Security Centre"
-        
-        # Date extraction patterns
-        date_patterns = [
-            r'(?:published|issued|date|effective):\s*(\d{4}-\d{2}-\d{2})',
-            r'(?:published|issued|date|effective):\s*([A-Z][a-z]+ \d{1,2}, \d{4})',
-            r'(?:2022|2021|2023|2024|2020|2019)',  # Common recent years
-            r'(\d{1,2}/\d{1,2}/\d{4})',
-            r'(\d{4})',
-        ]
-        
-        for pattern in date_patterns:
-            match = re.search(pattern, content, re.IGNORECASE)
-            if match:
-                if pattern == r'(?:2022|2021|2023|2024|2020|2019)':
-                    metadata["publication_date"] = match.group(0)
-                    break
-                else:
-                    date_str = match.group(1) if match.groups() else match.group(0)
-                    if len(date_str) >= 4 and date_str.isdigit():
-                        metadata["publication_date"] = date_str
-                    elif '-' in date_str:
-                        metadata["publication_date"] = date_str
-                    break
-        
-        # Document type classification
-        content_lower = content.lower()
-        if any(term in content_lower for term in ['framework', 'cybersecurity framework']):
-            metadata["document_type"] = "Framework"
-        elif any(term in content_lower for term in ['executive order', 'policy', 'directive']):
-            metadata["document_type"] = "Policy"
-        elif any(term in content_lower for term in ['guidelines', 'guidance', 'best practices']):
-            metadata["document_type"] = "Guidance"
-        elif any(term in content_lower for term in ['standard', 'specification']):
-            metadata["document_type"] = "Standard"
-        elif any(term in content_lower for term in ['report', 'assessment', 'analysis']):
-            metadata["document_type"] = "Report"
-        
-        # Topic classification
-        ai_terms = ['artificial intelligence', 'ai', 'machine learning', 'deep learning', 'neural network', 'responsible ai', 'trustworthy ai']
-        quantum_terms = ['quantum', 'quantum computing', 'quantum cryptography', 'post-quantum', 'quantum security']
-        
-        has_ai = any(term in content_lower or term in title.lower() for term in ai_terms)
-        has_quantum = any(term in content_lower or term in title.lower() for term in quantum_terms)
-        
-        if has_ai and has_quantum:
-            metadata["topic"] = "AI & Quantum"
-        elif has_ai:
-            metadata["topic"] = "AI"
-        elif has_quantum:
-            metadata["topic"] = "Quantum"
-        else:
-            metadata["topic"] = "General"
         
         return metadata
     
-    def _combine_metadata(self, llm_metadata: Dict, pattern_metadata: Dict) -> Dict[str, any]:
-        """Intelligently combine LLM and pattern-based metadata"""
+    def _clean_content(self, content: str) -> str:
+        """Clean and normalize content for better parsing"""
+        # Remove extra whitespace and normalize
+        content = re.sub(r'\s+', ' ', content.strip())
+        # Remove common PDF artifacts
+        content = re.sub(r'This publication is available free of charge from.*?(?=\n|\s{10})', '', content)
+        return content
+    
+    def _extract_title(self, content: str, existing_title: str = "") -> str:
+        """Extract proper document title using multiple strategies"""
         
-        combined = {}
+        content_lower = content.lower()
         
-        # Prioritize non-generic, high-confidence results
-        for field in ["title", "organization", "author", "publication_date", "document_type", "description"]:
-            llm_value = llm_metadata.get(field, "Unknown")
-            pattern_value = pattern_metadata.get(field, "Unknown")
+        # Strategy 1: Look for NIST publication patterns
+        nist_patterns = [
+            r'nist\s+special\s+publication\s+(\d+[-\w]*)\s+(.+?)(?=\n|author|this publication)',
+            r'nist\s+sp\s+(\d+[-\w]*)\s+(.+?)(?=\n|author|this publication)',
+            r'(nist\s+sp\s+\d+[-\w]*[^.]*?)(?=\s+author|\s+this\s+publication|\s+\w+\s+\w+\s+\w+\s+\w+)',
+        ]
+        
+        for pattern in nist_patterns:
+            match = re.search(pattern, content_lower, re.IGNORECASE | re.DOTALL)
+            if match:
+                if len(match.groups()) == 2:
+                    pub_num, title_part = match.groups()
+                    return f"NIST SP {pub_num.upper()} {title_part.strip()}".title()
+                else:
+                    return match.group(1).strip().title()
+        
+        # Strategy 2: Look for document headers
+        header_patterns = [
+            r'^(.+?)(?=\n.*?author|\n.*?published|\n.*?date)',
+            r'(?:^|\n)([A-Z][^.\n]{10,100})(?=\n|\s+version|\s+draft)',
+        ]
+        
+        for pattern in header_patterns:
+            match = re.search(pattern, content, re.MULTILINE | re.IGNORECASE)
+            if match:
+                potential_title = match.group(1).strip()
+                if len(potential_title) > 10 and not any(word in potential_title.lower() for word in ['page', 'section', 'chapter']):
+                    return potential_title.title()
+        
+        # Strategy 3: Use existing title if available
+        if existing_title and len(existing_title) > 5:
+            return existing_title
+        
+        # Strategy 4: Extract from first meaningful line
+        lines = content.split('\n')[:10]
+        for line in lines:
+            line = line.strip()
+            if len(line) > 15 and not line.lower().startswith(('page', 'section', 'chapter')):
+                return line.title()
+        
+        return "Untitled Document"
+    
+    def _determine_topic(self, content: str, title: str = "") -> str:
+        """Determine document topic with enhanced accuracy"""
+        
+        combined_text = (content + " " + title).lower()
+        
+        ai_score = sum(1 for indicator in self.ai_indicators if indicator in combined_text)
+        quantum_score = sum(1 for indicator in self.quantum_indicators if indicator in combined_text)
+        
+        # Weighted scoring based on context
+        if 'generative ai' in combined_text or 'ai model' in combined_text:
+            ai_score += 3
+        if 'quantum computing' in combined_text or 'post-quantum' in combined_text:
+            quantum_score += 3
+        
+        # Determine primary topic
+        if ai_score > quantum_score and ai_score >= 2:
+            return "AI"
+        elif quantum_score > ai_score and quantum_score >= 2:
+            return "Quantum"
+        elif ai_score > 0 and quantum_score > 0:
+            return "Both"
+        else:
+            return "General"
+    
+    def _determine_document_type(self, content: str, title: str = "") -> str:
+        """Determine document type with better accuracy"""
+        
+        combined_text = (content + " " + title).lower()
+        
+        type_indicators = {
+            'Standard': ['nist sp', 'special publication', 'standard', 'specification', 'guideline'],
+            'Policy': ['policy', 'memorandum', 'directive', 'executive order', 'strategy'],
+            'Research': ['research', 'study', 'analysis', 'evaluation', 'assessment'],
+            'Report': ['report', 'findings', 'results', 'survey'],
+            'Framework': ['framework', 'model', 'methodology'],
+            'Draft': ['draft', 'preliminary', 'working paper']
+        }
+        
+        scores = {}
+        for doc_type, indicators in type_indicators.items():
+            scores[doc_type] = sum(1 for indicator in indicators if indicator in combined_text)
+        
+        # Return the type with highest score
+        best_type = max(scores.items(), key=lambda x: x[1])
+        return best_type[0] if best_type[1] > 0 else "General"
+    
+    def _extract_organization(self, content: str, url: str = "") -> str:
+        """Extract organization with enhanced patterns"""
+        
+        # Strategy 1: URL-based detection
+        if url:
+            if 'nist.gov' in url or 'doi.org/10.6028/NIST' in url:
+                return "NIST"
+            elif 'nasa.gov' in url:
+                return "NASA"
+            elif 'whitehouse.gov' in url:
+                return "White House"
+            elif 'cisa.gov' in url:
+                return "CISA"
+        
+        # Strategy 2: Content-based patterns
+        content_lower = content.lower()
+        
+        org_patterns = {
+            'NIST': [r'nist\s+special\s+publication', r'national\s+institute\s+of\s+standards', r'nist\.gov'],
+            'NASA': [r'nasa', r'national\s+aeronautics'],
+            'White House': [r'white\s+house', r'executive\s+office', r'president'],
+            'CISA': [r'cisa', r'cybersecurity\s+and\s+infrastructure'],
+            'DOD': [r'department\s+of\s+defense', r'dod'],
+            'NSF': [r'national\s+science\s+foundation', r'nsf']
+        }
+        
+        for org, patterns in org_patterns.items():
+            if any(re.search(pattern, content_lower) for pattern in patterns):
+                return org
+        
+        # Strategy 3: Look for author affiliations
+        affiliation_match = re.search(r'(?:affiliation|organization|institution)[:]\s*([^.\n]+)', content_lower)
+        if affiliation_match:
+            return affiliation_match.group(1).strip().title()
+        
+        return "Unknown"
+    
+    def _extract_date(self, content: str) -> Optional[str]:
+        """Extract publication date with comprehensive patterns"""
+        
+        content_lower = content.lower()
+        
+        # Date patterns (most specific to least specific)
+        date_patterns = [
+            # Full dates
+            r'(?:published|date|issued)[:]\s*(\w+\s+\d{1,2},?\s+\d{4})',
+            r'(\w+\s+\d{4})',  # Month Year
+            r'(\d{1,2}/\d{4})',  # MM/YYYY
+            r'(\d{4}-\d{2})',  # YYYY-MM
+            r'(\d{4})',  # Just year
+        ]
+        
+        for pattern in date_patterns:
+            matches = re.findall(pattern, content_lower)
+            for match in matches:
+                try:
+                    # Try to parse and standardize the date
+                    normalized_date = self._normalize_date(match)
+                    if normalized_date:
+                        return normalized_date
+                except:
+                    continue
+        
+        return None
+    
+    def _normalize_date(self, date_str: str) -> Optional[str]:
+        """Normalize date string to YYYY-MM-DD format"""
+        
+        date_str = date_str.strip()
+        
+        # Handle different date formats
+        try:
+            # Try common formats
+            for fmt in ['%B %d, %Y', '%B %Y', '%m/%Y', '%Y-%m', '%Y']:
+                try:
+                    parsed = datetime.strptime(date_str, fmt)
+                    return parsed.strftime('%Y-%m-%d')
+                except ValueError:
+                    continue
             
-            # Prioritize specific over generic
-            if llm_value != "Unknown" and not self._is_generic(llm_value, field):
-                combined[field] = llm_value
-            elif pattern_value != "Unknown" and not self._is_generic(pattern_value, field):
-                combined[field] = pattern_value
-            else:
-                combined[field] = llm_value if llm_value != "Unknown" else pattern_value
+            # Handle "May 2024" style
+            if re.match(r'\w+\s+\d{4}', date_str):
+                parts = date_str.split()
+                if len(parts) == 2:
+                    month_name, year = parts
+                    month_num = {
+                        'january': 1, 'february': 2, 'march': 3, 'april': 4,
+                        'may': 5, 'june': 6, 'july': 7, 'august': 8,
+                        'september': 9, 'october': 10, 'november': 11, 'december': 12
+                    }.get(month_name.lower())
+                    
+                    if month_num:
+                        return f"{year}-{month_num:02d}-01"
         
-        # Set confidence based on data quality
-        llm_conf = llm_metadata.get("confidence", 0.0)
-        pattern_conf = pattern_metadata.get("confidence", 0.0)
-        combined["confidence"] = max(llm_conf, pattern_conf)
+        except Exception:
+            pass
         
-        return combined
+        return None
     
-    def _is_generic(self, value: str, field: str) -> bool:
-        """Check if a value is too generic to be useful"""
+    def _generate_summary(self, content: str) -> str:
+        """Generate intelligent summary of document content"""
         
-        if field == "title":
-            generic_titles = [
-                "cybersecurity document", "document", "untitled", "no title",
-                "web document", "pdf document", "government document"
-            ]
-            return value.lower() in generic_titles or len(value) < 10
+        # Extract first meaningful paragraph
+        paragraphs = [p.strip() for p in content.split('\n') if len(p.strip()) > 50]
         
-        elif field == "organization":
-            generic_orgs = [
-                "organization", "unknown organization", "government", "agency"
-            ]
-            return value.lower() in generic_orgs
+        if paragraphs:
+            first_para = paragraphs[0]
+            # Truncate to reasonable length
+            if len(first_para) > 200:
+                sentences = first_para.split('.')
+                summary = sentences[0] + '.'
+                if len(summary) < 100 and len(sentences) > 1:
+                    summary += ' ' + sentences[1] + '.'
+                return summary[:200] + '...' if len(summary) > 200 else summary
+            return first_para
         
-        return False
+        return "No summary available"
     
-    def _clean_html_artifacts(self, metadata: Dict) -> Dict[str, any]:
-        """Remove HTML artifacts from all metadata fields"""
+    def _assess_framework_applicability(self, content: str, title: str = "") -> Dict[str, bool]:
+        """Assess which scoring frameworks should apply to this document"""
         
-        cleaned = {}
+        combined_text = (content + " " + title).lower()
         
-        for key, value in metadata.items():
-            if isinstance(value, str):
-                # Remove all HTML tags and artifacts comprehensively
-                cleaned_value = str(value)
-                
-                # Remove HTML tags
-                cleaned_value = re.sub(r'<[^>]*>', '', cleaned_value)
-                # Remove HTML entities
-                cleaned_value = re.sub(r'&[a-zA-Z0-9#]+;', '', cleaned_value)
-                # Remove div artifacts specifically
-                cleaned_value = re.sub(r'</div>|<div[^>]*>', '', cleaned_value)
-                # Remove span artifacts
-                cleaned_value = re.sub(r'</span>|<span[^>]*>', '', cleaned_value)
-                # Remove other common artifacts
-                cleaned_value = re.sub(r'</p>|<p[^>]*>', '', cleaned_value)
-                cleaned_value = re.sub(r'</td>|<td[^>]*>', '', cleaned_value)
-                cleaned_value = re.sub(r'</tr>|<tr[^>]*>', '', cleaned_value)
-                cleaned_value = re.sub(r'</table>|<table[^>]*>', '', cleaned_value)
-                
-                # Remove excess whitespace and normalize
-                cleaned_value = re.sub(r'\s+', ' ', cleaned_value).strip()
-                
-                # Remove leading/trailing punctuation artifacts
-                cleaned_value = re.sub(r'^[^\w]*|[^\w]*$', '', cleaned_value)
-                
-                cleaned[key] = cleaned_value if cleaned_value and len(cleaned_value) > 1 else "Unknown"
-            else:
-                cleaned[key] = value
+        # AI frameworks
+        ai_relevant = any(indicator in combined_text for indicator in self.ai_indicators)
+        ai_cyber_relevant = ai_relevant and any(indicator in combined_text for indicator in self.cybersecurity_indicators)
+        ai_ethics_relevant = ai_relevant and any(indicator in combined_text for indicator in self.ethics_indicators)
         
-        return cleaned
-    
-    def _fallback_metadata(self) -> Dict[str, any]:
-        """Fallback metadata when extraction fails"""
+        # Quantum frameworks  
+        quantum_relevant = any(indicator in combined_text for indicator in self.quantum_indicators)
+        quantum_cyber_relevant = quantum_relevant and any(indicator in combined_text for indicator in self.cybersecurity_indicators)
+        quantum_ethics_relevant = quantum_relevant and any(indicator in combined_text for indicator in self.ethics_indicators)
+        
         return {
-            "title": "Unknown",
-            "organization": "Unknown",
-            "author": "Unknown", 
-            "publication_date": "Unknown",
-            "document_type": "Unknown",
-            "description": "Unknown",
-            "confidence": 0.0
+            'ai_cybersecurity': ai_cyber_relevant,
+            'ai_ethics': ai_ethics_relevant,
+            'quantum_cybersecurity': quantum_cyber_relevant,
+            'quantum_ethics': quantum_ethics_relevant
         }
 
-def extract_enhanced_metadata(title: str, content: str, url: str = "", filename: str = "") -> Dict[str, any]:
-    """Main function for enhanced metadata extraction"""
-    extractor = EnhancedMetadataExtractor()
-    return extractor.extract_comprehensive_metadata(title, content, url, filename)
+# Global instance
+enhanced_extractor = EnhancedMetadataExtractor()
+
+def extract_enhanced_metadata(content: str, title: str = "", url: str = "") -> Dict:
+    """Extract enhanced metadata from document content"""
+    return enhanced_extractor.extract_comprehensive_metadata(content, title, url)
