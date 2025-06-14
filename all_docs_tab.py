@@ -548,28 +548,64 @@ def render():
                     
                     found_url = None
                     
-                    # NIST documents
-                    if 'nist' in org.lower():
-                        nist_match = re.search(r'(?:SP\s+)?(\d+(?:-\d+)?[A-Z]?)', title, re.IGNORECASE)
-                        if nist_match:
-                            pub_num = nist_match.group(1)
-                            test_url = f"https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.{pub_num}.pdf"
-                            try:
-                                response = session.head(test_url, timeout=5)
-                                if response.status_code == 200:
-                                    found_url = test_url
-                            except:
-                                pass
+                    # Use web search-based discovery
+                    from utils.web_search_url_discovery import search_document_url
                     
-                    # White House documents
-                    elif 'white house' in org.lower() or 'quantum' in title.lower():
-                        test_url = "https://www.whitehouse.gov/wp-content/uploads/2022/05/National-Security-Memorandum-10.pdf"
-                        try:
-                            response = session.head(test_url, timeout=5)
-                            if response.status_code == 200:
-                                found_url = test_url
-                        except:
-                            pass
+                    # Try web search first (like manual Google search)
+                    found_url = search_document_url(title, org, doc.get('document_type', ''))
+                    
+                    # Fallback to direct URL patterns if web search fails
+                    if not found_url:
+                        # NIST documents
+                        if 'nist' in org.lower():
+                            nist_match = re.search(r'(?:SP\s+)?(\d+(?:-\d+)?[A-Z]?)', title, re.IGNORECASE)
+                            if nist_match:
+                                pub_num = nist_match.group(1)
+                                test_urls = [
+                                    f"https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.{pub_num}.pdf",
+                                    f"https://csrc.nist.gov/publications/detail/sp/{pub_num}/final"
+                                ]
+                                for test_url in test_urls:
+                                    try:
+                                        response = session.head(test_url, timeout=5)
+                                        if response.status_code == 200:
+                                            found_url = test_url
+                                            break
+                                    except:
+                                        continue
+                        
+                        # CISA documents - updated with 2025 pattern
+                        elif 'cisa' in org.lower():
+                            title_slug = re.sub(r'[^\w\s\-]', '', title.lower()).replace(' ', '-')
+                            test_urls = [
+                                f"https://www.cisa.gov/sites/default/files/2025-01/JCDC%20AI%20Playbook_1.pdf",
+                                f"https://www.cisa.gov/sites/default/files/publications/{title_slug}.pdf",
+                                f"https://www.cisa.gov/resources-tools/{title_slug}"
+                            ]
+                            for test_url in test_urls:
+                                try:
+                                    response = session.head(test_url, timeout=5)
+                                    if response.status_code == 200:
+                                        found_url = test_url
+                                        break
+                                except:
+                                    continue
+                        
+                        # White House documents
+                        elif 'white house' in org.lower() or 'quantum' in title.lower():
+                            # Try the actual policy page instead of PDF
+                            test_urls = [
+                                "https://www.whitehouse.gov/briefing-room/statements-releases/2022/05/04/national-security-memorandum-on-promoting-united-states-leadership-in-quantum-computing-while-mitigating-risks-to-vulnerable-cryptographic-systems/",
+                                "https://www.whitehouse.gov/briefing-room/statements-releases/quantum-computing/"
+                            ]
+                            for test_url in test_urls:
+                                try:
+                                    response = session.head(test_url, timeout=5)
+                                    if response.status_code == 200:
+                                        found_url = test_url
+                                        break
+                                except:
+                                    continue
                     
                     # Update database if URL found
                     if found_url:
