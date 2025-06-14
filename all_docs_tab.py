@@ -1307,8 +1307,10 @@ def render():
                                 
                                 return scores
                             
-                            scores = enhanced_quantum_scoring(clean_content, clean_title)
-                            st.success(f"✓ Enhanced quantum scoring complete: AI Cyber={scores.get('ai_cybersecurity', 0)}, Quantum Cyber={scores.get('quantum_cybersecurity', 0)}, AI Ethics={scores.get('ai_ethics', 0)}, Quantum Ethics={scores.get('quantum_ethics', 0)}")
+                            # Use ML-enhanced scoring for accurate analysis
+                            from utils.ml_enhanced_scoring import assess_document_with_ml
+                            scores = assess_document_with_ml(clean_content, clean_title)
+                            st.success(f"✓ ML-enhanced scoring complete: AI Cyber={scores.get('ai_cybersecurity_score', 'N/A')}, Quantum Cyber={scores.get('quantum_cybersecurity_score', 'N/A')}, AI Ethics={scores.get('ai_ethics_score', 'N/A')}, Quantum Ethics={scores.get('quantum_ethics_score', 'N/A')}")
                             
                             # Determine topic based on content analysis
                             def determine_document_topic(content, title):
