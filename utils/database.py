@@ -69,6 +69,7 @@ class DatabaseManager:
                ai_cybersecurity_score, quantum_cybersecurity_score, ai_ethics_score, quantum_ethics_score,
                document_type, source, author_organization, publish_date, content_preview,
                detected_region, region_confidence, region_reasoning, topic,
+               url_valid, url_status, source_redirect, url_checked,
                created_at, updated_at
         FROM documents 
         ORDER BY updated_at DESC, created_at DESC
@@ -107,6 +108,11 @@ class DatabaseManager:
                     'region_confidence': float(row.get('region_confidence', 0.0)) if row.get('region_confidence') else 0.0,
                     'region_reasoning': clean_field(row.get('region_reasoning', '')),
                     'topic': clean_field(row.get('topic', 'General')),
+                    # Add URL validation fields for clickable titles
+                    'url_valid': row.get('url_valid', False),
+                    'url_status': row.get('url_status', 'unchecked'),
+                    'source_redirect': row.get('source_redirect', ''),
+                    'url_checked': row.get('url_checked', False),
                     'created_at': row['created_at'],
                     'updated_at': row['updated_at']
                 }
