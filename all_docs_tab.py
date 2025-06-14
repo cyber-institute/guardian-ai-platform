@@ -349,7 +349,13 @@ def get_document_topic(doc):
 def render():
     """Render the All Documents tab with comprehensive document repository."""
     
-
+    # Test expandable section to debug touch issues
+    st.markdown("### Debug Test")
+    with st.expander("🔍 Test Touch - Tap Here", expanded=False):
+        st.write("If you can see this text after tapping above, the expanders work!")
+        st.write("This confirms the touch interaction is functioning.")
+    
+    st.markdown("---")
 
     try:
         # Force refresh documents - clear all caching mechanisms
