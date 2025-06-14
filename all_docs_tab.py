@@ -164,48 +164,44 @@ def show_score_explanation(framework_type, score, content="", title=""):
     </div>
     """, unsafe_allow_html=True)
     
-    col1, col2 = st.columns(2)
+    st.markdown("**Strengths Found:**")
+    if factors_found:
+        for factor in factors_found[:3]:  # Limit to top 3
+            st.markdown(f"• {factor.title()}")
+    else:
+        st.markdown("• None identified")
     
-    with col1:
-        st.markdown("**Strengths Found:**")
-        if factors_found:
-            for factor in factors_found[:3]:  # Limit to top 3
-                st.markdown(f"• {factor.title()}")
-        else:
-            st.markdown("• None identified")
+    st.markdown("**Key Improvements:**")
+    for improvement in improvements[:3]:
+        st.markdown(f"• {improvement}")
     
-    with col2:
-        st.markdown("**Key Improvements:**")
-        for improvement in improvements[:3]:
-            st.markdown(f"• {improvement}")
-        
-        with st.expander("Evaluation Criteria", expanded=False):
-            criteria_text = []
-            if framework_type == 'ai_cybersecurity':
-                criteria_text = [
-                    "AI system security architecture", "Threat modeling procedures", 
-                    "Data protection measures", "AI model security", "Governance structures"
-                ]
-            elif framework_type == 'quantum_cybersecurity':
-                criteria_text = [
-                    "Post-quantum cryptography planning", "Quantum key distribution",
-                    "Quantum threat assessment", "Cryptographic agility", "Standards compliance"
-                ]
-            elif framework_type == 'ai_ethics':
-                criteria_text = [
-                    "Bias detection strategies", "Transparency measures",
-                    "Accountability structures", "Privacy protection", "Human oversight"
-                ]
-            elif framework_type == 'quantum_ethics':
-                criteria_text = [
-                    "Equitable quantum access", "Quantum privacy implications",
-                    "Technology governance", "Societal impact", "Responsible development"
-                ]
-            
-            for criterion in criteria_text:
-                st.markdown(f"• {criterion}")
-        
-        st.markdown("<small style='color: #666;'>Scores calculated using multi-LLM analysis against NIST AI RMF, CISA guidelines, and quantum security standards.</small>", unsafe_allow_html=True)
+    st.markdown("**Evaluation Criteria:**")
+    criteria_text = []
+    if framework_type == 'ai_cybersecurity':
+        criteria_text = [
+            "AI system security architecture", "Threat modeling procedures", 
+            "Data protection measures", "AI model security", "Governance structures"
+        ]
+    elif framework_type == 'quantum_cybersecurity':
+        criteria_text = [
+            "Post-quantum cryptography planning", "Quantum key distribution",
+            "Quantum threat assessment", "Cryptographic agility", "Standards compliance"
+        ]
+    elif framework_type == 'ai_ethics':
+        criteria_text = [
+            "Bias detection strategies", "Transparency measures",
+            "Accountability structures", "Privacy protection", "Human oversight"
+        ]
+    elif framework_type == 'quantum_ethics':
+        criteria_text = [
+            "Equitable quantum access", "Quantum privacy implications",
+            "Technology governance", "Societal impact", "Responsible development"
+        ]
+    
+    for criterion in criteria_text:
+        st.markdown(f"• {criterion}")
+    
+    st.markdown("<small style='color: #666;'>Scores calculated using multi-LLM analysis against NIST AI RMF, CISA guidelines, and quantum security standards.</small>", unsafe_allow_html=True)
 from utils.html_artifact_interceptor import clean_documents, clean_field
 from utils.content_cleaner import clean_document_content
 from utils.clean_preview_generator import generate_clean_preview, extract_clean_metadata
