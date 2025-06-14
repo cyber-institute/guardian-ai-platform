@@ -300,10 +300,18 @@ def extract_organization_fallback(content: str) -> str:
     return 'Unknown'
 
 def extract_date_fallback(content: str) -> Optional[str]:
-    """Extract publication date using pattern matching."""
+    """Extract publication date using enhanced pattern matching for document covers and headers."""
     
-    # Enhanced date patterns for government documents
+    # Enhanced date patterns optimized for document covers like "January 14, 2025"
     date_patterns = [
+        # Document cover patterns - highest priority (like "January 14, 2025")
+        r'(?:^|\n)\s*((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4})\s*(?:\n|$)',
+        r'(?:^|\n)\s*((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.?\s+\d{1,2},?\s+\d{4})\s*(?:\n|$)',
+        
+        # Header and title area patterns
+        r'((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4})',
+        r'((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.?\s+\d{1,2},?\s+\d{4})',
+        
         # Standard formats
         r'(\d{4}-\d{2}-\d{2})',  # YYYY-MM-DD
         r'(?:published|date|updated|issued):\s*(\d{4}-\d{2}-\d{2})',
@@ -313,12 +321,10 @@ def extract_date_fallback(content: str) -> Optional[str]:
         # Government document patterns
         r'(?:published|issued):\s*(\w+ \d{4})',  # "Published: April 2024"
         r'(?:published|issued)\s+(\w+ \d{4})',  # "Published March 2024"
-        r'(\w+ \d{1,2}, \d{4})',  # "March 15, 2024"
         r'(\d{1,2}/\d{1,2}/\d{4})',  # MM/DD/YYYY
         
         # Date patterns on document covers and standalone
         r'(?:^|\n)\s*(\w+ \d{4})\s*(?:\n|$)',  # "October 2024" on separate line
-        r'(\d{4})',  # Just year - common in government docs
         
         # Version and revision dates
         r'(?:version|revision|updated)\s+(\w+ \d{4})',
@@ -327,6 +333,7 @@ def extract_date_fallback(content: str) -> Optional[str]:
         # Copyright and footer dates
         r'©\s*(\d{4})',
         r'copyright\s+(\d{4})',
+        r'(\d{4})',  # Just year - lowest priority
     ]
     
     for pattern in date_patterns:
@@ -363,19 +370,27 @@ def extract_date_fallback(content: str) -> Optional[str]:
                         month, day, year = parts
                         return f"{year}-{month.zfill(2)}-{day.zfill(2)}"
                 
-                # Handle full date formats like "March 15, 2024"
-                full_date_pattern = r'(\w+)\s+(\d{1,2}),\s+(\d{4})'
-                full_match = re.match(full_date_pattern, date_str)
-                if full_match:
-                    month_name, day, year = full_match.groups()
-                    month_map = {
-                        'january': '01', 'february': '02', 'march': '03', 'april': '04',
-                        'may': '05', 'june': '06', 'july': '07', 'august': '08',
-                        'september': '09', 'october': '10', 'november': '11', 'december': '12'
-                    }
-                    month_num = month_map.get(month_name.lower())
-                    if month_num:
-                        return f"{year}-{month_num}-{day.zfill(2)}"
+                # Handle full date formats like "March 15, 2024" or "January 14 2025"
+                full_date_patterns = [
+                    r'(\w+)\s+(\d{1,2}),\s+(\d{4})',  # "March 15, 2024"
+                    r'(\w+)\s+(\d{1,2})\s+(\d{4})'   # "January 14 2025"
+                ]
+                
+                for full_pattern in full_date_patterns:
+                    full_match = re.match(full_pattern, date_str)
+                    if full_match:
+                        month_name, day, year = full_match.groups()
+                        month_map = {
+                            'january': '01', 'february': '02', 'march': '03', 'april': '04',
+                            'may': '05', 'june': '06', 'july': '07', 'august': '08',
+                            'september': '09', 'october': '10', 'november': '11', 'december': '12',
+                            'jan': '01', 'feb': '02', 'mar': '03', 'apr': '04',
+                            'jun': '06', 'jul': '07', 'aug': '08', 'sep': '09',
+                            'oct': '10', 'nov': '11', 'dec': '12'
+                        }
+                        month_num = month_map.get(month_name.lower())
+                        if month_num:
+                            return f"{year}-{month_num}-{day.zfill(2)}"
                 
                 # Just year - check if it's recent
                 if re.match(r'\d{4}', date_str):
