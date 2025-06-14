@@ -1229,7 +1229,7 @@ def render():
                             # Use basic scoring to avoid OpenAI quota issues
                             st.info("🔄 Running basic document scoring...")
                             
-                            # Enhanced quantum-aware scoring for proper scoring
+                            # Enhanced quantum-aware scoring that only assigns scores when content is relevant
                             def enhanced_quantum_scoring(content, title):
                                 content_lower = content.lower()
                                 title_lower = title.lower()
@@ -1274,25 +1274,38 @@ def render():
                                 cyber_score = sum(weight for keyword, weight in cyber_keywords.items() if keyword in combined_text)
                                 ethics_score = sum(weight for keyword, weight in ethics_keywords.items() if keyword in combined_text)
                                 
-                                # Boost quantum score if document is clearly quantum-focused
-                                if 'quantum' in title_lower:
-                                    quantum_score = min(quantum_score * 1.5, 100)
+                                # Check if document actually has quantum content
+                                has_quantum_content = quantum_score > 0
+                                has_ai_content = ai_score > 0
                                 
-                                # Special boost for quantum policy documents
-                                if any(phrase in combined_text for phrase in ['quantum policy', 'quantum approach', 'quantum strategy']):
-                                    quantum_score = min(quantum_score + 25, 100)
+                                # Only boost quantum scores if quantum content exists
+                                if has_quantum_content:
+                                    # Boost quantum score if document is clearly quantum-focused
+                                    if 'quantum' in title_lower:
+                                        quantum_score = min(quantum_score * 1.5, 100)
+                                    
+                                    # Special boost for quantum policy documents
+                                    if any(phrase in combined_text for phrase in ['quantum policy', 'quantum approach', 'quantum strategy']):
+                                        quantum_score = min(quantum_score + 25, 100)
+                                    
+                                    # Boost for government quantum initiatives
+                                    if any(phrase in combined_text for phrase in ['national quantum initiative', 'quantum security', 'quantum framework']):
+                                        quantum_score = min(quantum_score + 20, 100)
                                 
-                                # Boost for government quantum initiatives
-                                if any(phrase in combined_text for phrase in ['national quantum initiative', 'quantum security', 'quantum framework']):
-                                    quantum_score = min(quantum_score + 20, 100)
+                                # Calculate final scores - only assign if content is relevant
+                                scores = {}
                                 
-                                # Calculate final scores with proper scaling
-                                return {
-                                    'ai_cybersecurity': min(int((ai_score + cyber_score) * 1.2), 100),
-                                    'quantum_cybersecurity': min(int((quantum_score + cyber_score) * 1.2), 100),
-                                    'ai_ethics': min(int((ai_score + ethics_score) * 1.2), 100),
-                                    'quantum_ethics': min(int((quantum_score + ethics_score) * 1.2), 100)
-                                }
+                                # AI frameworks - only if AI content exists
+                                if has_ai_content:
+                                    scores['ai_cybersecurity'] = min(int((ai_score + cyber_score) * 1.2), 100)
+                                    scores['ai_ethics'] = min(int((ai_score + ethics_score) * 1.2), 100)
+                                
+                                # Quantum frameworks - only if quantum content exists
+                                if has_quantum_content:
+                                    scores['quantum_cybersecurity'] = min(int((quantum_score + cyber_score) * 1.2), 100)
+                                    scores['quantum_ethics'] = min(int((quantum_score + ethics_score) * 1.2), 100)
+                                
+                                return scores
                             
                             scores = enhanced_quantum_scoring(clean_content, clean_title)
                             st.success(f"✓ Enhanced quantum scoring complete: AI Cyber={scores.get('ai_cybersecurity', 0)}, Quantum Cyber={scores.get('quantum_cybersecurity', 0)}, AI Ethics={scores.get('ai_ethics', 0)}, Quantum Ethics={scores.get('quantum_ethics', 0)}")
