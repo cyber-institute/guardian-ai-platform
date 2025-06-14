@@ -29,6 +29,7 @@ def render_fast_repository_admin():
     admin_section = st.selectbox(
         "Select Administrative Function:",
         [
+            "URL Discovery & Validation",
             "MultiLLM URL Analysis",
             "Multi-API Ingest",
             "Chatbot Configuration",
