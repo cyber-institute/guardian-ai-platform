@@ -2402,18 +2402,24 @@ def render_card_view(docs):
             # Display metadata card without thumbnail (Card View)
             import html
             
-            # Properly escape all HTML content
-            safe_title = html.escape(title)
+            # Properly escape all HTML content and handle clickable titles
+            source_url = doc.get('source', '')
             safe_doc_type = html.escape(doc_type)
             safe_author_org = html.escape(author_org)
             safe_pub_date = html.escape(pub_date)
             safe_topic = html.escape(ultra_clean_metadata(doc.get('topic', 'General')))
             
+            # Create clickable title if source URL exists
+            if source_url and source_url.startswith(('http://', 'https://')):
+                title_html = f'<a href="{source_url}" target="_blank" style="text-decoration: none; color: #2563eb; cursor: pointer;" onmouseover="this.style.color=\'#1d4ed8\'" onmouseout="this.style.color=\'#2563eb\'">{html.escape(title)}</a>'
+            else:
+                title_html = html.escape(title)
+            
             st.markdown(f"""
                 <div style='border:1px solid #ddd;padding:20px;border-radius:12px;margin:8px;
                 background:white;box-shadow:0 4px 6px rgba(0,0,0,0.1);
                 transition:transform 0.2s ease;border-left:5px solid #3B82F6'>
-                    <h3 style='margin:0 0 12px 0;color:#333;line-height:1.3;font-size:1rem'>{safe_title}</h3>
+                    <h3 style='margin:0 0 12px 0;color:#333;line-height:1.3;font-size:1rem'>{title_html}</h3>
                     <div style='margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap'>
                         <span style='background:#eceff1;padding:4px 10px;border-radius:12px;font-size:12px;color:#455a64' title='Topic Classification: AI (Artificial Intelligence related), Quantum (Quantum technology/cryptography related), General (Other technology governance)'>{safe_topic}</span>
                         <span style='background:#e1e8ed;padding:4px 10px;border-radius:12px;font-size:12px;color:#37474f' title='Document Type: Policy (Government/organizational policies), Standard (Industry standards like NIST), Regulation (Legal regulations), Guidance (Best practice documents), Research (Academic papers)'>{safe_doc_type}</span>
