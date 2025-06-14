@@ -2627,49 +2627,56 @@ def render_grid_view(docs):
                     </div>
                 """, unsafe_allow_html=True)
             
-            # Framework scores with simple info sections
-            st.markdown("**Framework Scores (Tap to expand for details):**")
+            # Framework scores with inline question marks
+            st.markdown("**Framework Scores (Tap to expand, ❓ for info):**")
             
             score_col1, score_col2 = st.columns(2)
             
             with score_col1:
-                # AI Cybersecurity Score
+                # AI Cybersecurity Score with inline question mark
                 ai_cyber_score = scores.get('ai_cybersecurity', 'N/A')
                 
-                # Info button using native button
-                if st.button(f"ℹ️ What is AI Cybersecurity Assessment?", key=f"ai_cyber_info_{hash(title)}"):
-                    st.info(f"**AI Cybersecurity Assessment (Score: {ai_cyber_score})**\n\nEvaluates AI system security architecture, threat modeling, data protection measures, and governance frameworks. Higher scores indicate better cybersecurity practices.")
+                sub_col1, sub_col2 = st.columns([4, 1])
+                with sub_col1:
+                    with st.expander(f"🔒 AI Cyber: {ai_cyber_score}", expanded=False):
+                        show_score_explanation('ai_cybersecurity', ai_cyber_score, content, title)
+                with sub_col2:
+                    if st.button("❓", key=f"ai_cyber_info_{hash(title)}"):
+                        st.info(f"**AI Cybersecurity Assessment (Score: {ai_cyber_score})**\n\nEvaluates AI system security architecture, threat modeling, data protection measures, and governance frameworks.")
                 
-                with st.expander(f"🔒 AI Cyber: {ai_cyber_score}", expanded=False):
-                    show_score_explanation('ai_cybersecurity', ai_cyber_score, content, title)
-                
-                # AI Ethics Score
+                # AI Ethics Score with inline question mark
                 ai_ethics_score = scores.get('ai_ethics', 'N/A')
                 
-                if st.button(f"ℹ️ What is AI Ethics Evaluation?", key=f"ai_ethics_info_{hash(title)}"):
-                    st.info(f"**AI Ethics Evaluation (Score: {ai_ethics_score})**\n\nAssesses bias detection strategies, transparency measures, accountability structures, and human oversight mechanisms. Higher scores show stronger ethical foundations.")
-                
-                with st.expander(f"⚖️ AI Ethics: {ai_ethics_score}", expanded=False):
-                    show_score_explanation('ai_ethics', ai_ethics_score, content, title)
+                sub_col1, sub_col2 = st.columns([4, 1])
+                with sub_col1:
+                    with st.expander(f"⚖️ AI Ethics: {ai_ethics_score}", expanded=False):
+                        show_score_explanation('ai_ethics', ai_ethics_score, content, title)
+                with sub_col2:
+                    if st.button("❓", key=f"ai_ethics_info_{hash(title)}"):
+                        st.info(f"**AI Ethics Evaluation (Score: {ai_ethics_score})**\n\nAssesses bias detection strategies, transparency measures, accountability structures, and human oversight mechanisms.")
                     
             with score_col2:
-                # Quantum Cybersecurity Score
+                # Quantum Cybersecurity Score with inline question mark
                 q_cyber_score = scores.get('quantum_cybersecurity', 'N/A')
                 
-                if st.button(f"ℹ️ What is Quantum Cybersecurity Analysis?", key=f"q_cyber_info_{hash(title)}"):
-                    st.info(f"**Quantum Cybersecurity Analysis (Score: {q_cyber_score})**\n\nReviews post-quantum cryptography adoption, quantum key distribution, threat assessment, and migration strategies. Higher scores indicate better quantum readiness.")
+                sub_col1, sub_col2 = st.columns([4, 1])
+                with sub_col1:
+                    with st.expander(f"🔐 Q Cyber: {q_cyber_score}", expanded=False):
+                        show_score_explanation('quantum_cybersecurity', q_cyber_score, content, title)
+                with sub_col2:
+                    if st.button("❓", key=f"q_cyber_info_{hash(title)}"):
+                        st.info(f"**Quantum Cybersecurity Analysis (Score: {q_cyber_score})**\n\nReviews post-quantum cryptography adoption, quantum key distribution, threat assessment, and migration strategies.")
                 
-                with st.expander(f"🔐 Q Cyber: {q_cyber_score}", expanded=False):
-                    show_score_explanation('quantum_cybersecurity', q_cyber_score, content, title)
-                
-                # Quantum Ethics Score
+                # Quantum Ethics Score with inline question mark
                 q_ethics_score = scores.get('quantum_ethics', 'N/A')
                 
-                if st.button(f"ℹ️ What is Quantum Ethics Assessment?", key=f"q_ethics_info_{hash(title)}"):
-                    st.info(f"**Quantum Ethics Assessment (Score: {q_ethics_score})**\n\nExamines equitable quantum access, privacy implications, governance frameworks, and responsible development practices. Higher scores reflect stronger ethical considerations.")
-                
-                with st.expander(f"⚡ Q Ethics: {q_ethics_score}", expanded=False):
-                    show_score_explanation('quantum_ethics', q_ethics_score, content, title)
+                sub_col1, sub_col2 = st.columns([4, 1])
+                with sub_col1:
+                    with st.expander(f"⚡ Q Ethics: {q_ethics_score}", expanded=False):
+                        show_score_explanation('quantum_ethics', q_ethics_score, content, title)
+                with sub_col2:
+                    if st.button("❓", key=f"q_ethics_info_{hash(title)}"):
+                        st.info(f"**Quantum Ethics Assessment (Score: {q_ethics_score})**\n\nExamines equitable quantum access, privacy implications, governance frameworks, and responsible development practices.")
             
             st.markdown("---")  # Separator between documents
 
