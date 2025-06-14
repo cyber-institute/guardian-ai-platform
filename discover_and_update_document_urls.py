@@ -89,7 +89,7 @@ def test_url_discovery():
     
     for test in test_cases:
         print(f"\nTesting: {test['title'][:60]}...")
-        discovered_url = discover_document_url(test['title'], test['organization'], test['content'])
+        discovered_url = find_document_url_with_search(test['title'], test['organization'], test['content'])
         
         if discovered_url:
             print(f"  ✓ Discovered: {discovered_url}")
