@@ -654,55 +654,6 @@ def render():
     with upload_col2:
         st.markdown('<div class="upload-section"><h4>🌐 Add from URL</h4></div>', unsafe_allow_html=True)
         
-        # Metadata Processing Mode Toggle
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            st.markdown("**Metadata Processing Mode:**")
-        with col2:
-            auto_mode = st.toggle(
-                "Auto Save",
-                value=st.session_state.get('auto_metadata_mode', False),
-                help="Enable to skip manual verification and save automatically"
-            )
-            st.session_state.auto_metadata_mode = auto_mode
-        
-        if auto_mode:
-            st.info("🤖 Auto mode: Documents will be saved automatically with extracted metadata")
-        else:
-            st.info("🔍 Verification mode: You can review and edit metadata before saving")
-        
-        # Metadata Verification History Viewer
-        if st.session_state.get('metadata_verification_history'):
-            with st.expander("📋 Metadata Verification History", expanded=False):
-                st.markdown("**Recent metadata verifications:**")
-                
-                for i, entry in enumerate(reversed(st.session_state.metadata_verification_history[-5:])):
-                    with st.container():
-                        col1, col2, col3 = st.columns([3, 2, 1])
-                        
-                        with col1:
-                            title_preview = entry['verified_metadata']['title'][:60]
-                            if len(entry['verified_metadata']['title']) > 60:
-                                title_preview += "..."
-                            st.write(f"**{title_preview}**")
-                            url_preview = entry['url'][:50]
-                            if len(entry['url']) > 50:
-                                url_preview += "..."
-                            st.caption(f"URL: {url_preview}")
-                        
-                        with col2:
-                            st.write(f"Type: {entry['verified_metadata']['document_type']}")
-                            st.caption(f"Verified: {entry['timestamp'][:16]}")
-                        
-                        with col3:
-                            if st.button(f"View Details", key=f"history_{i}"):
-                                st.json(entry)
-                        
-                        st.divider()
-                
-                if len(st.session_state.metadata_verification_history) > 5:
-                    st.info(f"Showing 5 most recent verifications. Total: {len(st.session_state.metadata_verification_history)}")
-        
         url_input = st.text_input(
             "Enter document URL",
             placeholder="https://example.com/document.pdf",
@@ -714,30 +665,34 @@ def render():
             st.warning("Please enter a valid URL")
         
         if url_input and url_input.strip():
-            # Import URL processing functionality
-            try:
-                from utils.fast_admin_loader import process_url_content
-            except ImportError:
-                from utils.url_content_extractor import extract_url_content as process_url_content
-            
             # Use session state to track processed URLs to avoid reprocessing
             if "processed_urls" not in st.session_state:
                 st.session_state.processed_urls = set()
             
             # Auto-process URL when entered (one-step process)
             if url_input not in st.session_state.processed_urls:
-                with st.spinner("Processing URL content..."):
-                    try:
-                        st.info(f"Processing URL: {url_input}")
-                        
-                        # Import required modules
-                        import requests
-                        import trafilatura
-                        from utils.comprehensive_scoring import comprehensive_document_scoring
-                        from utils.database import db_manager
-                        import uuid
-                        
-                        st.info("✓ Modules imported successfully")
+                # Playful loading spinner with animated messages
+                spinner_messages = [
+                    "🌐 Fetching document from the web...",
+                    "🔍 Analyzing content structure...", 
+                    "🧠 Extracting key information...",
+                    "📊 Calculating risk scores...",
+                    "✨ Almost ready!"
+                ]
+                
+                with st.spinner("🚀 Processing your document..."):
+                    import time
+                    import requests
+                    import trafilatura
+                    from utils.comprehensive_scoring import comprehensive_document_scoring
+                    from utils.database import db_manager
+                    import uuid
+                    
+                    # Show playful progress messages
+                    progress_placeholder = st.empty()
+                    for i, msg in enumerate(spinner_messages):
+                        progress_placeholder.info(msg)
+                        time.sleep(0.5)
                         
                         # Check for Congress.gov URLs and suggest alternative
                         if 'congress.gov' in url_input.lower():
@@ -1426,16 +1381,155 @@ def render():
                                 # Mark URL as processed to avoid reprocessing
                                 st.session_state.processed_urls.add(url_input)
                                 
-                                st.success("URL content processed successfully!")
+                                progress_placeholder.empty()
+                                st.success("🎉 Document processed successfully!")
+                                
+                                # Interactive Risk Prediction Heatmap
+                                st.markdown("### 🎯 Interactive Risk Prediction Heatmap")
+                                
+                                # Create heatmap visualization
+                                import plotly.graph_objects as go
+                                import plotly.express as px
+                                
+                                # Risk categories and scores
+                                risk_categories = ['AI Cybersecurity', 'Quantum Cybersecurity', 'AI Ethics', 'Quantum Ethics']
+                                risk_scores = [
+                                    scores.get('ai_cybersecurity', 0),
+                                    scores.get('quantum_cybersecurity', 0), 
+                                    scores.get('ai_ethics', 0),
+                                    scores.get('quantum_ethics', 0)
+                                ]
+                                
+                                # Create interactive heatmap
+                                fig = go.Figure(data=go.Heatmap(
+                                    z=[risk_scores],
+                                    x=risk_categories,
+                                    y=['Risk Level'],
+                                    colorscale=[
+                                        [0, '#10b981'],    # Green for low risk
+                                        [0.5, '#f59e0b'],  # Yellow for medium risk  
+                                        [1, '#ef4444']     # Red for high risk
+                                    ],
+                                    text=[[f"{score}%" for score in risk_scores]],
+                                    texttemplate="%{text}",
+                                    textfont={"size": 16, "color": "white"},
+                                    hovertemplate="<b>%{x}</b><br>Risk Score: %{z}%<extra></extra>"
+                                ))
+                                
+                                fig.update_layout(
+                                    title="Document Risk Assessment",
+                                    height=200,
+                                    showlegend=False,
+                                    margin=dict(l=20, r=20, t=40, b=20)
+                                )
+                                
+                                st.plotly_chart(fig, use_container_width=True)
+                                
+                                # Friendly AI Guidance Tooltips
+                                st.markdown("### 🤖 AI Guidance & Insights")
+                                
+                                guidance_col1, guidance_col2 = st.columns(2)
+                                
+                                with guidance_col1:
+                                    # AI Risk Insights
+                                    ai_cyber_score = scores.get('ai_cybersecurity', 0) or 0
+                                    ai_ethics_score = scores.get('ai_ethics', 0) or 0
+                                    if max(ai_cyber_score, ai_ethics_score) > 0:
+                                        ai_max_score = max(ai_cyber_score, ai_ethics_score)
+                                        if ai_max_score >= 70:
+                                            ai_guidance = "🟢 Strong AI governance framework detected! This document shows comprehensive AI risk management."
+                                        elif ai_max_score >= 40:
+                                            ai_guidance = "🟡 Moderate AI coverage. Consider reviewing additional AI safety guidelines."
+                                        else:
+                                            ai_guidance = "🔵 Limited AI focus. This document may complement AI-specific policies."
+                                        
+                                        st.info(f"**AI Assessment:** {ai_guidance}")
+                                
+                                with guidance_col2:
+                                    # Quantum Risk Insights  
+                                    quantum_cyber_score = scores.get('quantum_cybersecurity', 0) or 0
+                                    quantum_ethics_score = scores.get('quantum_ethics', 0) or 0
+                                    if max(quantum_cyber_score, quantum_ethics_score) > 0:
+                                        quantum_max_score = max(quantum_cyber_score, quantum_ethics_score)
+                                        if quantum_max_score >= 70:
+                                            quantum_guidance = "🟢 Excellent quantum readiness! This document addresses quantum computing challenges well."
+                                        elif quantum_max_score >= 40:
+                                            quantum_guidance = "🟡 Good quantum awareness. Consider quantum-specific implementation details."
+                                        else:
+                                            quantum_guidance = "🔵 Basic quantum coverage. May need quantum-focused supplementary guidance."
+                                        
+                                        st.info(f"**Quantum Assessment:** {quantum_guidance}")
+                                
+                                # Contextual Help Tooltips
+                                with st.expander("💡 Understanding Your Risk Scores", expanded=False):
+                                    help_col1, help_col2 = st.columns(2)
+                                    
+                                    with help_col1:
+                                        st.markdown("""
+                                        **🔒 Cybersecurity Scores:**
+                                        - **80-100:** Comprehensive security framework
+                                        - **60-79:** Good security practices  
+                                        - **40-59:** Basic security considerations
+                                        - **Below 40:** Limited security focus
+                                        """)
+                                    
+                                    with help_col2:
+                                        st.markdown("""
+                                        **⚖️ Ethics Scores:**
+                                        - **80-100:** Strong ethical guidelines
+                                        - **60-79:** Solid ethical framework
+                                        - **40-59:** Some ethical considerations
+                                        - **Below 40:** Minimal ethical guidance
+                                        """)
+                                
+                                # Next Steps Guidance
+                                st.markdown("### 🎯 Recommended Next Steps")
+                                
+                                # Intelligent recommendations based on scores
+                                recommendations = []
+                                
+                                # Check if content variables exist
+                                try:
+                                    content_str = str(content) if content else ""
+                                    title_str = str(title) if title else ""
+                                    combined_text = (content_str + " " + title_str).lower()
+                                    ai_content_exists = 'ai' in combined_text or 'artificial intelligence' in combined_text
+                                    quantum_content_exists = 'quantum' in combined_text
+                                except:
+                                    ai_content_exists = False
+                                    quantum_content_exists = False
+                                
+                                ai_cyber_score = scores.get('ai_cybersecurity', 0) or 0
+                                quantum_cyber_score = scores.get('quantum_cybersecurity', 0) or 0
+                                ai_ethics_score = scores.get('ai_ethics', 0) or 0
+                                quantum_ethics_score = scores.get('quantum_ethics', 0) or 0
+                                
+                                if ai_cyber_score < 50 and ai_content_exists:
+                                    recommendations.append("📋 Review NIST AI Risk Management Framework for cybersecurity guidelines")
+                                
+                                if quantum_cyber_score < 50 and quantum_content_exists:
+                                    recommendations.append("🔐 Consider post-quantum cryptography implementation strategies")
+                                
+                                if ai_ethics_score < 50 and ai_content_exists:
+                                    recommendations.append("⚖️ Explore AI ethics frameworks and bias mitigation strategies")
+                                
+                                if quantum_ethics_score < 50 and quantum_content_exists:
+                                    recommendations.append("🌟 Review quantum ethics and societal impact considerations")
+                                
+                                if not recommendations:
+                                    recommendations.append("✅ Document shows strong governance coverage across all frameworks")
+                                
+                                for rec in recommendations:
+                                    st.success(rec)
                                 
                                 # Clear all caches to ensure document counts are consistent across pages
                                 try:
                                     st.cache_data.clear()
-                                    if hasattr(fetch_documents_cached, 'clear'):
-                                        fetch_documents_cached.clear()
-                                    if hasattr(comprehensive_document_scoring_cached, 'clear'):
-                                        comprehensive_document_scoring_cached.clear()
-                                except:
+                                    # Clear function caches if they exist
+                                    for func in [fetch_documents_cached, comprehensive_document_scoring_cached]:
+                                        if hasattr(func, 'cache_clear'):
+                                            func.cache_clear()
+                                except Exception:
                                     pass  # Cache clearing is best effort
                                 
                                 st.info("Document added to collection. Page will refresh to show updated counts.")
@@ -1451,6 +1545,7 @@ def render():
                             st.error("Could not extract sufficient content from URL")
                             
                     except Exception as e:
+                        progress_placeholder.empty()
                         st.error(f"Error processing URL: {str(e)}")
                         st.info("Please verify the URL is accessible and contains readable content")
             else:
