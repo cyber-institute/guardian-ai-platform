@@ -614,7 +614,7 @@ def analyze_url_with_multillm(url_input):
                     'content': text_content,
                     'organization': metadata.get('organization', 'Unknown'),
                     'document_type': metadata.get('document_type', 'Report'),
-                    'source': f"URL: {url_input}",
+                    'source': url_input,  # Store clean URL for clickability
                     'text_content': text_content,
                     'analyzed_metadata': metadata,
                     'comprehensive_scores': scores
