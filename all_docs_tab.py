@@ -1269,10 +1269,83 @@ def render():
                                 
                                 return scores
                             
-                            # Use ML-enhanced scoring for accurate analysis
-                            from utils.ml_enhanced_scoring import assess_document_with_ml
-                            scores = assess_document_with_ml(clean_content, clean_title)
-                            st.success(f"✓ ML-enhanced scoring complete: AI Cyber={scores.get('ai_cybersecurity_score', 'N/A')}, Quantum Cyber={scores.get('quantum_cybersecurity_score', 'N/A')}, AI Ethics={scores.get('ai_ethics_score', 'N/A')}, Quantum Ethics={scores.get('quantum_ethics_score', 'N/A')}")
+                            # Enhanced content-based scoring using direct keyword analysis
+                            def calculate_content_scores(content, title):
+                                combined_text = (content + " " + title).lower()
+                                
+                                # Enhanced quantum keywords with weights
+                                quantum_keywords = {
+                                    'quantum computing': 20, 'quantum algorithm': 15, 'quantum cryptography': 18,
+                                    'quantum key distribution': 15, 'quantum supremacy': 12, 'quantum entanglement': 12,
+                                    'quantum state': 10, 'quantum mechanics': 8, 'qubit': 12, 'quantum gate': 10,
+                                    'quantum circuit': 10, 'quantum information': 12, 'quantum communication': 12,
+                                    'quantum technology': 15, 'quantum security': 18, 'quantum resistant': 15,
+                                    'post-quantum': 15, 'quantum safe': 12, 'quantum threat': 12
+                                }
+                                
+                                # Enhanced AI keywords with weights
+                                ai_keywords = {
+                                    'artificial intelligence': 15, 'machine learning': 12, 'neural network': 10, 
+                                    'deep learning': 12, 'ai system': 10, 'ai framework': 8, 'algorithm': 5, 
+                                    'automation': 6, 'chatbot': 5, 'nlp': 8, 'natural language': 7,
+                                    'computer vision': 8, 'robotics': 6, 'intelligent system': 8
+                                }
+                                
+                                # Enhanced cybersecurity keywords
+                                cyber_keywords = {
+                                    'cybersecurity': 15, 'information security': 12, 'privacy': 10, 'encryption': 12,
+                                    'threat': 8, 'vulnerability': 10, 'attack': 8, 'defense': 8, 'protection': 8,
+                                    'risk management': 10, 'security framework': 12, 'data protection': 10,
+                                    'cyber threat': 12, 'security policy': 10, 'incident response': 8
+                                }
+                                
+                                # Enhanced ethics keywords
+                                ethics_keywords = {
+                                    'ethics': 12, 'bias': 10, 'fairness': 10, 'transparency': 8, 'accountability': 10,
+                                    'responsible ai': 15, 'trust': 6, 'explainable': 12, 'interpretable': 10,
+                                    'ethical framework': 12, 'moral': 8, 'social impact': 8, 'human rights': 10
+                                }
+                                
+                                # Calculate weighted scores
+                                ai_score = sum(weight for keyword, weight in ai_keywords.items() if keyword in combined_text)
+                                quantum_score = sum(weight for keyword, weight in quantum_keywords.items() if keyword in combined_text)
+                                cyber_score = sum(weight for keyword, weight in cyber_keywords.items() if keyword in combined_text)
+                                ethics_score = sum(weight for keyword, weight in ethics_keywords.items() if keyword in combined_text)
+                                
+                                # Check if document actually has content
+                                has_quantum_content = quantum_score > 0
+                                has_ai_content = ai_score > 0
+                                
+                                # Only boost scores if content exists
+                                if has_quantum_content:
+                                    # Boost quantum score if document is clearly quantum-focused
+                                    if 'quantum' in title.lower():
+                                        quantum_score = min(quantum_score * 1.5, 100)
+                                
+                                # Calculate final scores
+                                scores = {}
+                                
+                                # AI frameworks - only if AI content exists
+                                if has_ai_content:
+                                    scores['ai_cybersecurity'] = min(int((ai_score + cyber_score) * 1.2), 100)
+                                    scores['ai_ethics'] = min(int((ai_score + ethics_score) * 1.2), 100)
+                                else:
+                                    scores['ai_cybersecurity'] = 0
+                                    scores['ai_ethics'] = 0
+                                
+                                # Quantum frameworks - only if quantum content exists
+                                if has_quantum_content:
+                                    scores['quantum_cybersecurity'] = min(int((quantum_score + cyber_score) * 1.2), 100)
+                                    scores['quantum_ethics'] = min(int((quantum_score + ethics_score) * 1.2), 100)
+                                else:
+                                    scores['quantum_cybersecurity'] = 0
+                                    scores['quantum_ethics'] = 0
+                                
+                                return scores, has_quantum_content, has_ai_content
+                            
+                            # Calculate scores using content-based analysis
+                            scores, has_quantum_content, has_ai_content = calculate_content_scores(clean_content, clean_title)
+                            st.success(f"✓ Content-based scoring complete: AI Cyber={scores.get('ai_cybersecurity', 0)}, Quantum Cyber={scores.get('quantum_cybersecurity', 0)}, AI Ethics={scores.get('ai_ethics', 0)}, Quantum Ethics={scores.get('quantum_ethics', 0)}")
                             
                             # Determine topic based on content analysis
                             def determine_document_topic(content, title):
@@ -1283,20 +1356,21 @@ def render():
                                     'quantum policy', 'quantum approach', 'quantum technology', 'quantum computing', 
                                     'quantum cryptography', 'quantum security', 'post-quantum', 'quantum-safe',
                                     'quantum initiative', 'quantum strategy', 'quantum framework', 'qkd',
-                                    'quantum key distribution', 'quantum resistant', 'quantum threat'
+                                    'quantum key distribution', 'quantum resistant', 'quantum threat', 'quantum',
+                                    'qubit', 'quantum state', 'quantum mechanics', 'quantum information'
                                 ]
                                 
                                 # Enhanced AI detection
                                 ai_indicators = [
                                     'artificial intelligence', 'machine learning', 'ai policy', 'ai framework',
                                     'ai strategy', 'ai governance', 'neural network', 'deep learning',
-                                    'ai ethics', 'ai safety', 'ai risk', 'generative ai'
+                                    'ai ethics', 'ai safety', 'ai risk', 'generative ai', 'ai system'
                                 ]
                                 
                                 quantum_count = sum(1 for indicator in quantum_indicators if indicator in combined_text)
                                 ai_count = sum(1 for indicator in ai_indicators if indicator in combined_text)
                                 
-                                # Determine primary topic
+                                # Determine primary topic based on content analysis
                                 if quantum_count > ai_count and quantum_count > 0:
                                     return "Quantum"
                                 elif ai_count > quantum_count and ai_count > 0:
@@ -1357,20 +1431,21 @@ def render():
                                 'content': clean_content,
                                 'clean_content': clean_content,
                                 'text_content': clean_content,
-                                'source_url': url_input,
+                                'source_url': url_input,  # Ensure URL is saved for clickability
+                                'url': url_input,  # Additional URL field for compatibility
                                 'document_type': doc_type_mapping.get(doc_type, "Document"),
                                 'author': clean_author,
-                                'author_organization': clean_organization,  # Ensure proper field mapping
+                                'author_organization': clean_organization,
                                 'organization': clean_organization,
                                 'publication_date': pub_date,
-                                'publish_date': pub_date,  # Ensure proper field mapping
+                                'publish_date': pub_date,
                                 'date': pub_date,
-                                'topic': document_topic,  # Add proper topic detection
+                                'topic': document_topic,  # Content-based topic detection
                                 'ai_cybersecurity_score': scores.get('ai_cybersecurity', 0),
                                 'quantum_cybersecurity_score': scores.get('quantum_cybersecurity', 0),
                                 'ai_ethics_score': scores.get('ai_ethics', 0),
                                 'quantum_ethics_score': scores.get('quantum_ethics', 0),
-                                'metadata_verified': True,  # Mark as verified
+                                'metadata_verified': True,
                                 'extraction_method': 'URL_VERIFIED',
                                 'verification_timestamp': datetime.now().isoformat()
                             }
