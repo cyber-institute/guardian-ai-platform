@@ -18,6 +18,219 @@ def comprehensive_document_scoring_cached(content, title):
 # Performance caching will be handled directly in functions
 from utils.document_metadata_extractor import extract_document_metadata
 from utils.multi_llm_metadata_extractor import extract_clean_metadata
+
+def show_score_explanation(framework_type, score, content="", title=""):
+    """Show detailed scoring explanation in a modal dialog"""
+    
+    # Analysis of content for specific factors
+    content_lower = (content + " " + title).lower()
+    
+    if framework_type == 'ai_cybersecurity':
+        factors = {
+            'security frameworks': ['security framework', 'cybersecurity framework', 'security model'],
+            'threat assessment': ['threat', 'risk assessment', 'vulnerability', 'attack'],
+            'data protection': ['data protection', 'privacy', 'encryption', 'secure data'],
+            'model security': ['model security', 'ai model protection', 'adversarial', 'poisoning'],
+            'governance': ['governance', 'oversight', 'compliance', 'audit']
+        }
+        
+        performance_levels = {
+            80: ("Excellent", "#2e7d32", "Comprehensive AI cybersecurity practices with robust security measures"),
+            60: ("Good", "#f57c00", "Solid AI cybersecurity foundation with room for enhancement"), 
+            40: ("Moderate", "#ed6c02", "Basic AI cybersecurity but lacks comprehensive coverage"),
+            20: ("Limited", "#d32f2f", "Minimal AI cybersecurity guidance"),
+            0: ("Insufficient", "#d32f2f", "Lacks adequate AI cybersecurity considerations")
+        }
+        
+        improvements = [
+            "Implement comprehensive AI threat modeling",
+            "Establish robust model validation procedures", 
+            "Develop AI-specific incident response plans",
+            "Create continuous monitoring frameworks",
+            "Enhance data governance for AI systems"
+        ]
+        
+        title_text = "AI Cybersecurity Maturity Assessment"
+        
+    elif framework_type == 'quantum_cybersecurity':
+        factors = {
+            'post-quantum cryptography': ['post-quantum', 'quantum-safe', 'quantum-resistant'],
+            'quantum key distribution': ['qkd', 'quantum key', 'quantum communication'],
+            'quantum threat assessment': ['quantum threat', 'quantum attack', 'quantum computing threat'],
+            'cryptographic agility': ['crypto agility', 'algorithm agility', 'cryptographic transition'],
+            'quantum readiness': ['quantum readiness', 'quantum preparedness', 'quantum migration']
+        }
+        
+        performance_levels = {
+            80: ("Tier 5 - Advanced", "#1976d2", "Advanced quantum cybersecurity readiness with comprehensive post-quantum strategies"),
+            60: ("Tier 4 - Proficient", "#1976d2", "Strong quantum cybersecurity foundation with active post-quantum planning"),
+            40: ("Tier 3 - Developing", "#f57c00", "Basic quantum awareness with initial post-quantum considerations"),
+            20: ("Tier 2 - Emerging", "#ed6c02", "Limited quantum cybersecurity awareness and preparation"),
+            0: ("Tier 1 - Baseline", "#d32f2f", "Minimal quantum cybersecurity considerations")
+        }
+        
+        improvements = [
+            "Develop post-quantum cryptography migration plan",
+            "Implement quantum threat assessment procedures",
+            "Establish cryptographic agility frameworks", 
+            "Create quantum risk management policies",
+            "Plan for NIST post-quantum standards adoption"
+        ]
+        
+        title_text = "Quantum Cybersecurity Maturity Assessment"
+        
+    elif framework_type == 'ai_ethics':
+        factors = {
+            'bias mitigation': ['bias', 'fairness', 'discrimination', 'bias mitigation'],
+            'transparency': ['transparency', 'explainable', 'interpretable', 'explainability'],
+            'accountability': ['accountability', 'responsibility', 'oversight', 'audit'],
+            'privacy protection': ['privacy', 'data protection', 'personal data', 'consent'],
+            'human oversight': ['human oversight', 'human control', 'human-in-the-loop']
+        }
+        
+        performance_levels = {
+            80: ("Exemplary", "#2e7d32", "Comprehensive AI ethics framework with strong emphasis on responsible AI"),
+            60: ("Proficient", "#f57c00", "Good AI ethics foundation with most key principles addressed"),
+            40: ("Developing", "#ed6c02", "Basic AI ethics considerations with room for significant improvement"),
+            20: ("Emerging", "#d32f2f", "Limited AI ethics awareness and implementation"),
+            0: ("Insufficient", "#d32f2f", "Inadequate attention to AI ethics principles")
+        }
+        
+        improvements = [
+            "Implement comprehensive bias testing procedures",
+            "Develop explainable AI capabilities",
+            "Establish ethical review boards",
+            "Create stakeholder engagement processes",
+            "Enhance privacy-preserving techniques"
+        ]
+        
+        title_text = "AI Ethics Assessment"
+        
+    elif framework_type == 'quantum_ethics':
+        factors = {
+            'quantum advantage equity': ['quantum advantage', 'quantum supremacy', 'equitable access'],
+            'quantum privacy': ['quantum privacy', 'quantum encryption', 'quantum security'],
+            'quantum governance': ['quantum governance', 'quantum regulation', 'quantum policy'],
+            'societal impact': ['societal impact', 'social implications', 'public benefit'],
+            'quantum responsibility': ['quantum responsibility', 'responsible quantum', 'ethical quantum']
+        }
+        
+        performance_levels = {
+            80: ("Advanced", "#2e7d32", "Sophisticated understanding of quantum ethics with comprehensive societal considerations"),
+            60: ("Developed", "#f57c00", "Good quantum ethics awareness with attention to key societal considerations"),
+            40: ("Emerging", "#ed6c02", "Basic quantum ethics considerations with limited depth"),
+            20: ("Initial", "#d32f2f", "Minimal quantum ethics awareness"),
+            0: ("Absent", "#d32f2f", "No significant quantum ethics considerations identified")
+        }
+        
+        improvements = [
+            "Develop quantum equity frameworks",
+            "Address quantum digital divide concerns",
+            "Create quantum ethics guidelines",
+            "Establish quantum governance structures", 
+            "Promote quantum literacy initiatives"
+        ]
+        
+        title_text = "Quantum Ethics Assessment"
+    
+    else:
+        return
+    
+    # Find matching factors
+    factors_found = []
+    for factor, keywords in factors.items():
+        if any(keyword in content_lower for keyword in keywords):
+            factors_found.append(factor)
+    
+    # Determine performance level
+    performance = "N/A"
+    color = "#9e9e9e"
+    interpretation = "Not applicable for this document type"
+    
+    if score != 'N/A' and isinstance(score, (int, float)):
+        for threshold, (perf, col, interp) in sorted(performance_levels.items(), reverse=True):
+            if score >= threshold:
+                performance = perf
+                color = col
+                interpretation = interp
+                break
+    
+    # Display explanation modal
+    with st.expander(f"📊 {title_text} - Detailed Explanation", expanded=True):
+        st.markdown(f"""
+        <div style="background: white; border-radius: 8px; padding: 20px; border-left: 4px solid {color};">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                <div style="background: {color}; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 1.1rem;">
+                    {score if score != 'N/A' else 'N/A'}
+                </div>
+                <div style="font-weight: bold; color: {color}; font-size: 1.1rem;">
+                    {performance}
+                </div>
+            </div>
+            <p style="color: #555; line-height: 1.5; margin-bottom: 16px;">
+                {interpretation}
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("**✅ Strengths Identified:**")
+            if factors_found:
+                for factor in factors_found:
+                    st.markdown(f"• {factor.title()}")
+            else:
+                st.markdown("• No specific strengths identified in content analysis")
+        
+        with col2:
+            st.markdown("**🎯 Improvement Opportunities:**")
+            for improvement in improvements[:3]:
+                st.markdown(f"• {improvement}")
+        
+        st.markdown("---")
+        st.markdown("**📋 Evaluation Criteria:**")
+        st.markdown("This framework evaluates documents based on:")
+        
+        criteria_text = []
+        if framework_type == 'ai_cybersecurity':
+            criteria_text = [
+                "AI system security architecture and frameworks",
+                "Threat modeling and risk assessment procedures", 
+                "Data protection and privacy measures",
+                "AI model security and integrity protection",
+                "Governance and compliance structures"
+            ]
+        elif framework_type == 'quantum_cybersecurity':
+            criteria_text = [
+                "Post-quantum cryptography adoption and planning",
+                "Quantum key distribution implementation",
+                "Quantum threat assessment and risk analysis", 
+                "Cryptographic agility and migration strategies",
+                "Quantum-safe standards compliance"
+            ]
+        elif framework_type == 'ai_ethics':
+            criteria_text = [
+                "Bias detection and mitigation strategies",
+                "Transparency and explainability measures",
+                "Accountability and governance structures",
+                "Privacy protection and data rights",
+                "Human oversight and control mechanisms"
+            ]
+        elif framework_type == 'quantum_ethics':
+            criteria_text = [
+                "Equitable access to quantum advantages",
+                "Quantum privacy and security implications",
+                "Quantum technology governance frameworks",
+                "Societal impact and public benefit considerations", 
+                "Responsible quantum development practices"
+            ]
+        
+        for criterion in criteria_text:
+            st.markdown(f"• {criterion}")
+            
+        st.markdown("---")
+        st.markdown("**ℹ️ Note:** Scores are calculated using GUARDIAN's multi-LLM ensemble analysis engine, evaluating content against established frameworks including NIST AI RMF, CISA guidelines, and quantum security standards.")
 from utils.html_artifact_interceptor import clean_documents, clean_field
 from utils.content_cleaner import clean_document_content
 from utils.clean_preview_generator import generate_clean_preview, extract_clean_metadata
@@ -2432,11 +2645,44 @@ def render_grid_view(docs):
                 border-left:4px solid #3B82F6'>
                     <h4 style='margin:0 0 6px 0;font-size:15px'>{title_html}</h4>
                     <div style='font-size:10px;color:#666;margin-bottom:8px' title='Type: {safe_doc_type} • Author/Org: {safe_author_org} • Published: {safe_pub_date}'>{safe_doc_type} • {safe_author_org} • {safe_pub_date}</div>
-                    <div style='display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px;font-size:10px'>
-                        <div title='AI Cybersecurity Maturity (0-100): Evaluates AI security risks and defensive measures. N/A means not AI-related.'>AI Cyber: <span style='background:#e8f5e8;padding:2px 6px;border-radius:8px;color:#2e7d32'>{scores.get('ai_cybersecurity', 'N/A')}</span></div>
-                        <div title='Quantum Cybersecurity Maturity (Tier 1-5): Assesses quantum-safe cryptography readiness. N/A means not quantum-related.'>Q Cyber: <span style='background:#e3f2fd;padding:2px 6px;border-radius:8px;color:#1976d2'>{scores.get('quantum_cybersecurity', 'N/A')}</span></div>
-                        <div title='AI Ethics Score (0-100): Measures ethical AI considerations and bias mitigation. N/A means not AI-related.'>AI Ethics: <span style='background:#fff3e0;padding:2px 6px;border-radius:8px;color:#f57c00'>{scores.get('ai_ethics', 'N/A')}</span></div>
-                        <div title='Quantum Ethics Score (0-100): Evaluates ethical implications of quantum technology. N/A means not quantum-related.'>Q Ethics: <span style='background:#fce4ec;padding:2px 6px;border-radius:8px;color:#c2185b'>{scores.get('quantum_ethics', 'N/A')}</span></div>
+                    <div style='margin-bottom:8px;font-size:10px'>
+                        <div style='margin-bottom:4px;font-weight:600;color:#333'>Framework Scores (Click for explanations):</div>
+                        <div style='display:grid;grid-template-columns:1fr 1fr;gap:6px'>""")
+            
+            # Add clickable score explanations
+            from components.scoring_explanations import create_clickable_score_badge
+            
+            # Create score buttons with explanations
+            score_col1, score_col2 = st.columns(2)
+            
+            with score_col1:
+                if st.button(f"AI Cyber: {scores.get('ai_cybersecurity', 'N/A')}", 
+                           key=f"ai_cyber_{doc.get('id', i)}", 
+                           help="Click for detailed AI Cybersecurity scoring explanation",
+                           type="secondary"):
+                    show_score_explanation('ai_cybersecurity', scores.get('ai_cybersecurity', 'N/A'), content, title)
+                
+                if st.button(f"AI Ethics: {scores.get('ai_ethics', 'N/A')}", 
+                           key=f"ai_ethics_{doc.get('id', i)}", 
+                           help="Click for detailed AI Ethics scoring explanation",
+                           type="secondary"):
+                    show_score_explanation('ai_ethics', scores.get('ai_ethics', 'N/A'), content, title)
+                    
+            with score_col2:
+                if st.button(f"Q Cyber: {scores.get('quantum_cybersecurity', 'N/A')}", 
+                           key=f"q_cyber_{doc.get('id', i)}", 
+                           help="Click for detailed Quantum Cybersecurity scoring explanation",
+                           type="secondary"):
+                    show_score_explanation('quantum_cybersecurity', scores.get('quantum_cybersecurity', 'N/A'), content, title)
+                
+                if st.button(f"Q Ethics: {scores.get('quantum_ethics', 'N/A')}", 
+                           key=f"q_ethics_{doc.get('id', i)}", 
+                           help="Click for detailed Quantum Ethics scoring explanation",
+                           type="secondary"):
+                    show_score_explanation('quantum_ethics', scores.get('quantum_ethics', 'N/A'), content, title)
+            
+            st.markdown("""
+                        </div>
                     </div>
                     <p style='font-size:11px;color:#666;margin:0'>{safe_content_preview[:120]}{'...' if len(safe_content_preview) > 120 else ''}</p>
                 </div>
