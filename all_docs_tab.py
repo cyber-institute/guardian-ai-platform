@@ -2626,65 +2626,24 @@ def render_grid_view(docs):
                     </div>
                 """, unsafe_allow_html=True)
                 
-                # Interactive scoring section with session state
-                st.markdown("**Framework Scores (Click for explanations):**")
+                # Framework scores with inline explanations using expanders (mobile-friendly)
+                st.markdown("**Framework Scores:**")
                 
                 score_col1, score_col2 = st.columns(2)
                 
                 with score_col1:
-                    if st.button(f"AI Cyber: {scores.get('ai_cybersecurity', 'N/A')}", 
-                               key=f"ai_cyber_{doc.get('id', i)}", 
-                               help="Click for detailed AI Cybersecurity scoring explanation",
-                               type="secondary"):
-                        st.session_state[f"show_explanation_{doc.get('id', i)}_ai_cyber"] = True
-                        st.rerun()
+                    with st.expander(f"AI Cyber: {scores.get('ai_cybersecurity', 'N/A')}", expanded=False):
+                        show_score_explanation('ai_cybersecurity', scores.get('ai_cybersecurity', 'N/A'), content, title)
                     
-                    if st.button(f"AI Ethics: {scores.get('ai_ethics', 'N/A')}", 
-                               key=f"ai_ethics_{doc.get('id', i)}", 
-                               help="Click for detailed AI Ethics scoring explanation",
-                               type="secondary"):
-                        st.session_state[f"show_explanation_{doc.get('id', i)}_ai_ethics"] = True
-                        st.rerun()
+                    with st.expander(f"AI Ethics: {scores.get('ai_ethics', 'N/A')}", expanded=False):
+                        show_score_explanation('ai_ethics', scores.get('ai_ethics', 'N/A'), content, title)
                         
                 with score_col2:
-                    if st.button(f"Q Cyber: {scores.get('quantum_cybersecurity', 'N/A')}", 
-                               key=f"q_cyber_{doc.get('id', i)}", 
-                               help="Click for detailed Quantum Cybersecurity scoring explanation",
-                               type="secondary"):
-                        st.session_state[f"show_explanation_{doc.get('id', i)}_q_cyber"] = True
-                        st.rerun()
+                    with st.expander(f"Q Cyber: {scores.get('quantum_cybersecurity', 'N/A')}", expanded=False):
+                        show_score_explanation('quantum_cybersecurity', scores.get('quantum_cybersecurity', 'N/A'), content, title)
                     
-                    if st.button(f"Q Ethics: {scores.get('quantum_ethics', 'N/A')}", 
-                               key=f"q_ethics_{doc.get('id', i)}", 
-                               help="Click for detailed Quantum Ethics scoring explanation",
-                               type="secondary"):
-                        st.session_state[f"show_explanation_{doc.get('id', i)}_q_ethics"] = True
-                        st.rerun()
-                
-                # Check if any explanation should be shown
-                if st.session_state.get(f"show_explanation_{doc.get('id', i)}_ai_cyber", False):
-                    show_score_explanation('ai_cybersecurity', scores.get('ai_cybersecurity', 'N/A'), content, title)
-                    if st.button("Close", key=f"close_ai_cyber_{doc.get('id', i)}"):
-                        st.session_state[f"show_explanation_{doc.get('id', i)}_ai_cyber"] = False
-                        st.rerun()
-                        
-                if st.session_state.get(f"show_explanation_{doc.get('id', i)}_ai_ethics", False):
-                    show_score_explanation('ai_ethics', scores.get('ai_ethics', 'N/A'), content, title)
-                    if st.button("Close", key=f"close_ai_ethics_{doc.get('id', i)}"):
-                        st.session_state[f"show_explanation_{doc.get('id', i)}_ai_ethics"] = False
-                        st.rerun()
-                        
-                if st.session_state.get(f"show_explanation_{doc.get('id', i)}_q_cyber", False):
-                    show_score_explanation('quantum_cybersecurity', scores.get('quantum_cybersecurity', 'N/A'), content, title)
-                    if st.button("Close", key=f"close_q_cyber_{doc.get('id', i)}"):
-                        st.session_state[f"show_explanation_{doc.get('id', i)}_q_cyber"] = False
-                        st.rerun()
-                        
-                if st.session_state.get(f"show_explanation_{doc.get('id', i)}_q_ethics", False):
-                    show_score_explanation('quantum_ethics', scores.get('quantum_ethics', 'N/A'), content, title)
-                    if st.button("Close", key=f"close_q_ethics_{doc.get('id', i)}"):
-                        st.session_state[f"show_explanation_{doc.get('id', i)}_q_ethics"] = False
-                        st.rerun()
+                    with st.expander(f"Q Ethics: {scores.get('quantum_ethics', 'N/A')}", expanded=False):
+                        show_score_explanation('quantum_ethics', scores.get('quantum_ethics', 'N/A'), content, title)
                 
                 # Content preview
                 st.markdown(f"<p style='font-size:11px;color:#666;margin:0'>{safe_content_preview[:120]}{'...' if len(safe_content_preview) > 120 else ''}</p>", unsafe_allow_html=True)
