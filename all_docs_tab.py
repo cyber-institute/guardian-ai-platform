@@ -593,9 +593,9 @@ def render():
                         
                         # White House documents
                         elif 'white house' in org.lower() or 'quantum' in title.lower():
-                            # Try the actual policy page instead of PDF
+                            # Updated with archived Biden administration URLs
                             test_urls = [
-                                "https://www.whitehouse.gov/briefing-room/statements-releases/2022/05/04/national-security-memorandum-on-promoting-united-states-leadership-in-quantum-computing-while-mitigating-risks-to-vulnerable-cryptographic-systems/",
+                                "https://bidenwhitehouse.archives.gov/briefing-room/statements-releases/2022/05/04/national-security-memorandum-on-promoting-united-states-leadership-in-quantum-computing-while-mitigating-risks-to-vulnerable-cryptographic-systems/",
                                 "https://www.whitehouse.gov/briefing-room/statements-releases/quantum-computing/"
                             ]
                             for test_url in test_urls:
