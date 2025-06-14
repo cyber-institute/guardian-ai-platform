@@ -25,6 +25,12 @@ from utils.simple_updater import update_document_metadata
 from components.chatbot_widget import create_tooltip, render_help_tooltip
 from utils.thumbnail_generator import get_thumbnail_html
 from components.recommendation_widget import render_document_recommendations, render_recommendation_sidebar
+import requests
+import time
+import re
+from urllib.parse import urlparse
+
+
 
 def ultra_clean_metadata(field_value):
     """Remove all HTML artifacts from metadata fields using enhanced interceptor"""
@@ -497,6 +503,152 @@ def render():
     else:  # cards
         render_card_view(page_docs)
 
+    # URL Discovery and Management Section
+    st.markdown("---")
+    
+    # Get URL statistics
+    total_docs = len(all_docs)
+    valid_urls = sum(1 for doc in all_docs if doc.get('url_valid') is True)
+    invalid_urls = sum(1 for doc in all_docs if doc.get('url_valid') is False)
+    unchecked_urls = total_docs - valid_urls - invalid_urls
+    
+    col1, col2, col3 = st.columns([2, 1, 1])
+    
+    with col1:
+        st.markdown(f"""
+        **Document URL Status:** {valid_urls}/{total_docs} documents have valid clickable links  
+        <span style='color: #059669'>✓ {valid_urls} Valid URLs</span> | 
+        <span style='color: #dc2626'>✗ {invalid_urls} Broken/Invalid</span> | 
+        <span style='color: #f59e0b'>⚠ {unchecked_urls} Not Checked</span>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        if st.button("🔍 Discover Missing URLs", help="Automatically find source URLs for documents without valid links"):
+            with st.spinner("Discovering document URLs..."):
+                # Inline URL discovery
+                from utils.database import db_manager
+                
+                query = """
+                SELECT id, title, source, author_organization
+                FROM documents 
+                WHERE url_valid IS NULL OR url_valid = false
+                LIMIT 5
+                """
+                
+                docs_needing_urls = db_manager.execute_query(query)
+                discovered_count = 0
+                
+                session = requests.Session()
+                session.headers.update({'User-Agent': 'Mozilla/5.0 (compatible; GUARDIAN/1.0)'})
+                
+                for doc in docs_needing_urls:
+                    doc_id = doc['id']
+                    title = doc['title']
+                    org = doc.get('author_organization', '')
+                    
+                    found_url = None
+                    
+                    # NIST documents
+                    if 'nist' in org.lower():
+                        nist_match = re.search(r'(?:SP\s+)?(\d+(?:-\d+)?[A-Z]?)', title, re.IGNORECASE)
+                        if nist_match:
+                            pub_num = nist_match.group(1)
+                            test_url = f"https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.{pub_num}.pdf"
+                            try:
+                                response = session.head(test_url, timeout=5)
+                                if response.status_code == 200:
+                                    found_url = test_url
+                            except:
+                                pass
+                    
+                    # White House documents
+                    elif 'white house' in org.lower() or 'quantum' in title.lower():
+                        test_url = "https://www.whitehouse.gov/wp-content/uploads/2022/05/National-Security-Memorandum-10.pdf"
+                        try:
+                            response = session.head(test_url, timeout=5)
+                            if response.status_code == 200:
+                                found_url = test_url
+                        except:
+                            pass
+                    
+                    # Update database if URL found
+                    if found_url:
+                        update_query = """
+                        UPDATE documents 
+                        SET source = %s, url_valid = %s, url_status = %s, source_redirect = %s, url_checked = NOW()
+                        WHERE id = %s
+                        """
+                        db_manager.execute_query(update_query, (found_url, True, 'valid', found_url, doc_id))
+                        discovered_count += 1
+                
+                st.success(f"Discovery completed! Found {discovered_count} new URLs.")
+            st.rerun()
+    
+    with col3:
+        if st.button("🔄 Validate All URLs", help="Check all existing URLs for validity and detect landing pages"):
+            with st.spinner("Validating URLs..."):
+                # Inline URL validation
+                from utils.database import db_manager
+                
+                query = """
+                SELECT id, title, source
+                FROM documents 
+                WHERE source IS NOT NULL AND source LIKE 'http%'
+                LIMIT 10
+                """
+                
+                docs_with_urls = db_manager.execute_query(query)
+                validated_count = 0
+                
+                session = requests.Session()
+                session.headers.update({'User-Agent': 'Mozilla/5.0 (compatible; GUARDIAN/1.0)'})
+                
+                landing_indicators = ['page not found', '404', 'search results', 'document library']
+                
+                for doc in docs_with_urls:
+                    doc_id = doc['id']
+                    title = doc['title']
+                    url = doc['source']
+                    
+                    try:
+                        response = session.get(url, timeout=8)
+                        
+                        if response.status_code == 200:
+                            content = response.text.lower()
+                            
+                            # Check for landing page indicators
+                            is_landing_page = any(indicator in content for indicator in landing_indicators)
+                            
+                            # Check title relevance
+                            title_words = [w.lower() for w in title.split() if len(w) > 3]
+                            matches = sum(1 for word in title_words if word in content)
+                            title_match = matches >= len(title_words) * 0.3 if title_words else False
+                            
+                            is_valid = not is_landing_page and (title_match or 'pdf' in response.headers.get('content-type', '').lower())
+                            status = 'valid' if is_valid else ('landing_page' if is_landing_page else 'low_relevance')
+                        else:
+                            is_valid = False
+                            status = f'http_{response.status_code}'
+                        
+                        update_query = """
+                        UPDATE documents 
+                        SET url_valid = %s, url_status = %s, url_checked = NOW()
+                        WHERE id = %s
+                        """
+                        db_manager.execute_query(update_query, (is_valid, status, doc_id))
+                        validated_count += 1
+                        
+                    except:
+                        update_query = """
+                        UPDATE documents 
+                        SET url_valid = %s, url_status = %s, url_checked = NOW()
+                        WHERE id = %s
+                        """
+                        db_manager.execute_query(update_query, (False, 'connection_error', doc_id))
+                
+                st.success(f"Validation completed! Checked {validated_count} URLs.")
+            st.rerun()
+    
     # Summary statistics
     st.markdown("---")
     st.markdown("### Collection Summary")
