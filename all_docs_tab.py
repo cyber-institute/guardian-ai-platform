@@ -155,29 +155,29 @@ def show_score_explanation(framework_type, score, content="", title=""):
                 interpretation = interp
                 break
     
-    # Display compact explanation modal
-    with st.expander(f"{title_text} - Score: {score} ({performance})", expanded=True):
-        st.markdown(f"""
-        <div style="background: {color}10; border-radius: 6px; padding: 12px; border-left: 3px solid {color}; margin-bottom: 12px;">
-            <div style="color: {color}; font-weight: 600; margin-bottom: 6px;">Score: {score if score != 'N/A' else 'N/A'} - {performance}</div>
-            <div style="color: #555; font-size: 0.9rem;">{interpretation}</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.markdown("**Strengths Found:**")
-            if factors_found:
-                for factor in factors_found[:3]:  # Limit to top 3
-                    st.markdown(f"• {factor.title()}")
-            else:
-                st.markdown("• None identified")
-        
-        with col2:
-            st.markdown("**Key Improvements:**")
-            for improvement in improvements[:3]:
-                st.markdown(f"• {improvement}")
+    # Display compact explanation content (no nested expander)
+    st.markdown(f"**{title_text} - Score: {score} ({performance})**")
+    st.markdown(f"""
+    <div style="background: {color}10; border-radius: 6px; padding: 12px; border-left: 3px solid {color}; margin-bottom: 12px;">
+        <div style="color: {color}; font-weight: 600; margin-bottom: 6px;">Score: {score if score != 'N/A' else 'N/A'} - {performance}</div>
+        <div style="color: #555; font-size: 0.9rem;">{interpretation}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Strengths Found:**")
+        if factors_found:
+            for factor in factors_found[:3]:  # Limit to top 3
+                st.markdown(f"• {factor.title()}")
+        else:
+            st.markdown("• None identified")
+    
+    with col2:
+        st.markdown("**Key Improvements:**")
+        for improvement in improvements[:3]:
+            st.markdown(f"• {improvement}")
         
         with st.expander("Evaluation Criteria", expanded=False):
             criteria_text = []
@@ -2810,8 +2810,27 @@ def render_minimal_list(docs):
             </div>
             """, unsafe_allow_html=True)
         
-        # Action buttons
-        col1, col2, col3 = st.columns(3)
+        # Compact action buttons
+        st.markdown("""
+        <style>
+        .stButton > button {
+            height: 28px !important;
+            padding: 2px 8px !important;
+            font-size: 11px !important;
+            border: 1px solid #d1d5db !important;
+            background: transparent !important;
+            color: #374151 !important;
+            border-radius: 4px !important;
+            margin-right: 4px !important;
+        }
+        .stButton > button:hover {
+            background: #f3f4f6 !important;
+            border-color: #9ca3af !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns([1, 1, 1])
         
         with col1:
             if st.button("View Details", key=f"view_{idx}"):
@@ -2838,7 +2857,7 @@ def render_minimal_list(docs):
         
         with col3:
             if has_scores:
-                if st.button("📧 Email Report", key=f"email_report_{idx}"):
+                if st.button("Email Report", key=f"email_report_{idx}"):
                     st.info("Email functionality available in Risk Reports section")
 
 def render_card_view(docs):
