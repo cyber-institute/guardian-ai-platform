@@ -2810,32 +2810,36 @@ def render_minimal_list(docs):
             </div>
             """, unsafe_allow_html=True)
         
-        # Ultra-compact action buttons
-        st.markdown("""
-        <style>
-        .stButton > button {
-            height: 20px !important;
-            padding: 1px 4px !important;
-            font-size: 9px !important;
-            line-height: 1.2 !important;
-            border: 1px solid #d1d5db !important;
-            background: transparent !important;
-            color: #374151 !important;
-            border-radius: 3px !important;
-            margin-right: 2px !important;
-            min-height: 20px !important;
-        }
-        .stButton > button:hover {
-            background: #f3f4f6 !important;
-            border-color: #9ca3af !important;
-        }
-        </style>
-        """, unsafe_allow_html=True)
+        # Dynamic action buttons (same style as cards view)
+        has_scores = any([scores[key] > 0 for key in scores.keys()])
         
-        col1, col2, col3 = st.columns([1, 1, 1])
-        
-        with col1:
-            if st.button("View Details", key=f"view_{idx}"):
+        if has_scores:
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                if st.button("View Details", key=f"view_{idx}", use_container_width=True):
+                    with st.expander("Document Details", expanded=True):
+                        st.write("**Intelligent Preview:**")
+                        st.write(content_preview)
+                        st.write("**Raw Content:**")
+                        # Clean the raw content for display
+                        clean_content = re.sub(r'<[^>]+>', '', content)  # Remove HTML tags
+                        clean_content = re.sub(r"style='[^']*'", '', clean_content)  # Remove style attributes
+                        clean_content = re.sub(r'\s+', ' ', clean_content).strip()  # Normalize whitespace
+                        st.write(clean_content[:500] + "..." if len(clean_content) > 500 else clean_content)
+            
+            with col2:
+                if st.button("Quick Report", key=f"quick_report_{idx}", use_container_width=True):
+                    from components.risk_report_interface import RiskReportInterface
+                    interface = RiskReportInterface()
+                    interface._generate_quick_report(doc)
+            
+            with col3:
+                if st.button("Email Report", key=f"email_report_{idx}", use_container_width=True):
+                    st.info("Email functionality available in Risk Reports section")
+        else:
+            # Single button for view details when no scores
+            if st.button("View Details", key=f"view_{idx}", use_container_width=True):
                 with st.expander("Document Details", expanded=True):
                     st.write("**Intelligent Preview:**")
                     st.write(content_preview)
@@ -2845,22 +2849,7 @@ def render_minimal_list(docs):
                     clean_content = re.sub(r"style='[^']*'", '', clean_content)  # Remove style attributes
                     clean_content = re.sub(r'\s+', ' ', clean_content).strip()  # Normalize whitespace
                     st.write(clean_content[:500] + "..." if len(clean_content) > 500 else clean_content)
-        
-        with col2:
-            # Quick report generation
-            has_scores = any([scores[key] > 0 for key in scores.keys()])
-            if has_scores:
-                if st.button("Quick Report", key=f"quick_report_{idx}"):
-                    from components.risk_report_interface import RiskReportInterface
-                    interface = RiskReportInterface()
-                    interface._generate_quick_report(doc)
-            else:
-                st.caption("Risk scoring required")
-        
-        with col3:
-            if has_scores:
-                if st.button("Email Report", key=f"email_report_{idx}"):
-                    st.info("Email functionality available in Risk Reports section")
+            st.caption("Risk scoring required for reports")
 
 def render_card_view(docs):
     """Render documents in full card format."""
