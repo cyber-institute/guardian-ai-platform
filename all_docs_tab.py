@@ -2806,15 +2806,25 @@ def render_minimal_list(docs):
             </div>
             """, unsafe_allow_html=True)
         
-        # Minimal clear action buttons
-        st.markdown("""
+        # Minimal view white buttons with maximum specificity
+        st.markdown(f"""
         <style>
-        div[data-testid="column"] > div > .stButton > button {
+        /* Minimal view button styling - ID {idx} */
+        .stApp .main .block-container div[data-testid="column"] > div > .stButton > button,
+        .stApp div[data-testid="column"] .stButton > button,
+        div[data-testid="column"] .stButton button,
+        .stButton > button[kind="secondary"],
+        .stButton > button[kind="primary"],
+        button[data-testid*="button"],
+        button[key*="view_"],
+        button[key*="report_"],
+        button[key*="email_"] {{
             height: 24px !important;
             padding: 4px 8px !important;
             font-size: 11px !important;
             line-height: 1.2 !important;
             border: 1px solid #e5e7eb !important;
+            background-color: #ffffff !important;
             background: #ffffff !important;
             color: #6b7280 !important;
             border-radius: 4px !important;
@@ -2823,13 +2833,22 @@ def render_minimal_list(docs):
             font-weight: 400 !important;
             opacity: 1.0 !important;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
-        }
-        div[data-testid="column"] > div > .stButton > button:hover {
+        }}
+        .stApp .main .block-container div[data-testid="column"] > div > .stButton > button:hover,
+        .stApp div[data-testid="column"] .stButton > button:hover,
+        div[data-testid="column"] .stButton button:hover,
+        .stButton > button[kind="secondary"]:hover,
+        .stButton > button[kind="primary"]:hover,
+        button[data-testid*="button"]:hover,
+        button[key*="view_"]:hover,
+        button[key*="report_"]:hover,
+        button[key*="email_"]:hover {{
+            background-color: #f9fafb !important;
             background: #f9fafb !important;
             border-color: #d1d5db !important;
             color: #374151 !important;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-        }
+        }}
         </style>
         """, unsafe_allow_html=True)
         
