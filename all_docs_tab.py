@@ -2626,24 +2626,273 @@ def render_grid_view(docs):
                     </div>
                 """, unsafe_allow_html=True)
                 
-                # Framework scores with inline explanations using expanders (mobile-friendly)
-                st.markdown("**Framework Scores:**")
+                # Touch-optimized framework scores with enhanced mobile interface
+                st.markdown("""
+                <style>
+                /* Touch-optimized scoring sections */
+                .stExpander {
+                    border: 1px solid #e0e4e7;
+                    border-radius: 8px;
+                    margin: 6px 0;
+                    background: white;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                    transition: all 0.2s ease;
+                }
+                
+                .stExpander:hover {
+                    border-color: #cbd5e0;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+                }
+                
+                .stExpander > div > div > div {
+                    padding: 12px 16px !important;
+                    min-height: 48px !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    font-weight: 600 !important;
+                    font-size: 14px !important;
+                    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+                    border-radius: 7px !important;
+                }
+                
+                .stExpander[data-testid="stExpander"] details summary {
+                    min-height: 48px;
+                    padding: 12px 16px;
+                    font-weight: 600;
+                    font-size: 14px;
+                    cursor: pointer;
+                    user-select: none;
+                    border-radius: 8px;
+                    transition: all 0.15s ease;
+                    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+                    border: 1px solid #e2e8f0;
+                }
+                
+                .stExpander[data-testid="stExpander"] details summary:hover {
+                    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+                    border-color: #cbd5e0;
+                    transform: translateY(-1px);
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                }
+                
+                .stExpander[data-testid="stExpander"] details summary:active {
+                    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+                    transform: translateY(0px) scale(0.98);
+                    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+                }
+                
+                .stExpander[data-testid="stExpander"] details[open] summary {
+                    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+                    border-color: #93c5fd;
+                    border-bottom-left-radius: 0;
+                    border-bottom-right-radius: 0;
+                }
+                
+                .stExpander[data-testid="stExpander"] details > div {
+                    border-top: 1px solid #e2e8f0;
+                    padding: 16px;
+                    background: #fafbfc;
+                    border-bottom-left-radius: 8px;
+                    border-bottom-right-radius: 8px;
+                }
+                
+                /* Mobile optimizations */
+                @media (max-width: 768px) {
+                    .stExpander[data-testid="stExpander"] details summary {
+                        min-height: 52px;
+                        padding: 14px 18px;
+                        font-size: 15px;
+                    }
+                    
+                    .stExpander {
+                        margin: 8px 0;
+                    }
+                    
+                    .stExpander[data-testid="stExpander"] details > div {
+                        padding: 18px;
+                    }
+                }
+                
+                /* Tablet optimizations */
+                @media (min-width: 769px) and (max-width: 1024px) {
+                    .stExpander[data-testid="stExpander"] details summary {
+                        min-height: 50px;
+                        padding: 13px 17px;
+                        font-size: 14px;
+                    }
+                }
+                
+                /* Score badge styling within expander titles */
+                .score-badge {
+                    display: inline-block;
+                    padding: 4px 10px;
+                    border-radius: 12px;
+                    font-weight: 700;
+                    font-size: 12px;
+                    margin-left: 8px;
+                    color: white;
+                    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+                }
+                
+                .score-excellent { background: linear-gradient(135deg, #22c55e, #16a34a); }
+                .score-good { background: linear-gradient(135deg, #f59e0b, #d97706); }
+                .score-fair { background: linear-gradient(135deg, #ef4444, #dc2626); }
+                .score-na { background: linear-gradient(135deg, #6b7280, #4b5563); }
+                
+                /* Ripple effect for touch feedback */
+                .stExpander[data-testid="stExpander"] details summary::before {
+                    content: '';
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 0;
+                    height: 0;
+                    border-radius: 50%;
+                    background: rgba(59, 130, 246, 0.3);
+                    transform: translate(-50%, -50%);
+                    transition: width 0.3s, height 0.3s;
+                    pointer-events: none;
+                    z-index: 0;
+                }
+                
+                .stExpander[data-testid="stExpander"] details summary:active::before {
+                    width: 300px;
+                    height: 300px;
+                }
+                </style>
+                """, unsafe_allow_html=True)
+                
+                st.markdown("**Framework Scores (Tap to expand):**")
+                
+                # Add loading animation and improved touch feedback
+                st.markdown("""
+                <style>
+                /* Loading spinner for touch interactions */
+                .loading-spinner {
+                    display: inline-block;
+                    width: 20px;
+                    height: 20px;
+                    border: 3px solid #f3f3f3;
+                    border-top: 3px solid #3498db;
+                    border-radius: 50%;
+                    animation: spin 1s linear infinite;
+                    margin-left: 10px;
+                }
+                
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                
+                /* Enhanced touch feedback */
+                .stExpander[data-testid="stExpander"] details summary:focus {
+                    outline: 2px solid #3b82f6;
+                    outline-offset: 2px;
+                    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+                }
+                
+                /* Touch-friendly spacing for mobile */
+                @media (max-width: 480px) {
+                    .stExpander {
+                        margin: 10px 0;
+                    }
+                    
+                    .stExpander[data-testid="stExpander"] details summary {
+                        min-height: 56px;
+                        padding: 16px 20px;
+                        font-size: 16px;
+                    }
+                }
+                
+                /* Accessibility improvements */
+                .stExpander[data-testid="stExpander"] details summary {
+                    position: relative;
+                    outline: none;
+                }
+                
+                .stExpander[data-testid="stExpander"] details summary:focus-visible {
+                    outline: 2px solid #3b82f6;
+                    outline-offset: 2px;
+                }
+                
+                /* Score badge animations */
+                .score-badge {
+                    transition: all 0.2s ease;
+                }
+                
+                .stExpander:hover .score-badge {
+                    transform: scale(1.05);
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+                }
+                </style>
+                """, unsafe_allow_html=True)
+                
+                # Create touch-optimized score sections
+                def create_touch_score_section(framework_type, framework_name, score_value, content, title, doc_id, index):
+                    """Create a touch-optimized expandable score section"""
+                    
+                    # Determine score badge class and performance level
+                    if score_value == 'N/A':
+                        badge_class = 'score-na'
+                        performance = 'Not Available'
+                    elif isinstance(score_value, (int, float)):
+                        if score_value >= 80:
+                            badge_class = 'score-excellent'
+                            performance = 'Excellent'
+                        elif score_value >= 60:
+                            badge_class = 'score-good'
+                            performance = 'Good'
+                        else:
+                            badge_class = 'score-fair'
+                            performance = 'Needs Improvement'
+                    else:
+                        badge_class = 'score-na'
+                        performance = 'Not Available'
+                    
+                    # Create expandable section with enhanced styling
+                    expand_key = f"expand_{framework_type}_{doc_id}_{index}"
+                    
+                    # Custom title with score badge
+                    title_html = f"""
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <span style="font-weight: 600;">{framework_name}</span>
+                        <span class="score-badge {badge_class}">{score_value}</span>
+                    </div>
+                    """
+                    
+                    with st.expander(
+                        f"{framework_name}: {score_value}", 
+                        expanded=False
+                    ):
+                        show_score_explanation(framework_type, score_value, content, title)
                 
                 score_col1, score_col2 = st.columns(2)
                 
                 with score_col1:
-                    with st.expander(f"AI Cyber: {scores.get('ai_cybersecurity', 'N/A')}", expanded=False):
-                        show_score_explanation('ai_cybersecurity', scores.get('ai_cybersecurity', 'N/A'), content, title)
+                    create_touch_score_section(
+                        'ai_cybersecurity', 'AI Cyber', 
+                        scores.get('ai_cybersecurity', 'N/A'), 
+                        content, title, doc.get('id', i), i
+                    )
                     
-                    with st.expander(f"AI Ethics: {scores.get('ai_ethics', 'N/A')}", expanded=False):
-                        show_score_explanation('ai_ethics', scores.get('ai_ethics', 'N/A'), content, title)
+                    create_touch_score_section(
+                        'ai_ethics', 'AI Ethics', 
+                        scores.get('ai_ethics', 'N/A'), 
+                        content, title, doc.get('id', i), i
+                    )
                         
                 with score_col2:
-                    with st.expander(f"Q Cyber: {scores.get('quantum_cybersecurity', 'N/A')}", expanded=False):
-                        show_score_explanation('quantum_cybersecurity', scores.get('quantum_cybersecurity', 'N/A'), content, title)
+                    create_touch_score_section(
+                        'quantum_cybersecurity', 'Q Cyber', 
+                        scores.get('quantum_cybersecurity', 'N/A'), 
+                        content, title, doc.get('id', i), i
+                    )
                     
-                    with st.expander(f"Q Ethics: {scores.get('quantum_ethics', 'N/A')}", expanded=False):
-                        show_score_explanation('quantum_ethics', scores.get('quantum_ethics', 'N/A'), content, title)
+                    create_touch_score_section(
+                        'quantum_ethics', 'Q Ethics', 
+                        scores.get('quantum_ethics', 'N/A'), 
+                        content, title, doc.get('id', i), i
+                    )
                 
                 # Content preview
                 st.markdown(f"<p style='font-size:11px;color:#666;margin:0'>{safe_content_preview[:120]}{'...' if len(safe_content_preview) > 120 else ''}</p>", unsafe_allow_html=True)
