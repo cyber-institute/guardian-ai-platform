@@ -2623,6 +2623,44 @@ def render_grid_view(docs):
                     </div>
                 """, unsafe_allow_html=True)
             
+            # Grid view white button styling
+            st.markdown(f"""
+            <style>
+            /* Grid view button styling - Doc {i} */
+            .stButton > button,
+            button[kind="secondary"],
+            button[kind="primary"],
+            [data-testid*="button"],
+            .stButton button {{
+                height: 32px !important;
+                padding: 6px 12px !important;
+                font-size: 12px !important;
+                line-height: 1.2 !important;
+                border: 1px solid #e5e7eb !important;
+                background-color: #ffffff !important;
+                background: #ffffff !important;
+                color: #6b7280 !important;
+                border-radius: 6px !important;
+                margin: 2px !important;
+                min-height: 32px !important;
+                font-weight: 400 !important;
+                opacity: 1.0 !important;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+            }}
+            .stButton > button:hover,
+            button[kind="secondary"]:hover,
+            button[kind="primary"]:hover,
+            [data-testid*="button"]:hover,
+            .stButton button:hover {{
+                background-color: #f9fafb !important;
+                background: #f9fafb !important;
+                border-color: #d1d5db !important;
+                color: #374151 !important;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+            }}
+            </style>
+            """, unsafe_allow_html=True)
+            
             # Framework scores with simple info buttons
             st.markdown("**Framework Scores:**")
             
