@@ -155,82 +155,57 @@ def show_score_explanation(framework_type, score, content="", title=""):
                 interpretation = interp
                 break
     
-    # Display explanation modal
-    with st.expander(f"📊 {title_text} - Detailed Explanation", expanded=True):
+    # Display compact explanation modal
+    with st.expander(f"{title_text} - Score: {score} ({performance})", expanded=True):
         st.markdown(f"""
-        <div style="background: white; border-radius: 8px; padding: 20px; border-left: 4px solid {color};">
-            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                <div style="background: {color}; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 1.1rem;">
-                    {score if score != 'N/A' else 'N/A'}
-                </div>
-                <div style="font-weight: bold; color: {color}; font-size: 1.1rem;">
-                    {performance}
-                </div>
-            </div>
-            <p style="color: #555; line-height: 1.5; margin-bottom: 16px;">
-                {interpretation}
-            </p>
+        <div style="background: {color}10; border-radius: 6px; padding: 12px; border-left: 3px solid {color}; margin-bottom: 12px;">
+            <div style="color: {color}; font-weight: 600; margin-bottom: 6px;">Score: {score if score != 'N/A' else 'N/A'} - {performance}</div>
+            <div style="color: #555; font-size: 0.9rem;">{interpretation}</div>
         </div>
         """, unsafe_allow_html=True)
         
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("**✅ Strengths Identified:**")
+            st.markdown("**Strengths Found:**")
             if factors_found:
-                for factor in factors_found:
+                for factor in factors_found[:3]:  # Limit to top 3
                     st.markdown(f"• {factor.title()}")
             else:
-                st.markdown("• No specific strengths identified in content analysis")
+                st.markdown("• None identified")
         
         with col2:
-            st.markdown("**🎯 Improvement Opportunities:**")
+            st.markdown("**Key Improvements:**")
             for improvement in improvements[:3]:
                 st.markdown(f"• {improvement}")
         
-        st.markdown("---")
-        st.markdown("**📋 Evaluation Criteria:**")
-        st.markdown("This framework evaluates documents based on:")
-        
-        criteria_text = []
-        if framework_type == 'ai_cybersecurity':
-            criteria_text = [
-                "AI system security architecture and frameworks",
-                "Threat modeling and risk assessment procedures", 
-                "Data protection and privacy measures",
-                "AI model security and integrity protection",
-                "Governance and compliance structures"
-            ]
-        elif framework_type == 'quantum_cybersecurity':
-            criteria_text = [
-                "Post-quantum cryptography adoption and planning",
-                "Quantum key distribution implementation",
-                "Quantum threat assessment and risk analysis", 
-                "Cryptographic agility and migration strategies",
-                "Quantum-safe standards compliance"
-            ]
-        elif framework_type == 'ai_ethics':
-            criteria_text = [
-                "Bias detection and mitigation strategies",
-                "Transparency and explainability measures",
-                "Accountability and governance structures",
-                "Privacy protection and data rights",
-                "Human oversight and control mechanisms"
-            ]
-        elif framework_type == 'quantum_ethics':
-            criteria_text = [
-                "Equitable access to quantum advantages",
-                "Quantum privacy and security implications",
-                "Quantum technology governance frameworks",
-                "Societal impact and public benefit considerations", 
-                "Responsible quantum development practices"
-            ]
-        
-        for criterion in criteria_text:
-            st.markdown(f"• {criterion}")
+        with st.expander("Evaluation Criteria", expanded=False):
+            criteria_text = []
+            if framework_type == 'ai_cybersecurity':
+                criteria_text = [
+                    "AI system security architecture", "Threat modeling procedures", 
+                    "Data protection measures", "AI model security", "Governance structures"
+                ]
+            elif framework_type == 'quantum_cybersecurity':
+                criteria_text = [
+                    "Post-quantum cryptography planning", "Quantum key distribution",
+                    "Quantum threat assessment", "Cryptographic agility", "Standards compliance"
+                ]
+            elif framework_type == 'ai_ethics':
+                criteria_text = [
+                    "Bias detection strategies", "Transparency measures",
+                    "Accountability structures", "Privacy protection", "Human oversight"
+                ]
+            elif framework_type == 'quantum_ethics':
+                criteria_text = [
+                    "Equitable quantum access", "Quantum privacy implications",
+                    "Technology governance", "Societal impact", "Responsible development"
+                ]
             
-        st.markdown("---")
-        st.markdown("**ℹ️ Note:** Scores are calculated using GUARDIAN's multi-LLM ensemble analysis engine, evaluating content against established frameworks including NIST AI RMF, CISA guidelines, and quantum security standards.")
+            for criterion in criteria_text:
+                st.markdown(f"• {criterion}")
+        
+        st.markdown("<small style='color: #666;'>Scores calculated using multi-LLM analysis against NIST AI RMF, CISA guidelines, and quantum security standards.</small>", unsafe_allow_html=True)
 from utils.html_artifact_interceptor import clean_documents, clean_field
 from utils.content_cleaner import clean_document_content
 from utils.clean_preview_generator import generate_clean_preview, extract_clean_metadata
@@ -374,29 +349,7 @@ def get_document_topic(doc):
 def render():
     """Render the All Documents tab with comprehensive document repository."""
     
-    # Test scoring explanation system
-    st.markdown("### 🧪 Test Scoring Explanations")
-    st.markdown("Click any button below to test the scoring explanation system:")
-    
-    test_col1, test_col2, test_col3, test_col4 = st.columns(4)
-    
-    with test_col1:
-        if st.button("Test AI Cyber", key="test_ai_cyber", type="secondary"):
-            show_score_explanation('ai_cybersecurity', 75, "artificial intelligence cybersecurity framework threat assessment", "AI Security Framework")
-    
-    with test_col2:
-        if st.button("Test Q Cyber", key="test_q_cyber", type="secondary"):
-            show_score_explanation('quantum_cybersecurity', 85, "quantum cryptography post-quantum security", "Quantum Security Guide")
-    
-    with test_col3:
-        if st.button("Test AI Ethics", key="test_ai_ethics", type="secondary"):
-            show_score_explanation('ai_ethics', 65, "artificial intelligence ethics bias fairness transparency", "AI Ethics Guidelines")
-    
-    with test_col4:
-        if st.button("Test Q Ethics", key="test_q_ethics", type="secondary"):
-            show_score_explanation('quantum_ethics', 70, "quantum ethics societal impact governance", "Quantum Ethics Framework")
-    
-    st.markdown("---")
+
 
     try:
         # Force refresh documents - clear all caching mechanisms
