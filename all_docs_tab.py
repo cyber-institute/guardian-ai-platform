@@ -2220,8 +2220,15 @@ def render_grid_view(docs):
             safe_pub_date = html.escape(pub_date)
             safe_content_preview = html.escape(content_preview)
             
-            # Create clickable title with CSS hover effects if source URL exists
-            if source_url and source_url.startswith(('http://', 'https://')):
+            # Only create clickable title if URL has been verified as working
+            url_valid = doc.get('url_valid')
+            url_status = doc.get('url_status', '')
+            source_redirect = doc.get('source_redirect', '')
+            
+            # Use redirect URL if available, otherwise original source
+            final_url = source_redirect if source_redirect else source_url
+            
+            if source_url and source_url.startswith(('http://', 'https://')) and url_valid is True:
                 title_html = f'''
                 <style>
                 .grid-doc-link:hover {{
@@ -2229,12 +2236,16 @@ def render_grid_view(docs):
                     text-decoration: underline !important;
                 }}
                 </style>
-                <a href="{source_url}" target="_blank" 
+                <a href="{final_url}" target="_blank" 
                    class="grid-doc-link"
                    style="text-decoration: none; color: #2563eb; cursor: pointer; transition: all 0.2s ease;" 
-                   title="Click to open document: {source_url}">
+                   title="Click to open document: {final_url}">
                    {html.escape(title[:40])}{'...' if len(title) > 40 else ''} 🔗
                 </a>'''
+            elif source_url and url_valid is False:
+                title_html = f'{html.escape(title[:40])}{"..." if len(title) > 40 else ""} <span style="color: #dc2626; font-size: 12px;" title="Link unavailable: {url_status}">🚫</span>'
+            elif source_url and url_valid is None:
+                title_html = f'{html.escape(title[:40])}{"..." if len(title) > 40 else ""} <span style="color: #f59e0b; font-size: 12px;" title="Link not yet verified">⚠️</span>'
             else:
                 title_html = html.escape(title[:40]) + ('...' if len(title) > 40 else '')
             
@@ -2347,8 +2358,15 @@ def render_minimal_list(docs):
         
         col1, col2 = st.columns([3, 2])
         with col1:
-            # Create clickable title with CSS hover effects if source URL exists
-            if source_url and source_url.startswith(('http://', 'https://')):
+            # Only create clickable title if URL has been verified as working
+            url_valid = doc.get('url_valid')
+            url_status = doc.get('url_status', '')
+            source_redirect = doc.get('source_redirect', '')
+            
+            # Use redirect URL if available, otherwise original source
+            final_url = source_redirect if source_redirect else source_url
+            
+            if source_url and source_url.startswith(('http://', 'https://')) and url_valid is True:
                 title_html = f'''
                 <style>
                 .list-doc-link:hover {{
@@ -2357,14 +2375,18 @@ def render_minimal_list(docs):
                 }}
                 </style>
                 <strong>
-                <a href="{source_url}" target="_blank" 
+                <a href="{final_url}" target="_blank" 
                    class="list-doc-link"
                    style="text-decoration: none; color: #2563eb; cursor: pointer; transition: all 0.2s ease;" 
-                   title="Click to open document: {source_url}">
+                   title="Click to open document: {final_url}">
                    {html.escape(title)} 🔗
                 </a>
                 </strong>'''
                 st.markdown(title_html, unsafe_allow_html=True)
+            elif source_url and url_valid is False:
+                st.markdown(f"**{title}** <span style='color: #dc2626; font-size: 12px;' title='Link unavailable: {url_status}'>🚫</span>", unsafe_allow_html=True)
+            elif source_url and url_valid is None:
+                st.markdown(f"**{title}** <span style='color: #f59e0b; font-size: 12px;' title='Link not yet verified'>⚠️</span>", unsafe_allow_html=True)
             else:
                 st.markdown(f"**{title}**")
             
@@ -2455,8 +2477,15 @@ def render_card_view(docs):
             safe_pub_date = html.escape(pub_date)
             safe_topic = html.escape(ultra_clean_metadata(doc.get('topic', 'General')))
             
-            # Create clickable title with CSS hover effects if source URL exists
-            if source_url and source_url.startswith(('http://', 'https://')):
+            # Only create clickable title if URL has been verified as working
+            url_valid = doc.get('url_valid')
+            url_status = doc.get('url_status', '')
+            source_redirect = doc.get('source_redirect', '')
+            
+            # Use redirect URL if available, otherwise original source
+            final_url = source_redirect if source_redirect else source_url
+            
+            if source_url and source_url.startswith(('http://', 'https://')) and url_valid is True:
                 title_html = f'''
                 <style>
                 .doc-link:hover {{
@@ -2464,12 +2493,16 @@ def render_card_view(docs):
                     text-decoration: underline !important;
                 }}
                 </style>
-                <a href="{source_url}" target="_blank" 
+                <a href="{final_url}" target="_blank" 
                    class="doc-link"
                    style="text-decoration: none; color: #2563eb; cursor: pointer; transition: all 0.2s ease;" 
-                   title="Click to open document: {source_url}">
+                   title="Click to open document: {final_url}">
                    {html.escape(title)} 🔗
                 </a>'''
+            elif source_url and url_valid is False:
+                title_html = f'{html.escape(title)} <span style="color: #dc2626; font-size: 12px;" title="Link unavailable: {url_status}">🚫</span>'
+            elif source_url and url_valid is None:
+                title_html = f'{html.escape(title)} <span style="color: #f59e0b; font-size: 12px;" title="Link not yet verified">⚠️</span>'
             else:
                 title_html = html.escape(title)
             
