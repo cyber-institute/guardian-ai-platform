@@ -1,635 +1,279 @@
 """
-Machine Learning Training System for GUARDIAN
-Captures verification patterns and builds training datasets for continuous improvement
+ML Training System for GUARDIAN
+Learns from scoring corrections and user feedback to improve future assessments
 """
 
 import json
-import sqlite3
-import numpy as np
+import os
 from datetime import datetime
-from typing import Dict, List, Any, Optional, Tuple
-from dataclasses import dataclass, asdict
-from pathlib import Path
-import logging
-import hashlib
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-
-@dataclass
-class VerificationPattern:
-    """Single verification event for training"""
-    document_id: str
-    original_extraction: Dict[str, Any]
-    verified_extraction: Dict[str, Any]
-    user_corrections: Dict[str, Any]
-    content_sample: str
-    extraction_confidence: Dict[str, float]
-    timestamp: str
-    document_type: str
-    source_type: str  # 'url', 'upload', 'manual'
-    content_hash: str
-
-@dataclass
-class LearningPattern:
-    """Identified pattern from multiple verifications"""
-    pattern_id: str
-    pattern_type: str  # 'title', 'author', 'organization', 'topic'
-    trigger_conditions: List[str]
-    correction_rule: str
-    confidence_score: float
-    usage_count: int
-    success_rate: float
-    created_at: str
-    last_updated: str
+from typing import Dict, List, Optional
+from utils.ml_enhanced_scoring import MLEnhancedScoringEngine
 
 class MLTrainingSystem:
     """
-    Advanced machine learning training system that learns from user verifications
-    and builds patterns for improved automatic extraction
+    Captures scoring patterns and user corrections to improve future document analysis
     """
     
-    def __init__(self, db_path: str = "ml_training.db"):
-        self.db_path = db_path
-        self.vectorizer = TfidfVectorizer(max_features=1000, stop_words='english')
-        self.logger = logging.getLogger(__name__)
-        self._initialize_database()
-        self.learned_patterns = self._load_learned_patterns()
-        
-    def _initialize_database(self):
-        """Initialize SQLite database for training data storage"""
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        
-        # Verification patterns table
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS verification_patterns (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                document_id TEXT,
-                original_extraction TEXT,
-                verified_extraction TEXT,
-                user_corrections TEXT,
-                content_sample TEXT,
-                extraction_confidence TEXT,
-                timestamp TEXT,
-                document_type TEXT,
-                source_type TEXT,
-                content_hash TEXT UNIQUE
-            )
-        """)
-        
-        # Learned patterns table
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS learned_patterns (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                pattern_id TEXT UNIQUE,
-                pattern_type TEXT,
-                trigger_conditions TEXT,
-                correction_rule TEXT,
-                confidence_score REAL,
-                usage_count INTEGER,
-                success_rate REAL,
-                created_at TEXT,
-                last_updated TEXT
-            )
-        """)
-        
-        # Performance metrics table
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS ml_performance (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                metric_type TEXT,
-                metric_value REAL,
-                document_count INTEGER,
-                timestamp TEXT
-            )
-        """)
-        
-        conn.commit()
-        conn.close()
+    def __init__(self):
+        self.training_data_path = "ml_training_data.json"
+        self.scoring_engine = MLEnhancedScoringEngine()
+        self.training_patterns = self._load_training_data()
     
-    def capture_verification_event(
-        self,
-        document_id: str,
-        original_extraction: Dict[str, Any],
-        verified_extraction: Dict[str, Any],
-        content: str,
-        document_type: str = "unknown",
-        source_type: str = "url"
-    ) -> str:
-        """
-        Capture a verification event for training
-        Returns the pattern ID for tracking
-        """
+    def _load_training_data(self) -> Dict:
+        """Load existing training data"""
+        if os.path.exists(self.training_data_path):
+            try:
+                with open(self.training_data_path, 'r') as f:
+                    return json.load(f)
+            except:
+                pass
         
-        # Calculate content hash for deduplication
-        content_hash = hashlib.md5(content.encode()).hexdigest()
-        
-        # Extract user corrections
-        user_corrections = self._identify_corrections(original_extraction, verified_extraction)
-        
-        # Calculate extraction confidence
-        extraction_confidence = self._calculate_extraction_confidence(
-            original_extraction, verified_extraction
-        )
-        
-        # Create verification pattern
-        pattern = VerificationPattern(
-            document_id=document_id,
-            original_extraction=original_extraction,
-            verified_extraction=verified_extraction,
-            user_corrections=user_corrections,
-            content_sample=content[:2000],  # First 2000 chars for analysis
-            extraction_confidence=extraction_confidence,
-            timestamp=datetime.now().isoformat(),
-            document_type=document_type,
-            source_type=source_type,
-            content_hash=content_hash
-        )
-        
-        # Store in database
-        pattern_id = self._store_verification_pattern(pattern)
-        
-        # Analyze for new learning patterns
-        self._analyze_for_new_patterns(pattern)
-        
-        # Update existing pattern performance
-        self._update_pattern_performance()
-        
-        self.logger.info(f"Captured verification pattern: {pattern_id}")
-        return pattern_id
+        return {
+            "scoring_corrections": [],
+            "content_patterns": {},
+            "framework_applicability": {},
+            "realistic_score_ranges": {
+                "ai_cybersecurity": {"min": 10, "max": 85, "typical": 45},
+                "quantum_cybersecurity": {"min": 1, "max": 5, "typical": 3},
+                "ai_ethics": {"min": 5, "max": 80, "typical": 35},
+                "quantum_ethics": {"min": 5, "max": 75, "typical": 30}
+            },
+            "topic_classification_rules": [],
+            "metadata_extraction_improvements": []
+        }
     
-    def _identify_corrections(
-        self, 
-        original: Dict[str, Any], 
-        verified: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """Identify what the user corrected"""
-        corrections = {}
+    def _save_training_data(self):
+        """Save training data to file"""
+        with open(self.training_data_path, 'w') as f:
+            json.dump(self.training_patterns, f, indent=2, default=str)
+    
+    def record_scoring_correction(self, document_id: int, original_scores: Dict, 
+                                corrected_scores: Dict, content: str, title: str):
+        """Record when scores are corrected for learning"""
         
-        for key in verified.keys():
-            original_val = original.get(key, "")
-            verified_val = verified.get(key, "")
+        correction_record = {
+            "timestamp": datetime.now().isoformat(),
+            "document_id": document_id,
+            "title": title[:100],
+            "content_snippet": content[:500],
+            "original_scores": original_scores,
+            "corrected_scores": corrected_scores,
+            "correction_type": self._classify_correction_type(original_scores, corrected_scores),
+            "content_features": self._extract_content_features(content, title)
+        }
+        
+        self.training_patterns["scoring_corrections"].append(correction_record)
+        self._update_scoring_patterns(correction_record)
+        self._save_training_data()
+    
+    def _classify_correction_type(self, original: Dict, corrected: Dict) -> str:
+        """Classify the type of correction made"""
+        
+        corrections = []
+        
+        for framework in ['ai_cybersecurity_score', 'quantum_cybersecurity_score', 
+                         'ai_ethics_score', 'quantum_ethics_score']:
+            orig_val = original.get(framework)
+            corr_val = corrected.get(framework)
             
-            if original_val != verified_val:
-                corrections[key] = {
-                    'original': original_val,
-                    'corrected': verified_val,
-                    'correction_type': self._classify_correction_type(key, original_val, verified_val)
+            if orig_val is not None and corr_val is None:
+                corrections.append(f"removed_{framework}")
+            elif orig_val is None and corr_val is not None:
+                corrections.append(f"added_{framework}")
+            elif orig_val != corr_val:
+                if isinstance(orig_val, (int, float)) and isinstance(corr_val, (int, float)):
+                    if orig_val > corr_val:
+                        corrections.append(f"reduced_{framework}")
+                    else:
+                        corrections.append(f"increased_{framework}")
+        
+        return "|".join(corrections) if corrections else "no_change"
+    
+    def _extract_content_features(self, content: str, title: str) -> Dict:
+        """Extract features from content for pattern learning"""
+        
+        content_lower = content.lower()
+        title_lower = title.lower()
+        combined = content_lower + " " + title_lower
+        
+        # Keyword density analysis
+        ai_keywords = ['artificial intelligence', 'machine learning', 'ai ', 'neural network']
+        quantum_keywords = ['quantum', 'post-quantum', 'quantum computing', 'quantum cryptography']
+        cyber_keywords = ['cybersecurity', 'security', 'encryption', 'vulnerability']
+        ethics_keywords = ['ethics', 'bias', 'fairness', 'transparency']
+        
+        return {
+            "word_count": len(content.split()),
+            "ai_keyword_density": sum(1 for kw in ai_keywords if kw in combined) / len(ai_keywords),
+            "quantum_keyword_density": sum(1 for kw in quantum_keywords if kw in combined) / len(quantum_keywords),
+            "cyber_keyword_density": sum(1 for kw in cyber_keywords if kw in combined) / len(cyber_keywords),
+            "ethics_keyword_density": sum(1 for kw in ethics_keywords if kw in combined) / len(ethics_keywords),
+            "has_technical_structure": "framework" in combined or "standard" in combined,
+            "document_formality": "shall" in combined or "must" in combined,
+            "title_indicates_topic": any(kw in title_lower for kw in ai_keywords + quantum_keywords)
+        }
+    
+    def _update_scoring_patterns(self, correction: Dict):
+        """Update scoring patterns based on corrections"""
+        
+        content_features = correction["content_features"]
+        corrected_scores = correction["corrected_scores"]
+        correction_type = correction["correction_type"]
+        
+        # Learn patterns for when frameworks should/shouldn't apply
+        for framework in ['ai_cybersecurity_score', 'quantum_cybersecurity_score', 
+                         'ai_ethics_score', 'quantum_ethics_score']:
+            
+            score = corrected_scores.get(framework)
+            framework_key = framework.replace('_score', '')
+            
+            if framework_key not in self.training_patterns["framework_applicability"]:
+                self.training_patterns["framework_applicability"][framework_key] = {
+                    "should_apply_patterns": [],
+                    "should_not_apply_patterns": []
+                }
+            
+            # Learn when framework should apply
+            if score is not None and score > 0:
+                self.training_patterns["framework_applicability"][framework_key]["should_apply_patterns"].append({
+                    "features": content_features,
+                    "score": score,
+                    "confidence": 0.8
+                })
+            
+            # Learn when framework should NOT apply
+            if score is None and f"removed_{framework}" in correction_type:
+                self.training_patterns["framework_applicability"][framework_key]["should_not_apply_patterns"].append({
+                    "features": content_features,
+                    "reason": "topic_mismatch",
+                    "confidence": 0.9
+                })
+    
+    def predict_framework_applicability(self, content: str, title: str) -> Dict[str, bool]:
+        """Predict which frameworks should apply based on learned patterns"""
+        
+        content_features = self._extract_content_features(content, title)
+        predictions = {}
+        
+        for framework, patterns in self.training_patterns["framework_applicability"].items():
+            should_apply_score = 0
+            should_not_apply_score = 0
+            
+            # Check positive patterns
+            for pattern in patterns.get("should_apply_patterns", []):
+                similarity = self._calculate_feature_similarity(content_features, pattern["features"])
+                should_apply_score += similarity * pattern["confidence"]
+            
+            # Check negative patterns
+            for pattern in patterns.get("should_not_apply_patterns", []):
+                similarity = self._calculate_feature_similarity(content_features, pattern["features"])
+                should_not_apply_score += similarity * pattern["confidence"]
+            
+            # Make prediction
+            predictions[framework] = should_apply_score > should_not_apply_score
+        
+        return predictions
+    
+    def _calculate_feature_similarity(self, features1: Dict, features2: Dict) -> float:
+        """Calculate similarity between two feature sets"""
+        
+        similarity_scores = []
+        
+        for key in features1:
+            if key in features2:
+                val1, val2 = features1[key], features2[key]
+                
+                if isinstance(val1, bool) and isinstance(val2, bool):
+                    similarity_scores.append(1.0 if val1 == val2 else 0.0)
+                elif isinstance(val1, (int, float)) and isinstance(val2, (int, float)):
+                    max_val = max(abs(val1), abs(val2), 1)
+                    similarity_scores.append(1.0 - abs(val1 - val2) / max_val)
+        
+        return sum(similarity_scores) / len(similarity_scores) if similarity_scores else 0.0
+    
+    def get_recommended_score_range(self, framework: str, content_features: Dict) -> Dict:
+        """Get recommended score range based on similar documents"""
+        
+        base_range = self.training_patterns["realistic_score_ranges"].get(framework, {})
+        
+        # Find similar documents in training data
+        similar_corrections = []
+        for correction in self.training_patterns["scoring_corrections"]:
+            if framework in correction["corrected_scores"]:
+                similarity = self._calculate_feature_similarity(
+                    content_features, correction["content_features"]
+                )
+                if similarity > 0.7:  # High similarity threshold
+                    similar_corrections.append({
+                        "score": correction["corrected_scores"][framework],
+                        "similarity": similarity
+                    })
+        
+        if similar_corrections:
+            # Weight scores by similarity
+            weighted_scores = [
+                corr["score"] * corr["similarity"] 
+                for corr in similar_corrections 
+                if corr["score"] is not None
+            ]
+            
+            if weighted_scores:
+                avg_score = sum(weighted_scores) / len(weighted_scores)
+                return {
+                    "recommended": int(avg_score),
+                    "min": max(int(avg_score * 0.8), base_range.get("min", 0)),
+                    "max": min(int(avg_score * 1.2), base_range.get("max", 100)),
+                    "confidence": min(len(similar_corrections) / 5, 1.0)
                 }
         
-        return corrections
+        return base_range
     
-    def _classify_correction_type(self, field: str, original: str, corrected: str) -> str:
-        """Classify the type of correction made"""
-        if not original and corrected:
-            return "missing_field_added"
-        elif original and not corrected:
-            return "incorrect_field_removed"
-        elif len(corrected) > len(original):
-            return "field_expanded"
-        elif len(corrected) < len(original):
-            return "field_truncated"
-        elif original.lower() != corrected.lower():
-            return "field_reformatted"
-        else:
-            return "field_replaced"
-    
-    def _calculate_extraction_confidence(
-        self, 
-        original: Dict[str, Any], 
-        verified: Dict[str, Any]
-    ) -> Dict[str, float]:
-        """Calculate confidence scores for each extracted field"""
-        confidence = {}
+    def enhance_scoring_with_ml(self, content: str, title: str) -> Dict:
+        """Enhance scoring using ML training patterns"""
         
-        for key in verified.keys():
-            original_val = str(original.get(key, ""))
-            verified_val = str(verified.get(key, ""))
+        # Get base ML scores
+        base_scores = self.scoring_engine.analyze_document_comprehensive(content, title)
+        
+        # Apply training improvements
+        content_features = self._extract_content_features(content, title)
+        applicability_predictions = self.predict_framework_applicability(content, title)
+        
+        enhanced_scores = {}
+        for framework, score in base_scores.items():
+            framework_key = framework.replace('_score', '')
             
-            if original_val == verified_val:
-                confidence[key] = 1.0  # Perfect extraction
-            elif not original_val:
-                confidence[key] = 0.0  # Missed extraction
-            else:
-                # Calculate similarity using character overlap
-                similarity = self._calculate_string_similarity(original_val, verified_val)
-                confidence[key] = similarity
-        
-        return confidence
-    
-    def _calculate_string_similarity(self, str1: str, str2: str) -> float:
-        """Calculate similarity between two strings"""
-        if not str1 or not str2:
-            return 0.0
-        
-        # Simple character-based similarity
-        longer = str1 if len(str1) > len(str2) else str2
-        shorter = str1 if len(str1) <= len(str2) else str2
-        
-        if len(longer) == 0:
-            return 1.0
-        
-        # Calculate edit distance approximation
-        matches = sum(1 for i, char in enumerate(shorter) if i < len(longer) and char == longer[i])
-        return matches / len(longer)
-    
-    def _store_verification_pattern(self, pattern: VerificationPattern) -> str:
-        """Store verification pattern in database"""
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        
-        try:
-            cursor.execute("""
-                INSERT OR REPLACE INTO verification_patterns 
-                (document_id, original_extraction, verified_extraction, user_corrections,
-                 content_sample, extraction_confidence, timestamp, document_type, 
-                 source_type, content_hash)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                pattern.document_id,
-                json.dumps(pattern.original_extraction),
-                json.dumps(pattern.verified_extraction),
-                json.dumps(pattern.user_corrections),
-                pattern.content_sample,
-                json.dumps(pattern.extraction_confidence),
-                pattern.timestamp,
-                pattern.document_type,
-                pattern.source_type,
-                pattern.content_hash
-            ))
-            
-            pattern_id = cursor.lastrowid
-            conn.commit()
-            return str(pattern_id)
-            
-        except Exception as e:
-            self.logger.error(f"Error storing verification pattern: {e}")
-            return ""
-        finally:
-            conn.close()
-    
-    def _analyze_for_new_patterns(self, pattern: VerificationPattern):
-        """Analyze verification event for new learning patterns"""
-        
-        # Analyze title extraction patterns
-        if 'title' in pattern.user_corrections:
-            self._learn_title_pattern(pattern)
-        
-        # Analyze author extraction patterns
-        if 'author' in pattern.user_corrections:
-            self._learn_author_pattern(pattern)
-        
-        # Analyze organization extraction patterns
-        if 'organization' in pattern.user_corrections:
-            self._learn_organization_pattern(pattern)
-        
-        # Analyze topic classification patterns
-        if 'topic' in pattern.user_corrections:
-            self._learn_topic_pattern(pattern)
-    
-    def _learn_title_pattern(self, pattern: VerificationPattern):
-        """Learn patterns for title extraction"""
-        correction = pattern.user_corrections['title']
-        original_title = correction['original']
-        corrected_title = correction['corrected']
-        content = pattern.content_sample
-        
-        # Identify content patterns that indicate the correct title
-        title_indicators = self._extract_title_indicators(content, corrected_title)
-        
-        if title_indicators:
-            # Create or update learning pattern
-            pattern_rule = {
-                'indicators': title_indicators,
-                'extraction_rule': self._create_title_extraction_rule(title_indicators, corrected_title),
-                'confidence_threshold': 0.8
-            }
-            
-            self._store_learned_pattern(
-                pattern_type='title',
-                trigger_conditions=title_indicators,
-                correction_rule=json.dumps(pattern_rule),
-                confidence_score=0.8
-            )
-    
-    def _extract_title_indicators(self, content: str, correct_title: str) -> List[str]:
-        """Extract indicators that point to the correct title"""
-        indicators = []
-        
-        # Look for title in first 500 characters
-        if correct_title.lower() in content[:500].lower():
-            indicators.append("title_in_first_500_chars")
-        
-        # Check for specific patterns
-        if "policy" in correct_title.lower() and "policy" in content[:200].lower():
-            indicators.append("policy_document_pattern")
-        
-        if "quantum" in correct_title.lower() and "quantum" in content[:300].lower():
-            indicators.append("quantum_document_pattern")
-        
-        if "approach to" in correct_title.lower():
-            indicators.append("approach_document_pattern")
-        
-        # Check for author attribution patterns
-        if "by " in content[:400].lower():
-            indicators.append("author_attribution_present")
-        
-        return indicators
-    
-    def _create_title_extraction_rule(self, indicators: List[str], correct_title: str) -> str:
-        """Create extraction rule based on indicators"""
-        rule_components = []
-        
-        if "quantum_document_pattern" in indicators:
-            rule_components.append("Look for quantum-related titles in first 300 characters")
-        
-        if "policy_document_pattern" in indicators:
-            rule_components.append("Extract policy document titles with 'Policy' keyword")
-        
-        if "approach_document_pattern" in indicators:
-            rule_components.append("Extract titles containing 'Approach to' pattern")
-        
-        return "; ".join(rule_components)
-    
-    def _learn_author_pattern(self, pattern: VerificationPattern):
-        """Learn patterns for author extraction"""
-        correction = pattern.user_corrections['author']
-        corrected_author = correction['corrected']
-        content = pattern.content_sample
-        
-        # Look for author patterns in content
-        author_indicators = []
-        
-        if f"by {corrected_author.lower()}" in content.lower():
-            author_indicators.append("by_author_pattern")
-        
-        if corrected_author.lower() in content[:500].lower():
-            author_indicators.append("author_in_first_500_chars")
-        
-        if author_indicators:
-            pattern_rule = {
-                'indicators': author_indicators,
-                'extraction_pattern': f"Extract author near 'by' keyword: {corrected_author}"
-            }
-            
-            self._store_learned_pattern(
-                pattern_type='author',
-                trigger_conditions=author_indicators,
-                correction_rule=json.dumps(pattern_rule),
-                confidence_score=0.75
-            )
-    
-    def _learn_organization_pattern(self, pattern: VerificationPattern):
-        """Learn patterns for organization extraction"""
-        # Similar to author pattern learning but for organizations
-        pass
-    
-    def _learn_topic_pattern(self, pattern: VerificationPattern):
-        """Learn patterns for topic classification"""
-        correction = pattern.user_corrections['topic']
-        corrected_topic = correction['corrected']
-        content = pattern.content_sample
-        
-        # Analyze content for topic indicators
-        topic_keywords = self._extract_topic_keywords(content, corrected_topic)
-        
-        if topic_keywords:
-            pattern_rule = {
-                'topic': corrected_topic,
-                'keywords': topic_keywords,
-                'classification_rule': f"Classify as {corrected_topic} when keywords present: {', '.join(topic_keywords)}"
-            }
-            
-            self._store_learned_pattern(
-                pattern_type='topic',
-                trigger_conditions=topic_keywords,
-                correction_rule=json.dumps(pattern_rule),
-                confidence_score=0.85
-            )
-    
-    def _extract_topic_keywords(self, content: str, topic: str) -> List[str]:
-        """Extract keywords that indicate the correct topic"""
-        content_lower = content.lower()
-        keywords = []
-        
-        if topic.lower() == "quantum":
-            quantum_keywords = ["quantum", "quantum policy", "quantum approach", "quantum technology"]
-            keywords = [kw for kw in quantum_keywords if kw in content_lower]
-        elif topic.lower() == "ai":
-            ai_keywords = ["artificial intelligence", "ai policy", "machine learning", "ai framework"]
-            keywords = [kw for kw in ai_keywords if kw in content_lower]
-        
-        return keywords
-    
-    def _store_learned_pattern(
-        self,
-        pattern_type: str,
-        trigger_conditions: List[str],
-        correction_rule: str,
-        confidence_score: float
-    ):
-        """Store a learned pattern in the database"""
-        
-        # Generate pattern ID
-        pattern_id = hashlib.md5(
-            (pattern_type + str(trigger_conditions) + correction_rule).encode()
-        ).hexdigest()[:12]
-        
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        
-        try:
-            # Check if pattern exists
-            cursor.execute(
-                "SELECT id, usage_count FROM learned_patterns WHERE pattern_id = ?",
-                (pattern_id,)
-            )
-            existing = cursor.fetchone()
-            
-            if existing:
-                # Update existing pattern
-                cursor.execute("""
-                    UPDATE learned_patterns 
-                    SET usage_count = usage_count + 1, last_updated = ?
-                    WHERE pattern_id = ?
-                """, (datetime.now().isoformat(), pattern_id))
-            else:
-                # Insert new pattern
-                cursor.execute("""
-                    INSERT INTO learned_patterns 
-                    (pattern_id, pattern_type, trigger_conditions, correction_rule,
-                     confidence_score, usage_count, success_rate, created_at, last_updated)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    pattern_id,
-                    pattern_type,
-                    json.dumps(trigger_conditions),
-                    correction_rule,
-                    confidence_score,
-                    1,
-                    0.0,  # Will be calculated later
-                    datetime.now().isoformat(),
-                    datetime.now().isoformat()
-                ))
-            
-            conn.commit()
-            
-        except Exception as e:
-            self.logger.error(f"Error storing learned pattern: {e}")
-        finally:
-            conn.close()
-    
-    def _load_learned_patterns(self) -> List[LearningPattern]:
-        """Load learned patterns from database"""
-        patterns = []
-        
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        
-        try:
-            cursor.execute("SELECT * FROM learned_patterns")
-            rows = cursor.fetchall()
-            
-            for row in rows:
-                pattern = LearningPattern(
-                    pattern_id=row[1],
-                    pattern_type=row[2],
-                    trigger_conditions=json.loads(row[3]),
-                    correction_rule=row[4],
-                    confidence_score=row[5],
-                    usage_count=row[6],
-                    success_rate=row[7],
-                    created_at=row[8],
-                    last_updated=row[9]
-                )
-                patterns.append(pattern)
-                
-        except Exception as e:
-            self.logger.error(f"Error loading learned patterns: {e}")
-        finally:
-            conn.close()
-        
-        return patterns
-    
-    def apply_learned_patterns(
-        self,
-        content: str,
-        extracted_metadata: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """Apply learned patterns to improve extraction"""
-        
-        improved_metadata = extracted_metadata.copy()
-        
-        for pattern in self.learned_patterns:
-            if pattern.confidence_score < 0.7:  # Skip low-confidence patterns
+            # Check if framework should apply based on training
+            if not applicability_predictions.get(framework_key, True):
+                enhanced_scores[framework] = None
                 continue
             
-            # Check if trigger conditions are met
-            if self._pattern_applies(pattern, content):
-                # Apply the pattern
-                improved_metadata = self._apply_pattern(pattern, content, improved_metadata)
+            # Adjust score based on training patterns
+            if score is not None:
+                score_range = self.get_recommended_score_range(framework, content_features)
+                if score_range.get("confidence", 0) > 0.5:
+                    # Adjust score within learned range
+                    recommended = score_range.get("recommended", score)
+                    min_score = score_range.get("min", 0)
+                    max_score = score_range.get("max", 100)
+                    
+                    adjusted_score = max(min_score, min(score, max_score))
+                    # Blend with recommendation
+                    enhanced_scores[framework] = int(0.7 * adjusted_score + 0.3 * recommended)
+                else:
+                    enhanced_scores[framework] = score
+            else:
+                enhanced_scores[framework] = None
         
-        return improved_metadata
-    
-    def _pattern_applies(self, pattern: LearningPattern, content: str) -> bool:
-        """Check if a learned pattern applies to the given content"""
-        content_lower = content.lower()
-        
-        # Check if trigger conditions are present
-        triggers_met = 0
-        for condition in pattern.trigger_conditions:
-            if condition.replace("_", " ") in content_lower:
-                triggers_met += 1
-        
-        # Pattern applies if majority of conditions are met
-        return triggers_met >= len(pattern.trigger_conditions) * 0.6
-    
-    def _apply_pattern(
-        self,
-        pattern: LearningPattern,
-        content: str,
-        metadata: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """Apply a specific learned pattern to improve metadata"""
-        
-        try:
-            rule_data = json.loads(pattern.correction_rule)
-            
-            if pattern.pattern_type == 'title' and 'extraction_rule' in rule_data:
-                # Apply title extraction improvements
-                if "quantum_document_pattern" in pattern.trigger_conditions:
-                    improved_title = self._extract_quantum_title(content)
-                    if improved_title:
-                        metadata['title'] = improved_title
-            
-            elif pattern.pattern_type == 'topic' and 'topic' in rule_data:
-                # Apply topic classification improvements
-                metadata['topic'] = rule_data['topic']
-            
-        except Exception as e:
-            self.logger.error(f"Error applying pattern {pattern.pattern_id}: {e}")
-        
-        return metadata
-    
-    def _extract_quantum_title(self, content: str) -> Optional[str]:
-        """Extract quantum document title using learned patterns"""
-        
-        # Look for quantum-specific title patterns
-        quantum_title_patterns = [
-            r'(The\s+U\.?S\.?\s+Approach\s+to\s+Quantum\s+Policy)',
-            r'(Quantum\s+[^.\n]{10,80}(?:Policy|Framework|Strategy))',
-            r'(National\s+Quantum\s+Initiative[^.\n]*)'
-        ]
-        
-        import re
-        for pattern in quantum_title_patterns:
-            match = re.search(pattern, content[:500], re.IGNORECASE)
-            if match:
-                return match.group(1).strip()
-        
-        return None
-    
-    def _update_pattern_performance(self):
-        """Update performance metrics for learned patterns"""
-        # This would analyze recent verification events to calculate success rates
-        # Implementation would track how often patterns lead to correct extractions
-        pass
-    
-    def get_training_statistics(self) -> Dict[str, Any]:
-        """Get statistics about the training system"""
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        
-        stats = {}
-        
-        try:
-            # Count verification events
-            cursor.execute("SELECT COUNT(*) FROM verification_patterns")
-            stats['total_verifications'] = cursor.fetchone()[0]
-            
-            # Count learned patterns
-            cursor.execute("SELECT COUNT(*) FROM learned_patterns")
-            stats['learned_patterns'] = cursor.fetchone()[0]
-            
-            # Pattern breakdown by type
-            cursor.execute("""
-                SELECT pattern_type, COUNT(*) 
-                FROM learned_patterns 
-                GROUP BY pattern_type
-            """)
-            stats['patterns_by_type'] = dict(cursor.fetchall())
-            
-            # Average confidence scores
-            cursor.execute("SELECT AVG(confidence_score) FROM learned_patterns")
-            avg_confidence = cursor.fetchone()[0]
-            stats['average_pattern_confidence'] = avg_confidence if avg_confidence else 0.0
-            
-        except Exception as e:
-            self.logger.error(f"Error getting training statistics: {e}")
-        finally:
-            conn.close()
-        
-        return stats
+        return enhanced_scores
 
-# Global instance
+# Global training system instance
 ml_training_system = MLTrainingSystem()
+
+def train_from_corrections(doc_id: int, original_scores: Dict, corrected_scores: Dict, 
+                          content: str, title: str):
+    """Record scoring corrections for training"""
+    ml_training_system.record_scoring_correction(doc_id, original_scores, corrected_scores, content, title)
+
+def get_ml_enhanced_scores(content: str, title: str) -> Dict:
+    """Get ML-enhanced scores using training patterns"""
+    return ml_training_system.enhance_scoring_with_ml(content, title)

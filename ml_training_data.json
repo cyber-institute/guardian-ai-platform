@@ -1,0 +1,211 @@
+{
+  "scoring_corrections": [
+    {
+      "timestamp": "2025-06-14T01:31:49.307652",
+      "document_id": 10,
+      "title": "NIST Special Publication 800-63-3 Digital Identity Guidelines",
+      "content_snippet": " \nNIST Special Publication 800-63-3 \n \nDigital Identity Guidelines \n \nPaul A. Grassi \nMichael E. Garcia \nJames L. Fenton \n \n \n \n \n \n \n \nThis publication is available free of charge from: \nhttps://doi.org/10.6028/NIST.SP.800-63-3 \n \n\n  \nNIST Special Publication 800-63-3 \nDigital Identity Guidelines \n \n \nPaul A. Grassi \nMichael E. Garcia \nApplied Cybersecurity Division \nInformation Technology Laboratory \nJames L. Fenton \nAltmode Networks \nLos Altos, Calif. \n \n \n \n \n \n \n \nThis publication is availa",
+      "original_scores": {
+        "ai_cybersecurity_score": 100,
+        "quantum_ethics_score": 11
+      },
+      "corrected_scores": {
+        "ai_cybersecurity_score": null,
+        "quantum_cybersecurity_score": null,
+        "ai_ethics_score": null,
+        "quantum_ethics_score": null
+      },
+      "correction_type": "removed_ai_cybersecurity_score|removed_quantum_ethics_score",
+      "content_features": {
+        "word_count": 56,
+        "ai_keyword_density": 0.0,
+        "quantum_keyword_density": 0.0,
+        "cyber_keyword_density": 0.5,
+        "ethics_keyword_density": 0.0,
+        "has_technical_structure": false,
+        "document_formality": false,
+        "title_indicates_topic": false
+      }
+    },
+    {
+      "timestamp": "2025-06-14T01:31:49.385263",
+      "document_id": 27,
+      "title": "NASA's Responsible AI Plan",
+      "content_snippet": "NASA\u2019s Response Plan: Executive Order 13960 - Promoting the Use of Trustworthy Artificial Intelligence (AI) in the Federal Government Foreword Artificial Intelligence (AI) is an integral part of today\u2019s process of conducting science and technology development. At NASA, AI has become an integral and ...",
+      "original_scores": {
+        "quantum_cybersecurity_score": 1,
+        "quantum_ethics_score": 11
+      },
+      "corrected_scores": {
+        "quantum_cybersecurity_score": null,
+        "quantum_ethics_score": null
+      },
+      "correction_type": "removed_quantum_cybersecurity_score|removed_quantum_ethics_score",
+      "content_features": {
+        "word_count": 45,
+        "ai_keyword_density": 0.5,
+        "quantum_keyword_density": 0.0,
+        "cyber_keyword_density": 0.0,
+        "ethics_keyword_density": 0.0,
+        "has_technical_structure": false,
+        "document_formality": false,
+        "title_indicates_topic": true
+      }
+    },
+    {
+      "timestamp": "2025-06-14T01:31:49.462695",
+      "document_id": 26,
+      "title": "Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+      "content_snippet": "NIST AI 100-1 Artificial Intelligence Risk Management Framework (AI RMF 1.0) NIST AI 100-1 Artificial Intelligence Risk Management Framework (AI RMF 1.0) This publication is available free of charge from: January 2023 U.S. Raimondo, Secretary National Institute of Standards and Technology Laurie E.",
+      "original_scores": {
+        "quantum_cybersecurity_score": 1,
+        "quantum_ethics_score": 11
+      },
+      "corrected_scores": {
+        "quantum_cybersecurity_score": null,
+        "quantum_ethics_score": null
+      },
+      "correction_type": "removed_quantum_cybersecurity_score|removed_quantum_ethics_score",
+      "content_features": {
+        "word_count": 43,
+        "ai_keyword_density": 0.5,
+        "quantum_keyword_density": 0.0,
+        "cyber_keyword_density": 0.0,
+        "ethics_keyword_density": 0.0,
+        "has_technical_structure": true,
+        "document_formality": false,
+        "title_indicates_topic": true
+      }
+    }
+  ],
+  "content_patterns": {},
+  "framework_applicability": {
+    "ai_cybersecurity": {
+      "should_apply_patterns": [],
+      "should_not_apply_patterns": [
+        {
+          "features": {
+            "word_count": 56,
+            "ai_keyword_density": 0.0,
+            "quantum_keyword_density": 0.0,
+            "cyber_keyword_density": 0.5,
+            "ethics_keyword_density": 0.0,
+            "has_technical_structure": false,
+            "document_formality": false,
+            "title_indicates_topic": false
+          },
+          "reason": "topic_mismatch",
+          "confidence": 0.9
+        }
+      ]
+    },
+    "quantum_cybersecurity": {
+      "should_apply_patterns": [],
+      "should_not_apply_patterns": [
+        {
+          "features": {
+            "word_count": 45,
+            "ai_keyword_density": 0.5,
+            "quantum_keyword_density": 0.0,
+            "cyber_keyword_density": 0.0,
+            "ethics_keyword_density": 0.0,
+            "has_technical_structure": false,
+            "document_formality": false,
+            "title_indicates_topic": true
+          },
+          "reason": "topic_mismatch",
+          "confidence": 0.9
+        },
+        {
+          "features": {
+            "word_count": 43,
+            "ai_keyword_density": 0.5,
+            "quantum_keyword_density": 0.0,
+            "cyber_keyword_density": 0.0,
+            "ethics_keyword_density": 0.0,
+            "has_technical_structure": true,
+            "document_formality": false,
+            "title_indicates_topic": true
+          },
+          "reason": "topic_mismatch",
+          "confidence": 0.9
+        }
+      ]
+    },
+    "ai_ethics": {
+      "should_apply_patterns": [],
+      "should_not_apply_patterns": []
+    },
+    "quantum_ethics": {
+      "should_apply_patterns": [],
+      "should_not_apply_patterns": [
+        {
+          "features": {
+            "word_count": 56,
+            "ai_keyword_density": 0.0,
+            "quantum_keyword_density": 0.0,
+            "cyber_keyword_density": 0.5,
+            "ethics_keyword_density": 0.0,
+            "has_technical_structure": false,
+            "document_formality": false,
+            "title_indicates_topic": false
+          },
+          "reason": "topic_mismatch",
+          "confidence": 0.9
+        },
+        {
+          "features": {
+            "word_count": 45,
+            "ai_keyword_density": 0.5,
+            "quantum_keyword_density": 0.0,
+            "cyber_keyword_density": 0.0,
+            "ethics_keyword_density": 0.0,
+            "has_technical_structure": false,
+            "document_formality": false,
+            "title_indicates_topic": true
+          },
+          "reason": "topic_mismatch",
+          "confidence": 0.9
+        },
+        {
+          "features": {
+            "word_count": 43,
+            "ai_keyword_density": 0.5,
+            "quantum_keyword_density": 0.0,
+            "cyber_keyword_density": 0.0,
+            "ethics_keyword_density": 0.0,
+            "has_technical_structure": true,
+            "document_formality": false,
+            "title_indicates_topic": true
+          },
+          "reason": "topic_mismatch",
+          "confidence": 0.9
+        }
+      ]
+    }
+  },
+  "realistic_score_ranges": {
+    "ai_cybersecurity": {
+      "min": 10,
+      "max": 85,
+      "typical": 45
+    },
+    "quantum_cybersecurity": {
+      "min": 1,
+      "max": 5,
+      "typical": 3
+    },
+    "ai_ethics": {
+      "min": 5,
+      "max": 80,
+      "typical": 35
+    },
+    "quantum_ethics": {
+      "min": 5,
+      "max": 75,
+      "typical": 30
+    }
+  },
+  "topic_classification_rules": [],
+  "metadata_extraction_improvements": []
+}

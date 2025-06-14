@@ -2423,12 +2423,12 @@ def render_card_view(docs):
                 </div>
             """, unsafe_allow_html=True)
             
-            # Use actual database scores with intelligent N/A detection (consistent with other views)
+            # Use actual database scores with proper NULL handling
             raw_scores = {
-                'ai_cybersecurity': doc.get('ai_cybersecurity_score', 0) or 0,
-                'quantum_cybersecurity': doc.get('quantum_cybersecurity_score', 0) or 0,
-                'ai_ethics': doc.get('ai_ethics_score', 0) or 0,
-                'quantum_ethics': doc.get('quantum_ethics_score', 0) or 0
+                'ai_cybersecurity': doc.get('ai_cybersecurity_score'),
+                'quantum_cybersecurity': doc.get('quantum_cybersecurity_score'),
+                'ai_ethics': doc.get('ai_ethics_score'),
+                'quantum_ethics': doc.get('quantum_ethics_score')
             }
             
             # Apply intelligent N/A logic based on document topic relevance
