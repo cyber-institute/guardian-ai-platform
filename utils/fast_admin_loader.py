@@ -44,7 +44,10 @@ def render_fast_repository_admin():
     )
     
     # Only load the selected section (lazy loading)
-    if admin_section == "MultiLLM URL Analysis":
+    if admin_section == "URL Discovery & Validation":
+        render_url_discovery_validation()
+        
+    elif admin_section == "MultiLLM URL Analysis":
         render_multillm_url_analysis()
         
     elif admin_section == "Multi-API Ingest":
@@ -70,6 +73,260 @@ def render_fast_repository_admin():
         
     else:  # Configuration & Settings
         render_fast_system_configuration()
+
+def render_url_discovery_validation():
+    """URL Discovery & Validation Management Interface"""
+    
+    st.markdown(
+        """<div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
+            <h2 style="color: white; margin-bottom: 1rem; font-size: 1.8rem; font-weight: 700; text-align: center;">
+                🔗 URL Discovery & Validation
+            </h2>
+            <p style="color: #dbeafe; text-align: center; font-size: 1.1rem; line-height: 1.5; margin: 0;">
+                Automated URL discovery and validation for document repository management
+            </p>
+        </div>""", 
+        unsafe_allow_html=True
+    )
+    
+    # Get URL statistics
+    try:
+        from utils.database import db_manager
+        
+        stats_query = """
+        SELECT 
+            COUNT(*) as total_docs,
+            SUM(CASE WHEN url_valid = true THEN 1 ELSE 0 END) as valid_urls,
+            SUM(CASE WHEN url_valid = false THEN 1 ELSE 0 END) as invalid_urls,
+            SUM(CASE WHEN url_valid IS NULL THEN 1 ELSE 0 END) as unchecked_urls
+        FROM documents
+        """
+        
+        stats = db_manager.execute_query(stats_query)
+        if stats and len(stats) > 0:
+            stat = stats[0]
+            total = stat.get('total_docs', 0)
+            valid = stat.get('valid_urls', 0)
+            invalid = stat.get('invalid_urls', 0) 
+            unchecked = stat.get('unchecked_urls', 0)
+            
+            # Display statistics
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.metric("Total Documents", total)
+            with col2:
+                st.metric("Valid URLs", valid, delta=f"{(valid/total*100):.1f}%" if total > 0 else "0%")
+            with col3:
+                st.metric("Invalid URLs", invalid, delta=f"{(invalid/total*100):.1f}%" if total > 0 else "0%")
+            with col4:
+                st.metric("Unchecked URLs", unchecked, delta=f"{(unchecked/total*100):.1f}%" if total > 0 else "0%")
+        
+    except Exception as e:
+        st.error(f"Error getting URL statistics: {e}")
+        return
+    
+    st.markdown("---")
+    
+    # URL Discovery and Validation Controls
+    st.markdown("### URL Management Controls")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if st.button("🔍 Discover Missing URLs", type="primary", help="Automatically find source URLs for documents without valid links"):
+            with st.spinner("Discovering document URLs..."):
+                import requests
+                import re
+                
+                query = """
+                SELECT id, title, source, author_organization
+                FROM documents 
+                WHERE url_valid IS NULL OR url_valid = false
+                LIMIT 10
+                """
+                
+                docs_needing_urls = db_manager.execute_query(query)
+                discovered_count = 0
+                
+                session = requests.Session()
+                session.headers.update({'User-Agent': 'Mozilla/5.0 (compatible; GUARDIAN/1.0)'})
+                
+                for doc in docs_needing_urls if docs_needing_urls else []:
+                    doc_id = doc['id']
+                    title = doc['title']
+                    org = doc.get('author_organization', '')
+                    
+                    found_url = None
+                    
+                    # Web search-based discovery
+                    try:
+                        from utils.web_search_url_discovery import search_document_url
+                        found_url = search_document_url(title, org, doc.get('document_type', ''))
+                    except:
+                        pass
+                    
+                    # Fallback to direct URL patterns
+                    if not found_url:
+                        # NIST documents
+                        if 'nist' in org.lower():
+                            nist_match = re.search(r'(?:SP\s+)?(\d+(?:-\d+)?[A-Z]?)', title, re.IGNORECASE)
+                            if nist_match:
+                                pub_num = nist_match.group(1)
+                                test_urls = [
+                                    f"https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.{pub_num}.pdf",
+                                    f"https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf"
+                                ]
+                                for test_url in test_urls:
+                                    try:
+                                        response = session.head(test_url, timeout=5)
+                                        if response.status_code == 200:
+                                            found_url = test_url
+                                            break
+                                    except:
+                                        continue
+                        
+                        # CISA documents
+                        elif 'cisa' in org.lower():
+                            test_urls = [
+                                "https://www.cisa.gov/sites/default/files/2025-01/Joint_Guidance_AI_Cybersecurity_Playbook_508c.pdf",
+                                "https://www.cisa.gov/sites/default/files/2025-01/Joint_Guidance_on_Deploying_AI_Systems_Securely_508c.pdf"
+                            ]
+                            for test_url in test_urls:
+                                try:
+                                    response = session.head(test_url, timeout=5)
+                                    if response.status_code == 200:
+                                        found_url = test_url
+                                        break
+                                except:
+                                    continue
+                        
+                        # White House documents
+                        elif 'white house' in org.lower() or 'quantum' in title.lower():
+                            test_urls = [
+                                "https://bidenwhitehouse.archives.gov/briefing-room/statements-releases/2022/05/04/national-security-memorandum-on-promoting-united-states-leadership-in-quantum-computing-while-mitigating-risks-to-vulnerable-cryptographic-systems/"
+                            ]
+                            for test_url in test_urls:
+                                try:
+                                    response = session.head(test_url, timeout=5)
+                                    if response.status_code == 200:
+                                        found_url = test_url
+                                        break
+                                except:
+                                    continue
+                    
+                    # Update database if URL found
+                    if found_url:
+                        update_query = """
+                        UPDATE documents 
+                        SET source = %s, url_valid = %s, url_status = %s, url_checked = NOW()
+                        WHERE id = %s
+                        """
+                        db_manager.execute_query(update_query, (found_url, True, 'valid', doc_id))
+                        discovered_count += 1
+                
+                st.success(f"Discovery completed! Found {discovered_count} new URLs.")
+                st.rerun()
+    
+    with col2:
+        if st.button("🔄 Validate All URLs", help="Check all existing URLs for validity and detect landing pages"):
+            with st.spinner("Validating URLs..."):
+                import requests
+                
+                query = """
+                SELECT id, title, source
+                FROM documents 
+                WHERE source IS NOT NULL AND source LIKE 'http%'
+                LIMIT 15
+                """
+                
+                docs_with_urls = db_manager.execute_query(query)
+                validated_count = 0
+                
+                session = requests.Session()
+                session.headers.update({'User-Agent': 'Mozilla/5.0 (compatible; GUARDIAN/1.0)'})
+                
+                landing_indicators = ['page not found', '404', 'search results', 'document library']
+                
+                for doc in docs_with_urls if docs_with_urls else []:
+                    doc_id = doc['id']
+                    title = doc['title']
+                    url = doc['source']
+                    
+                    try:
+                        response = session.get(url, timeout=8)
+                        
+                        if response.status_code == 200:
+                            content = response.text.lower()
+                            
+                            # Check for landing page indicators
+                            is_landing_page = any(indicator in content for indicator in landing_indicators)
+                            
+                            # Check title relevance
+                            title_words = [w.lower() for w in title.split() if len(w) > 3]
+                            matches = sum(1 for word in title_words if word in content)
+                            title_match = matches >= len(title_words) * 0.3 if title_words else False
+                            
+                            is_valid = not is_landing_page and (title_match or 'pdf' in response.headers.get('content-type', '').lower())
+                            status = 'valid' if is_valid else ('landing_page' if is_landing_page else 'low_relevance')
+                        else:
+                            is_valid = False
+                            status = f'http_{response.status_code}'
+                        
+                        update_query = """
+                        UPDATE documents 
+                        SET url_valid = %s, url_status = %s, url_checked = NOW()
+                        WHERE id = %s
+                        """
+                        db_manager.execute_query(update_query, (is_valid, status, doc_id))
+                        validated_count += 1
+                        
+                    except:
+                        update_query = """
+                        UPDATE documents 
+                        SET url_valid = %s, url_status = %s, url_checked = NOW()
+                        WHERE id = %s
+                        """
+                        db_manager.execute_query(update_query, (False, 'connection_error', doc_id))
+                
+                st.success(f"Validation completed! Checked {validated_count} URLs.")
+                st.rerun()
+    
+    # URL Status Details
+    st.markdown("---")
+    st.markdown("### Document URL Status Details")
+    
+    try:
+        details_query = """
+        SELECT title, source, url_valid, url_status, url_checked
+        FROM documents 
+        ORDER BY url_checked DESC NULLS LAST
+        LIMIT 20
+        """
+        
+        url_details = db_manager.execute_query(details_query)
+        
+        if url_details:
+            import pandas as pd
+            
+            df_data = []
+            for doc in url_details:
+                status_icon = "✅" if doc.get('url_valid') else ("❌" if doc.get('url_valid') is False else "⚠️")
+                
+                df_data.append({
+                    "Status": status_icon,
+                    "Title": doc['title'][:60] + "..." if len(doc['title']) > 60 else doc['title'],
+                    "URL": doc['source'][:50] + "..." if doc.get('source') and len(doc['source']) > 50 else (doc.get('source') or 'No URL'),
+                    "Validation": doc.get('url_status', 'unchecked'),
+                    "Last Checked": str(doc.get('url_checked', 'Never'))[:16] if doc.get('url_checked') else 'Never'
+                })
+            
+            df = pd.DataFrame(df_data)
+            st.dataframe(df, use_container_width=True)
+        else:
+            st.info("No URL data available")
+            
+    except Exception as e:
+        st.error(f"Error loading URL details: {e}")
 
 def render_fast_database_status():
     """Fast database status with cached data"""
