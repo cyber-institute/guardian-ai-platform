@@ -2627,30 +2627,160 @@ def render_grid_view(docs):
                     </div>
                 """, unsafe_allow_html=True)
             
-            # Framework scores OUTSIDE the styled container to avoid CSS conflicts
-            st.markdown("**Framework Scores (Tap to expand):**")
+            # Framework scores with interactive tooltips
+            st.markdown("""
+            <style>
+            /* Interactive tooltip styling */
+            .score-tooltip {
+                position: relative;
+                display: inline-block;
+                cursor: help;
+            }
+            
+            .score-tooltip .tooltip-text {
+                visibility: hidden;
+                width: 280px;
+                background-color: #2d3748;
+                color: #fff;
+                text-align: left;
+                border-radius: 8px;
+                padding: 12px;
+                position: absolute;
+                z-index: 1000;
+                bottom: 125%;
+                left: 50%;
+                margin-left: -140px;
+                opacity: 0;
+                transition: opacity 0.3s, visibility 0.3s;
+                font-size: 13px;
+                line-height: 1.4;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            }
+            
+            .score-tooltip .tooltip-text::after {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                margin-left: -5px;
+                border-width: 5px;
+                border-style: solid;
+                border-color: #2d3748 transparent transparent transparent;
+            }
+            
+            .score-tooltip:hover .tooltip-text {
+                visibility: visible;
+                opacity: 1;
+            }
+            
+            /* Mobile touch support */
+            @media (max-width: 768px) {
+                .score-tooltip .tooltip-text {
+                    width: 260px;
+                    margin-left: -130px;
+                    bottom: 110%;
+                    font-size: 12px;
+                }
+            }
+            
+            /* Score badge with tooltip indicator */
+            .score-badge-with-tooltip {
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                padding: 4px 8px;
+                background: rgba(59, 130, 246, 0.1);
+                border-radius: 12px;
+                border: 1px solid rgba(59, 130, 246, 0.2);
+                margin-left: 8px;
+                font-size: 11px;
+                color: #3b82f6;
+            }
+            
+            .tooltip-icon {
+                font-size: 10px;
+                opacity: 0.7;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+            
+            st.markdown("**Framework Scores (Tap to expand, hover for quick info):**")
+            
+            # Function to get tooltip text for each framework
+            def get_tooltip_text(framework_type, score):
+                tooltips = {
+                    'ai_cybersecurity': f"AI Cybersecurity Assessment (Score: {score}) - Evaluates AI system security architecture, threat modeling, data protection measures, and governance frameworks. Higher scores indicate better cybersecurity practices.",
+                    'ai_ethics': f"AI Ethics Evaluation (Score: {score}) - Assesses bias detection strategies, transparency measures, accountability structures, and human oversight mechanisms. Higher scores show stronger ethical foundations.",
+                    'quantum_cybersecurity': f"Quantum Cybersecurity Analysis (Score: {score}) - Reviews post-quantum cryptography adoption, quantum key distribution, threat assessment, and migration strategies. Higher scores indicate better quantum readiness.",
+                    'quantum_ethics': f"Quantum Ethics Assessment (Score: {score}) - Examines equitable quantum access, privacy implications, governance frameworks, and responsible development practices. Higher scores reflect stronger ethical considerations."
+                }
+                return tooltips.get(framework_type, "Framework assessment score")
             
             score_col1, score_col2 = st.columns(2)
             
             with score_col1:
-                # AI Cybersecurity Score
+                # AI Cybersecurity Score with tooltip
                 ai_cyber_score = scores.get('ai_cybersecurity', 'N/A')
+                tooltip_text = get_tooltip_text('ai_cybersecurity', ai_cyber_score)
+                
+                st.markdown(f"""
+                <div class="score-tooltip">
+                    <span class="score-badge-with-tooltip">
+                        ℹ️ <span class="tooltip-icon">?</span>
+                    </span>
+                    <div class="tooltip-text">{tooltip_text}</div>
+                </div>
+                """, unsafe_allow_html=True)
+                
                 with st.expander(f"🔒 AI Cyber: {ai_cyber_score}", expanded=False):
                     show_score_explanation('ai_cybersecurity', ai_cyber_score, content, title)
                 
-                # AI Ethics Score  
+                # AI Ethics Score with tooltip
                 ai_ethics_score = scores.get('ai_ethics', 'N/A')
+                tooltip_text = get_tooltip_text('ai_ethics', ai_ethics_score)
+                
+                st.markdown(f"""
+                <div class="score-tooltip">
+                    <span class="score-badge-with-tooltip">
+                        ℹ️ <span class="tooltip-icon">?</span>
+                    </span>
+                    <div class="tooltip-text">{tooltip_text}</div>
+                </div>
+                """, unsafe_allow_html=True)
+                
                 with st.expander(f"⚖️ AI Ethics: {ai_ethics_score}", expanded=False):
                     show_score_explanation('ai_ethics', ai_ethics_score, content, title)
                     
             with score_col2:
-                # Quantum Cybersecurity Score
+                # Quantum Cybersecurity Score with tooltip
                 q_cyber_score = scores.get('quantum_cybersecurity', 'N/A')
+                tooltip_text = get_tooltip_text('quantum_cybersecurity', q_cyber_score)
+                
+                st.markdown(f"""
+                <div class="score-tooltip">
+                    <span class="score-badge-with-tooltip">
+                        ℹ️ <span class="tooltip-icon">?</span>
+                    </span>
+                    <div class="tooltip-text">{tooltip_text}</div>
+                </div>
+                """, unsafe_allow_html=True)
+                
                 with st.expander(f"🔐 Q Cyber: {q_cyber_score}", expanded=False):
                     show_score_explanation('quantum_cybersecurity', q_cyber_score, content, title)
                 
-                # Quantum Ethics Score
+                # Quantum Ethics Score with tooltip
                 q_ethics_score = scores.get('quantum_ethics', 'N/A')
+                tooltip_text = get_tooltip_text('quantum_ethics', q_ethics_score)
+                
+                st.markdown(f"""
+                <div class="score-tooltip">
+                    <span class="score-badge-with-tooltip">
+                        ℹ️ <span class="tooltip-icon">?</span>
+                    </span>
+                    <div class="tooltip-text">{tooltip_text}</div>
+                </div>
+                """, unsafe_allow_html=True)
+                
                 with st.expander(f"⚡ Q Ethics: {q_ethics_score}", expanded=False):
                     show_score_explanation('quantum_ethics', q_ethics_score, content, title)
             
