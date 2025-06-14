@@ -2626,206 +2626,75 @@ def render_grid_view(docs):
                     </div>
                 """, unsafe_allow_html=True)
                 
-                # Touch-optimized framework scores with enhanced mobile interface
+                # Simplified mobile-friendly styling for expanders
                 st.markdown("""
                 <style>
-                /* Touch-optimized scoring sections */
+                /* Simple, working expander styling */
                 .stExpander {
-                    border: 1px solid #e0e4e7;
-                    border-radius: 8px;
-                    margin: 6px 0;
-                    background: white;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-                    transition: all 0.2s ease;
+                    margin: 8px 0 !important;
+                    border: 1px solid #ddd !important;
+                    border-radius: 8px !important;
+                    background: white !important;
                 }
                 
-                .stExpander:hover {
-                    border-color: #cbd5e0;
-                    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-                }
-                
-                .stExpander > div > div > div {
-                    padding: 12px 16px !important;
-                    min-height: 48px !important;
-                    display: flex !important;
-                    align-items: center !important;
+                .stExpander details summary {
+                    padding: 16px !important;
+                    font-size: 16px !important;
                     font-weight: 600 !important;
-                    font-size: 14px !important;
-                    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
-                    border-radius: 7px !important;
+                    cursor: pointer !important;
+                    background: #f8f9fa !important;
+                    border-radius: 8px !important;
+                    border: none !important;
+                    outline: none !important;
+                    -webkit-tap-highlight-color: rgba(0,0,0,0.1) !important;
+                    user-select: none !important;
                 }
                 
-                .stExpander[data-testid="stExpander"] details summary {
-                    min-height: 48px;
-                    padding: 12px 16px;
-                    font-weight: 600;
-                    font-size: 14px;
-                    cursor: pointer;
-                    user-select: none;
-                    border-radius: 8px;
-                    transition: all 0.15s ease;
-                    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-                    border: 1px solid #e2e8f0;
+                .stExpander details summary:hover,
+                .stExpander details summary:focus,
+                .stExpander details summary:active {
+                    background: #e9ecef !important;
+                    color: #495057 !important;
                 }
                 
-                .stExpander[data-testid="stExpander"] details summary:hover {
-                    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-                    border-color: #cbd5e0;
-                    transform: translateY(-1px);
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                .stExpander details[open] summary {
+                    background: #d1ecf1 !important;
+                    border-bottom: 1px solid #bee5eb !important;
+                    border-radius: 8px 8px 0 0 !important;
                 }
                 
-                .stExpander[data-testid="stExpander"] details summary:active {
-                    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
-                    transform: translateY(0px) scale(0.98);
-                    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+                .stExpander .streamlit-expanderContent {
+                    padding: 16px !important;
+                    background: #fafbfc !important;
+                    border-radius: 0 0 8px 8px !important;
                 }
                 
-                .stExpander[data-testid="stExpander"] details[open] summary {
-                    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-                    border-color: #93c5fd;
-                    border-bottom-left-radius: 0;
-                    border-bottom-right-radius: 0;
-                }
-                
-                .stExpander[data-testid="stExpander"] details > div {
-                    border-top: 1px solid #e2e8f0;
-                    padding: 16px;
-                    background: #fafbfc;
-                    border-bottom-left-radius: 8px;
-                    border-bottom-right-radius: 8px;
-                }
-                
-                /* Mobile optimizations */
+                /* Mobile specific optimizations */
                 @media (max-width: 768px) {
-                    .stExpander[data-testid="stExpander"] details summary {
-                        min-height: 52px;
-                        padding: 14px 18px;
-                        font-size: 15px;
+                    .stExpander details summary {
+                        padding: 18px !important;
+                        font-size: 17px !important;
+                        min-height: 56px !important;
+                        display: flex !important;
+                        align-items: center !important;
                     }
                     
                     .stExpander {
-                        margin: 8px 0;
-                    }
-                    
-                    .stExpander[data-testid="stExpander"] details > div {
-                        padding: 18px;
+                        margin: 12px 0 !important;
                     }
                 }
                 
-                /* Tablet optimizations */
-                @media (min-width: 769px) and (max-width: 1024px) {
-                    .stExpander[data-testid="stExpander"] details summary {
-                        min-height: 50px;
-                        padding: 13px 17px;
-                        font-size: 14px;
-                    }
-                }
-                
-                /* Score badge styling within expander titles */
-                .score-badge {
-                    display: inline-block;
-                    padding: 4px 10px;
-                    border-radius: 12px;
-                    font-weight: 700;
-                    font-size: 12px;
-                    margin-left: 8px;
-                    color: white;
-                    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
-                }
-                
-                .score-excellent { background: linear-gradient(135deg, #22c55e, #16a34a); }
-                .score-good { background: linear-gradient(135deg, #f59e0b, #d97706); }
-                .score-fair { background: linear-gradient(135deg, #ef4444, #dc2626); }
-                .score-na { background: linear-gradient(135deg, #6b7280, #4b5563); }
-                
-                /* Ripple effect for touch feedback */
-                .stExpander[data-testid="stExpander"] details summary::before {
-                    content: '';
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    width: 0;
-                    height: 0;
-                    border-radius: 50%;
-                    background: rgba(59, 130, 246, 0.3);
-                    transform: translate(-50%, -50%);
-                    transition: width 0.3s, height 0.3s;
-                    pointer-events: none;
-                    z-index: 0;
-                }
-                
-                .stExpander[data-testid="stExpander"] details summary:active::before {
-                    width: 300px;
-                    height: 300px;
+                /* Ensure touch targets are large enough */
+                .stExpander details summary {
+                    min-height: 48px !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    touch-action: manipulation !important;
                 }
                 </style>
                 """, unsafe_allow_html=True)
                 
                 st.markdown("**Framework Scores (Tap to expand):**")
-                
-                # Add loading animation and improved touch feedback
-                st.markdown("""
-                <style>
-                /* Loading spinner for touch interactions */
-                .loading-spinner {
-                    display: inline-block;
-                    width: 20px;
-                    height: 20px;
-                    border: 3px solid #f3f3f3;
-                    border-top: 3px solid #3498db;
-                    border-radius: 50%;
-                    animation: spin 1s linear infinite;
-                    margin-left: 10px;
-                }
-                
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-                
-                /* Enhanced touch feedback */
-                .stExpander[data-testid="stExpander"] details summary:focus {
-                    outline: 2px solid #3b82f6;
-                    outline-offset: 2px;
-                    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-                }
-                
-                /* Touch-friendly spacing for mobile */
-                @media (max-width: 480px) {
-                    .stExpander {
-                        margin: 10px 0;
-                    }
-                    
-                    .stExpander[data-testid="stExpander"] details summary {
-                        min-height: 56px;
-                        padding: 16px 20px;
-                        font-size: 16px;
-                    }
-                }
-                
-                /* Accessibility improvements */
-                .stExpander[data-testid="stExpander"] details summary {
-                    position: relative;
-                    outline: none;
-                }
-                
-                .stExpander[data-testid="stExpander"] details summary:focus-visible {
-                    outline: 2px solid #3b82f6;
-                    outline-offset: 2px;
-                }
-                
-                /* Score badge animations */
-                .score-badge {
-                    transition: all 0.2s ease;
-                }
-                
-                .stExpander:hover .score-badge {
-                    transform: scale(1.05);
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-                }
-                </style>
-                """, unsafe_allow_html=True)
                 
                 # Touch-optimized score sections with direct implementation
                 score_col1, score_col2 = st.columns(2)
