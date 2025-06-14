@@ -5,7 +5,7 @@ Discover and update URLs for all existing documents
 
 import os
 import psycopg2
-from utils.document_url_discovery import discover_document_url
+from utils.web_search_url_discovery import find_document_url_with_search
 
 def discover_urls_for_all_documents():
     """Discover source URLs for all documents in the database"""
@@ -33,7 +33,7 @@ def discover_urls_for_all_documents():
             continue
         
         # Discover URL
-        discovered_url = discover_document_url(title, organization or "", content or "")
+        discovered_url = find_document_url_with_search(title, organization or "", content or "")
         
         if discovered_url:
             # Update database

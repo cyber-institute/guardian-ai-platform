@@ -8,7 +8,7 @@ import tempfile
 import pypdf
 from typing import Optional, Dict
 from utils.enhanced_metadata_extractor import extract_enhanced_metadata
-from utils.document_url_discovery import discover_document_url
+from utils.web_search_url_discovery import find_document_url_with_search
 from utils.ml_enhanced_scoring import assess_document_with_ml
 import psycopg2
 from datetime import datetime
@@ -63,9 +63,9 @@ class DocumentUploadSystem:
                 with st.spinner("Extracting metadata..."):
                     metadata = extract_enhanced_metadata(content, uploaded_file.name)
                 
-                # Discover source URL
+                # Discover source URL using web search
                 with st.spinner("Discovering source URL..."):
-                    discovered_url = discover_document_url(
+                    discovered_url = find_document_url_with_search(
                         metadata['title'], 
                         metadata['author_organization'], 
                         content
