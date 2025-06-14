@@ -8,7 +8,7 @@ import tempfile
 import pypdf
 from typing import Optional, Dict
 from utils.enhanced_metadata_extractor import extract_enhanced_metadata
-from utils.web_search_url_discovery import find_document_url_with_search
+from utils.self_healing_url_system import SelfHealingURLSystem
 from utils.ml_enhanced_scoring import assess_document_with_ml
 import psycopg2
 from datetime import datetime
@@ -63,13 +63,20 @@ class DocumentUploadSystem:
                 with st.spinner("Extracting metadata..."):
                     metadata = extract_enhanced_metadata(content, uploaded_file.name)
                 
-                # Discover source URL using web search
-                with st.spinner("Discovering source URL..."):
-                    discovered_url = find_document_url_with_search(
+                # Auto-discover and validate source URL
+                with st.spinner("Auto-discovering source URL..."):
+                    healer = SelfHealingURLSystem()
+                    discovered_url = healer._heal_document_url(
                         metadata['title'], 
                         metadata['author_organization'], 
                         content
                     )
+                    
+                    # Validate discovered URL
+                    if discovered_url:
+                        is_valid, status, redirect = healer.validator.validate_url(discovered_url)
+                        if not is_valid:
+                            discovered_url = None
                 
                 # Perform ML-enhanced scoring
                 with st.spinner("Analyzing document with ML frameworks..."):
