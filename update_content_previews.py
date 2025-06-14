@@ -3,14 +3,16 @@
 Update content previews for all documents using the intelligent summarizer
 """
 
-import sqlite3
+import os
+import psycopg2
 from utils.intelligent_content_summarizer import generate_intelligent_content_preview
 
 def update_all_content_previews():
     """Update content previews for all documents using intelligent summarizer"""
     
-    # Connect to database
-    conn = sqlite3.connect('benchmarks.db')
+    # Connect to PostgreSQL database
+    database_url = os.getenv('DATABASE_URL')
+    conn = psycopg2.connect(database_url)
     cursor = conn.cursor()
     
     # Get all documents
@@ -32,7 +34,7 @@ def update_all_content_previews():
             if intelligent_summary and len(intelligent_summary.strip()) > 10:
                 # Update the document with new content preview
                 cursor.execute(
-                    "UPDATE documents SET content_preview = ? WHERE id = ?",
+                    "UPDATE documents SET content_preview = %s WHERE id = %s",
                     (intelligent_summary, doc_id)
                 )
                 updated_count += 1
