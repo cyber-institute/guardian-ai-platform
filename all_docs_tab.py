@@ -2220,14 +2220,19 @@ def render_grid_view(docs):
             safe_pub_date = html.escape(pub_date)
             safe_content_preview = html.escape(content_preview)
             
-            # Create clickable title with hover tooltip if source URL exists
+            # Create clickable title with CSS hover effects if source URL exists
             if source_url and source_url.startswith(('http://', 'https://')):
                 title_html = f'''
+                <style>
+                .grid-doc-link:hover {{
+                    color: #1d4ed8 !important;
+                    text-decoration: underline !important;
+                }}
+                </style>
                 <a href="{source_url}" target="_blank" 
-                   style="text-decoration: none; color: #2563eb; cursor: pointer;" 
-                   title="Click to open document: {source_url}"
-                   onmouseenter="this.style.color='#1d4ed8'; this.style.textDecoration='underline';" 
-                   onmouseleave="this.style.color='#2563eb'; this.style.textDecoration='none';">
+                   class="grid-doc-link"
+                   style="text-decoration: none; color: #2563eb; cursor: pointer; transition: all 0.2s ease;" 
+                   title="Click to open document: {source_url}">
                    {html.escape(title[:40])}{'...' if len(title) > 40 else ''} 🔗
                 </a>'''
             else:
@@ -2342,15 +2347,20 @@ def render_minimal_list(docs):
         
         col1, col2 = st.columns([3, 2])
         with col1:
-            # Create clickable title with hover tooltip if source URL exists
+            # Create clickable title with CSS hover effects if source URL exists
             if source_url and source_url.startswith(('http://', 'https://')):
                 title_html = f'''
+                <style>
+                .list-doc-link:hover {{
+                    color: #1d4ed8 !important;
+                    text-decoration: underline !important;
+                }}
+                </style>
                 <strong>
                 <a href="{source_url}" target="_blank" 
-                   style="text-decoration: none; color: #2563eb; cursor: pointer;" 
-                   title="Click to open document: {source_url}"
-                   onmouseenter="this.style.color='#1d4ed8'; this.style.textDecoration='underline';" 
-                   onmouseleave="this.style.color='#2563eb'; this.style.textDecoration='none';">
+                   class="list-doc-link"
+                   style="text-decoration: none; color: #2563eb; cursor: pointer; transition: all 0.2s ease;" 
+                   title="Click to open document: {source_url}">
                    {html.escape(title)} 🔗
                 </a>
                 </strong>'''
