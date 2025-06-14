@@ -2627,49 +2627,48 @@ def render_grid_view(docs):
                     </div>
                 """, unsafe_allow_html=True)
             
-            # Framework scores with built-in Streamlit tooltips
-            st.markdown("**Framework Scores (Tap to expand):**")
-            
-            # Function to get help text for each framework
-            def get_help_text(framework_type, score):
-                help_texts = {
-                    'ai_cybersecurity': f"AI Cybersecurity Assessment (Score: {score}) - Evaluates AI system security architecture, threat modeling, data protection measures, and governance frameworks.",
-                    'ai_ethics': f"AI Ethics Evaluation (Score: {score}) - Assesses bias detection strategies, transparency measures, accountability structures, and human oversight mechanisms.",
-                    'quantum_cybersecurity': f"Quantum Cybersecurity Analysis (Score: {score}) - Reviews post-quantum cryptography adoption, quantum key distribution, threat assessment, and migration strategies.",
-                    'quantum_ethics': f"Quantum Ethics Assessment (Score: {score}) - Examines equitable quantum access, privacy implications, governance frameworks, and responsible development practices."
-                }
-                return help_texts.get(framework_type, "Framework assessment score")
+            # Framework scores with simple info sections
+            st.markdown("**Framework Scores (Tap to expand for details):**")
             
             score_col1, score_col2 = st.columns(2)
             
             with score_col1:
-                # AI Cybersecurity Score with built-in help
+                # AI Cybersecurity Score
                 ai_cyber_score = scores.get('ai_cybersecurity', 'N/A')
-                help_text = get_help_text('ai_cybersecurity', ai_cyber_score)
                 
-                with st.expander(f"🔒 AI Cyber: {ai_cyber_score}", expanded=False, help=help_text):
+                # Info button using native button
+                if st.button(f"ℹ️ What is AI Cybersecurity Assessment?", key=f"ai_cyber_info_{hash(title)}"):
+                    st.info(f"**AI Cybersecurity Assessment (Score: {ai_cyber_score})**\n\nEvaluates AI system security architecture, threat modeling, data protection measures, and governance frameworks. Higher scores indicate better cybersecurity practices.")
+                
+                with st.expander(f"🔒 AI Cyber: {ai_cyber_score}", expanded=False):
                     show_score_explanation('ai_cybersecurity', ai_cyber_score, content, title)
                 
-                # AI Ethics Score with built-in help
+                # AI Ethics Score
                 ai_ethics_score = scores.get('ai_ethics', 'N/A')
-                help_text = get_help_text('ai_ethics', ai_ethics_score)
                 
-                with st.expander(f"⚖️ AI Ethics: {ai_ethics_score}", expanded=False, help=help_text):
+                if st.button(f"ℹ️ What is AI Ethics Evaluation?", key=f"ai_ethics_info_{hash(title)}"):
+                    st.info(f"**AI Ethics Evaluation (Score: {ai_ethics_score})**\n\nAssesses bias detection strategies, transparency measures, accountability structures, and human oversight mechanisms. Higher scores show stronger ethical foundations.")
+                
+                with st.expander(f"⚖️ AI Ethics: {ai_ethics_score}", expanded=False):
                     show_score_explanation('ai_ethics', ai_ethics_score, content, title)
                     
             with score_col2:
-                # Quantum Cybersecurity Score with built-in help
+                # Quantum Cybersecurity Score
                 q_cyber_score = scores.get('quantum_cybersecurity', 'N/A')
-                help_text = get_help_text('quantum_cybersecurity', q_cyber_score)
                 
-                with st.expander(f"🔐 Q Cyber: {q_cyber_score}", expanded=False, help=help_text):
+                if st.button(f"ℹ️ What is Quantum Cybersecurity Analysis?", key=f"q_cyber_info_{hash(title)}"):
+                    st.info(f"**Quantum Cybersecurity Analysis (Score: {q_cyber_score})**\n\nReviews post-quantum cryptography adoption, quantum key distribution, threat assessment, and migration strategies. Higher scores indicate better quantum readiness.")
+                
+                with st.expander(f"🔐 Q Cyber: {q_cyber_score}", expanded=False):
                     show_score_explanation('quantum_cybersecurity', q_cyber_score, content, title)
                 
-                # Quantum Ethics Score with built-in help
+                # Quantum Ethics Score
                 q_ethics_score = scores.get('quantum_ethics', 'N/A')
-                help_text = get_help_text('quantum_ethics', q_ethics_score)
                 
-                with st.expander(f"⚡ Q Ethics: {q_ethics_score}", expanded=False, help=help_text):
+                if st.button(f"ℹ️ What is Quantum Ethics Assessment?", key=f"q_ethics_info_{hash(title)}"):
+                    st.info(f"**Quantum Ethics Assessment (Score: {q_ethics_score})**\n\nExamines equitable quantum access, privacy implications, governance frameworks, and responsible development practices. Higher scores reflect stronger ethical considerations.")
+                
+                with st.expander(f"⚡ Q Ethics: {q_ethics_score}", expanded=False):
                     show_score_explanation('quantum_ethics', q_ethics_score, content, title)
             
             st.markdown("---")  # Separator between documents
