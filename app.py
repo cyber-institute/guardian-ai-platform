@@ -231,20 +231,24 @@ def main():
     
     /* Button styling */
     .stButton > button {
-        background: linear-gradient(145deg, #6b7280 0%, #4b5563 100%);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-weight: 500;
-        padding: 0.75rem 1.5rem;
+        background: #ffffff;
+        color: #374151;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-weight: 400;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         transition: all 0.3s ease;
         font-family: 'Inter', sans-serif;
     }
     
     .stButton > button:hover {
-        background: linear-gradient(145deg, #4b5563 0%, #374151 100%);
+        background: #f9fafb;
+        border-color: #9ca3af;
+        color: #111827;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
     }
     
     /* Metric styling */

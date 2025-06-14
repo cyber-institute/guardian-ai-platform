@@ -2810,24 +2810,25 @@ def render_minimal_list(docs):
         st.markdown("""
         <style>
         div[data-testid="column"] > div > .stButton > button {
-            height: 16px !important;
-            padding: 0px 2px !important;
-            font-size: 7px !important;
-            line-height: 1.0 !important;
-            border: 0.5px solid #f3f4f6 !important;
-            background: rgba(255,255,255,0.1) !important;
-            color: #9ca3af !important;
-            border-radius: 1px !important;
-            margin: 0.5px !important;
-            min-height: 16px !important;
-            font-weight: 300 !important;
-            opacity: 0.8 !important;
+            height: 24px !important;
+            padding: 4px 8px !important;
+            font-size: 11px !important;
+            line-height: 1.2 !important;
+            border: 1px solid #e5e7eb !important;
+            background: #ffffff !important;
+            color: #6b7280 !important;
+            border-radius: 4px !important;
+            margin: 2px !important;
+            min-height: 24px !important;
+            font-weight: 400 !important;
+            opacity: 1.0 !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
         }
         div[data-testid="column"] > div > .stButton > button:hover {
-            background: rgba(249,250,251,0.3) !important;
-            border-color: #e5e7eb !important;
-            color: #6b7280 !important;
-            opacity: 1.0 !important;
+            background: #f9fafb !important;
+            border-color: #d1d5db !important;
+            color: #374151 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
         }
         </style>
         """, unsafe_allow_html=True)
