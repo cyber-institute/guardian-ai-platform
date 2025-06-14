@@ -135,6 +135,26 @@ class OrganizationAcronymConverter:
         
         return None
     
+    def _is_already_acronym(self, org_name: str) -> bool:
+        """Check if the organization name is already an acronym"""
+        
+        # Common patterns for acronyms
+        if len(org_name) <= 6 and org_name.isupper():
+            return True
+        
+        # Check if it's a known acronym
+        known_acronyms = set(self.acronym_library.values())
+        if org_name in known_acronyms:
+            return True
+        
+        # Check if it looks like an acronym (mostly capitals, few vowels)
+        if len(org_name) <= 8:
+            upper_count = sum(1 for c in org_name if c.isupper())
+            if upper_count / len(org_name) > 0.7:  # More than 70% uppercase
+                return True
+        
+        return False
+    
     def _generate_acronym_from_pattern(self, org_name: str) -> Optional[str]:
         """Generate acronym from organization name patterns"""
         
