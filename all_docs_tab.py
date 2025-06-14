@@ -681,18 +681,19 @@ def render():
                 ]
                 
                 with st.spinner("🚀 Processing your document..."):
-                    import time
-                    import requests
-                    import trafilatura
-                    from utils.comprehensive_scoring import comprehensive_document_scoring
-                    from utils.database import db_manager
-                    import uuid
-                    
-                    # Show playful progress messages
-                    progress_placeholder = st.empty()
-                    for i, msg in enumerate(spinner_messages):
-                        progress_placeholder.info(msg)
-                        time.sleep(0.5)
+                    try:
+                        import time
+                        import requests
+                        import trafilatura
+                        from utils.comprehensive_scoring import comprehensive_document_scoring
+                        from utils.database import db_manager
+                        import uuid
+                        
+                        # Show playful progress messages
+                        progress_placeholder = st.empty()
+                        for i, msg in enumerate(spinner_messages):
+                            progress_placeholder.info(msg)
+                            time.sleep(0.5)
                         
                         # Check for Congress.gov URLs and suggest alternative
                         if 'congress.gov' in url_input.lower():
