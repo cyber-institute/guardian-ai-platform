@@ -2649,10 +2649,9 @@ def render_grid_view(docs):
                         <div style='margin-bottom:4px;font-weight:600;color:#333'>Framework Scores (Click for explanations):</div>
                         <div style='display:grid;grid-template-columns:1fr 1fr;gap:6px'>""")
             
-            # Add clickable score explanations
-            from components.scoring_explanations import create_clickable_score_badge
+            # Create interactive score display with explanations
+            st.markdown("**Framework Scores (Click for explanations):**")
             
-            # Create score buttons with explanations
             score_col1, score_col2 = st.columns(2)
             
             with score_col1:
