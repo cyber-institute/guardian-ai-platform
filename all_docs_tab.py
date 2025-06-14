@@ -2389,8 +2389,8 @@ def render_grid_view(docs):
             # Properly escape all HTML content for grid view
             import html
             
-            # Get source URL for clickable title
-            source_url = doc.get('source', '') or doc.get('url', '') or ''
+            # Get source URL for clickable title (check multiple field names)
+            source_url = doc.get('source_url', '') or doc.get('url', '') or doc.get('source', '') or ''
             
             safe_doc_type = html.escape(doc_type)
             safe_author_org = html.escape(author_org)
