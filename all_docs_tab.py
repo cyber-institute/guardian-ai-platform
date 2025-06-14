@@ -2810,14 +2810,37 @@ def render_minimal_list(docs):
             </div>
             """, unsafe_allow_html=True)
         
-        # Dynamic action buttons (same style as cards view)
+        # Ultra-small clear action buttons
+        st.markdown("""
+        <style>
+        div[data-testid="column"] > div > .stButton > button {
+            height: 18px !important;
+            padding: 0px 3px !important;
+            font-size: 8px !important;
+            line-height: 1.1 !important;
+            border: 1px solid #e5e7eb !important;
+            background: transparent !important;
+            color: #6b7280 !important;
+            border-radius: 2px !important;
+            margin: 1px !important;
+            min-height: 18px !important;
+            font-weight: 400 !important;
+        }
+        div[data-testid="column"] > div > .stButton > button:hover {
+            background: #f9fafb !important;
+            border-color: #d1d5db !important;
+            color: #374151 !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
         has_scores = any([scores[key] > 0 for key in scores.keys()])
         
         if has_scores:
             col1, col2, col3 = st.columns(3)
             
             with col1:
-                if st.button("View Details", key=f"view_{idx}", use_container_width=True):
+                if st.button("View", key=f"view_{idx}"):
                     with st.expander("Document Details", expanded=True):
                         st.write("**Intelligent Preview:**")
                         st.write(content_preview)
@@ -2829,17 +2852,17 @@ def render_minimal_list(docs):
                         st.write(clean_content[:500] + "..." if len(clean_content) > 500 else clean_content)
             
             with col2:
-                if st.button("Quick Report", key=f"quick_report_{idx}", use_container_width=True):
+                if st.button("Report", key=f"quick_report_{idx}"):
                     from components.risk_report_interface import RiskReportInterface
                     interface = RiskReportInterface()
                     interface._generate_quick_report(doc)
             
             with col3:
-                if st.button("Email Report", key=f"email_report_{idx}", use_container_width=True):
+                if st.button("Email", key=f"email_report_{idx}"):
                     st.info("Email functionality available in Risk Reports section")
         else:
             # Single button for view details when no scores
-            if st.button("View Details", key=f"view_{idx}", use_container_width=True):
+            if st.button("View", key=f"view_{idx}"):
                 with st.expander("Document Details", expanded=True):
                     st.write("**Intelligent Preview:**")
                     st.write(content_preview)
