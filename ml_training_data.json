@@ -207,5 +207,40 @@
     }
   },
   "topic_classification_rules": [],
-  "metadata_extraction_improvements": []
+  "metadata_extraction_improvements": [
+    {
+      "document_id": 30,
+      "document_title": "NIST SP 800-218A Secure Software Development Practices for Generative AI and Dual-Use Foundation Models",
+      "extraction_failures": {
+        "topic": {
+          "extracted": "General",
+          "correct": "AI",
+          "reason": "Content truncation prevented detection of AI keywords"
+        },
+        "organization": {
+          "extracted": "Special",
+          "correct": "NIST",
+          "reason": "Parser extracted wrong part of title instead of organization"
+        },
+        "date": {
+          "extracted": null,
+          "correct": "2024-05-01",
+          "reason": "Date not found in truncated content"
+        }
+      },
+      "content_issues": {
+        "truncated_content": true,
+        "content_length": 303,
+        "expected_length": ">5000",
+        "source_type": "PDF",
+        "extraction_method": "trafilatura"
+      },
+      "learning_patterns": {
+        "nist_sp_pattern": "Documents with 'NIST SP' should have organization=NIST",
+        "ai_keywords": "Documents mentioning 'Generative AI', 'AI model' should be topic=AI",
+        "secure_development": "Secure software development for AI should score AI Cybersecurity framework",
+        "content_validation": "Validate content length before metadata extraction"
+      }
+    }
+  ]
 }
