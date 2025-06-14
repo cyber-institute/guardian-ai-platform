@@ -2212,17 +2212,32 @@ def render_grid_view(docs):
             # Properly escape all HTML content for grid view
             import html
             
-            safe_title = html.escape(title)
+            # Get source URL for clickable title
+            source_url = doc.get('source', '') or doc.get('url', '') or ''
+            
             safe_doc_type = html.escape(doc_type)
             safe_author_org = html.escape(author_org)
             safe_pub_date = html.escape(pub_date)
             safe_content_preview = html.escape(content_preview)
             
+            # Create clickable title with hover tooltip if source URL exists
+            if source_url and source_url.startswith(('http://', 'https://')):
+                title_html = f'''
+                <a href="{source_url}" target="_blank" 
+                   style="text-decoration: none; color: #2563eb; cursor: pointer;" 
+                   title="Click to open document: {source_url}"
+                   onmouseenter="this.style.color='#1d4ed8'; this.style.textDecoration='underline';" 
+                   onmouseleave="this.style.color='#2563eb'; this.style.textDecoration='none';">
+                   {html.escape(title[:40])}{'...' if len(title) > 40 else ''} 🔗
+                </a>'''
+            else:
+                title_html = html.escape(title[:40]) + ('...' if len(title) > 40 else '')
+            
             st.markdown(f"""
                 <div style='border:2px solid #f0f0f0;padding:12px;border-radius:8px;margin:6px;
                 background:white;box-shadow:0 2px 4px rgba(0,0,0,0.08);
                 border-left:4px solid #3B82F6'>
-                    <h4 style='margin:0 0 6px 0;font-size:15px'>{safe_title[:40]}{'...' if len(safe_title) > 40 else ''}</h4>
+                    <h4 style='margin:0 0 6px 0;font-size:15px'>{title_html}</h4>
                     <div style='font-size:10px;color:#666;margin-bottom:8px' title='Type: {safe_doc_type} • Author/Org: {safe_author_org} • Published: {safe_pub_date}'>{safe_doc_type} • {safe_author_org} • {safe_pub_date}</div>
                     <div style='display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px;font-size:10px'>
                         <div title='AI Cybersecurity Maturity (0-100): Evaluates AI security risks and defensive measures. N/A means not AI-related.'>AI Cyber: <span style='background:#e8f5e8;padding:2px 6px;border-radius:8px;color:#2e7d32'>{scores.get('ai_cybersecurity', 'N/A')}</span></div>
@@ -2319,9 +2334,30 @@ def render_minimal_list(docs):
             'quantum_ethics': doc.get('quantum_ethics_score', 0) or 0
         }
         
+        # Get source URL for clickable title
+        source_url = doc.get('source', '') or doc.get('url', '') or ''
+        
+        # Import html for escaping
+        import html
+        
         col1, col2 = st.columns([3, 2])
         with col1:
-            st.markdown(f"**{title}**")
+            # Create clickable title with hover tooltip if source URL exists
+            if source_url and source_url.startswith(('http://', 'https://')):
+                title_html = f'''
+                <strong>
+                <a href="{source_url}" target="_blank" 
+                   style="text-decoration: none; color: #2563eb; cursor: pointer;" 
+                   title="Click to open document: {source_url}"
+                   onmouseenter="this.style.color='#1d4ed8'; this.style.textDecoration='underline';" 
+                   onmouseleave="this.style.color='#2563eb'; this.style.textDecoration='none';">
+                   {html.escape(title)} 🔗
+                </a>
+                </strong>'''
+                st.markdown(title_html, unsafe_allow_html=True)
+            else:
+                st.markdown(f"**{title}**")
+            
             topic = ultra_clean_metadata(doc.get('topic', 'General'))
             st.caption(f"{topic} • {doc_type} • {author_org} • {pub_date}")
         with col2:
@@ -2409,9 +2445,21 @@ def render_card_view(docs):
             safe_pub_date = html.escape(pub_date)
             safe_topic = html.escape(ultra_clean_metadata(doc.get('topic', 'General')))
             
-            # Create clickable title if source URL exists
+            # Create clickable title with CSS hover effects if source URL exists
             if source_url and source_url.startswith(('http://', 'https://')):
-                title_html = f'<a href="{source_url}" target="_blank" style="text-decoration: none; color: #2563eb; cursor: pointer;" onmouseover="this.style.color=\'#1d4ed8\'" onmouseout="this.style.color=\'#2563eb\'">{html.escape(title)}</a>'
+                title_html = f'''
+                <style>
+                .doc-link:hover {{
+                    color: #1d4ed8 !important;
+                    text-decoration: underline !important;
+                }}
+                </style>
+                <a href="{source_url}" target="_blank" 
+                   class="doc-link"
+                   style="text-decoration: none; color: #2563eb; cursor: pointer; transition: all 0.2s ease;" 
+                   title="Click to open document: {source_url}">
+                   {html.escape(title)} 🔗
+                </a>'''
             else:
                 title_html = html.escape(title)
             
