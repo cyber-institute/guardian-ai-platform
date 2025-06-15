@@ -3382,9 +3382,15 @@ def render_card_view(docs):
                     [data-testid="stDialogCloseButton"] {
                         color: white !important;
                         background-color: transparent !important;
+                        border: none !important;
                     }
                     [data-testid="stDialogCloseButton"]:hover {
-                        color: #f0f0f0 !important;
+                        color: #ffffff !important;
+                        background-color: rgba(255,255,255,0.1) !important;
+                    }
+                    [data-testid="stDialogCloseButton"] svg {
+                        color: white !important;
+                        fill: white !important;
                     }
                     .stMarkdown { margin: 0 !important; padding: 0 !important; }
                     .element-container { margin: 0 !important; padding: 0 !important; }
