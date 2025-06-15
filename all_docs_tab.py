@@ -3134,9 +3134,17 @@ def render_card_view(docs):
                     </div>
                 </div>
                 
-                <script>
-                function showScoreDetails(framework, score, docId) {{
-                    const popup = window.open('', 'scoreDetails', 'width=600,height=500,scrollbars=yes,resizable=yes');
+
+            """, unsafe_allow_html=True)
+            
+            # Add JavaScript functions in a separate script block that won't interfere with content
+            st.components.v1.html(f"""
+            <script>
+            if (!window.scoreDetailsLoaded) {{
+                window.scoreDetailsLoaded = true;
+                
+                window.showScoreDetails = function(framework, score, docId) {{
+                    const popup = window.open('', 'scoreDetails_' + docId, 'width=600,height=500,scrollbars=yes,resizable=yes');
                     popup.document.write(`
                         <html>
                         <head>
@@ -3159,7 +3167,7 @@ def render_card_view(docs):
                                 ${{score === 'N/A' ? '<br><em>Document not relevant to this framework</em>' : ''}}
                             </div>
                             <div class="explanation">
-                                ${{getFrameworkExplanation(framework, score)}}
+                                ${{window.getFrameworkExplanation(framework, score)}}
                             </div>
                             <div style="margin-top: 20px; text-align: center;">
                                 <button onclick="window.close()" style="background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">Close</button>
@@ -3167,11 +3175,10 @@ def render_card_view(docs):
                         </body>
                         </html>
                     `);
-                    
                     popup.document.close();
-                }}
+                }};
                 
-                function getFrameworkExplanation(framework, score) {{
+                window.getFrameworkExplanation = function(framework, score) {{
                     const explanations = {{
                         'ai_cybersecurity': `
                             <h3>AI Cybersecurity Maturity Assessment</h3>
@@ -3227,9 +3234,10 @@ def render_card_view(docs):
                         `
                     }};
                     return explanations[framework] || 'Framework explanation not available.';
-                }}
-                </script>
-            """, unsafe_allow_html=True)
+                }};
+            }}
+            </script>
+            """, height=0)
             
             # ISOLATED STEP 4: Display clean content preview (completely separate from scoring)
             with st.expander("Content Preview"):
