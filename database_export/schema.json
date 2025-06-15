@@ -1,0 +1,348 @@
+{
+  "tables": [
+    {
+      "name": "assessments",
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer",
+          "is_nullable": "NO",
+          "column_default": "nextval('assessments_id_seq'::regclass)"
+        },
+        {
+          "column_name": "document_id",
+          "data_type": "integer",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "assessment_type",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "score",
+          "data_type": "numeric",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "confidence_scores",
+          "data_type": "jsonb",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "narrative",
+          "data_type": "ARRAY",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "traits",
+          "data_type": "jsonb",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "raw_analysis",
+          "data_type": "jsonb",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone",
+          "is_nullable": "YES",
+          "column_default": "CURRENT_TIMESTAMP"
+        }
+      ],
+      "constraints": [
+        {
+          "constraint_name": "assessments_pkey",
+          "constraint_type": "PRIMARY KEY"
+        },
+        {
+          "constraint_name": "assessments_document_id_fkey",
+          "constraint_type": "FOREIGN KEY"
+        },
+        {
+          "constraint_name": "2200_16485_1_not_null",
+          "constraint_type": "CHECK"
+        },
+        {
+          "constraint_name": "2200_16485_3_not_null",
+          "constraint_type": "CHECK"
+        },
+        {
+          "constraint_name": "2200_16485_4_not_null",
+          "constraint_type": "CHECK"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "assessments_pkey",
+          "indexdef": "CREATE UNIQUE INDEX assessments_pkey ON public.assessments USING btree (id)"
+        }
+      ]
+    },
+    {
+      "name": "documents",
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer",
+          "is_nullable": "NO",
+          "column_default": "nextval('documents_id_seq'::regclass)"
+        },
+        {
+          "column_name": "title",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "content",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "text_content",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "quantum_score",
+          "data_type": "numeric",
+          "is_nullable": "YES",
+          "column_default": "0"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone",
+          "is_nullable": "YES",
+          "column_default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp without time zone",
+          "is_nullable": "YES",
+          "column_default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "column_name": "document_type",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "source",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "metadata",
+          "data_type": "jsonb",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "author_organization",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "publish_date",
+          "data_type": "date",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "content_preview",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "ai_cybersecurity_score",
+          "data_type": "integer",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "quantum_cybersecurity_score",
+          "data_type": "integer",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "ai_ethics_score",
+          "data_type": "integer",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "quantum_ethics_score",
+          "data_type": "integer",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "detected_region",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": "'Unknown'::character varying"
+        },
+        {
+          "column_name": "region_confidence",
+          "data_type": "double precision",
+          "is_nullable": "YES",
+          "column_default": "0.0"
+        },
+        {
+          "column_name": "region_reasoning",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": "''::text"
+        },
+        {
+          "column_name": "topic",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": "'General'::character varying"
+        },
+        {
+          "column_name": "url_valid",
+          "data_type": "boolean",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "url_status",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "url_checked",
+          "data_type": "timestamp without time zone",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "source_redirect",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        }
+      ],
+      "constraints": [
+        {
+          "constraint_name": "documents_pkey",
+          "constraint_type": "PRIMARY KEY"
+        },
+        {
+          "constraint_name": "2200_16473_1_not_null",
+          "constraint_type": "CHECK"
+        },
+        {
+          "constraint_name": "2200_16473_2_not_null",
+          "constraint_type": "CHECK"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "documents_pkey",
+          "indexdef": "CREATE UNIQUE INDEX documents_pkey ON public.documents USING btree (id)"
+        }
+      ]
+    },
+    {
+      "name": "scoring_criteria",
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer",
+          "is_nullable": "NO",
+          "column_default": "nextval('scoring_criteria_id_seq'::regclass)"
+        },
+        {
+          "column_name": "criterion_name",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "weight",
+          "data_type": "numeric",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "category",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "description",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone",
+          "is_nullable": "YES",
+          "column_default": "CURRENT_TIMESTAMP"
+        }
+      ],
+      "constraints": [
+        {
+          "constraint_name": "scoring_criteria_pkey",
+          "constraint_type": "PRIMARY KEY"
+        },
+        {
+          "constraint_name": "2200_16500_1_not_null",
+          "constraint_type": "CHECK"
+        },
+        {
+          "constraint_name": "2200_16500_2_not_null",
+          "constraint_type": "CHECK"
+        },
+        {
+          "constraint_name": "2200_16500_3_not_null",
+          "constraint_type": "CHECK"
+        },
+        {
+          "constraint_name": "2200_16500_4_not_null",
+          "constraint_type": "CHECK"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "scoring_criteria_pkey",
+          "indexdef": "CREATE UNIQUE INDEX scoring_criteria_pkey ON public.scoring_criteria USING btree (id)"
+        }
+      ]
+    }
+  ],
+  "indexes": [],
+  "constraints": [],
+  "sequences": [
+    {
+      "sequence_name": "documents_id_seq"
+    },
+    {
+      "sequence_name": "assessments_id_seq"
+    },
+    {
+      "sequence_name": "scoring_criteria_id_seq"
+    }
+  ]
+}
