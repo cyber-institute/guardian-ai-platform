@@ -2797,15 +2797,15 @@ def render_compact_cards(docs):
             safe_pub_date = html.escape(pub_date)
             safe_content_preview = html.escape(content_preview)
             
-            # Display metadata card with content preview
+            # Display metadata card with content preview - compact spacing
             st.markdown(f"""
-                <div style='border:1px solid #e0e0e0;padding:12px;border-radius:8px;margin:4px;
+                <div style='border:1px solid #e0e0e0;padding:8px;border-radius:6px;margin:2px 0px;
                 background:linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
                 box-shadow:0 1px 3px rgba(0,0,0,0.1);height:auto;overflow:hidden'>
-                    <div style='font-weight:bold;font-size:12px;margin-bottom:4px;line-height:1.2'>{safe_title[:32]}{'...' if len(safe_title) > 32 else ''}</div>
-                    <div style='font-size:9px;color:#666;margin-bottom:6px' title='Document Type: {safe_doc_type} • Author/Organization: {safe_author_org}'>{safe_doc_type} • {safe_author_org[:15]}{'...' if len(safe_author_org) > 15 else ''}</div>
-                    <div style='font-size:10px;color:#555;margin-bottom:8px;line-height:1.3'>{safe_content_preview[:100]}{'...' if len(safe_content_preview) > 100 else ''}</div>
-                    <div style='font-size:8px;color:#888;margin-bottom:8px'>{safe_pub_date if safe_pub_date != 'Date not available' else 'Date not available'}</div>
+                    <div style='font-weight:bold;font-size:12px;margin-bottom:3px;line-height:1.2'>{safe_title[:32]}{'...' if len(safe_title) > 32 else ''}</div>
+                    <div style='font-size:9px;color:#666;margin-bottom:4px' title='Document Type: {safe_doc_type} • Author/Organization: {safe_author_org}'>{safe_doc_type} • {safe_author_org[:15]}{'...' if len(safe_author_org) > 15 else ''}</div>
+                    <div style='font-size:10px;color:#555;margin-bottom:4px;line-height:1.3'>{safe_content_preview[:100]}{'...' if len(safe_content_preview) > 100 else ''}</div>
+                    <div style='font-size:8px;color:#888;margin-bottom:2px'>{safe_pub_date if safe_pub_date != 'Date not available' else 'Date not available'}</div>
                 </div>
             """, unsafe_allow_html=True)
             
@@ -2813,8 +2813,8 @@ def render_compact_cards(docs):
             doc_id = doc.get('id', str(hash(title + doc.get('url', ''))))
             unique_id = f"compact_{doc_id}"
             
-            # Use enhanced scoring display component
-            st.markdown("<div style='margin:4px;padding:8px;background:#f8f9fa;border-radius:6px'>", unsafe_allow_html=True)
+            # Use enhanced scoring display component with minimal spacing
+            st.markdown("<div style='margin:0px;padding:4px;background:#f8f9fa;border-radius:4px'>", unsafe_allow_html=True)
             
             # Prepare document data for enhanced scoring
             document_data = {

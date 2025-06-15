@@ -61,29 +61,41 @@ class EnhancedScoringDisplay:
         else:
             display_value = f"{score}/100" if score != 'N/A' else "N/A"
         
-        # Add custom CSS for this specific button
+        # Add ultra-compact CSS styling for minimal buttons
         button_css = f"""
         <style>
-        .enhanced-button-{unique_id} {{
-            background: {colors['bg']};
-            border: 2px solid {colors['border']};
-            border-radius: 8px;
-            padding: 10px 12px;
-            color: {colors['text']};
-            font-weight: 600;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 4px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+        .stButton > button,
+        button[kind="secondary"],
+        button[kind="primary"],
+        [data-testid*="button"] {{
+            height: 24px !important;
+            padding: 2px 6px !important;
+            font-size: 9px !important;
+            line-height: 1.0 !important;
+            margin: 0px !important;
+            border-radius: 3px !important;
+            font-weight: 500 !important;
+            min-height: 24px !important;
+            background: {colors['bg']} !important;
+            border: 1px solid {colors['border']} !important;
+            color: {colors['text']} !important;
+            width: 100% !important;
         }}
-        .enhanced-button-{unique_id}:hover {{
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            background: {colors['border']}20;
+        .stButton > button:hover,
+        button[kind="secondary"]:hover,
+        button[kind="primary"]:hover,
+        [data-testid*="button"]:hover {{
+            background: {colors['border']}30 !important;
+            transform: none !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }}
+        .stButton {{
+            margin: 0px !important;
+            padding: 0px !important;
+        }}
+        div[data-testid="column"] {{
+            padding: 0px !important;
+            margin: 0px !important;
         }}
         </style>
         """
