@@ -371,6 +371,33 @@ def render():
     # Apply ultra-compact CSS to eliminate all spacing
     apply_ultra_compact_css()
     
+    # Force button font size with aggressive CSS override
+    st.markdown("""
+    <style>
+    /* Force all buttons to have small font size */
+    button, 
+    .stButton button, 
+    .stButton > button,
+    [data-testid="baseButton-secondary"],
+    [data-testid="baseButton-primary"],
+    [data-testid*="button"],
+    div[data-testid="stButton"] button {
+        font-size: 8px !important;
+        height: 20px !important;
+        padding: 1px 4px !important;
+        margin: 0px !important;
+        border-radius: 0px !important;
+        line-height: 1.0 !important;
+        font-family: inherit !important;
+    }
+    
+    /* Override any other button styles */
+    * button {
+        font-size: 8px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
     # Add custom CSS for help tooltips
     help_tooltips.add_custom_css()
     
