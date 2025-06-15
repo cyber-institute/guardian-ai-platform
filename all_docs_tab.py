@@ -3371,15 +3371,15 @@ def render_card_view(docs):
             
             st.markdown("</div>", unsafe_allow_html=True)
             
-            # Show modal dialog if any framework button triggered
-            any_modal_open = (
+            # Simple unified modal system
+            modal_active = (
                 st.session_state.get(f"modal_ai_cyber_{unique_id}", False) or
                 st.session_state.get(f"modal_ai_ethics_{unique_id}", False) or
                 st.session_state.get(f"modal_quantum_cyber_{unique_id}", False) or
                 st.session_state.get(f"modal_quantum_ethics_{unique_id}", False)
             )
             
-            if any_modal_open:
+            if modal_active:
                 @st.dialog("Framework Scoring Analysis")
                 def show_scoring_modal():
                     # Ultra-compact modal CSS
@@ -3470,12 +3470,17 @@ def render_card_view(docs):
                     if all(score == 'N/A' for score in [scores['ai_cybersecurity'], scores['quantum_cybersecurity'], scores['ai_ethics'], scores['quantum_ethics']]):
                         st.info("This document was not scored against any frameworks as it doesn't contain relevant content for AI or quantum assessment areas.")
                     
-                    if st.button("Close", key=f"close_modal_{doc.get('id', 'unknown')}_{hash(title)}", type="secondary"):
-                        # Clear all modal states for this document
-                        st.session_state[f"modal_ai_cyber_{unique_id}"] = False
-                        st.session_state[f"modal_ai_ethics_{unique_id}"] = False
-                        st.session_state[f"modal_quantum_cyber_{unique_id}"] = False
-                        st.session_state[f"modal_quantum_ethics_{unique_id}"] = False
+                    if st.button("Close", key=f"close_all_{unique_id}", type="secondary"):
+                        # Clear only the modal states for this specific document
+                        keys_to_clear = [
+                            f"modal_ai_cyber_{unique_id}",
+                            f"modal_ai_ethics_{unique_id}", 
+                            f"modal_quantum_cyber_{unique_id}",
+                            f"modal_quantum_ethics_{unique_id}"
+                        ]
+                        for key in keys_to_clear:
+                            if key in st.session_state:
+                                del st.session_state[key]
                         st.rerun()
                 
                 show_scoring_modal()
