@@ -3292,7 +3292,23 @@ def render_card_view(docs):
             # Apply smarter scoring logic - only score if content is relevant
             scores['ai_cybersecurity'] = raw_scores['ai_cybersecurity'] if is_ai_related and raw_scores['ai_cybersecurity'] > 0 else 'N/A'
             scores['ai_ethics'] = raw_scores['ai_ethics'] if is_ai_related and raw_scores['ai_ethics'] > 0 else 'N/A'
-            scores['quantum_cybersecurity'] = raw_scores['quantum_cybersecurity'] if is_quantum_related and raw_scores['quantum_cybersecurity'] > 0 else 'N/A'
+            
+            # Convert quantum cybersecurity from 100-scale to 5-tier scale
+            if is_quantum_related and raw_scores['quantum_cybersecurity'] and raw_scores['quantum_cybersecurity'] > 0:
+                quantum_score = raw_scores['quantum_cybersecurity']
+                if quantum_score >= 90:
+                    scores['quantum_cybersecurity'] = 5
+                elif quantum_score >= 70:
+                    scores['quantum_cybersecurity'] = 4
+                elif quantum_score >= 50:
+                    scores['quantum_cybersecurity'] = 3
+                elif quantum_score >= 30:
+                    scores['quantum_cybersecurity'] = 2
+                else:
+                    scores['quantum_cybersecurity'] = 1
+            else:
+                scores['quantum_cybersecurity'] = 'N/A'
+            
             scores['quantum_ethics'] = raw_scores['quantum_ethics'] if is_quantum_related and raw_scores['quantum_ethics'] > 0 else 'N/A'
             
             # Display scores with clickable buttons that trigger modal popup
@@ -3340,8 +3356,20 @@ def render_card_view(docs):
             if st.session_state.get(modal_key, False):
                 @st.dialog("Framework Scoring Analysis")
                 def show_scoring_modal():
-                    st.markdown(f"### {title}")
+                    # Custom CSS for white close button
+                    st.markdown("""
+                    <style>
+                    [data-testid="stDialogCloseButton"] {
+                        color: white !important;
+                        background-color: transparent !important;
+                    }
+                    [data-testid="stDialogCloseButton"]:hover {
+                        color: #f0f0f0 !important;
+                    }
+                    </style>
+                    """, unsafe_allow_html=True)
                     
+                    st.markdown(f"**{title}**")
                     # Get repository statistics for comparison
                     try:
                         from utils.fast_admin_loader import get_documents_cached
@@ -3356,13 +3384,9 @@ def render_card_view(docs):
                         performance = "above average" if scores['ai_cybersecurity'] > avg_score else ("average" if scores['ai_cybersecurity'] == avg_score else "below average")
                         analysis = analyze_ai_cybersecurity_content(raw_content, scores['ai_cybersecurity'])
                         
-                        st.markdown(f"**AI Cybersecurity: {scores['ai_cybersecurity']}/100** ({performance}, repository avg: {avg_score:.0f})")
-                        col1, col2 = st.columns(2)
-                        with col1:
-                            st.markdown("**Strengths:** " + " • ".join(analysis['strengths']))
-                        with col2:
-                            st.markdown("**Areas for Improvement:** " + " • ".join(analysis['weaknesses']))
-                        st.markdown("**Recommendations:** " + " | ".join([f"{i}. {rec}" for i, rec in enumerate(analysis['recommendations'], 1)]))
+                        st.markdown(f"**AI Cybersecurity: {scores['ai_cybersecurity']}/100** ({performance}, avg: {avg_score:.0f})")
+                        st.markdown(f"**Strengths:** {' • '.join(analysis['strengths'])} **|** **Needs:** {' • '.join(analysis['weaknesses'])}")
+                        st.markdown(f"**Recommendations:** {' | '.join([f'{i}. {rec}' for i, rec in enumerate(analysis['recommendations'], 1)])}")
                         st.markdown("---")
                     
                     # Quantum Cybersecurity Analysis  
@@ -3371,13 +3395,9 @@ def render_card_view(docs):
                         performance = "above average" if scores['quantum_cybersecurity'] > avg_tier else ("average" if scores['quantum_cybersecurity'] == avg_tier else "below average")
                         analysis = analyze_quantum_cybersecurity_content(raw_content, scores['quantum_cybersecurity'])
                         
-                        st.markdown(f"**Quantum Cybersecurity: Tier {scores['quantum_cybersecurity']}/5** ({performance}, repository avg: Tier {avg_tier:.0f})")
-                        col1, col2 = st.columns(2)
-                        with col1:
-                            st.markdown("**Strengths:** " + " • ".join(analysis['strengths']))
-                        with col2:
-                            st.markdown("**Areas for Improvement:** " + " • ".join(analysis['weaknesses']))
-                        st.markdown("**Recommendations:** " + " | ".join([f"{i}. {rec}" for i, rec in enumerate(analysis['recommendations'], 1)]))
+                        st.markdown(f"**Quantum Cybersecurity: Tier {scores['quantum_cybersecurity']}/5** ({performance}, avg: Tier {avg_tier:.0f})")
+                        st.markdown(f"**Strengths:** {' • '.join(analysis['strengths'])} **|** **Needs:** {' • '.join(analysis['weaknesses'])}")
+                        st.markdown(f"**Recommendations:** {' | '.join([f'{i}. {rec}' for i, rec in enumerate(analysis['recommendations'], 1)])}")
                         st.markdown("---")
                     
                     # AI Ethics Analysis
@@ -3386,13 +3406,9 @@ def render_card_view(docs):
                         performance = "above average" if scores['ai_ethics'] > avg_score else ("average" if scores['ai_ethics'] == avg_score else "below average")
                         analysis = analyze_ai_ethics_content(raw_content, scores['ai_ethics'])
                         
-                        st.markdown(f"**AI Ethics: {scores['ai_ethics']}/100** ({performance}, repository avg: {avg_score:.0f})")
-                        col1, col2 = st.columns(2)
-                        with col1:
-                            st.markdown("**Strengths:** " + " • ".join(analysis['strengths']))
-                        with col2:
-                            st.markdown("**Areas for Improvement:** " + " • ".join(analysis['weaknesses']))
-                        st.markdown("**Recommendations:** " + " | ".join([f"{i}. {rec}" for i, rec in enumerate(analysis['recommendations'], 1)]))
+                        st.markdown(f"**AI Ethics: {scores['ai_ethics']}/100** ({performance}, avg: {avg_score:.0f})")
+                        st.markdown(f"**Strengths:** {' • '.join(analysis['strengths'])} **|** **Needs:** {' • '.join(analysis['weaknesses'])}")
+                        st.markdown(f"**Recommendations:** {' | '.join([f'{i}. {rec}' for i, rec in enumerate(analysis['recommendations'], 1)])}")
                         st.markdown("---")
                     
                     # Quantum Ethics Analysis
@@ -3401,13 +3417,9 @@ def render_card_view(docs):
                         performance = "above average" if scores['quantum_ethics'] > avg_score else ("average" if scores['quantum_ethics'] == avg_score else "below average")
                         analysis = analyze_quantum_ethics_content(raw_content, scores['quantum_ethics'])
                         
-                        st.markdown(f"**Quantum Ethics: {scores['quantum_ethics']}/100** ({performance}, repository avg: {avg_score:.0f})")
-                        col1, col2 = st.columns(2)
-                        with col1:
-                            st.markdown("**Strengths:** " + " • ".join(analysis['strengths']))
-                        with col2:
-                            st.markdown("**Areas for Improvement:** " + " • ".join(analysis['weaknesses']))
-                        st.markdown("**Recommendations:** " + " | ".join([f"{i}. {rec}" for i, rec in enumerate(analysis['recommendations'], 1)]))
+                        st.markdown(f"**Quantum Ethics: {scores['quantum_ethics']}/100** ({performance}, avg: {avg_score:.0f})")
+                        st.markdown(f"**Strengths:** {' • '.join(analysis['strengths'])} **|** **Needs:** {' • '.join(analysis['weaknesses'])}")
+                        st.markdown(f"**Recommendations:** {' | '.join([f'{i}. {rec}' for i, rec in enumerate(analysis['recommendations'], 1)])}")
                     
                     if all(score == 'N/A' for score in [scores['ai_cybersecurity'], scores['quantum_cybersecurity'], scores['ai_ethics'], scores['quantum_ethics']]):
                         st.info("This document was not scored against any frameworks as it doesn't contain relevant content for AI or quantum assessment areas.")
