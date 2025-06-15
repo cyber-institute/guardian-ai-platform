@@ -2760,6 +2760,257 @@ def render_table_view(docs):
     df = pd.DataFrame(table_data)
     st.dataframe(df, use_container_width=True, hide_index=True)
 
+def calculate_repository_statistics(docs):
+    """Calculate average scores across the repository for comparison."""
+    scores = {
+        'ai_cybersecurity': [],
+        'quantum_cybersecurity': [],
+        'ai_ethics': [],
+        'quantum_ethics': []
+    }
+    
+    for doc in docs:
+        if doc.get('ai_cybersecurity_score') and doc['ai_cybersecurity_score'] != 'N/A':
+            try:
+                scores['ai_cybersecurity'].append(int(doc['ai_cybersecurity_score']))
+            except:
+                pass
+        if doc.get('quantum_cybersecurity_score') and doc['quantum_cybersecurity_score'] != 'N/A':
+            try:
+                scores['quantum_cybersecurity'].append(int(doc['quantum_cybersecurity_score']))
+            except:
+                pass
+        if doc.get('ai_ethics_score') and doc['ai_ethics_score'] != 'N/A':
+            try:
+                scores['ai_ethics'].append(int(doc['ai_ethics_score']))
+            except:
+                pass
+        if doc.get('quantum_ethics_score') and doc['quantum_ethics_score'] != 'N/A':
+            try:
+                scores['quantum_ethics'].append(int(doc['quantum_ethics_score']))
+            except:
+                pass
+    
+    # Calculate averages
+    return {
+        'ai_cybersecurity': sum(scores['ai_cybersecurity']) / len(scores['ai_cybersecurity']) if scores['ai_cybersecurity'] else 50,
+        'quantum_cybersecurity': sum(scores['quantum_cybersecurity']) / len(scores['quantum_cybersecurity']) if scores['quantum_cybersecurity'] else 3,
+        'ai_ethics': sum(scores['ai_ethics']) / len(scores['ai_ethics']) if scores['ai_ethics'] else 50,
+        'quantum_ethics': sum(scores['quantum_ethics']) / len(scores['quantum_ethics']) if scores['quantum_ethics'] else 50
+    }
+
+def analyze_ai_cybersecurity_content(content, score):
+    """Analyze AI cybersecurity content to identify strengths, weaknesses, and recommendations."""
+    content_lower = content.lower()
+    
+    # Key terms for analysis
+    strong_terms = ['threat model', 'adversarial attack', 'model security', 'ai security framework', 'secure development', 'vulnerability assessment', 'penetration testing', 'security by design']
+    moderate_terms = ['security', 'threat', 'risk', 'vulnerability', 'protection', 'defense', 'authentication', 'authorization']
+    missing_terms = ['bias attack', 'model poisoning', 'differential privacy', 'federated learning security', 'ai red teaming']
+    
+    strengths = []
+    weaknesses = []
+    recommendations = []
+    
+    # Identify strengths based on content
+    for term in strong_terms:
+        if term in content_lower:
+            strengths.append(f"Addresses {term}")
+    
+    if score >= 70:
+        if 'framework' in content_lower or 'methodology' in content_lower:
+            strengths.append("Systematic security approach")
+        if 'implementation' in content_lower:
+            strengths.append("Practical implementation guidance")
+    
+    # Identify weaknesses
+    if score < 50:
+        weaknesses.append("Limited security depth")
+        weaknesses.append("Missing threat modeling")
+    if score < 70:
+        found_moderate = sum(1 for term in moderate_terms if term in content_lower)
+        if found_moderate < 3:
+            weaknesses.append("Insufficient security coverage")
+    
+    # Generate recommendations
+    if not any(term in content_lower for term in ['threat model', 'threat modeling']):
+        recommendations.append("Include comprehensive AI threat modeling methodology")
+    if not any(term in content_lower for term in ['adversarial', 'attack']):
+        recommendations.append("Address adversarial attack prevention and detection")
+    if not any(term in content_lower for term in ['secure development', 'security lifecycle']):
+        recommendations.append("Integrate security into AI development lifecycle")
+    
+    # Ensure we have content
+    if not strengths:
+        strengths = ["Basic security awareness demonstrated"]
+    if not weaknesses:
+        weaknesses = ["Could expand on implementation details"]
+    if not recommendations:
+        recommendations = ["Consider adding more specific security metrics", "Include case studies or examples", "Expand on monitoring and incident response"]
+    
+    return {
+        'strengths': strengths[:3],
+        'weaknesses': weaknesses[:3], 
+        'recommendations': recommendations[:3]
+    }
+
+def analyze_quantum_cybersecurity_content(content, score):
+    """Analyze quantum cybersecurity content to identify strengths, weaknesses, and recommendations."""
+    content_lower = content.lower()
+    
+    strong_terms = ['post-quantum cryptography', 'quantum key distribution', 'quantum-safe', 'pqc', 'migration strategy', 'cryptographic agility']
+    moderate_terms = ['quantum', 'cryptography', 'encryption', 'key management', 'quantum computing threat']
+    
+    strengths = []
+    weaknesses = []
+    recommendations = []
+    
+    # Identify strengths
+    for term in strong_terms:
+        if term in content_lower:
+            strengths.append(f"Addresses {term}")
+    
+    if score >= 4:
+        if 'implementation' in content_lower:
+            strengths.append("Implementation focus")
+        if 'timeline' in content_lower or 'roadmap' in content_lower:
+            strengths.append("Strategic planning approach")
+    
+    # Identify weaknesses
+    if score <= 2:
+        weaknesses.append("Limited quantum threat awareness")
+        weaknesses.append("Missing migration planning")
+    if score <= 3:
+        if not any(term in content_lower for term in strong_terms):
+            weaknesses.append("Lacks specific quantum-safe measures")
+    
+    # Generate recommendations
+    if 'post-quantum' not in content_lower:
+        recommendations.append("Include post-quantum cryptography adoption strategy")
+    if 'migration' not in content_lower:
+        recommendations.append("Develop cryptographic migration roadmap")
+    if 'inventory' not in content_lower:
+        recommendations.append("Conduct cryptographic asset inventory")
+    
+    # Ensure content
+    if not strengths:
+        strengths = ["Demonstrates quantum awareness"]
+    if not weaknesses:
+        weaknesses = ["Could provide more technical depth"]
+    if not recommendations:
+        recommendations = ["Add implementation timeline", "Include risk assessment framework", "Expand on testing procedures"]
+    
+    return {
+        'strengths': strengths[:3],
+        'weaknesses': weaknesses[:3],
+        'recommendations': recommendations[:3]
+    }
+
+def analyze_ai_ethics_content(content, score):
+    """Analyze AI ethics content to identify strengths, weaknesses, and recommendations."""
+    content_lower = content.lower()
+    
+    strong_terms = ['bias detection', 'algorithmic fairness', 'transparency', 'explainability', 'accountability', 'human oversight', 'ethical review']
+    moderate_terms = ['ethics', 'fairness', 'bias', 'discrimination', 'responsible', 'oversight', 'governance']
+    
+    strengths = []
+    weaknesses = []
+    recommendations = []
+    
+    # Identify strengths
+    for term in strong_terms:
+        if term in content_lower:
+            strengths.append(f"Addresses {term}")
+    
+    if score >= 70:
+        if 'process' in content_lower or 'framework' in content_lower:
+            strengths.append("Systematic ethics approach")
+        if 'metrics' in content_lower:
+            strengths.append("Measurable ethics criteria")
+    
+    # Identify weaknesses
+    if score < 50:
+        weaknesses.append("Limited ethics integration")
+        weaknesses.append("Missing bias mitigation")
+    if score < 70:
+        found_moderate = sum(1 for term in moderate_terms if term in content_lower)
+        if found_moderate < 3:
+            weaknesses.append("Insufficient ethical coverage")
+    
+    # Generate recommendations
+    if 'bias' not in content_lower:
+        recommendations.append("Include comprehensive bias detection and mitigation")
+    if 'transparency' not in content_lower and 'explainability' not in content_lower:
+        recommendations.append("Add algorithmic transparency requirements")
+    if 'oversight' not in content_lower:
+        recommendations.append("Establish human oversight mechanisms")
+    
+    # Ensure content
+    if not strengths:
+        strengths = ["Shows ethical awareness"]
+    if not weaknesses:
+        weaknesses = ["Could strengthen implementation guidance"]
+    if not recommendations:
+        recommendations = ["Add stakeholder engagement process", "Include ethics training requirements", "Develop ethics assessment metrics"]
+    
+    return {
+        'strengths': strengths[:3],
+        'weaknesses': weaknesses[:3],
+        'recommendations': recommendations[:3]
+    }
+
+def analyze_quantum_ethics_content(content, score):
+    """Analyze quantum ethics content to identify strengths, weaknesses, and recommendations."""
+    content_lower = content.lower()
+    
+    strong_terms = ['quantum ethics', 'equitable access', 'quantum divide', 'responsible development', 'quantum governance', 'privacy implications']
+    moderate_terms = ['ethics', 'responsible', 'governance', 'equity', 'access', 'privacy', 'international cooperation']
+    
+    strengths = []
+    weaknesses = []
+    recommendations = []
+    
+    # Identify strengths
+    for term in strong_terms:
+        if term in content_lower:
+            strengths.append(f"Addresses {term}")
+    
+    if score >= 70:
+        if 'framework' in content_lower:
+            strengths.append("Systematic ethics framework")
+        if 'international' in content_lower or 'cooperation' in content_lower:
+            strengths.append("Global perspective")
+    
+    # Identify weaknesses
+    if score < 50:
+        weaknesses.append("Limited quantum ethics consideration")
+        weaknesses.append("Missing equity concerns")
+    if score < 70:
+        if not any(term in content_lower for term in strong_terms):
+            weaknesses.append("Lacks quantum-specific ethics")
+    
+    # Generate recommendations
+    if 'access' not in content_lower and 'equity' not in content_lower:
+        recommendations.append("Address equitable quantum technology access")
+    if 'privacy' not in content_lower:
+        recommendations.append("Include quantum computing privacy implications")
+    if 'governance' not in content_lower:
+        recommendations.append("Establish quantum technology governance framework")
+    
+    # Ensure content
+    if not strengths:
+        strengths = ["Demonstrates quantum technology awareness"]
+    if not weaknesses:
+        weaknesses = ["Could expand on global implications"]
+    if not recommendations:
+        recommendations = ["Add stakeholder consultation process", "Include quantum education initiatives", "Develop international cooperation framework"]
+    
+    return {
+        'strengths': strengths[:3],
+        'weaknesses': weaknesses[:3],
+        'recommendations': recommendations[:3]
+    }
+
 def render_minimal_list(docs):
     """Render documents in minimal list format."""
     for idx, doc in enumerate(docs):
@@ -3053,14 +3304,14 @@ def render_card_view(docs):
             
             with col1:
                 # AI Cybersecurity button
-                if st.button(f"🔒 AI Cybersecurity: {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity', raw_content, title)}", 
+                if st.button(f"AI Cybersecurity: {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity', raw_content, title)}", 
                            key=f"ai_cyber_{unique_id}", 
                            help="AI Cybersecurity Assessment (0-100) - Click for detailed analysis",
                            use_container_width=True):
                     st.session_state[modal_key] = True
                 
                 # AI Ethics button  
-                if st.button(f"🤖 AI Ethics: {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics', raw_content, title)}", 
+                if st.button(f"AI Ethics: {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics', raw_content, title)}", 
                            key=f"ai_ethics_{unique_id}",
                            help="AI Ethics Evaluation (0-100) - Click for detailed analysis", 
                            use_container_width=True):
@@ -3068,14 +3319,14 @@ def render_card_view(docs):
             
             with col2:
                 # Quantum Cybersecurity button
-                if st.button(f"⚛️ Quantum Cybersecurity: {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity', raw_content, title)}", 
+                if st.button(f"Quantum Cybersecurity: {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity', raw_content, title)}", 
                            key=f"quantum_cyber_{unique_id}",
                            help="Quantum Cybersecurity Assessment (Tier 1-5) - Click for detailed analysis",
                            use_container_width=True):
                     st.session_state[modal_key] = True
                 
                 # Quantum Ethics button
-                if st.button(f"⚛️ Quantum Ethics: {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics', raw_content, title)}", 
+                if st.button(f"Quantum Ethics: {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics', raw_content, title)}", 
                            key=f"quantum_ethics_{unique_id}",
                            help="Quantum Ethics Assessment (0-100) - Click for detailed analysis",
                            use_container_width=True):
@@ -3090,77 +3341,131 @@ def render_card_view(docs):
                     st.markdown(f"### {title}")
                     st.markdown("---")
                     
+                    # Get repository statistics for comparison
+                    try:
+                        from utils.fast_admin_loader import get_documents_cached
+                        all_docs = get_documents_cached()
+                        repo_stats = calculate_repository_statistics(all_docs)
+                    except:
+                        repo_stats = {"ai_cybersecurity": 50, "quantum_cybersecurity": 3, "ai_ethics": 50, "quantum_ethics": 50}
+                    
                     # AI Cybersecurity Analysis
                     if scores['ai_cybersecurity'] != 'N/A':
-                        st.markdown("#### 🔒 AI Cybersecurity Maturity")
+                        st.markdown("#### AI Cybersecurity Maturity")
                         st.markdown(f"**Score: {scores['ai_cybersecurity']}/100**")
-                        with st.expander("View Details"):
-                            st.markdown("""
-                            **Purpose:** Evaluates AI-specific security risks, threat modeling, and defensive measures.
-                            
-                            **Scoring Criteria:**
-                            - **90-100:** Comprehensive AI security framework
-                            - **70-89:** Strong AI security considerations  
-                            - **50-69:** Moderate AI security awareness
-                            - **30-49:** Basic AI security mentions
-                            - **0-29:** Minimal AI security considerations
-                            
-                            **Key Areas:** AI model security, data protection, adversarial attack prevention, secure development lifecycle.
-                            """)
+                        
+                        # Performance comparison
+                        avg_score = repo_stats.get('ai_cybersecurity', 50)
+                        performance = "above average" if scores['ai_cybersecurity'] > avg_score else ("average" if scores['ai_cybersecurity'] == avg_score else "below average")
+                        st.markdown(f"*This score is {performance} compared to repository average ({avg_score:.1f})*")
+                        
+                        # Document-specific analysis
+                        analysis = analyze_ai_cybersecurity_content(raw_content, scores['ai_cybersecurity'])
+                        
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.markdown("**Scored Well:**")
+                            for strength in analysis['strengths']:
+                                st.markdown(f"• {strength}")
+                        
+                        with col2:
+                            st.markdown("**Areas for Improvement:**")
+                            for weakness in analysis['weaknesses']:
+                                st.markdown(f"• {weakness}")
+                        
+                        st.markdown("**Top 3 Recommendations:**")
+                        for i, rec in enumerate(analysis['recommendations'][:3], 1):
+                            st.markdown(f"{i}. {rec}")
+                        
+                        st.divider()
                     
                     # Quantum Cybersecurity Analysis  
                     if scores['quantum_cybersecurity'] != 'N/A':
-                        st.markdown("#### ⚛️ Quantum Cybersecurity Maturity")
+                        st.markdown("#### Quantum Cybersecurity Maturity")
                         st.markdown(f"**Score: Tier {scores['quantum_cybersecurity']}/5**")
-                        with st.expander("View Details"):
-                            st.markdown("""
-                            **Purpose:** Assesses quantum-safe cryptography readiness and post-quantum security preparedness.
-                            
-                            **Tier System:**
-                            - **Tier 5:** Full post-quantum cryptography implementation
-                            - **Tier 4:** Advanced quantum threat preparation
-                            - **Tier 3:** Moderate quantum awareness
-                            - **Tier 2:** Basic quantum threat recognition
-                            - **Tier 1:** Minimal quantum security considerations
-                            
-                            **Key Areas:** Post-quantum cryptography, quantum key distribution, threat assessment, migration strategies.
-                            """)
+                        
+                        # Performance comparison
+                        avg_tier = repo_stats.get('quantum_cybersecurity', 3)
+                        performance = "above average" if scores['quantum_cybersecurity'] > avg_tier else ("average" if scores['quantum_cybersecurity'] == avg_tier else "below average")
+                        st.markdown(f"*This tier is {performance} compared to repository average (Tier {avg_tier:.1f})*")
+                        
+                        # Document-specific analysis
+                        analysis = analyze_quantum_cybersecurity_content(raw_content, scores['quantum_cybersecurity'])
+                        
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.markdown("**Scored Well:**")
+                            for strength in analysis['strengths']:
+                                st.markdown(f"• {strength}")
+                        
+                        with col2:
+                            st.markdown("**Areas for Improvement:**")
+                            for weakness in analysis['weaknesses']:
+                                st.markdown(f"• {weakness}")
+                        
+                        st.markdown("**Top 3 Recommendations:**")
+                        for i, rec in enumerate(analysis['recommendations'][:3], 1):
+                            st.markdown(f"{i}. {rec}")
+                        
+                        st.divider()
                     
                     # AI Ethics Analysis
                     if scores['ai_ethics'] != 'N/A':
-                        st.markdown("#### 🤖 AI Ethics Evaluation")
+                        st.markdown("#### AI Ethics Evaluation")
                         st.markdown(f"**Score: {scores['ai_ethics']}/100**")
-                        with st.expander("View Details"):
-                            st.markdown("""
-                            **Purpose:** Measures ethical AI considerations including fairness, transparency, and accountability.
-                            
-                            **Scoring Criteria:**
-                            - **90-100:** Comprehensive ethical AI framework
-                            - **70-89:** Strong ethical considerations
-                            - **50-69:** Moderate ethical awareness
-                            - **30-49:** Basic ethical mentions
-                            - **0-29:** Minimal ethical AI considerations
-                            
-                            **Key Areas:** Bias detection, algorithmic transparency, human oversight, fairness metrics.
-                            """)
+                        
+                        # Performance comparison
+                        avg_score = repo_stats.get('ai_ethics', 50)
+                        performance = "above average" if scores['ai_ethics'] > avg_score else ("average" if scores['ai_ethics'] == avg_score else "below average")
+                        st.markdown(f"*This score is {performance} compared to repository average ({avg_score:.1f})*")
+                        
+                        # Document-specific analysis
+                        analysis = analyze_ai_ethics_content(raw_content, scores['ai_ethics'])
+                        
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.markdown("**Scored Well:**")
+                            for strength in analysis['strengths']:
+                                st.markdown(f"• {strength}")
+                        
+                        with col2:
+                            st.markdown("**Areas for Improvement:**")
+                            for weakness in analysis['weaknesses']:
+                                st.markdown(f"• {weakness}")
+                        
+                        st.markdown("**Top 3 Recommendations:**")
+                        for i, rec in enumerate(analysis['recommendations'][:3], 1):
+                            st.markdown(f"{i}. {rec}")
+                        
+                        st.divider()
                     
                     # Quantum Ethics Analysis
                     if scores['quantum_ethics'] != 'N/A':
-                        st.markdown("#### ⚛️ Quantum Ethics Assessment")
+                        st.markdown("#### Quantum Ethics Assessment")
                         st.markdown(f"**Score: {scores['quantum_ethics']}/100**")
-                        with st.expander("View Details"):
-                            st.markdown("""
-                            **Purpose:** Evaluates ethical implications of quantum technology deployment.
-                            
-                            **Scoring Criteria:**
-                            - **90-100:** Comprehensive quantum ethics framework
-                            - **70-89:** Strong ethical considerations
-                            - **50-69:** Moderate ethical awareness
-                            - **30-49:** Basic ethical mentions
-                            - **0-29:** Minimal quantum ethics considerations
-                            
-                            **Key Areas:** Equitable access, privacy implications, responsible development, international cooperation.
-                            """)
+                        
+                        # Performance comparison
+                        avg_score = repo_stats.get('quantum_ethics', 50)
+                        performance = "above average" if scores['quantum_ethics'] > avg_score else ("average" if scores['quantum_ethics'] == avg_score else "below average")
+                        st.markdown(f"*This score is {performance} compared to repository average ({avg_score:.1f})*")
+                        
+                        # Document-specific analysis
+                        analysis = analyze_quantum_ethics_content(raw_content, scores['quantum_ethics'])
+                        
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.markdown("**Scored Well:**")
+                            for strength in analysis['strengths']:
+                                st.markdown(f"• {strength}")
+                        
+                        with col2:
+                            st.markdown("**Areas for Improvement:**")
+                            for weakness in analysis['weaknesses']:
+                                st.markdown(f"• {weakness}")
+                        
+                        st.markdown("**Top 3 Recommendations:**")
+                        for i, rec in enumerate(analysis['recommendations'][:3], 1):
+                            st.markdown(f"{i}. {rec}")
                     
                     if all(score == 'N/A' for score in [scores['ai_cybersecurity'], scores['quantum_cybersecurity'], scores['ai_ethics'], scores['quantum_ethics']]):
                         st.info("This document was not scored against any frameworks as it doesn't contain relevant content for AI or quantum assessment areas.")
