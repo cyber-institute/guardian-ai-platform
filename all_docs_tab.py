@@ -380,6 +380,7 @@ def render():
     .main .stButton > button,
     .stApp .stButton > button {
         font-size: 8px !important;
+        font-weight: bold !important;
         height: 18px !important;
         padding: 2px 4px !important;
         line-height: 1.0 !important;
@@ -392,12 +393,14 @@ def render():
     .stButton > button > p,
     .stButton button * {
         font-size: 8px !important;
+        font-weight: bold !important;
         line-height: 1.0 !important;
     }
     
     /* Global button override with maximum specificity */
     html body .stApp .main .stButton button {
         font-size: 8px !important;
+        font-weight: bold !important;
     }
     </style>
     """, unsafe_allow_html=True)
