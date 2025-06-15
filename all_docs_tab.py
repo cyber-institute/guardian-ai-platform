@@ -3341,25 +3341,134 @@ def render_card_view(docs):
             
             col1, col2 = st.columns(2)
             
-            # Display framework scores as compact badges without modal popups
-            score_display = []
-            if scores['ai_cybersecurity'] != 'N/A':
-                score_display.append(f"AI Cyber: {scores['ai_cybersecurity']}/100")
-            if scores['quantum_cybersecurity'] != 'N/A':
-                score_display.append(f"Quantum Cyber: Tier {scores['quantum_cybersecurity']}/5")
-            if scores['ai_ethics'] != 'N/A':
-                score_display.append(f"AI Ethics: {scores['ai_ethics']}/100")
-            if scores['quantum_ethics'] != 'N/A':
-                score_display.append(f"Quantum Ethics: {scores['quantum_ethics']}/100")
+            with col1:
+                # AI Cybersecurity button
+                if st.button(f"AI Cybersecurity: {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity', raw_content, title)}", 
+                           key=f"ai_cyber_{unique_id}", 
+                           help="AI Cybersecurity Assessment (0-100) - Click for detailed analysis",
+                           use_container_width=True):
+                    st.session_state[f"show_analysis_{unique_id}"] = 'ai_cybersecurity'
+                
+                # AI Ethics button  
+                if st.button(f"AI Ethics: {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics', raw_content, title)}", 
+                           key=f"ai_ethics_{unique_id}",
+                           help="AI Ethics Evaluation (0-100) - Click for detailed analysis", 
+                           use_container_width=True):
+                    st.session_state[f"show_analysis_{unique_id}"] = 'ai_ethics'
             
-            if score_display:
-                st.markdown(f"**Scores:** {' | '.join(score_display)}")
-            else:
-                st.markdown("**Scores:** Not applicable for assessment frameworks")
+            with col2:
+                # Quantum Cybersecurity button
+                if st.button(f"Quantum Cybersecurity: {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity', raw_content, title)}", 
+                           key=f"quantum_cyber_{unique_id}",
+                           help="Quantum Cybersecurity Assessment (Tier 1-5) - Click for detailed analysis",
+                           use_container_width=True):
+                    st.session_state[f"show_analysis_{unique_id}"] = 'quantum_cybersecurity'
+                
+                # Quantum Ethics button
+                if st.button(f"Quantum Ethics: {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics', raw_content, title)}", 
+                           key=f"quantum_ethics_{unique_id}",
+                           help="Quantum Ethics Assessment (0-100) - Click for detailed analysis",
+                           use_container_width=True):
+                    st.session_state[f"show_analysis_{unique_id}"] = 'quantum_ethics'
             
             st.markdown("</div>", unsafe_allow_html=True)
             
-
+            # Modal system with single state variable to prevent cycling
+            current_analysis = st.session_state.get(f"show_analysis_{unique_id}")
+            
+            if current_analysis:
+                @st.dialog("Framework Scoring Analysis")
+                def show_scoring_modal():
+                    # Ultra-compact modal CSS
+                    st.markdown("""
+                    <style>
+                    [data-testid="stDialogCloseButton"] {
+                        color: white !important;
+                        background-color: transparent !important;
+                        border: none !important;
+                    }
+                    [data-testid="stDialogCloseButton"]:hover {
+                        color: #ffffff !important;
+                        background-color: rgba(255,255,255,0.1) !important;
+                    }
+                    [data-testid="stDialogCloseButton"] svg {
+                        color: white !important;
+                        fill: white !important;
+                    }
+                    .stButton > button[kind="secondary"] {
+                        background-color: white !important;
+                        color: #333 !important;
+                        border: 1px solid #ccc !important;
+                    }
+                    .stButton > button[kind="secondary"]:hover {
+                        background-color: #f0f0f0 !important;
+                        color: #333 !important;
+                    }
+                    .stMarkdown { margin: 0 !important; padding: 0 !important; }
+                    .element-container { margin: 0 !important; padding: 0 !important; }
+                    [data-testid="stMarkdownContainer"] p { margin: 0 !important; line-height: 1.2 !important; }
+                    .stMarkdown div { margin-bottom: 0 !important; }
+                    hr { margin: 0.1rem 0 !important; border: 0; border-top: 1px solid #ddd; }
+                    </style>
+                    """, unsafe_allow_html=True)
+                    
+                    st.markdown(f"**{title}**")
+                    
+                    # Get repository statistics for comparison
+                    try:
+                        from utils.fast_admin_loader import get_documents_cached
+                        all_docs = get_documents_cached()
+                        repo_stats = calculate_repository_statistics(all_docs)
+                    except:
+                        repo_stats = {"ai_cybersecurity": 50, "quantum_cybersecurity": 3, "ai_ethics": 50, "quantum_ethics": 50}
+                    
+                    # Show analysis based on which button was clicked
+                    if current_analysis == 'ai_cybersecurity' and scores['ai_cybersecurity'] != 'N/A':
+                        avg_score = repo_stats.get('ai_cybersecurity', 50)
+                        performance = "above average" if scores['ai_cybersecurity'] > avg_score else ("average" if scores['ai_cybersecurity'] == avg_score else "below average")
+                        analysis = analyze_ai_cybersecurity_content(raw_content, scores['ai_cybersecurity'])
+                        
+                        st.markdown(f"**AI Cybersecurity: {scores['ai_cybersecurity']}/100** ({performance}, avg: {avg_score:.0f})")
+                        st.markdown(f"**Strengths:** {' • '.join(analysis['strengths'])} **|** **Needs:** {' • '.join(analysis['weaknesses'])}")
+                        st.markdown(f"**Recommendations:** {' | '.join([f'{i}. {rec}' for i, rec in enumerate(analysis['recommendations'], 1)])}")
+                    
+                    elif current_analysis == 'quantum_cybersecurity' and scores['quantum_cybersecurity'] != 'N/A':
+                        avg_tier = repo_stats.get('quantum_cybersecurity', 3)
+                        performance = "above average" if scores['quantum_cybersecurity'] > avg_tier else ("average" if scores['quantum_cybersecurity'] == avg_tier else "below average")
+                        analysis = analyze_quantum_cybersecurity_content(raw_content, scores['quantum_cybersecurity'])
+                        
+                        st.markdown(f"**Quantum Cybersecurity: Tier {scores['quantum_cybersecurity']}/5** ({performance}, avg: Tier {avg_tier:.0f})")
+                        st.markdown(f"**Strengths:** {' • '.join(analysis['strengths'])} **|** **Needs:** {' • '.join(analysis['weaknesses'])}")
+                        st.markdown(f"**Recommendations:** {' | '.join([f'{i}. {rec}' for i, rec in enumerate(analysis['recommendations'], 1)])}")
+                    
+                    elif current_analysis == 'ai_ethics' and scores['ai_ethics'] != 'N/A':
+                        avg_score = repo_stats.get('ai_ethics', 50)
+                        performance = "above average" if scores['ai_ethics'] > avg_score else ("average" if scores['ai_ethics'] == avg_score else "below average")
+                        analysis = analyze_ai_ethics_content(raw_content, scores['ai_ethics'])
+                        
+                        st.markdown(f"**AI Ethics: {scores['ai_ethics']}/100** ({performance}, avg: {avg_score:.0f})")
+                        st.markdown(f"**Strengths:** {' • '.join(analysis['strengths'])} **|** **Needs:** {' • '.join(analysis['weaknesses'])}")
+                        st.markdown(f"**Recommendations:** {' | '.join([f'{i}. {rec}' for i, rec in enumerate(analysis['recommendations'], 1)])}")
+                    
+                    elif current_analysis == 'quantum_ethics' and scores['quantum_ethics'] != 'N/A':
+                        avg_score = repo_stats.get('quantum_ethics', 50)
+                        performance = "above average" if scores['quantum_ethics'] > avg_score else ("average" if scores['quantum_ethics'] == avg_score else "below average")
+                        analysis = analyze_quantum_ethics_content(raw_content, scores['quantum_ethics'])
+                        
+                        st.markdown(f"**Quantum Ethics: {scores['quantum_ethics']}/100** ({performance}, avg: {avg_score:.0f})")
+                        st.markdown(f"**Strengths:** {' • '.join(analysis['strengths'])} **|** **Needs:** {' • '.join(analysis['weaknesses'])}")
+                        st.markdown(f"**Recommendations:** {' | '.join([f'{i}. {rec}' for i, rec in enumerate(analysis['recommendations'], 1)])}")
+                    
+                    else:
+                        st.info("This document was not scored against this framework as it doesn't contain relevant content.")
+                    
+                    if st.button("Close", key=f"close_{unique_id}", type="secondary"):
+                        # Clear only this document's analysis state
+                        if f"show_analysis_{unique_id}" in st.session_state:
+                            del st.session_state[f"show_analysis_{unique_id}"]
+                        st.rerun()
+                
+                show_scoring_modal()
             
             # ISOLATED STEP 4: Display clean content preview (completely separate from scoring)
             with st.expander("Content Preview"):
