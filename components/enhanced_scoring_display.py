@@ -61,21 +61,21 @@ class EnhancedScoringDisplay:
         else:
             display_value = f"{score}/100" if score != 'N/A' else "N/A"
         
-        # Add ultra-compact CSS styling for minimal buttons
+        # Add ultra-compact CSS styling to eliminate all spacing
         button_css = f"""
         <style>
         .stButton > button,
         button[kind="secondary"],
         button[kind="primary"],
         [data-testid*="button"] {{
-            height: 24px !important;
-            padding: 2px 6px !important;
-            font-size: 9px !important;
+            height: 22px !important;
+            padding: 1px 4px !important;
+            font-size: 8px !important;
             line-height: 1.0 !important;
             margin: 0px !important;
-            border-radius: 3px !important;
+            border-radius: 0px !important;
             font-weight: 500 !important;
-            min-height: 24px !important;
+            min-height: 22px !important;
             background: {colors['bg']} !important;
             border: 1px solid {colors['border']} !important;
             color: {colors['text']} !important;
@@ -87,7 +87,7 @@ class EnhancedScoringDisplay:
         [data-testid*="button"]:hover {{
             background: {colors['border']}30 !important;
             transform: none !important;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+            box-shadow: none !important;
         }}
         .stButton {{
             margin: 0px !important;
@@ -96,6 +96,20 @@ class EnhancedScoringDisplay:
         div[data-testid="column"] {{
             padding: 0px !important;
             margin: 0px !important;
+            gap: 0px !important;
+        }}
+        div[data-testid="stVerticalBlock"] {{
+            gap: 0px !important;
+            margin: 0px !important;
+            padding: 0px !important;
+        }}
+        .element-container {{
+            margin: 0px !important;
+            padding: 0px !important;
+        }}
+        [data-testid="stVerticalBlock"] > div {{
+            margin: 0px !important;
+            padding: 0px !important;
         }}
         </style>
         """
