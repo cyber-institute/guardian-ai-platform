@@ -3042,105 +3042,46 @@ def render_card_view(docs):
             scores['quantum_cybersecurity'] = raw_scores['quantum_cybersecurity'] if raw_scores['quantum_cybersecurity'] > 0 else ('N/A' if not is_quantum_related else 0)
             scores['quantum_ethics'] = raw_scores['quantum_ethics'] if raw_scores['quantum_ethics'] > 0 else ('N/A' if not is_quantum_related else 0)
             
-            # Display scores with hover tooltips and popup links
+            # Display scores with clickable buttons that trigger modal popup
             unique_id = hash(title + str(i))
-            st.markdown(f"""
-                <style>
-                .score-tooltip-{unique_id} {{
-                    position: relative;
-                    display: inline-block;
-                    cursor: help;
-                }}
-                
-                .score-tooltip-{unique_id} .tooltiptext {{
-                    visibility: hidden;
-                    width: 300px;
-                    background-color: #333;
-                    color: #fff;
-                    text-align: left;
-                    border-radius: 6px;
-                    padding: 10px;
-                    position: absolute;
-                    z-index: 1000;
-                    bottom: 125%;
-                    left: 50%;
-                    margin-left: -150px;
-                    opacity: 0;
-                    transition: opacity 0.3s;
-                    font-size: 11px;
-                    line-height: 1.4;
-                    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-                    pointer-events: none;
-                }}
-                
-                .score-tooltip-{unique_id}:hover .tooltiptext {{
-                    visibility: visible;
-                    opacity: 1;
-                    pointer-events: auto;
-                }}
-                
-                .score-tooltip-{unique_id} .tooltiptext:hover {{
-                    visibility: visible;
-                    opacity: 1;
-                    pointer-events: auto;
-                }}
-                
-                .popup-link {{
-                    color: #4FC3F7;
-                    text-decoration: underline;
-                    cursor: pointer;
-                    font-weight: bold;
-                }}
-                
-                .popup-link:hover {{
-                    color: #81D4FA;
-                }}
-                </style>
-                
-                <div style='margin:8px;padding:8px;background:#f8f9fa;border-radius:6px'>
-                    <div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px'>
-                        <div class="score-tooltip-{unique_id}">
-                            <strong>AI Cybersecurity Maturity:</strong> <strong>{get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity', raw_content, title)}</strong>
-                            <span class="tooltiptext">
-                                <strong>AI Cybersecurity Assessment (0-100)</strong><br>
-                                Evaluates AI security risks, threat modeling, and defensive measures.<br><br>
-                                Click below for detailed analysis
-                            </span>
-                        </div>
-                        <div class="score-tooltip-{unique_id}">
-                            <strong>Quantum Cybersecurity Maturity:</strong> <strong>{get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity', raw_content, title)}</strong>
-                            <span class="tooltiptext">
-                                <strong>Quantum Cybersecurity Assessment (Tier 1-5)</strong><br>
-                                Assesses post-quantum cryptography readiness and quantum threat preparedness.<br><br>
-                                Click below for detailed analysis
-                            </span>
-                        </div>
-                        <div class="score-tooltip-{unique_id}">
-                            <strong>AI Ethics:</strong> <strong>{get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics', raw_content, title)}</strong>
-                            <span class="tooltiptext">
-                                <strong>AI Ethics Evaluation (0-100)</strong><br>
-                                Measures ethical AI considerations including fairness, transparency, and accountability.<br><br>
-                                Click below for detailed analysis
-                            </span>
-                        </div>
-                        <div class="score-tooltip-{unique_id}">
-                            <strong>Quantum Ethics:</strong> <strong>{get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics', raw_content, title)}</strong>
-                            <span class="tooltiptext">
-                                <strong>Quantum Ethics Assessment (0-100)</strong><br>
-                                Evaluates ethical implications of quantum technology deployment and governance.<br><br>
-                                Click below for detailed analysis
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                
-
-            """, unsafe_allow_html=True)
-            
-            # Add modal dialog functionality for detailed analysis
             modal_key = f"modal_{unique_id}"
-            if st.button("📊 View Detailed Analysis", key=f"analysis_{unique_id}", help="Click to see detailed scoring explanations"):
-                st.session_state[modal_key] = True
+            
+            # Create clean grid layout with clickable score buttons
+            st.markdown("<div style='margin:8px;padding:8px;background:#f8f9fa;border-radius:6px'>", unsafe_allow_html=True)
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                # AI Cybersecurity button
+                if st.button(f"🔒 AI Cybersecurity: {get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity', raw_content, title)}", 
+                           key=f"ai_cyber_{unique_id}", 
+                           help="AI Cybersecurity Assessment (0-100) - Click for detailed analysis",
+                           use_container_width=True):
+                    st.session_state[modal_key] = True
+                
+                # AI Ethics button  
+                if st.button(f"🤖 AI Ethics: {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics', raw_content, title)}", 
+                           key=f"ai_ethics_{unique_id}",
+                           help="AI Ethics Evaluation (0-100) - Click for detailed analysis", 
+                           use_container_width=True):
+                    st.session_state[modal_key] = True
+            
+            with col2:
+                # Quantum Cybersecurity button
+                if st.button(f"⚛️ Quantum Cybersecurity: {get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity', raw_content, title)}", 
+                           key=f"quantum_cyber_{unique_id}",
+                           help="Quantum Cybersecurity Assessment (Tier 1-5) - Click for detailed analysis",
+                           use_container_width=True):
+                    st.session_state[modal_key] = True
+                
+                # Quantum Ethics button
+                if st.button(f"⚛️ Quantum Ethics: {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics', raw_content, title)}", 
+                           key=f"quantum_ethics_{unique_id}",
+                           help="Quantum Ethics Assessment (0-100) - Click for detailed analysis",
+                           use_container_width=True):
+                    st.session_state[modal_key] = True
+            
+            st.markdown("</div>", unsafe_allow_html=True)
             
             # Show modal dialog if triggered
             if st.session_state.get(modal_key, False):
