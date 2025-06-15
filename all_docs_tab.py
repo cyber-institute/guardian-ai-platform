@@ -18,6 +18,7 @@ def comprehensive_document_scoring_cached(content, title):
 # Performance caching will be handled directly in functions
 from utils.document_metadata_extractor import extract_document_metadata
 from utils.multi_llm_metadata_extractor import extract_clean_metadata
+from components.help_tooltips import help_tooltips
 
 def show_score_explanation(framework_type, score, content="", title=""):
     """Show detailed scoring explanation in a modal dialog"""
@@ -748,9 +749,13 @@ def render():
                     performance = "above average" if scores['ai_cybersecurity'] > avg_score else ("average" if scores['ai_cybersecurity'] == avg_score else "below average")
                     analysis = analyze_ai_cybersecurity_content(raw_content, scores['ai_cybersecurity'])
                     
-                    st.markdown(f"""
-                    **AI Cybersecurity Assessment: {scores['ai_cybersecurity']}/100** ({performance})
+                    col1, col2 = st.columns([4, 1])
+                    with col1:
+                        st.markdown(f"**AI Cybersecurity Assessment: {scores['ai_cybersecurity']}/100** ({performance})")
+                    with col2:
+                        help_tooltips.render_help_icon('ai_cybersecurity_score', size="medium")
                     
+                    st.markdown(f"""
                     **Identified Strengths:**
                     {chr(10).join([f"• {strength}" for strength in analysis['strengths']])}
                     
@@ -759,19 +764,26 @@ def render():
                     
                     **Recommendations:**
                     {chr(10).join([f"• {rec}" for rec in analysis['recommendations']])}
-                    
-                    ---
-                    *Scores calculated using multi-LLM analysis against NIST AI RMF, CISA guidelines, and quantum security standards*
                     """)
+                    
+                    # Add expandable help section for detailed explanations
+                    help_tooltips.render_expandable_help('ai_cybersecurity_score')
+                    
+                    st.markdown("---")
+                    st.markdown("*Scores calculated using multi-LLM analysis against NIST AI RMF, CISA guidelines, and quantum security standards*")
                     
                 elif current_analysis == 'ai_ethics' and scores['ai_ethics'] != 'N/A':
                     avg_score = repo_stats.get('ai_ethics', 50)
                     performance = "above average" if scores['ai_ethics'] > avg_score else ("average" if scores['ai_ethics'] == avg_score else "below average")
                     analysis = analyze_ai_ethics_content(raw_content, scores['ai_ethics'])
                     
-                    st.markdown(f"""
-                    **AI Ethics Assessment: {scores['ai_ethics']}/100** ({performance})
+                    col1, col2 = st.columns([4, 1])
+                    with col1:
+                        st.markdown(f"**AI Ethics Assessment: {scores['ai_ethics']}/100** ({performance})")
+                    with col2:
+                        help_tooltips.render_help_icon('ai_ethics_score', size="medium")
                     
+                    st.markdown(f"""
                     **Identified Strengths:**
                     {chr(10).join([f"• {strength}" for strength in analysis['strengths']])}
                     
@@ -780,19 +792,26 @@ def render():
                     
                     **Recommendations:**
                     {chr(10).join([f"• {rec}" for rec in analysis['recommendations']])}
-                    
-                    ---
-                    *Scores calculated using multi-LLM analysis against NIST AI RMF, CISA guidelines, and quantum security standards*
                     """)
+                    
+                    # Add expandable help section for detailed explanations
+                    help_tooltips.render_expandable_help('ai_ethics_score')
+                    
+                    st.markdown("---")
+                    st.markdown("*Scores calculated using multi-LLM analysis against NIST AI RMF, CISA guidelines, and quantum security standards*")
                     
                 elif current_analysis == 'quantum_cybersecurity' and scores['quantum_cybersecurity'] != 'N/A':
                     avg_tier = repo_stats.get('quantum_cybersecurity', 3)
                     performance = "above average" if scores['quantum_cybersecurity'] > avg_tier else ("average" if scores['quantum_cybersecurity'] == avg_tier else "below average")
                     analysis = analyze_quantum_cybersecurity_content(raw_content, scores['quantum_cybersecurity'])
                     
-                    st.markdown(f"""
-                    **Quantum Cybersecurity Assessment: Tier {scores['quantum_cybersecurity']}/5** ({performance})
+                    col1, col2 = st.columns([4, 1])
+                    with col1:
+                        st.markdown(f"**Quantum Cybersecurity Assessment: Tier {scores['quantum_cybersecurity']}/5** ({performance})")
+                    with col2:
+                        help_tooltips.render_help_icon('quantum_cybersecurity_score', size="medium")
                     
+                    st.markdown(f"""
                     **Identified Strengths:**
                     {chr(10).join([f"• {strength}" for strength in analysis['strengths']])}
                     
@@ -801,19 +820,26 @@ def render():
                     
                     **Recommendations:**
                     {chr(10).join([f"• {rec}" for rec in analysis['recommendations']])}
-                    
-                    ---
-                    *Scores calculated using multi-LLM analysis against NIST AI RMF, CISA guidelines, and quantum security standards*
                     """)
+                    
+                    # Add expandable help section for detailed explanations
+                    help_tooltips.render_expandable_help('quantum_cybersecurity_score')
+                    
+                    st.markdown("---")
+                    st.markdown("*Scores calculated using multi-LLM analysis against NIST AI RMF, CISA guidelines, and quantum security standards*")
                     
                 elif current_analysis == 'quantum_ethics' and scores['quantum_ethics'] != 'N/A':
                     avg_score = repo_stats.get('quantum_ethics', 50)
                     performance = "above average" if scores['quantum_ethics'] > avg_score else ("average" if scores['quantum_ethics'] == avg_score else "below average")
                     analysis = analyze_quantum_ethics_content(raw_content, scores['quantum_ethics'])
                     
-                    st.markdown(f"""
-                    **Quantum Ethics Assessment: {scores['quantum_ethics']}/100** ({performance})
+                    col1, col2 = st.columns([4, 1])
+                    with col1:
+                        st.markdown(f"**Quantum Ethics Assessment: {scores['quantum_ethics']}/100** ({performance})")
+                    with col2:
+                        help_tooltips.render_help_icon('quantum_ethics_score', size="medium")
                     
+                    st.markdown(f"""
                     **Identified Strengths:**
                     {chr(10).join([f"• {strength}" for strength in analysis['strengths']])}
                     
@@ -822,10 +848,13 @@ def render():
                     
                     **Recommendations:**
                     {chr(10).join([f"• {rec}" for rec in analysis['recommendations']])}
-                    
-                    ---
-                    *Scores calculated using multi-LLM analysis against NIST AI RMF, CISA guidelines, and quantum security standards*
                     """)
+                    
+                    # Add expandable help section for detailed explanations
+                    help_tooltips.render_expandable_help('quantum_ethics_score')
+                    
+                    st.markdown("---")
+                    st.markdown("*Scores calculated using multi-LLM analysis against NIST AI RMF, CISA guidelines, and quantum security standards*")
                     
                 else:
                     st.warning("No detailed analysis available for this framework.")
