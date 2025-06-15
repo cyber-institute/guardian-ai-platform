@@ -3392,6 +3392,15 @@ def render_card_view(docs):
                         color: white !important;
                         fill: white !important;
                     }
+                    .stButton > button[kind="secondary"] {
+                        background-color: white !important;
+                        color: #333 !important;
+                        border: 1px solid #ccc !important;
+                    }
+                    .stButton > button[kind="secondary"]:hover {
+                        background-color: #f0f0f0 !important;
+                        color: #333 !important;
+                    }
                     .stMarkdown { margin: 0 !important; padding: 0 !important; }
                     .element-container { margin: 0 !important; padding: 0 !important; }
                     [data-testid="stMarkdownContainer"] p { margin: 0 !important; line-height: 1.2 !important; }
@@ -3455,7 +3464,7 @@ def render_card_view(docs):
                     if all(score == 'N/A' for score in [scores['ai_cybersecurity'], scores['quantum_cybersecurity'], scores['ai_ethics'], scores['quantum_ethics']]):
                         st.info("This document was not scored against any frameworks as it doesn't contain relevant content for AI or quantum assessment areas.")
                     
-                    if st.button("Close", key=f"close_{unique_id}"):
+                    if st.button("Close", key=f"close_modal_{doc.get('id', 'unknown')}_{hash(title)}", type="secondary"):
                         st.session_state[modal_key] = False
                         st.rerun()
                 
