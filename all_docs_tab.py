@@ -1,6 +1,10 @@
 import streamlit as st
 import re
 from utils.db import fetch_documents
+from components.help_tooltips import HelpTooltips
+
+# Initialize help tooltips
+help_tooltips = HelpTooltips()
 
 # Performance optimization: Cache document fetching
 @st.cache_data(ttl=180)  # Cache for 3 minutes
@@ -2809,52 +2813,70 @@ def render_compact_cards(docs):
                 
                 with help_col1:
                     help_tooltips.render_help_icon('ai_cybersecurity_score', size="small")
-                    st.session_state[f"modal_doc_data_{unique_id}"] = {
-                        'title': title,
-                        'scores': scores,
-                        'content': raw_content
-                    }
-                    st.session_state[f"show_analysis_{unique_id}"] = 'ai_cybersecurity'
                 
-                # AI Ethics button
+                # AI Ethics button with help tooltip
                 ai_ethics_display = f"{scores['ai_ethics']}/100" if scores['ai_ethics'] != 'N/A' else "N/A"
-                if st.button(f"AI Ethics: {ai_ethics_display}", 
-                           key=f"ai_ethics_{unique_id}",
-                           help="AI Ethics Evaluation - Click for analysis", 
-                           use_container_width=True):
-                    st.session_state[f"modal_doc_data_{unique_id}"] = {
-                        'title': title,
-                        'scores': scores,
-                        'content': raw_content
-                    }
-                    st.session_state[f"show_analysis_{unique_id}"] = 'ai_ethics'
+                
+                # Create two-column layout for score and help icon
+                score_col2, help_col2 = st.columns([4, 1])
+                with score_col2:
+                    if st.button(f"AI Ethics: {ai_ethics_display}", 
+                               key=f"ai_ethics_{unique_id}",
+                               help="AI Ethics Evaluation - Click for analysis", 
+                               use_container_width=True):
+                        st.session_state[f"modal_doc_data_{unique_id}"] = {
+                            'title': title,
+                            'scores': scores,
+                            'content': raw_content
+                        }
+                        st.session_state[f"show_analysis_{unique_id}"] = 'ai_ethics'
+                        st.rerun()
+                
+                with help_col2:
+                    help_tooltips.render_help_icon('ai_ethics_score', size="small")
             
             with col2:
-                # Quantum Cybersecurity button
+                # Quantum Cybersecurity button with help tooltip
                 quantum_cyber_display = f"Tier {scores['quantum_cybersecurity']}/5" if scores['quantum_cybersecurity'] != 'N/A' else "N/A"
-                if st.button(f"Q Cyber: {quantum_cyber_display}", 
-                           key=f"quantum_cyber_{unique_id}",
-                           help="Quantum Cybersecurity Assessment - Click for analysis",
-                           use_container_width=True):
-                    st.session_state[f"modal_doc_data_{unique_id}"] = {
-                        'title': title,
-                        'scores': scores,
-                        'content': raw_content
-                    }
-                    st.session_state[f"show_analysis_{unique_id}"] = 'quantum_cybersecurity'
                 
-                # Quantum Ethics button
+                # Create two-column layout for score and help icon
+                score_col3, help_col3 = st.columns([4, 1])
+                with score_col3:
+                    if st.button(f"Q Cyber: {quantum_cyber_display}", 
+                               key=f"quantum_cyber_{unique_id}",
+                               help="Quantum Cybersecurity Assessment - Click for analysis",
+                               use_container_width=True):
+                        st.session_state[f"modal_doc_data_{unique_id}"] = {
+                            'title': title,
+                            'scores': scores,
+                            'content': raw_content
+                        }
+                        st.session_state[f"show_analysis_{unique_id}"] = 'quantum_cybersecurity'
+                        st.rerun()
+                
+                with help_col3:
+                    help_tooltips.render_help_icon('quantum_cybersecurity_score', size="small")
+                
+                # Quantum Ethics button with help tooltip
                 quantum_ethics_display = f"{scores['quantum_ethics']}/100" if scores['quantum_ethics'] != 'N/A' else "N/A"
-                if st.button(f"Q Ethics: {quantum_ethics_display}", 
-                           key=f"quantum_ethics_{unique_id}",
-                           help="Quantum Ethics Assessment - Click for analysis",
-                           use_container_width=True):
-                    st.session_state[f"modal_doc_data_{unique_id}"] = {
-                        'title': title,
-                        'scores': scores,
-                        'content': raw_content
-                    }
-                    st.session_state[f"show_analysis_{unique_id}"] = 'quantum_ethics'
+                
+                # Create two-column layout for score and help icon
+                score_col4, help_col4 = st.columns([4, 1])
+                with score_col4:
+                    if st.button(f"Q Ethics: {quantum_ethics_display}", 
+                               key=f"quantum_ethics_{unique_id}",
+                               help="Quantum Ethics Assessment - Click for analysis",
+                               use_container_width=True):
+                        st.session_state[f"modal_doc_data_{unique_id}"] = {
+                            'title': title,
+                            'scores': scores,
+                            'content': raw_content
+                        }
+                        st.session_state[f"show_analysis_{unique_id}"] = 'quantum_ethics'
+                        st.rerun()
+                
+                with help_col4:
+                    help_tooltips.render_help_icon('quantum_ethics_score', size="small")
             
             st.markdown("</div>", unsafe_allow_html=True)
 
