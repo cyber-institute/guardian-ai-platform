@@ -3,6 +3,7 @@ import re
 from utils.db import fetch_documents
 from components.help_tooltips import HelpTooltips
 from components.enhanced_scoring_display import EnhancedScoringDisplay
+from components.compact_layout import apply_ultra_compact_css
 
 # Initialize help tooltips and enhanced scoring display
 help_tooltips = HelpTooltips()
@@ -366,6 +367,9 @@ def get_document_topic(doc):
 
 def render():
     """Render the All Documents tab with comprehensive document repository and contextual help tooltips."""
+    
+    # Apply ultra-compact CSS to eliminate all spacing
+    apply_ultra_compact_css()
     
     # Add custom CSS for help tooltips
     help_tooltips.add_custom_css()
@@ -2830,6 +2834,36 @@ def render_compact_cards(docs):
             enhanced_scoring.render_analysis_popup(unique_id)
             
             st.markdown("</div>", unsafe_allow_html=True)
+            
+            # Aggressive CSS to eliminate ALL spacing
+            st.markdown("""
+            <style>
+            .stButton, .stButton > div, .stButton > div > div {
+                margin: 0px !important;
+                padding: 0px !important;
+                gap: 0px !important;
+            }
+            div[data-testid="column"] > div {
+                gap: 0px !important;
+                margin: 0px !important;
+                padding: 0px !important;
+            }
+            div[data-testid="stVerticalBlock"] {
+                gap: 0px !important;
+                margin: 0px !important;
+                padding: 0px !important;
+            }
+            .element-container {
+                margin: 0px !important;
+                padding: 0px !important;
+                gap: 0px !important;
+            }
+            div[data-testid="stVerticalBlock"] > div > div {
+                margin: 0px !important;
+                padding: 0px !important;
+            }
+            </style>
+            """, unsafe_allow_html=True)
 
 def render_grid_view(docs):
     """Render documents in grid layout."""
