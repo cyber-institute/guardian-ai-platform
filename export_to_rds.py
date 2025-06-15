@@ -166,7 +166,7 @@ class DatabaseExporter:
             # Get total row count
             cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
             count_result = cursor.fetchone()
-            total_rows = count_result[0] if count_result else 0
+            total_rows = count_result['count'] if count_result and 'count' in count_result else 0
             
             if total_rows == 0:
                 logger.info(f"Table {table_name} is empty, creating empty CSV file")

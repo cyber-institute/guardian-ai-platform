@@ -1,0 +1,322 @@
+[
+  {
+    "table_name": "assessments",
+    "column_name": "id",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": "nextval('assessments_id_seq'::regclass)",
+    "ordinal_position": 1
+  },
+  {
+    "table_name": "assessments",
+    "column_name": "document_id",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_name": "assessments",
+    "column_name": "assessment_type",
+    "data_type": "character varying",
+    "is_nullable": "NO",
+    "column_default": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_name": "assessments",
+    "column_name": "score",
+    "data_type": "numeric",
+    "is_nullable": "NO",
+    "column_default": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_name": "assessments",
+    "column_name": "confidence_scores",
+    "data_type": "jsonb",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_name": "assessments",
+    "column_name": "narrative",
+    "data_type": "ARRAY",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 6
+  },
+  {
+    "table_name": "assessments",
+    "column_name": "traits",
+    "data_type": "jsonb",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 7
+  },
+  {
+    "table_name": "assessments",
+    "column_name": "raw_analysis",
+    "data_type": "jsonb",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 8
+  },
+  {
+    "table_name": "assessments",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": "CURRENT_TIMESTAMP",
+    "ordinal_position": 9
+  },
+  {
+    "table_name": "documents",
+    "column_name": "id",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": "nextval('documents_id_seq'::regclass)",
+    "ordinal_position": 1
+  },
+  {
+    "table_name": "documents",
+    "column_name": "title",
+    "data_type": "character varying",
+    "is_nullable": "NO",
+    "column_default": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_name": "documents",
+    "column_name": "content",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_name": "documents",
+    "column_name": "text_content",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_name": "documents",
+    "column_name": "quantum_score",
+    "data_type": "numeric",
+    "is_nullable": "YES",
+    "column_default": "0",
+    "ordinal_position": 5
+  },
+  {
+    "table_name": "documents",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": "CURRENT_TIMESTAMP",
+    "ordinal_position": 6
+  },
+  {
+    "table_name": "documents",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": "CURRENT_TIMESTAMP",
+    "ordinal_position": 7
+  },
+  {
+    "table_name": "documents",
+    "column_name": "document_type",
+    "data_type": "character varying",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 8
+  },
+  {
+    "table_name": "documents",
+    "column_name": "source",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 9
+  },
+  {
+    "table_name": "documents",
+    "column_name": "metadata",
+    "data_type": "jsonb",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 10
+  },
+  {
+    "table_name": "documents",
+    "column_name": "author_organization",
+    "data_type": "character varying",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 11
+  },
+  {
+    "table_name": "documents",
+    "column_name": "publish_date",
+    "data_type": "date",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 12
+  },
+  {
+    "table_name": "documents",
+    "column_name": "content_preview",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 13
+  },
+  {
+    "table_name": "documents",
+    "column_name": "ai_cybersecurity_score",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 14
+  },
+  {
+    "table_name": "documents",
+    "column_name": "quantum_cybersecurity_score",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 15
+  },
+  {
+    "table_name": "documents",
+    "column_name": "ai_ethics_score",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 16
+  },
+  {
+    "table_name": "documents",
+    "column_name": "quantum_ethics_score",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 17
+  },
+  {
+    "table_name": "documents",
+    "column_name": "detected_region",
+    "data_type": "character varying",
+    "is_nullable": "YES",
+    "column_default": "'Unknown'::character varying",
+    "ordinal_position": 18
+  },
+  {
+    "table_name": "documents",
+    "column_name": "region_confidence",
+    "data_type": "double precision",
+    "is_nullable": "YES",
+    "column_default": "0.0",
+    "ordinal_position": 19
+  },
+  {
+    "table_name": "documents",
+    "column_name": "region_reasoning",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": "''::text",
+    "ordinal_position": 20
+  },
+  {
+    "table_name": "documents",
+    "column_name": "topic",
+    "data_type": "character varying",
+    "is_nullable": "YES",
+    "column_default": "'General'::character varying",
+    "ordinal_position": 21
+  },
+  {
+    "table_name": "documents",
+    "column_name": "url_valid",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 22
+  },
+  {
+    "table_name": "documents",
+    "column_name": "url_status",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 23
+  },
+  {
+    "table_name": "documents",
+    "column_name": "url_checked",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 24
+  },
+  {
+    "table_name": "documents",
+    "column_name": "source_redirect",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 25
+  },
+  {
+    "table_name": "scoring_criteria",
+    "column_name": "id",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": "nextval('scoring_criteria_id_seq'::regclass)",
+    "ordinal_position": 1
+  },
+  {
+    "table_name": "scoring_criteria",
+    "column_name": "criterion_name",
+    "data_type": "character varying",
+    "is_nullable": "NO",
+    "column_default": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_name": "scoring_criteria",
+    "column_name": "weight",
+    "data_type": "numeric",
+    "is_nullable": "NO",
+    "column_default": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_name": "scoring_criteria",
+    "column_name": "category",
+    "data_type": "character varying",
+    "is_nullable": "NO",
+    "column_default": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_name": "scoring_criteria",
+    "column_name": "description",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_name": "scoring_criteria",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": "CURRENT_TIMESTAMP",
+    "ordinal_position": 6
+  }
+]

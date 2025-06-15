@@ -1,11 +1,7 @@
 -- GUARDIAN Database DDL Script
--- Generated: 2025-06-15 05:55:35.178831
+-- Generated: 2025-06-15 05:57:02.932758
 -- Source: Replit PostgreSQL
 -- Target: Amazon RDS PostgreSQL
-
-CREATE SEQUENCE IF NOT EXISTS documents_id_seq;
-CREATE SEQUENCE IF NOT EXISTS assessments_id_seq;
-CREATE SEQUENCE IF NOT EXISTS scoring_criteria_id_seq;
 
 -- Table: assessments
 CREATE TABLE IF NOT EXISTS assessments (
@@ -19,8 +15,6 @@ CREATE TABLE IF NOT EXISTS assessments (
     raw_analysis jsonb,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
 );
-
-CREATE UNIQUE INDEX assessments_pkey ON public.assessments USING btree (id);
 
 -- Table: documents
 CREATE TABLE IF NOT EXISTS documents (
@@ -51,8 +45,6 @@ CREATE TABLE IF NOT EXISTS documents (
     source_redirect text
 );
 
-CREATE UNIQUE INDEX documents_pkey ON public.documents USING btree (id);
-
 -- Table: scoring_criteria
 CREATE TABLE IF NOT EXISTS scoring_criteria (
     id integer NOT NULL DEFAULT nextval('scoring_criteria_id_seq'::regclass),
@@ -62,6 +54,4 @@ CREATE TABLE IF NOT EXISTS scoring_criteria (
     description text,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
 );
-
-CREATE UNIQUE INDEX scoring_criteria_pkey ON public.scoring_criteria USING btree (id);
 

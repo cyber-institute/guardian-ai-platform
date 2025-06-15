@@ -1,169 +1,174 @@
-# GUARDIAN GitHub Deployment Checklist
+# GUARDIAN Production Deployment Checklist
 
-## Pre-Deployment Verification ✓
+## Pre-Migration Requirements ✓
 
-### Files Created and Ready
-- [x] README.md - Comprehensive documentation
-- [x] .gitignore - Optimized for Python/Streamlit projects  
-- [x] LICENSE - MIT License for open source distribution
-- [x] .env.example - Environment configuration template
-- [x] github_requirements.txt - Complete dependency list
-- [x] GITHUB_SETUP_GUIDE.md - Step-by-step deployment instructions
+### Database Export Package Created
+- [x] Database schema exported (`database_export/table_schema.json`)
+- [x] DDL script created (`database_export/create_tables.sql`)
+- [x] Data exported to CSV files (13 documents, 9 scoring criteria)
+- [x] Import scripts generated (`database_export/import_data.sql`)
+- [x] Migration guide provided (`database_export/MIGRATION_GUIDE.md`)
 
-### Codebase Status
-- [x] All emoji icons removed (35+ instances cleaned)
-- [x] Import dependencies fixed with fallback mechanisms
-- [x] Database connections optimized with retry logic
-- [x] Professional code appearance maintained
-- [x] Error handling enhanced throughout
-- [x] Performance optimizations implemented
+### AWS Infrastructure Required
+- [ ] Amazon RDS PostgreSQL instance created
+- [ ] Security groups configured (RDS + Application)
+- [ ] VPC and subnets configured
+- [ ] SSL certificates obtained (AWS Certificate Manager)
+- [ ] IAM roles and policies created
 
-### Documentation Complete
-- [x] System architecture documented
-- [x] Installation instructions provided
-- [x] Environment setup explained
-- [x] Usage examples included
-- [x] Contributing guidelines added
+## Migration Steps
 
-## GitHub Repository Requirements
+### Phase 1: RDS Setup
+1. **Create RDS Instance**
+   - Instance type: db.t3.medium (recommended)
+   - Engine: PostgreSQL 15+
+   - Multi-AZ: Yes (for production)
+   - Storage: 20GB GP3 (expandable)
+   - Backup retention: 7 days
 
-### Repository Information
-- **Name**: `guardian-ai-platform` (suggested)
-- **Description**: "GUARDIAN: AI-powered platform for emerging technology risk assessment"
-- **Visibility**: Public (recommended for portfolio showcase)
-- **Topics**: `ai machine-learning cybersecurity quantum-computing risk-assessment streamlit`
+2. **Configure Security**
+   ```bash
+   # Test RDS connection
+   python3 rds_setup_helper.py
+   ```
+   - [ ] Database endpoint accessible
+   - [ ] SSL connection verified
+   - [ ] User permissions validated
 
-### Essential Commands for Upload
+3. **Import Database**
+   ```bash
+   # Execute DDL
+   psql -h RDS_ENDPOINT -U USERNAME -d DATABASE -f database_export/create_tables.sql
+   
+   # Import data
+   psql -h RDS_ENDPOINT -U USERNAME -d DATABASE -f database_export/import_data.sql
+   ```
+   - [ ] Tables created successfully
+   - [ ] Data imported (13 documents, 9 criteria)
+   - [ ] Sequences reset correctly
+
+### Phase 2: Application Deployment
+
+#### Option A: AWS Elastic Beanstalk (Recommended)
 ```bash
-# Remove git lock and configure
-rm -f .git/index.lock
-git config user.name "Your Name"
-git config user.email "your.email@example.com"
+# Configure deployment
+python3 aws_deployment_config.py
 
-# Add, commit, and push
-git add .
-git commit -m "Initial commit: Complete GUARDIAN Platform"
-git remote add origin https://github.com/YOUR_USERNAME/guardian-ai-platform.git
-git branch -M main
-git push -u origin main
+# Deploy application
+./deploy_eb.sh
 ```
 
-## Project Statistics
+#### Option B: Docker Container
+```bash
+# Build and test locally
+docker-compose up
 
-### Codebase Metrics
-- **Python Files**: 50+ modules
-- **Lines of Code**: 15,000+ (estimated)
-- **Dependencies**: 23 core packages
-- **Documentation**: 6 comprehensive guides
-- **Test Files**: 8 testing modules
-
-### Key Features
-- Multi-LLM ensemble processing
-- Patent-protected scoring algorithms
-- Real-time document analysis
-- Interactive visualization dashboards
-- Quantum cybersecurity assessment
-- Comprehensive database integration
-
-### Technology Stack
-- **Frontend**: Streamlit with custom components
-- **Backend**: Python with SQLAlchemy ORM
-- **Database**: PostgreSQL with advanced indexing
-- **AI/ML**: Multiple LLM integrations
-- **Visualization**: Plotly and Matplotlib
-- **Quantum**: Qiskit integration
-
-## Deployment Options Available
-
-### 1. Streamlit Cloud (Recommended)
-- Free hosting directly from GitHub
-- Automatic deployments on push
-- Built-in secrets management
-- Custom domain support
-
-### 2. Local Development
-- Full-featured development environment
-- All dependencies included
-- Database configuration templates
-- Performance optimization tools
-
-### 3. AWS/Cloud Deployment
-- Complete deployment scripts included
-- Docker containerization ready
-- Production environment configurations
-- Scalable infrastructure support
-
-## Quality Assurance Completed
-
-### Code Quality
-- [x] No syntax errors in any Python files
-- [x] Import statements optimized with fallbacks
-- [x] Database connections tested and secured
-- [x] Error handling comprehensive
-- [x] Performance optimizations implemented
-
-### Documentation Quality
-- [x] README professionally formatted
-- [x] Installation instructions clear
-- [x] Usage examples provided
-- [x] Architecture diagrams included
-- [x] Troubleshooting guides available
-
-### Security Measures
-- [x] No API keys or secrets in code
-- [x] Environment variables properly templated
-- [x] Database credentials secured
-- [x] Input validation implemented
-- [x] Error messages sanitized
-
-## Final Repository Structure
-
-```
-guardian-ai-platform/
-├── app.py                      # Main application
-├── README.md                   # Project documentation
-├── LICENSE                     # MIT license
-├── .gitignore                  # Git exclusions
-├── .env.example               # Environment template
-├── github_requirements.txt    # Dependencies
-├── GITHUB_SETUP_GUIDE.md      # Deployment guide
-├── DEPLOYMENT_CHECKLIST.md    # This checklist
-├── components/                # UI components
-├── utils/                     # Core utilities
-├── assets/                    # Static assets
-├── thumbnails/               # Generated thumbnails
-└── [50+ additional files]    # Complete codebase
+# Deploy to ECS/Fargate
+./deploy_docker.sh
 ```
 
-## Post-Deployment Actions
+### Phase 3: Production Configuration
 
-### Immediate (After Push)
-1. Verify repository visibility and description
-2. Add repository topics for discoverability
-3. Enable Issues and Projects features
-4. Configure branch protection rules
+1. **Environment Variables**
+   ```
+   DATABASE_URL=postgresql://user:pass@rds-endpoint:5432/db?sslmode=require
+   ENVIRONMENT=production
+   AWS_REGION=us-east-1
+   ```
 
-### Short Term (Within 24 hours)
-1. Set up Streamlit Cloud deployment
-2. Test deployment with sample data
-3. Configure GitHub Actions for CI/CD
-4. Add deployment status badges
+2. **API Keys (AWS Systems Manager)**
+   - [ ] OPENAI_API_KEY stored securely
+   - [ ] ANTHROPIC_API_KEY stored securely
+   - [ ] Google Cloud credentials configured (if using Dialogflow)
 
-### Long Term (Within 1 week)
-1. Create project documentation wiki
-2. Set up automated testing workflows
-3. Configure security scanning
-4. Plan feature roadmap and milestones
+3. **Monitoring Setup**
+   - [ ] CloudWatch alarms configured
+   - [ ] Application logs forwarded
+   - [ ] Database performance monitoring enabled
+   - [ ] Health check endpoints responding
+
+## Post-Deployment Verification
+
+### Application Health
+- [ ] Main application loads (`https://your-domain.com`)
+- [ ] Database connectivity verified
+- [ ] All document scoring frameworks operational:
+  - [ ] AI Cybersecurity scoring
+  - [ ] Quantum Cybersecurity scoring  
+  - [ ] AI Ethics scoring
+  - [ ] Quantum Ethics scoring
+- [ ] Document upload and processing working
+- [ ] Multi-LLM ensemble analysis functional
+
+### Performance Validation
+- [ ] Response times < 3 seconds for document analysis
+- [ ] Database queries optimized
+- [ ] Memory usage within limits
+- [ ] CPU utilization normal
+
+### Security Verification
+- [ ] HTTPS enforced
+- [ ] Database connections encrypted
+- [ ] No sensitive data in logs
+- [ ] Security groups properly configured
+- [ ] No public database access
+
+## Estimated Costs (Monthly)
+
+| Service | Instance Type | Estimated Cost |
+|---------|---------------|----------------|
+| RDS PostgreSQL | db.t3.medium | $35 |
+| Elastic Beanstalk | t3.medium | $25 |
+| Application Load Balancer | - | $18 |
+| Data Transfer | ~100GB | $9 |
+| CloudWatch | Standard | $5 |
+| **Total** | | **~$92/month** |
+
+## Rollback Plan
+
+### If Migration Fails
+1. Keep Replit environment active during transition
+2. Update DNS to point back to Replit
+3. Restore from RDS backup if needed
+
+### Emergency Contacts
+- AWS Support: [Account-specific]
+- Database Admin: [Your team]
+- Application Owner: [Your team]
+
+## Success Criteria
+
+### Technical Metrics
+- [ ] 99.9% uptime
+- [ ] < 2 second average response time
+- [ ] Zero data loss during migration
+- [ ] All 13 documents accessible and scoring correctly
+
+### Business Metrics
+- [ ] All assessment frameworks operational
+- [ ] Document analysis accuracy maintained
+- [ ] User experience equivalent or improved
+- [ ] Cost within budget ($100/month target)
+
+## Next Steps After Deployment
+
+1. **Optimization**
+   - Monitor performance for 1 week
+   - Optimize database queries based on CloudWatch insights
+   - Right-size instances based on actual usage
+
+2. **Enhanced Features**
+   - Configure auto-scaling
+   - Set up automated backups
+   - Implement blue-green deployment pipeline
+
+3. **Monitoring & Maintenance**
+   - Schedule regular security updates
+   - Monitor cost optimization opportunities
+   - Review and update disaster recovery procedures
 
 ---
 
-## Ready for GitHub! 🚀
-
-Your GUARDIAN platform is fully prepared for professional GitHub deployment with:
-- Clean, documented codebase
-- Comprehensive setup instructions
-- Professional repository structure
-- Production-ready configuration
-- Complete dependency management
-
-Execute the git commands in the setup guide to push your complete AI governance platform to GitHub.
+**Migration Completion Date:** _______________  
+**Verified By:** _______________  
+**Production Ready:** ✓ / ✗

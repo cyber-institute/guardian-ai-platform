@@ -1,0 +1,10 @@
+id,criterion_name,weight,category,description,created_at
+1,quantum-aware-basic,0.80,awareness,Basic quantum awareness indicators,2025-06-09 02:15:42.386872
+2,quantum-aware-advanced,0.80,awareness,Advanced quantum awareness indicators,2025-06-09 02:15:42.386872
+3,quantum-ready-planning,1.20,readiness,Quantum readiness planning indicators,2025-06-09 02:15:42.386872
+4,quantum-ready-testing,1.20,readiness,Quantum readiness testing indicators,2025-06-09 02:15:42.386872
+5,quantum-controls-implemented,1.50,controls,Implemented quantum controls,2025-06-09 02:15:42.386872
+6,quantum-controls-validated,1.50,controls,Validated quantum controls,2025-06-09 02:15:42.386872
+7,post-quantum-cryptography,1.80,implementation,Post-quantum cryptography implementation,2025-06-09 02:15:42.386872
+8,quantum-risk-assessment,1.30,risk,Quantum risk assessment indicators,2025-06-09 02:15:42.386872
+9,quantum-migration-strategy,1.40,strategy,Quantum migration strategy indicators,2025-06-09 02:15:42.386872
