@@ -3390,6 +3390,7 @@ def render_card_view(docs):
                     .element-container { margin: 0 !important; padding: 0 !important; }
                     [data-testid="stMarkdownContainer"] p { margin: 0 !important; line-height: 1.2 !important; }
                     .stMarkdown div { margin-bottom: 0 !important; }
+                    hr { margin: 0.1rem 0 !important; border: 0; border-top: 1px solid #ddd; }
                     </style>
                     """, unsafe_allow_html=True)
                     
@@ -3411,7 +3412,7 @@ def render_card_view(docs):
                         st.markdown(f"**AI Cybersecurity: {scores['ai_cybersecurity']}/100** ({performance}, avg: {avg_score:.0f})")
                         st.markdown(f"**Strengths:** {' • '.join(analysis['strengths'])} **|** **Needs:** {' • '.join(analysis['weaknesses'])}")
                         st.markdown(f"**Recommendations:** {' | '.join([f'{i}. {rec}' for i, rec in enumerate(analysis['recommendations'], 1)])}")
-                        st.markdown("---")
+                        st.markdown("<hr style='margin:0.25rem 0;'>", unsafe_allow_html=True)
                     
                     # Quantum Cybersecurity Analysis  
                     if scores['quantum_cybersecurity'] != 'N/A':
@@ -3422,7 +3423,7 @@ def render_card_view(docs):
                         st.markdown(f"**Quantum Cybersecurity: Tier {scores['quantum_cybersecurity']}/5** ({performance}, avg: Tier {avg_tier:.0f})")
                         st.markdown(f"**Strengths:** {' • '.join(analysis['strengths'])} **|** **Needs:** {' • '.join(analysis['weaknesses'])}")
                         st.markdown(f"**Recommendations:** {' | '.join([f'{i}. {rec}' for i, rec in enumerate(analysis['recommendations'], 1)])}")
-                        st.markdown("---")
+                        st.markdown("<hr style='margin:0.25rem 0;'>", unsafe_allow_html=True)
                     
                     # AI Ethics Analysis
                     if scores['ai_ethics'] != 'N/A':
@@ -3433,7 +3434,7 @@ def render_card_view(docs):
                         st.markdown(f"**AI Ethics: {scores['ai_ethics']}/100** ({performance}, avg: {avg_score:.0f})")
                         st.markdown(f"**Strengths:** {' • '.join(analysis['strengths'])} **|** **Needs:** {' • '.join(analysis['weaknesses'])}")
                         st.markdown(f"**Recommendations:** {' | '.join([f'{i}. {rec}' for i, rec in enumerate(analysis['recommendations'], 1)])}")
-                        st.markdown("---")
+                        st.markdown("<hr style='margin:0.25rem 0;'>", unsafe_allow_html=True)
                     
                     # Quantum Ethics Analysis
                     if scores['quantum_ethics'] != 'N/A':
