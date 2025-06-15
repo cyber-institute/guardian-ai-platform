@@ -247,7 +247,7 @@ def clean_date_safely(doc):
         return 'Date not available'
 
 def get_comprehensive_badge(score, framework, doc_content="", doc_title=""):
-    """Create badge for comprehensive scoring system with intelligent topic detection."""
+    """Create badge for comprehensive scoring system with intelligent topic detection and help tooltips."""
     
     if score == 'N/A':
         return "N/A"
@@ -271,13 +271,25 @@ def get_comprehensive_badge(score, framework, doc_content="", doc_title=""):
         
         return "0"
     
-    # Format display based on framework type
+    # Format display based on framework type with help tooltips
     if framework == 'quantum_cybersecurity':
         # Show as Tier X/5 format
-        return f"{score}/5"
+        score_text = f"{score}/5"
+        help_key = 'quantum_cybersecurity_score'
+    elif framework == 'ai_cybersecurity':
+        score_text = f"{score}/100"
+        help_key = 'ai_cybersecurity_score'
+    elif framework == 'ai_ethics':
+        score_text = f"{score}/100"
+        help_key = 'ai_ethics_score'
+    elif framework == 'quantum_ethics':
+        score_text = f"{score}/100"
+        help_key = 'quantum_ethics_score'
     else:
-        # Show as X/100 format for AI frameworks
-        return f"{score}/100"
+        score_text = f"{score}/100"
+        help_key = None
+    
+    return {'score_text': score_text, 'help_key': help_key}
 
 def get_badge(score):
     """Legacy badge function for backward compatibility."""
@@ -347,9 +359,22 @@ def get_document_topic(doc):
         return "Both"  # Show documents that don't clearly fit either category
 
 def render():
-    """Render the All Documents tab with comprehensive document repository."""
+    """Render the All Documents tab with comprehensive document repository and contextual help tooltips."""
     
-
+    # Add custom CSS for help tooltips
+    help_tooltips.add_custom_css()
+    
+    # Add help tooltips to the sidebar for currently visible terms
+    visible_terms = ['ai_cybersecurity_score', 'quantum_cybersecurity_score', 'ai_ethics_score', 'quantum_ethics_score', 'confidence_score', 'maturity_level', 'risk_assessment']
+    help_tooltips.render_contextual_help_panel(visible_terms)
+    
+    # Title with help icon
+    col1, col2 = st.columns([6, 1])
+    with col1:
+        st.title("📄 All Documents")
+        st.markdown("Repository with comprehensive document analysis and risk assessment frameworks.")
+    with col2:
+        help_tooltips.render_help_icon('risk_assessment', size="medium")
 
     try:
         # Force refresh documents - clear all caching mechanisms
@@ -2763,12 +2788,27 @@ def render_compact_cards(docs):
             col1, col2 = st.columns(2)
             
             with col1:
-                # AI Cybersecurity button
+                # AI Cybersecurity button with help tooltip
                 ai_cyber_display = f"{scores['ai_cybersecurity']}/100" if scores['ai_cybersecurity'] != 'N/A' else "N/A"
-                if st.button(f"AI Cyber: {ai_cyber_display}", 
-                           key=f"ai_cyber_{unique_id}", 
-                           help="AI Cybersecurity Assessment - Click for analysis",
-                           use_container_width=True):
+                
+                # Create two-column layout for score and help icon
+                score_col1, help_col1 = st.columns([4, 1])
+                with score_col1:
+                    if st.button(f"AI Cyber: {ai_cyber_display}", 
+                               key=f"ai_cyber_{unique_id}", 
+                               help="AI Cybersecurity Assessment - Click for analysis",
+                               use_container_width=True):
+                        # Store data for modal
+                        st.session_state[f"modal_doc_data_{unique_id}"] = {
+                            'title': title,
+                            'scores': scores,
+                            'content': raw_content
+                        }
+                        st.session_state[f"show_analysis_{unique_id}"] = 'ai_cybersecurity'
+                        st.rerun()
+                
+                with help_col1:
+                    help_tooltips.render_help_icon('ai_cybersecurity_score', size="small")
                     st.session_state[f"modal_doc_data_{unique_id}"] = {
                         'title': title,
                         'scores': scores,
