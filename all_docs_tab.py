@@ -2,9 +2,11 @@ import streamlit as st
 import re
 from utils.db import fetch_documents
 from components.help_tooltips import HelpTooltips
+from components.enhanced_scoring_display import EnhancedScoringDisplay
 
-# Initialize help tooltips
+# Initialize help tooltips and enhanced scoring display
 help_tooltips = HelpTooltips()
+enhanced_scoring = EnhancedScoringDisplay()
 
 # Performance optimization: Cache document fetching
 @st.cache_data(ttl=180)  # Cache for 3 minutes
