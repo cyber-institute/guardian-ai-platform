@@ -3409,6 +3409,7 @@ def render_card_view(docs):
                     [data-testid="stMarkdownContainer"] p { margin: 0 !important; line-height: 1.2 !important; }
                     .stMarkdown div { margin-bottom: 0 !important; }
                     hr { margin: 0.1rem 0 !important; border: 0; border-top: 1px solid #ddd; }
+                    [data-testid="stMarkdownContainer"]:first-child p { margin-bottom: 0 !important; padding-bottom: 0 !important; }
                     </style>
                     """, unsafe_allow_html=True)
                     
