@@ -40,16 +40,16 @@ def apply_ultra_compact_css():
         border-radius: 0px !important;
         height: 20px !important;
         padding: 1px 4px !important;
-        font-size: 4px !important;
-        font-family: monospace !important;
+        font-size: 10px !important;
+        font-family: inherit !important;
         line-height: 1.0 !important;
     }
     
-    /* Force ultra-small font size on ALL buttons */
+    /* Force ultra-small font size on ALL buttons to match metadata text */
     button, .stButton button, [data-testid*="button"], 
     button[kind="secondary"], button[kind="primary"] {
-        font-size: 4px !important;
-        font-family: monospace !important;
+        font-size: 10px !important;
+        font-family: inherit !important;
         height: 20px !important;
         min-height: 20px !important;
         max-height: 20px !important;
