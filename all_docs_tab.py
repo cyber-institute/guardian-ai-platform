@@ -3279,19 +3279,21 @@ def render_card_view(docs):
             scores = {}
             content_text = (raw_content + " " + title).lower()
             
-            # AI-related frameworks
-            ai_keywords = ['artificial intelligence', 'machine learning', 'ai ', ' ai', 'neural network', 'algorithm', 'deep learning', 'llm', 'generative ai']
-            is_ai_related = any(keyword in content_text for keyword in ai_keywords)
+            # Enhanced AI content detection - requires specific AI terms
+            ai_specific_terms = ['artificial intelligence', 'machine learning', 'neural network', 'deep learning', 'llm', 'large language model', 'generative ai', 'ai model', 'training data', 'ai bias', 'algorithmic fairness', 'ai governance', 'ai ethics', 'ai security', 'ai risk']
+            ai_count = sum(1 for term in ai_specific_terms if term in content_text)
+            is_ai_related = ai_count >= 2 or any(term in content_text for term in ['artificial intelligence', 'machine learning', 'neural network'])
             
-            scores['ai_cybersecurity'] = raw_scores['ai_cybersecurity'] if raw_scores['ai_cybersecurity'] > 0 else ('N/A' if not is_ai_related else 0)
-            scores['ai_ethics'] = raw_scores['ai_ethics'] if raw_scores['ai_ethics'] > 0 else ('N/A' if not is_ai_related else 0)
+            # Enhanced quantum content detection - requires specific quantum terms
+            quantum_specific_terms = ['quantum computing', 'quantum cryptography', 'post-quantum', 'quantum-safe', 'quantum key distribution', 'qkd', 'quantum algorithm', 'quantum supremacy', 'quantum entanglement', 'quantum mechanics', 'qubit']
+            quantum_count = sum(1 for term in quantum_specific_terms if term in content_text)
+            is_quantum_related = quantum_count >= 1 or 'quantum' in content_text
             
-            # Quantum-related frameworks
-            quantum_keywords = ['quantum', 'post-quantum', 'quantum-safe', 'qkd', 'quantum computing', 'cryptography', 'encryption']
-            is_quantum_related = any(keyword in content_text for keyword in quantum_keywords)
-            
-            scores['quantum_cybersecurity'] = raw_scores['quantum_cybersecurity'] if raw_scores['quantum_cybersecurity'] > 0 else ('N/A' if not is_quantum_related else 0)
-            scores['quantum_ethics'] = raw_scores['quantum_ethics'] if raw_scores['quantum_ethics'] > 0 else ('N/A' if not is_quantum_related else 0)
+            # Apply smarter scoring logic - only score if content is relevant
+            scores['ai_cybersecurity'] = raw_scores['ai_cybersecurity'] if is_ai_related and raw_scores['ai_cybersecurity'] > 0 else 'N/A'
+            scores['ai_ethics'] = raw_scores['ai_ethics'] if is_ai_related and raw_scores['ai_ethics'] > 0 else 'N/A'
+            scores['quantum_cybersecurity'] = raw_scores['quantum_cybersecurity'] if is_quantum_related and raw_scores['quantum_cybersecurity'] > 0 else 'N/A'
+            scores['quantum_ethics'] = raw_scores['quantum_ethics'] if is_quantum_related and raw_scores['quantum_ethics'] > 0 else 'N/A'
             
             # Display scores with clickable buttons that trigger modal popup
             unique_id = hash(title + str(i))
@@ -3351,121 +3353,90 @@ def render_card_view(docs):
                     
                     # AI Cybersecurity Analysis
                     if scores['ai_cybersecurity'] != 'N/A':
-                        st.markdown("#### AI Cybersecurity Maturity")
-                        st.markdown(f"**Score: {scores['ai_cybersecurity']}/100**")
-                        
-                        # Performance comparison
                         avg_score = repo_stats.get('ai_cybersecurity', 50)
                         performance = "above average" if scores['ai_cybersecurity'] > avg_score else ("average" if scores['ai_cybersecurity'] == avg_score else "below average")
-                        st.markdown(f"*This score is {performance} compared to repository average ({avg_score:.1f})*")
                         
-                        # Document-specific analysis
+                        st.markdown(f"**AI Cybersecurity: {scores['ai_cybersecurity']}/100** ({performance}, avg: {avg_score:.0f})")
+                        
                         analysis = analyze_ai_cybersecurity_content(raw_content, scores['ai_cybersecurity'])
                         
                         col1, col2 = st.columns(2)
                         with col1:
-                            st.markdown("**Scored Well:**")
-                            for strength in analysis['strengths']:
+                            st.markdown("**Strengths:**")
+                            for strength in analysis['strengths'][:2]:
                                 st.markdown(f"• {strength}")
-                        
                         with col2:
-                            st.markdown("**Areas for Improvement:**")
-                            for weakness in analysis['weaknesses']:
+                            st.markdown("**Improvements:**")
+                            for weakness in analysis['weaknesses'][:2]:
                                 st.markdown(f"• {weakness}")
                         
-                        st.markdown("**Top 3 Recommendations:**")
-                        for i, rec in enumerate(analysis['recommendations'][:3], 1):
-                            st.markdown(f"{i}. {rec}")
-                        
+                        st.markdown(f"**Key Recommendations:** {', '.join(analysis['recommendations'][:2])}")
                         st.divider()
                     
                     # Quantum Cybersecurity Analysis  
                     if scores['quantum_cybersecurity'] != 'N/A':
-                        st.markdown("#### Quantum Cybersecurity Maturity")
-                        st.markdown(f"**Score: Tier {scores['quantum_cybersecurity']}/5**")
-                        
-                        # Performance comparison
                         avg_tier = repo_stats.get('quantum_cybersecurity', 3)
                         performance = "above average" if scores['quantum_cybersecurity'] > avg_tier else ("average" if scores['quantum_cybersecurity'] == avg_tier else "below average")
-                        st.markdown(f"*This tier is {performance} compared to repository average (Tier {avg_tier:.1f})*")
                         
-                        # Document-specific analysis
+                        st.markdown(f"**Quantum Cybersecurity: Tier {scores['quantum_cybersecurity']}/5** ({performance}, avg: {avg_tier:.0f})")
+                        
                         analysis = analyze_quantum_cybersecurity_content(raw_content, scores['quantum_cybersecurity'])
                         
                         col1, col2 = st.columns(2)
                         with col1:
-                            st.markdown("**Scored Well:**")
-                            for strength in analysis['strengths']:
+                            st.markdown("**Strengths:**")
+                            for strength in analysis['strengths'][:2]:
                                 st.markdown(f"• {strength}")
-                        
                         with col2:
-                            st.markdown("**Areas for Improvement:**")
-                            for weakness in analysis['weaknesses']:
+                            st.markdown("**Improvements:**")
+                            for weakness in analysis['weaknesses'][:2]:
                                 st.markdown(f"• {weakness}")
                         
-                        st.markdown("**Top 3 Recommendations:**")
-                        for i, rec in enumerate(analysis['recommendations'][:3], 1):
-                            st.markdown(f"{i}. {rec}")
-                        
+                        st.markdown(f"**Key Recommendations:** {', '.join(analysis['recommendations'][:2])}")
                         st.divider()
                     
                     # AI Ethics Analysis
                     if scores['ai_ethics'] != 'N/A':
-                        st.markdown("#### AI Ethics Evaluation")
-                        st.markdown(f"**Score: {scores['ai_ethics']}/100**")
-                        
-                        # Performance comparison
                         avg_score = repo_stats.get('ai_ethics', 50)
                         performance = "above average" if scores['ai_ethics'] > avg_score else ("average" if scores['ai_ethics'] == avg_score else "below average")
-                        st.markdown(f"*This score is {performance} compared to repository average ({avg_score:.1f})*")
                         
-                        # Document-specific analysis
+                        st.markdown(f"**AI Ethics: {scores['ai_ethics']}/100** ({performance}, avg: {avg_score:.0f})")
+                        
                         analysis = analyze_ai_ethics_content(raw_content, scores['ai_ethics'])
                         
                         col1, col2 = st.columns(2)
                         with col1:
-                            st.markdown("**Scored Well:**")
-                            for strength in analysis['strengths']:
+                            st.markdown("**Strengths:**")
+                            for strength in analysis['strengths'][:2]:
                                 st.markdown(f"• {strength}")
-                        
                         with col2:
-                            st.markdown("**Areas for Improvement:**")
-                            for weakness in analysis['weaknesses']:
+                            st.markdown("**Improvements:**")
+                            for weakness in analysis['weaknesses'][:2]:
                                 st.markdown(f"• {weakness}")
                         
-                        st.markdown("**Top 3 Recommendations:**")
-                        for i, rec in enumerate(analysis['recommendations'][:3], 1):
-                            st.markdown(f"{i}. {rec}")
-                        
+                        st.markdown(f"**Key Recommendations:** {', '.join(analysis['recommendations'][:2])}")
                         st.divider()
                     
                     # Quantum Ethics Analysis
                     if scores['quantum_ethics'] != 'N/A':
-                        st.markdown("#### Quantum Ethics Assessment")
-                        st.markdown(f"**Score: {scores['quantum_ethics']}/100**")
-                        
-                        # Performance comparison
                         avg_score = repo_stats.get('quantum_ethics', 50)
                         performance = "above average" if scores['quantum_ethics'] > avg_score else ("average" if scores['quantum_ethics'] == avg_score else "below average")
-                        st.markdown(f"*This score is {performance} compared to repository average ({avg_score:.1f})*")
                         
-                        # Document-specific analysis
+                        st.markdown(f"**Quantum Ethics: {scores['quantum_ethics']}/100** ({performance}, avg: {avg_score:.0f})")
+                        
                         analysis = analyze_quantum_ethics_content(raw_content, scores['quantum_ethics'])
                         
                         col1, col2 = st.columns(2)
                         with col1:
-                            st.markdown("**Scored Well:**")
-                            for strength in analysis['strengths']:
+                            st.markdown("**Strengths:**")
+                            for strength in analysis['strengths'][:2]:
                                 st.markdown(f"• {strength}")
-                        
                         with col2:
-                            st.markdown("**Areas for Improvement:**")
-                            for weakness in analysis['weaknesses']:
+                            st.markdown("**Improvements:**")
+                            for weakness in analysis['weaknesses'][:2]:
                                 st.markdown(f"• {weakness}")
                         
-                        st.markdown("**Top 3 Recommendations:**")
-                        for i, rec in enumerate(analysis['recommendations'][:3], 1):
-                            st.markdown(f"{i}. {rec}")
+                        st.markdown(f"**Key Recommendations:** {', '.join(analysis['recommendations'][:2])}")
                     
                     if all(score == 'N/A' for score in [scores['ai_cybersecurity'], scores['quantum_cybersecurity'], scores['ai_ethics'], scores['quantum_ethics']]):
                         st.info("This document was not scored against any frameworks as it doesn't contain relevant content for AI or quantum assessment areas.")
