@@ -269,7 +269,7 @@ class EnhancedScoringDisplay:
         st.markdown("#### 🔒 AI Cybersecurity Assessment")
         
         if score == 'N/A':
-            st.info("This document does not contain sufficient AI cybersecurity content for assessment.")
+            st.info("This document does not sufficiently contain AI content to be evaluated under the AI cybersecurity framework.")
             return
         
         try:
@@ -323,7 +323,7 @@ class EnhancedScoringDisplay:
         st.markdown("#### 🧠 AI Ethics Assessment")
         
         if score == 'N/A':
-            st.info("This document does not contain sufficient AI ethics content for assessment.")
+            st.info("This document does not sufficiently contain AI content to be evaluated under the AI ethics framework.")
             return
         
         try:
@@ -377,7 +377,7 @@ class EnhancedScoringDisplay:
         st.markdown("#### ⚡ Quantum Cybersecurity Maturity")
         
         if score == 'N/A':
-            st.info("This document does not contain sufficient quantum cybersecurity content for assessment.")
+            st.info("This document does not sufficiently contain quantum content to be evaluated under the quantum cybersecurity framework.")
             return
         
         try:
@@ -431,7 +431,7 @@ class EnhancedScoringDisplay:
         st.markdown("#### 🌐 Quantum Ethics Assessment")
         
         if score == 'N/A':
-            st.info("This document does not contain sufficient quantum ethics content for assessment.")
+            st.info("This document does not sufficiently contain quantum content to be evaluated under the quantum ethics framework.")
             return
         
         try:
