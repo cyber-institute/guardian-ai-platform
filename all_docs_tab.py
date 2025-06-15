@@ -2809,101 +2809,25 @@ def render_compact_cards(docs):
                 </div>
             """, unsafe_allow_html=True)
             
-            # Display scores with clickable buttons that trigger modal popup
+            # Enhanced scoring display with visual indicators and analysis popups
             doc_id = doc.get('id', str(hash(title + doc.get('url', ''))))
             unique_id = f"compact_{doc_id}"
             
-            # Clickable score buttons in compact format
-            st.markdown("<div style='margin:4px;padding:4px;background:#f8f9fa;border-radius:4px'>", unsafe_allow_html=True)
+            # Use enhanced scoring display component
+            st.markdown("<div style='margin:4px;padding:8px;background:#f8f9fa;border-radius:6px'>", unsafe_allow_html=True)
             
-            col1, col2 = st.columns(2)
+            # Prepare document data for enhanced scoring
+            document_data = {
+                'title': title,
+                'scores': scores,
+                'content': raw_content
+            }
             
-            with col1:
-                # AI Cybersecurity button with help tooltip
-                ai_cyber_display = f"{scores['ai_cybersecurity']}/100" if scores['ai_cybersecurity'] != 'N/A' else "N/A"
-                
-                # Create two-column layout for score and help icon
-                score_col1, help_col1 = st.columns([4, 1])
-                with score_col1:
-                    if st.button(f"AI Cyber: {ai_cyber_display}", 
-                               key=f"ai_cyber_{unique_id}", 
-                               help="AI Cybersecurity Assessment - Click for analysis",
-                               use_container_width=True):
-                        # Store data for modal
-                        st.session_state[f"modal_doc_data_{unique_id}"] = {
-                            'title': title,
-                            'scores': scores,
-                            'content': raw_content
-                        }
-                        st.session_state[f"show_analysis_{unique_id}"] = 'ai_cybersecurity'
-                        st.rerun()
-                
-                with help_col1:
-                    help_tooltips.render_help_icon('ai_cybersecurity_score', size="small")
-                
-                # AI Ethics button with help tooltip
-                ai_ethics_display = f"{scores['ai_ethics']}/100" if scores['ai_ethics'] != 'N/A' else "N/A"
-                
-                # Create two-column layout for score and help icon
-                score_col2, help_col2 = st.columns([4, 1])
-                with score_col2:
-                    if st.button(f"AI Ethics: {ai_ethics_display}", 
-                               key=f"ai_ethics_{unique_id}",
-                               help="AI Ethics Evaluation - Click for analysis", 
-                               use_container_width=True):
-                        st.session_state[f"modal_doc_data_{unique_id}"] = {
-                            'title': title,
-                            'scores': scores,
-                            'content': raw_content
-                        }
-                        st.session_state[f"show_analysis_{unique_id}"] = 'ai_ethics'
-                        st.rerun()
-                
-                with help_col2:
-                    help_tooltips.render_help_icon('ai_ethics_score', size="small")
+            # Render enhanced score grid with visual indicators
+            enhanced_scoring.render_score_grid(scores, document_data, unique_id, help_tooltips)
             
-            with col2:
-                # Quantum Cybersecurity button with help tooltip
-                quantum_cyber_display = f"Tier {scores['quantum_cybersecurity']}/5" if scores['quantum_cybersecurity'] != 'N/A' else "N/A"
-                
-                # Create two-column layout for score and help icon
-                score_col3, help_col3 = st.columns([4, 1])
-                with score_col3:
-                    if st.button(f"Q Cyber: {quantum_cyber_display}", 
-                               key=f"quantum_cyber_{unique_id}",
-                               help="Quantum Cybersecurity Assessment - Click for analysis",
-                               use_container_width=True):
-                        st.session_state[f"modal_doc_data_{unique_id}"] = {
-                            'title': title,
-                            'scores': scores,
-                            'content': raw_content
-                        }
-                        st.session_state[f"show_analysis_{unique_id}"] = 'quantum_cybersecurity'
-                        st.rerun()
-                
-                with help_col3:
-                    help_tooltips.render_help_icon('quantum_cybersecurity_score', size="small")
-                
-                # Quantum Ethics button with help tooltip
-                quantum_ethics_display = f"{scores['quantum_ethics']}/100" if scores['quantum_ethics'] != 'N/A' else "N/A"
-                
-                # Create two-column layout for score and help icon
-                score_col4, help_col4 = st.columns([4, 1])
-                with score_col4:
-                    if st.button(f"Q Ethics: {quantum_ethics_display}", 
-                               key=f"quantum_ethics_{unique_id}",
-                               help="Quantum Ethics Assessment - Click for analysis",
-                               use_container_width=True):
-                        st.session_state[f"modal_doc_data_{unique_id}"] = {
-                            'title': title,
-                            'scores': scores,
-                            'content': raw_content
-                        }
-                        st.session_state[f"show_analysis_{unique_id}"] = 'quantum_ethics'
-                        st.rerun()
-                
-                with help_col4:
-                    help_tooltips.render_help_icon('quantum_ethics_score', size="small")
+            # Render analysis popup if triggered
+            enhanced_scoring.render_analysis_popup(unique_id)
             
             st.markdown("</div>", unsafe_allow_html=True)
 
@@ -3118,67 +3042,24 @@ def render_grid_view(docs):
             </style>
             """, unsafe_allow_html=True)
             
-            # Clickable score buttons with modal triggers like CARD view
+            # Enhanced scoring display with visual indicators and analysis popups
             doc_id = doc.get('id', str(hash(title + doc.get('url', ''))))
             unique_id = f"grid_{doc_id}"
             
             st.markdown("**Framework Scores:**")
             
-            score_col1, score_col2 = st.columns(2)
+            # Prepare document data for enhanced scoring
+            document_data = {
+                'title': title,
+                'scores': scores,
+                'content': content
+            }
             
-            with score_col1:
-                # AI Cybersecurity button
-                ai_cyber_display = f"{scores['ai_cybersecurity']}/100" if scores['ai_cybersecurity'] != 'N/A' else "N/A"
-                if st.button(f"AI Cybersecurity: {ai_cyber_display}", 
-                           key=f"ai_cyber_{unique_id}", 
-                           help="AI Cybersecurity Assessment - Click for analysis",
-                           use_container_width=True):
-                    st.session_state[f"modal_doc_data_{unique_id}"] = {
-                        'title': title,
-                        'scores': scores,
-                        'content': content
-                    }
-                    st.session_state[f"show_analysis_{unique_id}"] = 'ai_cybersecurity'
-                
-                # AI Ethics button
-                ai_ethics_display = f"{scores['ai_ethics']}/100" if scores['ai_ethics'] != 'N/A' else "N/A"
-                if st.button(f"AI Ethics: {ai_ethics_display}", 
-                           key=f"ai_ethics_{unique_id}",
-                           help="AI Ethics Evaluation - Click for analysis", 
-                           use_container_width=True):
-                    st.session_state[f"modal_doc_data_{unique_id}"] = {
-                        'title': title,
-                        'scores': scores,
-                        'content': content
-                    }
-                    st.session_state[f"show_analysis_{unique_id}"] = 'ai_ethics'
-                    
-            with score_col2:
-                # Quantum Cybersecurity button
-                quantum_cyber_display = f"Tier {scores['quantum_cybersecurity']}/5" if scores['quantum_cybersecurity'] != 'N/A' else "N/A"
-                if st.button(f"Quantum Cybersecurity: {quantum_cyber_display}", 
-                           key=f"quantum_cyber_{unique_id}",
-                           help="Quantum Cybersecurity Assessment - Click for analysis",
-                           use_container_width=True):
-                    st.session_state[f"modal_doc_data_{unique_id}"] = {
-                        'title': title,
-                        'scores': scores,
-                        'content': content
-                    }
-                    st.session_state[f"show_analysis_{unique_id}"] = 'quantum_cybersecurity'
-                
-                # Quantum Ethics button
-                quantum_ethics_display = f"{scores['quantum_ethics']}/100" if scores['quantum_ethics'] != 'N/A' else "N/A"
-                if st.button(f"Quantum Ethics: {quantum_ethics_display}", 
-                           key=f"quantum_ethics_{unique_id}",
-                           help="Quantum Ethics Assessment - Click for analysis",
-                           use_container_width=True):
-                    st.session_state[f"modal_doc_data_{unique_id}"] = {
-                        'title': title,
-                        'scores': scores,
-                        'content': content
-                    }
-                    st.session_state[f"show_analysis_{unique_id}"] = 'quantum_ethics'
+            # Render enhanced score grid with visual indicators
+            enhanced_scoring.render_score_grid(scores, document_data, unique_id, help_tooltips)
+            
+            # Render analysis popup if triggered
+            enhanced_scoring.render_analysis_popup(unique_id)
             
             st.markdown("---")  # Separator between documents
 
