@@ -839,8 +839,8 @@ def render():
                 
                 return  # Only show one modal at a time
     
-    # Check if any modal should be shown
-    should_show_modal = any(key.startswith("show_analysis_doc_") and st.session_state.get(key) for key in st.session_state.keys())
+    # Check if any modal should be shown (handle all view types)
+    should_show_modal = any(key.startswith("show_analysis_") and st.session_state.get(key) for key in st.session_state.keys())
     if should_show_modal:
         show_global_scoring_modal()
 
