@@ -3359,17 +3359,11 @@ def render_card_view(docs):
                         st.markdown(f"**AI Cybersecurity: {scores['ai_cybersecurity']}/100** ({performance}, repository avg: {avg_score:.0f})")
                         col1, col2 = st.columns(2)
                         with col1:
-                            st.markdown("**Strengths:**")
-                            for strength in analysis['strengths']:
-                                st.markdown(f"• {strength}")
+                            st.markdown("**Strengths:** " + " • ".join(analysis['strengths']))
                         with col2:
-                            st.markdown("**Areas for Improvement:**")
-                            for weakness in analysis['weaknesses']:
-                                st.markdown(f"• {weakness}")
-                        st.markdown("**Recommendations:**")
-                        for i, rec in enumerate(analysis['recommendations'], 1):
-                            st.markdown(f"{i}. {rec}")
-                        st.divider()
+                            st.markdown("**Areas for Improvement:** " + " • ".join(analysis['weaknesses']))
+                        st.markdown("**Recommendations:** " + " | ".join([f"{i}. {rec}" for i, rec in enumerate(analysis['recommendations'], 1)]))
+                        st.markdown("---")
                     
                     # Quantum Cybersecurity Analysis  
                     if scores['quantum_cybersecurity'] != 'N/A':
@@ -3380,17 +3374,11 @@ def render_card_view(docs):
                         st.markdown(f"**Quantum Cybersecurity: Tier {scores['quantum_cybersecurity']}/5** ({performance}, repository avg: Tier {avg_tier:.0f})")
                         col1, col2 = st.columns(2)
                         with col1:
-                            st.markdown("**Strengths:**")
-                            for strength in analysis['strengths']:
-                                st.markdown(f"• {strength}")
+                            st.markdown("**Strengths:** " + " • ".join(analysis['strengths']))
                         with col2:
-                            st.markdown("**Areas for Improvement:**")
-                            for weakness in analysis['weaknesses']:
-                                st.markdown(f"• {weakness}")
-                        st.markdown("**Recommendations:**")
-                        for i, rec in enumerate(analysis['recommendations'], 1):
-                            st.markdown(f"{i}. {rec}")
-                        st.divider()
+                            st.markdown("**Areas for Improvement:** " + " • ".join(analysis['weaknesses']))
+                        st.markdown("**Recommendations:** " + " | ".join([f"{i}. {rec}" for i, rec in enumerate(analysis['recommendations'], 1)]))
+                        st.markdown("---")
                     
                     # AI Ethics Analysis
                     if scores['ai_ethics'] != 'N/A':
@@ -3401,17 +3389,11 @@ def render_card_view(docs):
                         st.markdown(f"**AI Ethics: {scores['ai_ethics']}/100** ({performance}, repository avg: {avg_score:.0f})")
                         col1, col2 = st.columns(2)
                         with col1:
-                            st.markdown("**Strengths:**")
-                            for strength in analysis['strengths']:
-                                st.markdown(f"• {strength}")
+                            st.markdown("**Strengths:** " + " • ".join(analysis['strengths']))
                         with col2:
-                            st.markdown("**Areas for Improvement:**")
-                            for weakness in analysis['weaknesses']:
-                                st.markdown(f"• {weakness}")
-                        st.markdown("**Recommendations:**")
-                        for i, rec in enumerate(analysis['recommendations'], 1):
-                            st.markdown(f"{i}. {rec}")
-                        st.divider()
+                            st.markdown("**Areas for Improvement:** " + " • ".join(analysis['weaknesses']))
+                        st.markdown("**Recommendations:** " + " | ".join([f"{i}. {rec}" for i, rec in enumerate(analysis['recommendations'], 1)]))
+                        st.markdown("---")
                     
                     # Quantum Ethics Analysis
                     if scores['quantum_ethics'] != 'N/A':
@@ -3422,16 +3404,10 @@ def render_card_view(docs):
                         st.markdown(f"**Quantum Ethics: {scores['quantum_ethics']}/100** ({performance}, repository avg: {avg_score:.0f})")
                         col1, col2 = st.columns(2)
                         with col1:
-                            st.markdown("**Strengths:**")
-                            for strength in analysis['strengths']:
-                                st.markdown(f"• {strength}")
+                            st.markdown("**Strengths:** " + " • ".join(analysis['strengths']))
                         with col2:
-                            st.markdown("**Areas for Improvement:**")
-                            for weakness in analysis['weaknesses']:
-                                st.markdown(f"• {weakness}")
-                        st.markdown("**Recommendations:**")
-                        for i, rec in enumerate(analysis['recommendations'], 1):
-                            st.markdown(f"{i}. {rec}")
+                            st.markdown("**Areas for Improvement:** " + " • ".join(analysis['weaknesses']))
+                        st.markdown("**Recommendations:** " + " | ".join([f"{i}. {rec}" for i, rec in enumerate(analysis['recommendations'], 1)]))
                     
                     if all(score == 'N/A' for score in [scores['ai_cybersecurity'], scores['quantum_cybersecurity'], scores['ai_ethics'], scores['quantum_ethics']]):
                         st.info("This document was not scored against any frameworks as it doesn't contain relevant content for AI or quantum assessment areas.")
