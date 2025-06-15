@@ -3104,9 +3104,7 @@ def render_card_view(docs):
                             <span class="tooltiptext">
                                 <strong>AI Cybersecurity Assessment (0-100)</strong><br>
                                 Evaluates AI security risks, threat modeling, and defensive measures.<br><br>
-                                <span class="popup-link" onclick="showScoreDetails_{unique_id}('ai_cybersecurity', '{scores['ai_cybersecurity']}')">
-                                    📊 View Detailed Analysis
-                                </span>
+                                Click below for detailed analysis
                             </span>
                         </div>
                         <div class="score-tooltip-{unique_id}">
@@ -3114,9 +3112,7 @@ def render_card_view(docs):
                             <span class="tooltiptext">
                                 <strong>Quantum Cybersecurity Assessment (Tier 1-5)</strong><br>
                                 Assesses post-quantum cryptography readiness and quantum threat preparedness.<br><br>
-                                <span class="popup-link" onclick="showScoreDetails_{unique_id}('quantum_cybersecurity', '{scores['quantum_cybersecurity']}')">
-                                    📊 View Detailed Analysis
-                                </span>
+                                Click below for detailed analysis
                             </span>
                         </div>
                         <div class="score-tooltip-{unique_id}">
@@ -3124,9 +3120,7 @@ def render_card_view(docs):
                             <span class="tooltiptext">
                                 <strong>AI Ethics Evaluation (0-100)</strong><br>
                                 Measures ethical AI considerations including fairness, transparency, and accountability.<br><br>
-                                <span class="popup-link" onclick="showScoreDetails_{unique_id}('ai_ethics', '{scores['ai_ethics']}')">
-                                    📊 View Detailed Analysis
-                                </span>
+                                Click below for detailed analysis
                             </span>
                         </div>
                         <div class="score-tooltip-{unique_id}">
@@ -3134,9 +3128,7 @@ def render_card_view(docs):
                             <span class="tooltiptext">
                                 <strong>Quantum Ethics Assessment (0-100)</strong><br>
                                 Evaluates ethical implications of quantum technology deployment and governance.<br><br>
-                                <span class="popup-link" onclick="showScoreDetails_{unique_id}('quantum_ethics', '{scores['quantum_ethics']}')">
-                                    📊 View Detailed Analysis
-                                </span>
+                                Click below for detailed analysis
                             </span>
                         </div>
                     </div>
@@ -3145,56 +3137,82 @@ def render_card_view(docs):
 
             """, unsafe_allow_html=True)
             
-            # Add JavaScript functions for popup functionality
-            st.markdown(f"""
-            <script>
-            if (!window.scoreDetailsLoaded_{unique_id}) {{
-                window.scoreDetailsLoaded_{unique_id} = true;
-                
-                window.showScoreDetails_{unique_id} = function(framework, score) {{
-                    const popup = window.open('', 'scoreDetails_' + Math.random(), 'width=600,height=500,scrollbars=yes,resizable=yes');
-                    const explanations = {{
-                        'ai_cybersecurity': '<h3>AI Cybersecurity Maturity Assessment</h3><p><strong>Purpose:</strong> Evaluates AI-specific security risks, threat modeling, and defensive measures.</p><p><strong>Scoring:</strong> 90-100: Comprehensive | 70-89: Strong | 50-69: Moderate | 30-49: Basic | 0-29: Minimal</p><p><strong>Key Areas:</strong> AI model security, data protection, adversarial attack prevention, secure development lifecycle.</p>',
-                        'quantum_cybersecurity': '<h3>Quantum Cybersecurity Maturity Assessment</h3><p><strong>Purpose:</strong> Assesses post-quantum cryptography readiness and quantum threat preparedness.</p><p><strong>Tiers:</strong> Tier 5: Full implementation | Tier 4: Advanced preparation | Tier 3: Moderate awareness | Tier 2: Basic recognition | Tier 1: Minimal</p><p><strong>Key Areas:</strong> Post-quantum cryptography, quantum key distribution, threat assessment, migration strategies.</p>',
-                        'ai_ethics': '<h3>AI Ethics Evaluation</h3><p><strong>Purpose:</strong> Measures ethical AI considerations including fairness, transparency, accountability.</p><p><strong>Scoring:</strong> 90-100: Comprehensive governance | 70-89: Strong accountability | 50-69: Moderate awareness | 30-49: Basic mentions | 0-29: Minimal</p><p><strong>Key Areas:</strong> Bias detection, algorithmic transparency, human oversight, fairness metrics.</p>',
-                        'quantum_ethics': '<h3>Quantum Ethics Assessment</h3><p><strong>Purpose:</strong> Evaluates ethical implications of quantum technology deployment.</p><p><strong>Scoring:</strong> 90-100: Comprehensive framework | 70-89: Strong considerations | 50-69: Moderate awareness | 30-49: Basic mentions | 0-29: Minimal</p><p><strong>Key Areas:</strong> Equitable access, privacy implications, responsible development, international cooperation.</p>'
-                    }};
+            # Add native Streamlit button for detailed analysis
+            if st.button("📊 View Detailed Framework Analysis", key=f"analysis_{unique_id}", help="Click to see detailed scoring explanations"):
+                with st.expander("📊 Framework Scoring Analysis", expanded=True):
+                    # AI Cybersecurity Analysis
+                    if scores['ai_cybersecurity'] != 'N/A':
+                        st.markdown("### 🔒 AI Cybersecurity Maturity Assessment")
+                        st.markdown(f"**Score: {scores['ai_cybersecurity']}/100**")
+                        st.markdown("""
+                        **Purpose:** Evaluates how well the document addresses AI-specific security risks, threat modeling, and defensive measures.
+                        
+                        **Scoring Criteria:**
+                        - **90-100:** Comprehensive AI security framework with detailed threat models
+                        - **70-89:** Strong AI security considerations with most key areas covered  
+                        - **50-69:** Moderate AI security awareness with some gaps
+                        - **30-49:** Basic AI security mentions but lacks depth
+                        - **0-29:** Minimal or no AI security considerations
+                        
+                        **Key Areas:** AI model security, data protection, adversarial attack prevention, secure AI development lifecycle, AI system monitoring and incident response.
+                        """)
+                        st.divider()
                     
-                    popup.document.write(`
-                        <html>
-                        <head>
-                            <title>Score Analysis: ${{framework.replace('_', ' ').toUpperCase()}}</title>
-                            <style>
-                                body {{ font-family: Arial, sans-serif; padding: 20px; background: #f8f9fa; }}
-                                .header {{ background: #2563eb; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }}
-                                .score-display {{ background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #3b82f6; }}
-                                .explanation {{ background: white; padding: 15px; border-radius: 8px; line-height: 1.6; }}
-                                .framework-name {{ font-size: 18px; font-weight: bold; }}
-                                .score-value {{ font-size: 24px; font-weight: bold; color: #2563eb; }}
-                            </style>
-                        </head>
-                        <body>
-                            <div class="header">
-                                <div class="framework-name">${{framework.replace('_', ' ').toUpperCase()}} Analysis</div>
-                            </div>
-                            <div class="score-display">
-                                <strong>Score:</strong> <span class="score-value">${{score}}</span>
-                                ${{score === 'N/A' ? '<br><em>Document not relevant to this framework</em>' : ''}}
-                            </div>
-                            <div class="explanation">
-                                ${{explanations[framework] || 'Framework explanation not available.'}}
-                            </div>
-                            <div style="margin-top: 20px; text-align: center;">
-                                <button onclick="window.close()" style="background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">Close</button>
-                            </div>
-                        </body>
-                        </html>
-                    `);
-                    popup.document.close();
-                }};
-            }}
-            </script>
-            """, unsafe_allow_html=True)
+                    # Quantum Cybersecurity Analysis  
+                    if scores['quantum_cybersecurity'] != 'N/A':
+                        st.markdown("### ⚛️ Quantum Cybersecurity Maturity Assessment")
+                        st.markdown(f"**Score: Tier {scores['quantum_cybersecurity']}/5**")
+                        st.markdown("""
+                        **Purpose:** Assesses quantum-safe cryptography readiness and post-quantum security preparedness.
+                        
+                        **Tier System:**
+                        - **Tier 5:** Full post-quantum cryptography implementation
+                        - **Tier 4:** Advanced quantum threat preparation with migration plans
+                        - **Tier 3:** Moderate quantum awareness with some preparations
+                        - **Tier 2:** Basic quantum threat recognition
+                        - **Tier 1:** Minimal quantum security considerations
+                        
+                        **Key Areas:** Post-quantum cryptography adoption, quantum key distribution, quantum threat assessment, cryptographic agility, migration strategies.
+                        """)
+                        st.divider()
+                    
+                    # AI Ethics Analysis
+                    if scores['ai_ethics'] != 'N/A':
+                        st.markdown("### 🤖 AI Ethics Evaluation")
+                        st.markdown(f"**Score: {scores['ai_ethics']}/100**")
+                        st.markdown("""
+                        **Purpose:** Measures ethical AI considerations including fairness, transparency, accountability, and bias mitigation.
+                        
+                        **Scoring Criteria:**
+                        - **90-100:** Comprehensive ethical AI framework with detailed governance
+                        - **70-89:** Strong ethical considerations with accountability measures
+                        - **50-69:** Moderate ethical awareness with some implementation gaps
+                        - **30-49:** Basic ethical mentions but lacks operational details
+                        - **0-29:** Minimal or no ethical AI considerations
+                        
+                        **Key Areas:** Bias detection and mitigation, algorithmic transparency, human oversight, fairness metrics, ethical review processes.
+                        """)
+                        st.divider()
+                    
+                    # Quantum Ethics Analysis
+                    if scores['quantum_ethics'] != 'N/A':
+                        st.markdown("### ⚛️ Quantum Ethics Assessment")
+                        st.markdown(f"**Score: {scores['quantum_ethics']}/100**")
+                        st.markdown("""
+                        **Purpose:** Evaluates ethical implications of quantum technology deployment and governance frameworks.
+                        
+                        **Scoring Criteria:**
+                        - **90-100:** Comprehensive quantum ethics framework with governance structures
+                        - **70-89:** Strong ethical considerations for quantum technology
+                        - **50-69:** Moderate ethical awareness with implementation considerations
+                        - **30-49:** Basic ethical mentions related to quantum technology
+                        - **0-29:** Minimal or no quantum ethics considerations
+                        
+                        **Key Areas:** Equitable quantum access, privacy implications, responsible quantum development, international cooperation, quantum advantage ethics.
+                        """)
+                    
+                    if all(score == 'N/A' for score in [scores['ai_cybersecurity'], scores['quantum_cybersecurity'], scores['ai_ethics'], scores['quantum_ethics']]):
+                        st.info("This document was not scored against any frameworks as it doesn't contain relevant content for AI or quantum assessment areas.")
             
             # ISOLATED STEP 4: Display clean content preview (completely separate from scoring)
             with st.expander("Content Preview"):
