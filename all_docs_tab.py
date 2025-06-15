@@ -3461,12 +3461,6 @@ def render_card_view(docs):
                     
                     else:
                         st.info("This document was not scored against this framework as it doesn't contain relevant content.")
-                    
-                    if st.button("Close", key=f"close_{unique_id}", type="secondary"):
-                        # Clear only this document's analysis state
-                        if f"show_analysis_{unique_id}" in st.session_state:
-                            del st.session_state[f"show_analysis_{unique_id}"]
-                        st.rerun()
                 
                 show_scoring_modal()
             
