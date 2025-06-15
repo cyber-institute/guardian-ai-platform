@@ -3332,7 +3332,9 @@ def render_card_view(docs):
                 scores['quantum_ethics'] = 'N/A'
             
             # Display scores with clickable buttons that trigger modal popup
-            unique_id = hash(title + str(i))
+            # Use document ID if available, otherwise use a stable hash
+            doc_id = doc.get('id', str(hash(title + doc.get('url', ''))))
+            unique_id = f"doc_{doc_id}"
             
             # Create clean grid layout with clickable score buttons
             st.markdown("<div style='margin:8px;padding:8px;background:#f8f9fa;border-radius:6px'>", unsafe_allow_html=True)
@@ -3470,17 +3472,13 @@ def render_card_view(docs):
                     if all(score == 'N/A' for score in [scores['ai_cybersecurity'], scores['quantum_cybersecurity'], scores['ai_ethics'], scores['quantum_ethics']]):
                         st.info("This document was not scored against any frameworks as it doesn't contain relevant content for AI or quantum assessment areas.")
                     
-                    if st.button("Close", key=f"close_all_{unique_id}", type="secondary"):
-                        # Clear only the modal states for this specific document
-                        keys_to_clear = [
-                            f"modal_ai_cyber_{unique_id}",
-                            f"modal_ai_ethics_{unique_id}", 
-                            f"modal_quantum_cyber_{unique_id}",
-                            f"modal_quantum_ethics_{unique_id}"
-                        ]
-                        for key in keys_to_clear:
-                            if key in st.session_state:
-                                del st.session_state[key]
+                    if st.button("Close", key=f"close_{unique_id}", type="secondary"):
+                        # Use session state key prefix to clear all modals for this document
+                        prefix = f"modal_"
+                        suffix = f"_{unique_id}"
+                        keys_to_remove = [k for k in st.session_state.keys() if k.startswith(prefix) and k.endswith(suffix)]
+                        for key in keys_to_remove:
+                            del st.session_state[key]
                         st.rerun()
                 
                 show_scoring_modal()
