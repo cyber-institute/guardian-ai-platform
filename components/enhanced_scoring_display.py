@@ -70,7 +70,7 @@ class EnhancedScoringDisplay:
         [data-testid*="button"] {{
             height: 22px !important;
             padding: 1px 4px !important;
-            font-size: 8px !important;
+            font-size: 4px !important;
             line-height: 1.0 !important;
             margin: 0px !important;
             border-radius: 0px !important;

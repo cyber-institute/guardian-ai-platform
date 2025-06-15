@@ -40,7 +40,7 @@ def apply_ultra_compact_css():
         border-radius: 0px !important;
         height: 20px !important;
         padding: 1px 4px !important;
-        font-size: 8px !important;
+        font-size: 4px !important;
         line-height: 1.0 !important;
     }
     
