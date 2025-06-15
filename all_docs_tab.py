@@ -3137,82 +3137,98 @@ def render_card_view(docs):
 
             """, unsafe_allow_html=True)
             
-            # Add native Streamlit button for detailed analysis
-            if st.button("📊 View Detailed Framework Analysis", key=f"analysis_{unique_id}", help="Click to see detailed scoring explanations"):
-                with st.expander("📊 Framework Scoring Analysis", expanded=True):
+            # Add modal dialog functionality for detailed analysis
+            modal_key = f"modal_{unique_id}"
+            if st.button("📊 View Detailed Analysis", key=f"analysis_{unique_id}", help="Click to see detailed scoring explanations"):
+                st.session_state[modal_key] = True
+            
+            # Show modal dialog if triggered
+            if st.session_state.get(modal_key, False):
+                @st.dialog("Framework Scoring Analysis")
+                def show_scoring_modal():
+                    st.markdown(f"### {title}")
+                    st.markdown("---")
+                    
                     # AI Cybersecurity Analysis
                     if scores['ai_cybersecurity'] != 'N/A':
-                        st.markdown("### 🔒 AI Cybersecurity Maturity Assessment")
+                        st.markdown("#### 🔒 AI Cybersecurity Maturity")
                         st.markdown(f"**Score: {scores['ai_cybersecurity']}/100**")
-                        st.markdown("""
-                        **Purpose:** Evaluates how well the document addresses AI-specific security risks, threat modeling, and defensive measures.
-                        
-                        **Scoring Criteria:**
-                        - **90-100:** Comprehensive AI security framework with detailed threat models
-                        - **70-89:** Strong AI security considerations with most key areas covered  
-                        - **50-69:** Moderate AI security awareness with some gaps
-                        - **30-49:** Basic AI security mentions but lacks depth
-                        - **0-29:** Minimal or no AI security considerations
-                        
-                        **Key Areas:** AI model security, data protection, adversarial attack prevention, secure AI development lifecycle, AI system monitoring and incident response.
-                        """)
-                        st.divider()
+                        with st.expander("View Details"):
+                            st.markdown("""
+                            **Purpose:** Evaluates AI-specific security risks, threat modeling, and defensive measures.
+                            
+                            **Scoring Criteria:**
+                            - **90-100:** Comprehensive AI security framework
+                            - **70-89:** Strong AI security considerations  
+                            - **50-69:** Moderate AI security awareness
+                            - **30-49:** Basic AI security mentions
+                            - **0-29:** Minimal AI security considerations
+                            
+                            **Key Areas:** AI model security, data protection, adversarial attack prevention, secure development lifecycle.
+                            """)
                     
                     # Quantum Cybersecurity Analysis  
                     if scores['quantum_cybersecurity'] != 'N/A':
-                        st.markdown("### ⚛️ Quantum Cybersecurity Maturity Assessment")
+                        st.markdown("#### ⚛️ Quantum Cybersecurity Maturity")
                         st.markdown(f"**Score: Tier {scores['quantum_cybersecurity']}/5**")
-                        st.markdown("""
-                        **Purpose:** Assesses quantum-safe cryptography readiness and post-quantum security preparedness.
-                        
-                        **Tier System:**
-                        - **Tier 5:** Full post-quantum cryptography implementation
-                        - **Tier 4:** Advanced quantum threat preparation with migration plans
-                        - **Tier 3:** Moderate quantum awareness with some preparations
-                        - **Tier 2:** Basic quantum threat recognition
-                        - **Tier 1:** Minimal quantum security considerations
-                        
-                        **Key Areas:** Post-quantum cryptography adoption, quantum key distribution, quantum threat assessment, cryptographic agility, migration strategies.
-                        """)
-                        st.divider()
+                        with st.expander("View Details"):
+                            st.markdown("""
+                            **Purpose:** Assesses quantum-safe cryptography readiness and post-quantum security preparedness.
+                            
+                            **Tier System:**
+                            - **Tier 5:** Full post-quantum cryptography implementation
+                            - **Tier 4:** Advanced quantum threat preparation
+                            - **Tier 3:** Moderate quantum awareness
+                            - **Tier 2:** Basic quantum threat recognition
+                            - **Tier 1:** Minimal quantum security considerations
+                            
+                            **Key Areas:** Post-quantum cryptography, quantum key distribution, threat assessment, migration strategies.
+                            """)
                     
                     # AI Ethics Analysis
                     if scores['ai_ethics'] != 'N/A':
-                        st.markdown("### 🤖 AI Ethics Evaluation")
+                        st.markdown("#### 🤖 AI Ethics Evaluation")
                         st.markdown(f"**Score: {scores['ai_ethics']}/100**")
-                        st.markdown("""
-                        **Purpose:** Measures ethical AI considerations including fairness, transparency, accountability, and bias mitigation.
-                        
-                        **Scoring Criteria:**
-                        - **90-100:** Comprehensive ethical AI framework with detailed governance
-                        - **70-89:** Strong ethical considerations with accountability measures
-                        - **50-69:** Moderate ethical awareness with some implementation gaps
-                        - **30-49:** Basic ethical mentions but lacks operational details
-                        - **0-29:** Minimal or no ethical AI considerations
-                        
-                        **Key Areas:** Bias detection and mitigation, algorithmic transparency, human oversight, fairness metrics, ethical review processes.
-                        """)
-                        st.divider()
+                        with st.expander("View Details"):
+                            st.markdown("""
+                            **Purpose:** Measures ethical AI considerations including fairness, transparency, and accountability.
+                            
+                            **Scoring Criteria:**
+                            - **90-100:** Comprehensive ethical AI framework
+                            - **70-89:** Strong ethical considerations
+                            - **50-69:** Moderate ethical awareness
+                            - **30-49:** Basic ethical mentions
+                            - **0-29:** Minimal ethical AI considerations
+                            
+                            **Key Areas:** Bias detection, algorithmic transparency, human oversight, fairness metrics.
+                            """)
                     
                     # Quantum Ethics Analysis
                     if scores['quantum_ethics'] != 'N/A':
-                        st.markdown("### ⚛️ Quantum Ethics Assessment")
+                        st.markdown("#### ⚛️ Quantum Ethics Assessment")
                         st.markdown(f"**Score: {scores['quantum_ethics']}/100**")
-                        st.markdown("""
-                        **Purpose:** Evaluates ethical implications of quantum technology deployment and governance frameworks.
-                        
-                        **Scoring Criteria:**
-                        - **90-100:** Comprehensive quantum ethics framework with governance structures
-                        - **70-89:** Strong ethical considerations for quantum technology
-                        - **50-69:** Moderate ethical awareness with implementation considerations
-                        - **30-49:** Basic ethical mentions related to quantum technology
-                        - **0-29:** Minimal or no quantum ethics considerations
-                        
-                        **Key Areas:** Equitable quantum access, privacy implications, responsible quantum development, international cooperation, quantum advantage ethics.
-                        """)
+                        with st.expander("View Details"):
+                            st.markdown("""
+                            **Purpose:** Evaluates ethical implications of quantum technology deployment.
+                            
+                            **Scoring Criteria:**
+                            - **90-100:** Comprehensive quantum ethics framework
+                            - **70-89:** Strong ethical considerations
+                            - **50-69:** Moderate ethical awareness
+                            - **30-49:** Basic ethical mentions
+                            - **0-29:** Minimal quantum ethics considerations
+                            
+                            **Key Areas:** Equitable access, privacy implications, responsible development, international cooperation.
+                            """)
                     
                     if all(score == 'N/A' for score in [scores['ai_cybersecurity'], scores['quantum_cybersecurity'], scores['ai_ethics'], scores['quantum_ethics']]):
                         st.info("This document was not scored against any frameworks as it doesn't contain relevant content for AI or quantum assessment areas.")
+                    
+                    if st.button("Close", key=f"close_{unique_id}"):
+                        st.session_state[modal_key] = False
+                        st.rerun()
+                
+                show_scoring_modal()
             
             # ISOLATED STEP 4: Display clean content preview (completely separate from scoring)
             with st.expander("Content Preview"):
