@@ -371,7 +371,7 @@ def render():
     # Apply ultra-compact CSS to eliminate all spacing
     apply_ultra_compact_css()
     
-    # Override button font with highest CSS specificity
+    # Override button font with intelligent color coding
     st.markdown("""
     <style>
     /* Target Streamlit's specific button structure with maximum specificity */
@@ -403,6 +403,77 @@ def render():
         font-weight: bold !important;
     }
     </style>
+    """, unsafe_allow_html=True)
+    
+    # Add dynamic JavaScript for intelligent score-based color coding
+    st.markdown("""
+    <script>
+    function applyScoreBasedColors() {
+        const buttons = document.querySelectorAll('.stButton button');
+        buttons.forEach(button => {
+            const text = button.textContent || button.innerText;
+            
+            // Check for tier-based scoring (Tier 1-5)
+            const tierMatch = text.match(/Tier (\\d+)/);
+            if (tierMatch) {
+                const tier = parseInt(tierMatch[1]);
+                if (tier >= 4) {
+                    // Green for Tier 4 or 5
+                    button.style.backgroundColor = '#28a745';
+                    button.style.color = '#ffffff';
+                    button.style.borderColor = '#28a745';
+                } else if (tier === 3) {
+                    // Orange for Tier 3
+                    button.style.backgroundColor = '#fd7e14';
+                    button.style.color = '#ffffff';
+                    button.style.borderColor = '#fd7e14';
+                } else {
+                    // Red for Tier 1 or 2
+                    button.style.backgroundColor = '#dc3545';
+                    button.style.color = '#ffffff';
+                    button.style.borderColor = '#dc3545';
+                }
+                return;
+            }
+            
+            // Check for 100-point scale scoring
+            const scoreMatch = text.match(/(\\d+)\/100/);
+            if (scoreMatch) {
+                const score = parseInt(scoreMatch[1]);
+                if (score >= 75) {
+                    // Green for 75-100
+                    button.style.backgroundColor = '#28a745';
+                    button.style.color = '#ffffff';
+                    button.style.borderColor = '#28a745';
+                } else if (score >= 50) {
+                    // Orange for 50-74
+                    button.style.backgroundColor = '#fd7e14';
+                    button.style.color = '#ffffff';
+                    button.style.borderColor = '#fd7e14';
+                } else {
+                    // Red for below 50
+                    button.style.backgroundColor = '#dc3545';
+                    button.style.color = '#ffffff';
+                    button.style.borderColor = '#dc3545';
+                }
+                return;
+            }
+            
+            // Default styling for N/A or other cases
+            if (text.includes('N/A')) {
+                button.style.backgroundColor = '#6c757d';
+                button.style.color = '#ffffff';
+                button.style.borderColor = '#6c757d';
+            }
+        });
+    }
+    
+    // Apply colors when page loads and when content changes
+    document.addEventListener('DOMContentLoaded', applyScoreBasedColors);
+    setTimeout(applyScoreBasedColors, 100);
+    setTimeout(applyScoreBasedColors, 500);
+    setTimeout(applyScoreBasedColors, 1000);
+    </script>
     """, unsafe_allow_html=True)
     
     # Add custom CSS for help tooltips

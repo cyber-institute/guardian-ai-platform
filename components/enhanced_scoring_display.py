@@ -11,11 +11,10 @@ class EnhancedScoringDisplay:
     
     def __init__(self):
         self.score_colors = {
-            'excellent': {'bg': '#d4edda', 'border': '#28a745', 'text': '#155724', 'icon': '🟢'},
-            'good': {'bg': '#fff3cd', 'border': '#ffc107', 'text': '#856404', 'icon': '🟡'},
-            'warning': {'bg': '#ffe8d1', 'border': '#fd7e14', 'text': '#bd4d00', 'icon': '🟠'},
-            'danger': {'bg': '#f8d7da', 'border': '#dc3545', 'text': '#721c24', 'icon': '🔴'},
-            'na': {'bg': '#f8f9fa', 'border': '#dee2e6', 'text': '#6c757d', 'icon': '❓'}
+            'excellent': {'bg': '#28a745', 'border': '#28a745', 'text': '#ffffff', 'icon': '🟢'},  # Green
+            'warning': {'bg': '#fd7e14', 'border': '#fd7e14', 'text': '#ffffff', 'icon': '🟠'},    # Orange  
+            'danger': {'bg': '#dc3545', 'border': '#dc3545', 'text': '#ffffff', 'icon': '🔴'},     # Red
+            'na': {'bg': '#6c757d', 'border': '#6c757d', 'text': '#ffffff', 'icon': '❓'}          # Gray
         }
     
     def get_score_category(self, score: Any, framework_type: str = 'standard') -> str:
@@ -23,31 +22,31 @@ class EnhancedScoringDisplay:
         if score == 'N/A' or score is None:
             return 'na'
         
+        # Handle tier-based scoring (Tier 1, Tier 2, etc.)
+        if isinstance(score, str) and 'tier' in score.lower():
+            try:
+                tier_num = int(''.join(filter(str.isdigit, score)))
+                if tier_num >= 4:
+                    return 'excellent'  # Green for Tier 4 or 5
+                elif tier_num == 3:
+                    return 'warning'    # Orange for Tier 3
+                else:
+                    return 'danger'     # Red for Tier 1 or 2
+            except (ValueError, TypeError):
+                return 'na'
+        
         try:
             score_val = float(score)
         except (ValueError, TypeError):
             return 'na'
         
-        if framework_type == 'quantum_cybersecurity':
-            # Quantum cybersecurity uses 1-5 scale
-            if score_val >= 4:
-                return 'excellent'
-            elif score_val >= 3:
-                return 'good'
-            elif score_val >= 2:
-                return 'warning'
-            else:
-                return 'danger'
+        # For 100-point scale scoring
+        if score_val >= 75:
+            return 'excellent'  # Green for 75-100
+        elif score_val >= 50:
+            return 'warning'    # Orange for 50-74
         else:
-            # Standard 0-100 scale
-            if score_val >= 85:
-                return 'excellent'
-            elif score_val >= 70:
-                return 'good'
-            elif score_val >= 50:
-                return 'warning'
-            else:
-                return 'danger'
+            return 'danger'     # Red for below 50
     
     def render_enhanced_score_button(self, score: Any, label: str, framework_type: str, 
                                    unique_id: str, help_text: str, on_click_data: Dict[str, Any]) -> bool:
