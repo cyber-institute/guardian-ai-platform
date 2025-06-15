@@ -3333,7 +3333,6 @@ def render_card_view(docs):
             
             # Display scores with clickable buttons that trigger modal popup
             unique_id = hash(title + str(i))
-            modal_key = f"modal_{unique_id}"
             
             # Create clean grid layout with clickable score buttons
             st.markdown("<div style='margin:8px;padding:8px;background:#f8f9fa;border-radius:6px'>", unsafe_allow_html=True)
@@ -3346,14 +3345,14 @@ def render_card_view(docs):
                            key=f"ai_cyber_{unique_id}", 
                            help="AI Cybersecurity Assessment (0-100) - Click for detailed analysis",
                            use_container_width=True):
-                    st.session_state[modal_key] = True
+                    st.session_state[f"modal_ai_cyber_{unique_id}"] = True
                 
                 # AI Ethics button  
                 if st.button(f"AI Ethics: {get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics', raw_content, title)}", 
                            key=f"ai_ethics_{unique_id}",
                            help="AI Ethics Evaluation (0-100) - Click for detailed analysis", 
                            use_container_width=True):
-                    st.session_state[modal_key] = True
+                    st.session_state[f"modal_ai_ethics_{unique_id}"] = True
             
             with col2:
                 # Quantum Cybersecurity button
@@ -3361,19 +3360,26 @@ def render_card_view(docs):
                            key=f"quantum_cyber_{unique_id}",
                            help="Quantum Cybersecurity Assessment (Tier 1-5) - Click for detailed analysis",
                            use_container_width=True):
-                    st.session_state[modal_key] = True
+                    st.session_state[f"modal_quantum_cyber_{unique_id}"] = True
                 
                 # Quantum Ethics button
                 if st.button(f"Quantum Ethics: {get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics', raw_content, title)}", 
                            key=f"quantum_ethics_{unique_id}",
                            help="Quantum Ethics Assessment (0-100) - Click for detailed analysis",
                            use_container_width=True):
-                    st.session_state[modal_key] = True
+                    st.session_state[f"modal_quantum_ethics_{unique_id}"] = True
             
             st.markdown("</div>", unsafe_allow_html=True)
             
-            # Show modal dialog if triggered
-            if st.session_state.get(modal_key, False):
+            # Show modal dialog if any framework button triggered
+            any_modal_open = (
+                st.session_state.get(f"modal_ai_cyber_{unique_id}", False) or
+                st.session_state.get(f"modal_ai_ethics_{unique_id}", False) or
+                st.session_state.get(f"modal_quantum_cyber_{unique_id}", False) or
+                st.session_state.get(f"modal_quantum_ethics_{unique_id}", False)
+            )
+            
+            if any_modal_open:
                 @st.dialog("Framework Scoring Analysis")
                 def show_scoring_modal():
                     # Ultra-compact modal CSS
@@ -3465,7 +3471,11 @@ def render_card_view(docs):
                         st.info("This document was not scored against any frameworks as it doesn't contain relevant content for AI or quantum assessment areas.")
                     
                     if st.button("Close", key=f"close_modal_{doc.get('id', 'unknown')}_{hash(title)}", type="secondary"):
-                        st.session_state[modal_key] = False
+                        # Clear all modal states for this document
+                        st.session_state[f"modal_ai_cyber_{unique_id}"] = False
+                        st.session_state[f"modal_ai_ethics_{unique_id}"] = False
+                        st.session_state[f"modal_quantum_cyber_{unique_id}"] = False
+                        st.session_state[f"modal_quantum_ethics_{unique_id}"] = False
                         st.rerun()
                 
                 show_scoring_modal()
