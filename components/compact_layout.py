@@ -41,6 +41,21 @@ def apply_ultra_compact_css():
         height: 20px !important;
         padding: 1px 4px !important;
         font-size: 4px !important;
+        font-family: monospace !important;
+        line-height: 1.0 !important;
+    }
+    
+    /* Force ultra-small font size on ALL buttons */
+    button, .stButton button, [data-testid*="button"], 
+    button[kind="secondary"], button[kind="primary"] {
+        font-size: 4px !important;
+        font-family: monospace !important;
+        height: 20px !important;
+        min-height: 20px !important;
+        max-height: 20px !important;
+        padding: 1px 4px !important;
+        margin: 0px !important;
+        border-radius: 0px !important;
         line-height: 1.0 !important;
     }
     
