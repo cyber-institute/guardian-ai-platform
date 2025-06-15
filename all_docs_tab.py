@@ -3042,49 +3042,17 @@ def render_card_view(docs):
             scores['quantum_cybersecurity'] = raw_scores['quantum_cybersecurity'] if raw_scores['quantum_cybersecurity'] > 0 else ('N/A' if not is_quantum_related else 0)
             scores['quantum_ethics'] = raw_scores['quantum_ethics'] if raw_scores['quantum_ethics'] > 0 else ('N/A' if not is_quantum_related else 0)
             
-            # Display scores with interactive Score Info button
-            col_scores, col_info = st.columns([4, 1])
-            
-            with col_scores:
-                st.markdown(f"""
-                    <div style='margin:8px;padding:8px;background:#f8f9fa;border-radius:6px'>
-                        <div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px'>
-                            <div><strong>AI Cybersecurity Maturity:</strong> <strong>{get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity', raw_content, title)}</strong></div>
-                            <div><strong>Quantum Cybersecurity Maturity:</strong> <strong>{get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity', raw_content, title)}</strong></div>
-                            <div><strong>AI Ethics:</strong> <strong>{get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics', raw_content, title)}</strong></div>
-                            <div><strong>Quantum Ethics:</strong> <strong>{get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics', raw_content, title)}</strong></div>
-                        </div>
+            # Display scores using database values
+            st.markdown(f"""
+                <div style='margin:8px;padding:8px;background:#f8f9fa;border-radius:6px'>
+                    <div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px'>
+                        <div><strong>AI Cybersecurity Maturity:</strong> <strong>{get_comprehensive_badge(scores['ai_cybersecurity'], 'ai_cybersecurity', raw_content, title)}</strong></div>
+                        <div><strong>Quantum Cybersecurity Maturity:</strong> <strong>{get_comprehensive_badge(scores['quantum_cybersecurity'], 'quantum_cybersecurity', raw_content, title)}</strong></div>
+                        <div><strong>AI Ethics:</strong> <strong>{get_comprehensive_badge(scores['ai_ethics'], 'ai_ethics', raw_content, title)}</strong></div>
+                        <div><strong>Quantum Ethics:</strong> <strong>{get_comprehensive_badge(scores['quantum_ethics'], 'quantum_ethics', raw_content, title)}</strong></div>
                     </div>
-                """, unsafe_allow_html=True)
-            
-            with col_info:
-                if st.button("❓ Score Info", key=f"score_info_{hash(title)}_{i}", help="Click to see detailed scoring explanations"):
-                    with st.expander("📊 Framework Scoring Details", expanded=True):
-                        st.markdown("""
-                        **AI Cybersecurity Maturity (0-100):**
-                        Evaluates how well the document addresses AI security risks, threat modeling, and defensive measures. Scores based on coverage of AI security frameworks, risk assessment methodologies, and defensive strategies.
-                        
-                        **Quantum Cybersecurity Maturity (Tier 1-5):**
-                        Assesses quantum-safe cryptography readiness and post-quantum security measures. Based on NIST post-quantum cryptography standards and quantum threat preparedness.
-                        
-                        **AI Ethics (0-100):**
-                        Measures ethical AI considerations including fairness, transparency, accountability, and bias mitigation. Evaluates alignment with responsible AI principles and governance frameworks.
-                        
-                        **Quantum Ethics (0-100):**
-                        Evaluates ethical implications of quantum technology deployment and governance. Considers equitable access, privacy implications, and responsible quantum development.
-                        
-                        **Note:** N/A scores indicate the document is not relevant to that particular framework (e.g., non-AI documents receive N/A for AI frameworks).
-                        """)
-                        
-                        # Show specific explanations for this document's scores
-                        if scores['ai_cybersecurity'] != 'N/A':
-                            show_score_explanation('ai_cybersecurity', scores['ai_cybersecurity'], raw_content, title)
-                        if scores['quantum_cybersecurity'] != 'N/A':
-                            show_score_explanation('quantum_cybersecurity', scores['quantum_cybersecurity'], raw_content, title)
-                        if scores['ai_ethics'] != 'N/A':
-                            show_score_explanation('ai_ethics', scores['ai_ethics'], raw_content, title)
-                        if scores['quantum_ethics'] != 'N/A':
-                            show_score_explanation('quantum_ethics', scores['quantum_ethics'], raw_content, title)
+                </div>
+            """, unsafe_allow_html=True)
             
             # ISOLATED STEP 4: Display clean content preview (completely separate from scoring)
             with st.expander("Content Preview"):
