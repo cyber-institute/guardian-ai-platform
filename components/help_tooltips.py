@@ -116,6 +116,183 @@ class HelpTooltips:
                 'examples': ['Responsible disclosure', 'Migration timelines', 'Stakeholder protection']
             },
             
+            # Advanced Risk Calculation Terms
+            'threat_modeling': {
+                'title': 'Threat Modeling',
+                'definition': 'Systematic approach to identifying and evaluating potential security threats in AI systems',
+                'calculation': 'Analyzes attack vectors, threat actors, and vulnerabilities specific to AI/ML systems',
+                'importance': 'Essential for proactive security planning and risk mitigation in AI deployments',
+                'examples': ['Adversarial attacks', 'Data poisoning', 'Model extraction', 'Privacy attacks']
+            },
+            'adversarial_robustness': {
+                'title': 'Adversarial Robustness',
+                'definition': 'Measures how well an AI system can resist adversarial attacks designed to fool or manipulate it',
+                'calculation': 'Evaluates resistance to carefully crafted inputs that cause incorrect predictions',
+                'importance': 'Critical for AI system reliability and security in hostile environments',
+                'examples': ['Adversarial examples', 'Evasion attacks', 'Perturbation resistance', 'Input validation']
+            },
+            'model_interpretability': {
+                'title': 'Model Interpretability',
+                'definition': 'The degree to which humans can understand and explain AI model decisions and behavior',
+                'calculation': 'Encompasses explainability techniques, feature importance analysis, and transparency measures',
+                'importance': 'Vital for trust, accountability, and regulatory compliance in AI systems',
+                'examples': ['LIME', 'SHAP', 'Attention mechanisms', 'Decision trees visualization']
+            },
+            'data_governance': {
+                'title': 'Data Governance',
+                'definition': 'Framework for managing data quality, privacy, and ethical use throughout the AI lifecycle',
+                'calculation': 'Includes data lineage tracking, privacy protection, consent management, and bias assessment',
+                'importance': 'Fundamental for responsible AI development and regulatory compliance',
+                'examples': ['Data lineage', 'Privacy protection', 'Consent management', 'Quality assurance']
+            },
+            'quantum_cryptography': {
+                'title': 'Quantum Cryptography',
+                'definition': 'Cryptographic methods that leverage quantum mechanical properties for enhanced security',
+                'calculation': 'Includes quantum key distribution, quantum-resistant algorithms, and post-quantum cryptography',
+                'importance': 'Critical for preparing cybersecurity infrastructure for the quantum computing era',
+                'examples': ['Quantum key distribution', 'BB84 protocol', 'Quantum entanglement', 'No-cloning theorem']
+            },
+            'quantum_supremacy_risk': {
+                'title': 'Quantum Supremacy Risk',
+                'definition': 'Security vulnerabilities that emerge when quantum computers can break classical encryption',
+                'calculation': 'Assesses timeline and impact of quantum computers compromising current cryptographic standards',
+                'importance': 'Essential for planning cryptographic transitions and maintaining long-term data security',
+                'examples': ['RSA vulnerability', 'ECC breaking', 'Shor\'s algorithm', 'Cryptographic agility']
+            },
+            'post_quantum_cryptography': {
+                'title': 'Post-Quantum Cryptography',
+                'definition': 'Cryptographic algorithms designed to be secure against both classical and quantum attacks',
+                'calculation': 'Includes lattice-based, hash-based, code-based, and multivariate cryptographic schemes',
+                'importance': 'Necessary for maintaining cybersecurity as quantum computing technology advances',
+                'examples': ['NIST PQC standards', 'Lattice cryptography', 'Hash-based signatures', 'Code-based crypto']
+            },
+            'algorithmic_accountability': {
+                'title': 'Algorithmic Accountability',
+                'definition': 'Frameworks and practices for ensuring AI systems are responsible, transparent, and fair',
+                'calculation': 'Encompasses audit trails, decision logging, bias monitoring, and challenge mechanisms',
+                'importance': 'Essential for maintaining public trust and meeting regulatory requirements',
+                'examples': ['Algorithm audits', 'Bias testing', 'Decision logs', 'Appeal processes']
+            },
+            'federated_learning_privacy': {
+                'title': 'Federated Learning Privacy',
+                'definition': 'Privacy-preserving techniques for training AI models across distributed data sources',
+                'calculation': 'Enables collaborative AI training without centralizing sensitive data',
+                'importance': 'Critical for AI development in privacy-sensitive domains like healthcare and finance',
+                'examples': ['Differential privacy', 'Secure aggregation', 'Local training', 'Model updates']
+            },
+            'homomorphic_encryption': {
+                'title': 'Homomorphic Encryption',
+                'definition': 'Encryption method that allows computations on encrypted data without decrypting it',
+                'calculation': 'Enables secure cloud computing and privacy-preserving AI inference',
+                'importance': 'Revolutionary for maintaining data privacy while enabling AI processing',
+                'examples': ['Fully homomorphic encryption', 'Lattice-based schemes', 'Noise management', 'Circuit evaluation']
+            },
+            'zero_knowledge_proofs': {
+                'title': 'Zero-Knowledge Proofs',
+                'definition': 'Cryptographic methods for proving knowledge without revealing the information itself',
+                'calculation': 'Allows verification of AI model properties without exposing sensitive details',
+                'importance': 'Enables privacy-preserving verification and authentication in AI systems',
+                'examples': ['zk-SNARKs', 'zk-STARKs', 'Bulletproofs', 'Commitment schemes']
+            },
+            'differential_privacy': {
+                'title': 'Differential Privacy',
+                'definition': 'Mathematical framework for quantifying and limiting privacy risks in data analysis',
+                'calculation': 'Adds calibrated noise to prevent identification while preserving statistical utility',
+                'importance': 'Gold standard for privacy protection in AI systems processing personal data',
+                'examples': ['Epsilon-delta privacy', 'Laplace mechanism', 'Gaussian mechanism', 'Privacy budget']
+            },
+            'secure_multiparty_computation': {
+                'title': 'Secure Multiparty Computation',
+                'definition': 'Cryptographic techniques enabling multiple parties to jointly compute over private inputs',
+                'calculation': 'Allows collaborative AI training while keeping each party\'s data private',
+                'importance': 'Enables secure collaboration in AI development across organizations',
+                'examples': ['Garbled circuits', 'Secret sharing', 'Oblivious transfer', 'MPC protocols']
+            },
+            'privacy_engineering': {
+                'title': 'Privacy Engineering',
+                'definition': 'Systematic approach to building privacy protection into AI systems by design',
+                'calculation': 'Incorporates privacy-by-design principles throughout the AI development lifecycle',
+                'importance': 'Ensures privacy compliance and user trust from system conception to deployment',
+                'examples': ['Privacy by design', 'Data minimization', 'Purpose limitation', 'Privacy impact assessments']
+            },
+            'explainable_ai': {
+                'title': 'Explainable AI (XAI)',
+                'definition': 'AI systems designed to provide human-understandable explanations for their decisions',
+                'calculation': 'Measures transparency, interpretability, and explanation quality of AI decisions',
+                'importance': 'Critical for building trust, ensuring accountability, and meeting regulatory requirements',
+                'examples': ['Local explanations', 'Global interpretability', 'Counterfactual explanations', 'Feature attribution']
+            },
+            'ai_safety': {
+                'title': 'AI Safety',
+                'definition': 'Research and practices focused on developing AI systems that are safe, beneficial, and aligned with human values',
+                'calculation': 'Assesses robustness, reliability, and alignment of AI systems with intended objectives',
+                'importance': 'Prevents harmful AI behavior and ensures systems operate within acceptable safety bounds',
+                'examples': ['Value alignment', 'Robustness testing', 'Fail-safe mechanisms', 'Containment strategies']
+            },
+            'model_governance': {
+                'title': 'Model Governance',
+                'definition': 'Comprehensive framework for managing AI models throughout their lifecycle',
+                'calculation': 'Encompasses model development, validation, deployment, monitoring, and retirement processes',
+                'importance': 'Ensures consistent, compliant, and effective management of AI assets',
+                'examples': ['Model registry', 'Version control', 'Performance monitoring', 'Compliance tracking']
+            },
+            'quantum_error_correction': {
+                'title': 'Quantum Error Correction',
+                'definition': 'Techniques for protecting quantum information from decoherence and quantum noise',
+                'calculation': 'Evaluates error rates, correction codes, and fault-tolerance thresholds',
+                'importance': 'Essential for building reliable quantum computers and quantum communication systems',
+                'examples': ['Surface codes', 'Stabilizer codes', 'Logical qubits', 'Error syndrome detection']
+            },
+            'quantum_decoherence': {
+                'title': 'Quantum Decoherence',
+                'definition': 'Loss of quantum properties due to interaction with the environment',
+                'calculation': 'Measures coherence time, fidelity degradation, and environmental factors',
+                'importance': 'Major challenge for quantum computing requiring mitigation strategies',
+                'examples': ['Coherence time', 'Dephasing', 'Environmental noise', 'Decoherence mitigation']
+            },
+            'document_repository': {
+                'title': 'Document Repository',
+                'definition': 'Centralized collection of documents analyzed for AI and quantum cybersecurity risks',
+                'calculation': 'Aggregates documents from various sources including government agencies, research institutions, and standards bodies',
+                'importance': 'Provides comprehensive view of current AI/quantum security landscape and policy frameworks',
+                'examples': ['NIST publications', 'White House policies', 'Academic research', 'Industry standards']
+            },
+            'maturity_assessment': {
+                'title': 'Maturity Assessment',
+                'definition': 'Evaluation of organizational readiness and capability level in AI/quantum technologies',
+                'calculation': 'Measures implementation depth, process maturity, and strategic alignment across multiple dimensions',
+                'importance': 'Identifies gaps and provides roadmap for advancing AI/quantum security capabilities',
+                'examples': ['Process maturity', 'Technical capability', 'Governance structures', 'Risk management']
+            },
+            'framework_compliance': {
+                'title': 'Framework Compliance',
+                'definition': 'Adherence to established cybersecurity and ethics frameworks for AI/quantum systems',
+                'calculation': 'Compares current practices against industry standards and regulatory requirements',
+                'importance': 'Ensures consistent approach to risk management and regulatory compliance',
+                'examples': ['NIST AI RMF', 'ISO standards', 'Regulatory guidelines', 'Industry best practices']
+            },
+            'policy_gap_analysis': {
+                'title': 'Policy Gap Analysis',
+                'definition': 'Systematic identification of missing or insufficient policy coverage areas',
+                'calculation': 'Compares existing policies against comprehensive framework requirements',
+                'importance': 'Highlights areas requiring policy development or enhancement',
+                'examples': ['Missing controls', 'Incomplete coverage', 'Outdated policies', 'Regulatory gaps']
+            },
+            'risk_quantification': {
+                'title': 'Risk Quantification',
+                'definition': 'Mathematical modeling and measurement of cybersecurity and ethics risks',
+                'calculation': 'Uses statistical analysis and machine learning to assign numerical risk scores',
+                'importance': 'Enables objective comparison and prioritization of risk mitigation efforts',
+                'examples': ['Probability modeling', 'Impact assessment', 'Risk matrices', 'Quantitative analysis']
+            },
+            'multi_framework_scoring': {
+                'title': 'Multi-Framework Scoring',
+                'definition': 'Simultaneous evaluation across multiple cybersecurity and ethics frameworks',
+                'calculation': 'Applies different scoring methodologies and aggregates results for comprehensive assessment',
+                'importance': 'Provides holistic view of compliance and risk across various standards',
+                'examples': ['Cross-framework analysis', 'Weighted scoring', 'Aggregate metrics', 'Comparative assessment']
+            },
+            
             # General Assessment Terms
             'confidence_score': {
                 'title': 'Confidence Score',

@@ -368,9 +368,34 @@ def render():
     # Add custom CSS for help tooltips
     help_tooltips.add_custom_css()
     
-    # Add help tooltips to the sidebar for currently visible terms
-    visible_terms = ['ai_cybersecurity_score', 'quantum_cybersecurity_score', 'ai_ethics_score', 'quantum_ethics_score', 'confidence_score', 'maturity_level', 'risk_assessment']
-    help_tooltips.render_contextual_help_panel(visible_terms)
+    # Enhanced contextual help system for complex risk calculation terms
+    with st.sidebar:
+        st.markdown("### 🎯 Risk Calculation Help")
+        st.markdown("*Click any help icon for detailed explanations*")
+        
+        # Compact help reference for key terms
+        help_categories = {
+            "🔒 Cybersecurity": ['threat_modeling', 'adversarial_robustness', 'quantum_cryptography'],
+            "🧠 AI Ethics": ['algorithmic_accountability', 'explainable_ai', 'ai_safety'], 
+            "🔐 Privacy": ['differential_privacy', 'homomorphic_encryption', 'zero_knowledge_proofs'],
+            "⚡ Quantum": ['quantum_supremacy_risk', 'quantum_error_correction'],
+            "📊 Assessment": ['risk_quantification', 'multi_framework_scoring', 'policy_gap_analysis']
+        }
+        
+        for category, terms in help_categories.items():
+            st.markdown(f"**{category}**")
+            cols = st.columns(len(terms))
+            for i, term in enumerate(terms):
+                with cols[i]:
+                    help_tooltips.render_help_icon(term, size="small")
+    
+    # Add contextual help tooltips throughout the interface
+    visible_terms = [
+        'ai_cybersecurity_score', 'quantum_cybersecurity_score', 'ai_ethics_score', 'quantum_ethics_score', 
+        'confidence_score', 'maturity_level', 'risk_assessment', 'threat_modeling', 'adversarial_robustness',
+        'model_interpretability', 'data_governance', 'quantum_cryptography', 'algorithmic_accountability',
+        'differential_privacy', 'explainable_ai', 'ai_safety', 'privacy_engineering', 'model_governance'
+    ]
     
     # Title with help icon
     col1, col2 = st.columns([6, 1])
