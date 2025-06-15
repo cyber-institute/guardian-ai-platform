@@ -115,13 +115,50 @@ class EnhancedScoringDisplay:
         """
         st.markdown(button_css, unsafe_allow_html=True)
         
-        # Render the button with enhanced styling
+        # Create HTML button with direct color styling
+        button_html = f"""
+        <div style="margin: 0px; padding: 0px;">
+            <button style="
+                background: {colors['bg']} !important;
+                border: 1px solid {colors['border']} !important;
+                color: {colors['text']} !important;
+                height: 18px !important;
+                padding: 2px 4px !important;
+                font-size: 8px !important;
+                font-weight: bold !important;
+                font-family: inherit !important;
+                line-height: 1.0 !important;
+                margin: 0px !important;
+                border-radius: 0px !important;
+                width: 100% !important;
+                cursor: pointer;
+                transition: opacity 0.2s ease;
+            " 
+            onmouseover="this.style.opacity='0.8'" 
+            onmouseout="this.style.opacity='1'"
+            onclick="document.querySelector('[data-testid=\\'stApp\\'] button[key=\\'{framework_type}_{unique_id}\\']').click()">
+                {colors['icon']} {label}: {display_value}
+            </button>
+        </div>
+        """
+        st.markdown(button_html, unsafe_allow_html=True)
+        
+        # Hidden Streamlit button for functionality
         button_clicked = st.button(
-            f"{colors['icon']} {label}: {display_value}",
+            f"Hidden {label}",
             key=f"{framework_type}_{unique_id}",
             help=help_text,
-            use_container_width=True
+            type="secondary"
         )
+        
+        # Hide the Streamlit button
+        st.markdown("""
+        <style>
+        button[key*="Hidden"] {
+            display: none !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
         
         if button_clicked:
             # Store data for modal popup
