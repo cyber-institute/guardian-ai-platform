@@ -4580,93 +4580,165 @@ def render_card_view(docs):
             </script>
             """
             
-            # Use native Streamlit buttons to avoid iframe overlap issues
-            col1, col2 = st.columns(2)
-            with col1:
-                if st.button(f"AI Cybersecurity: {ai_cyber_display}", 
-                           key=f"ai_cyber_{unique_id}", 
-                           help="Click for detailed AI Cybersecurity analysis"):
-                    st.session_state[f"modal_open"] = True
-                    st.session_state[f"modal_type"] = "ai_cyber"
-                    st.session_state[f"modal_data"] = {
-                        "title": "AI Cybersecurity Analysis",
-                        "score": ai_cyber_display,
-                        "analysis": ai_cyber_analysis,
-                        "color": ai_cyber_color
-                    }
-                    st.rerun()
+            # HTML approach with global modal coordination to prevent iframe overlap
+            button_html = f"""
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em; position: relative;">
+                <button onclick="showGlobalModal('ai_cyber', '{unique_id}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;">
+                    AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
+                </button>
+                <button onclick="showGlobalModal('q_cyber', '{unique_id}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;">
+                    Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
+                </button>
+                <button onclick="showGlobalModal('ai_ethics', '{unique_id}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;">
+                    AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
+                </button>
+                <button onclick="showGlobalModal('q_ethics', '{unique_id}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;">
+                    Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
+                </button>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; grid-column: 1 / -1; margin-top: 8px;">
+                    <button onclick="showGlobalModal('preview', '{unique_id}')" style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;">
+                        Content Preview
+                    </button>
+                    <button onclick="showGlobalModal('translate', '{unique_id}')" style="background: #f3e5f5; border: 1px solid #9c27b0; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;">
+                        Translate
+                    </button>
+                </div>
+            </div>
+            
+            <script>
+                // Store data for this component in global registry
+                if (!window.modalDataRegistry) {{
+                    window.modalDataRegistry = {{}};
+                }}
+                
+                window.modalDataRegistry['{unique_id}'] = {{
+                    'ai_cyber': {{
+                        'title': 'AI Cybersecurity Analysis',
+                        'score': '{ai_cyber_display}',
+                        'analysis': '{ai_cyber_analysis_js}',
+                        'color': '{ai_cyber_color}'
+                    }},
+                    'q_cyber': {{
+                        'title': 'Quantum Cybersecurity Analysis',
+                        'score': '{q_cyber_display}',
+                        'analysis': '{q_cyber_analysis_js}',
+                        'color': '{q_cyber_color}'
+                    }},
+                    'ai_ethics': {{
+                        'title': 'AI Ethics Analysis',
+                        'score': '{ai_ethics_display}',
+                        'analysis': '{ai_ethics_analysis_js}',
+                        'color': '{ai_ethics_color}'
+                    }},
+                    'q_ethics': {{
+                        'title': 'Quantum Ethics Analysis',
+                        'score': '{q_ethics_display}',
+                        'analysis': '{q_ethics_analysis_js}',
+                        'color': '{q_ethics_color}'
+                    }},
+                    'preview': {{
+                        'title': 'Content Preview',
+                        'score': 'N/A',
+                        'analysis': '{preview_content_js}',
+                        'color': '#666'
+                    }},
+                    'translate': {{
+                        'title': 'Document Translation',
+                        'score': 'N/A',
+                        'analysis': 'Translation features coming soon.',
+                        'color': '#666'
+                    }}
+                }};
+                
+                // Global modal function that coordinates across all iframes
+                window.showGlobalModal = function(type, componentId) {{
+                    // Close any existing modals first
+                    if (window.currentGlobalModal) {{
+                        window.currentGlobalModal.style.display = 'none';
+                    }}
                     
-            with col2:
-                if st.button(f"Quantum Cybersecurity: {q_cyber_display}", 
-                           key=f"q_cyber_{unique_id}", 
-                           help="Click for detailed Quantum Cybersecurity analysis"):
-                    st.session_state[f"modal_open"] = True
-                    st.session_state[f"modal_type"] = "q_cyber"
-                    st.session_state[f"modal_data"] = {
-                        "title": "Quantum Cybersecurity Analysis",
-                        "score": q_cyber_display,
-                        "analysis": q_cyber_analysis,
-                        "color": q_cyber_color
-                    }
-                    st.rerun()
+                    // Create or get global modal
+                    var modalId = 'globalModal_' + componentId + '_' + type;
+                    var existingModal = parent.document.getElementById(modalId);
                     
-            col3, col4 = st.columns(2)
-            with col3:
-                if st.button(f"AI Ethics: {ai_ethics_display}", 
-                           key=f"ai_ethics_{unique_id}", 
-                           help="Click for detailed AI Ethics analysis"):
-                    st.session_state[f"modal_open"] = True
-                    st.session_state[f"modal_type"] = "ai_ethics"
-                    st.session_state[f"modal_data"] = {
-                        "title": "AI Ethics Analysis",
-                        "score": ai_ethics_display,
-                        "analysis": ai_ethics_analysis,
-                        "color": ai_ethics_color
-                    }
-                    st.rerun()
+                    if (existingModal) {{
+                        existingModal.remove();
+                    }}
                     
-            with col4:
-                if st.button(f"Quantum Ethics: {q_ethics_display}", 
-                           key=f"q_ethics_{unique_id}", 
-                           help="Click for detailed Quantum Ethics analysis"):
-                    st.session_state[f"modal_open"] = True
-                    st.session_state[f"modal_type"] = "q_ethics"
-                    st.session_state[f"modal_data"] = {
-                        "title": "Quantum Ethics Analysis",
-                        "score": q_ethics_display,
-                        "analysis": q_ethics_analysis,
-                        "color": q_ethics_color
-                    }
-                    st.rerun()
+                    var data = window.modalDataRegistry[componentId][type];
+                    var modal = parent.document.createElement('div');
+                    modal.id = modalId;
+                    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.4); z-index: 2147483647; overflow: hidden; display: block;';
                     
-            col5, col6 = st.columns(2)
-            with col5:
-                if st.button("Content Preview", 
-                           key=f"preview_{unique_id}", 
-                           help="Click to view content preview"):
-                    st.session_state[f"modal_open"] = True
-                    st.session_state[f"modal_type"] = "preview"
-                    st.session_state[f"modal_data"] = {
-                        "title": "Content Preview",
-                        "score": "N/A",
-                        "analysis": f"<b>Title:</b> {title}<br><br><b>Content:</b> {raw_content[:500]}...",
-                        "color": "#666"
-                    }
-                    st.rerun()
+                    var offsetX = Math.floor(Math.random() * 100) + 50;
+                    var offsetY = Math.floor(Math.random() * 50) + 30;
                     
-            with col6:
-                if st.button("Translate", 
-                           key=f"translate_{unique_id}", 
-                           help="Translate document to other languages"):
-                    st.session_state[f"modal_open"] = True
-                    st.session_state[f"modal_type"] = "translate"
-                    st.session_state[f"modal_data"] = {
-                        "title": "Document Translation",
-                        "score": "N/A",
-                        "analysis": "Translation features coming soon. This document can be translated into multiple languages.",
-                        "color": "#666"
-                    }
-                    st.rerun()
+                    modal.innerHTML = `
+                        <div id="modalWindow_${{modalId}}" style="position: absolute; top: ${{offsetY}}px; left: ${{offsetX}}px; background-color: white; border: 2px solid #333; border-radius: 8px; width: 450px; max-height: 400px; overflow-y: auto; box-shadow: 0 8px 16px rgba(0,0,0,0.3); font-family: Arial, sans-serif;">
+                            <div id="modalHeader_${{modalId}}" style="background-color: #f8f9fa; padding: 12px 16px; border-bottom: 2px solid #ddd; cursor: move; font-weight: bold; border-radius: 6px 6px 0 0; position: relative;">
+                                <span style="font-size: 16px;">${{data.title}}</span>
+                                <span onclick="parent.document.getElementById('${{modalId}}').remove(); window.currentGlobalModal = null;" style="position: absolute; right: 12px; top: 8px; color: #666; font-size: 24px; font-weight: bold; cursor: pointer; line-height: 1;">&times;</span>
+                            </div>
+                            <div style="padding: 16px; font-size: 14px; line-height: 1.5;">
+                                ${{data.score !== 'N/A' ? '<div style="margin-bottom: 15px;"><b>Score: <span style="color: ' + data.color + '; font-weight: bold;">' + data.score + '</span></b></div>' : ''}}
+                                <div>${{data.analysis}}</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    parent.document.body.appendChild(modal);
+                    window.currentGlobalModal = modal;
+                    
+                    // Close on background click
+                    modal.onclick = function(e) {{
+                        if (e.target === modal) {{
+                            modal.remove();
+                            window.currentGlobalModal = null;
+                        }}
+                    }};
+                    
+                    // Prevent bubbling on modal content
+                    modal.querySelector('#modalWindow_' + modalId).onclick = function(e) {{
+                        e.stopPropagation();
+                    }};
+                    
+                    // Add drag functionality
+                    var modalWindow = modal.querySelector('#modalWindow_' + modalId);
+                    var header = modal.querySelector('#modalHeader_' + modalId);
+                    var isDragging = false;
+                    var startX, startY, startLeft, startTop;
+                    
+                    header.onmousedown = function(e) {{
+                        isDragging = true;
+                        startX = e.clientX;
+                        startY = e.clientY;
+                        startLeft = parseInt(modalWindow.style.left) || offsetX;
+                        startTop = parseInt(modalWindow.style.top) || offsetY;
+                        e.preventDefault();
+                    }};
+                    
+                    parent.document.onmousemove = function(e) {{
+                        if (isDragging) {{
+                            var newLeft = startLeft + (e.clientX - startX);
+                            var newTop = startTop + (e.clientY - startY);
+                            
+                            var maxLeft = Math.max(200, parent.window.innerWidth - 450);
+                            var maxTop = Math.max(200, parent.window.innerHeight - 100);
+                            
+                            modalWindow.style.left = Math.max(0, Math.min(maxLeft, newLeft)) + 'px';
+                            modalWindow.style.top = Math.max(0, Math.min(maxTop, newTop)) + 'px';
+                        }}
+                    }};
+                    
+                    parent.document.onmouseup = function() {{
+                        isDragging = false;
+                    }};
+                }};
+            </script>
+            """
+            
+            import streamlit.components.v1 as components
+            components.html(button_html, height=180)
             
 
             
@@ -4674,73 +4746,3 @@ def render_card_view(docs):
             
             # Add spacing between cards
             st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
-
-    # Global modal display at end of render function
-    if "modal_open" in st.session_state and st.session_state["modal_open"]:
-        modal_data = st.session_state.get("modal_data", {})
-        
-        # Create modal overlay
-        st.markdown("""
-        <style>
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            z-index: 999999;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding-top: 50px;
-        }
-        .modal-content {
-            background-color: white;
-            border: 2px solid #333;
-            border-radius: 8px;
-            width: 450px;
-            max-height: 400px;
-            overflow-y: auto;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-            font-family: Arial, sans-serif;
-            position: relative;
-        }
-        .modal-header {
-            background-color: #f8f9fa;
-            padding: 12px 16px;
-            border-bottom: 2px solid #ddd;
-            font-weight: bold;
-            border-radius: 6px 6px 0 0;
-            font-size: 16px;
-        }
-        .modal-body {
-            padding: 16px;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-        
-        # Display modal content
-        title = modal_data.get("title", "Analysis")
-        score = modal_data.get("score", "N/A")
-        analysis = modal_data.get("analysis", "No analysis available")
-        color = modal_data.get("color", "#666")
-        
-        st.markdown(f"""
-        <div class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header">{title}</div>
-                <div class="modal-body">
-                    {f'<div style="margin-bottom: 15px;"><b>Score: <span style="color: {color}; font-weight: bold;">{score}</span></b></div>' if score != 'N/A' else ''}
-                    <div>{analysis}</div>
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Close button
-        if st.button("Close Analysis", key="close_modal"):
-            st.session_state["modal_open"] = False
-            st.rerun()
