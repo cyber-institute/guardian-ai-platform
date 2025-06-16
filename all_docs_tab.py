@@ -4292,24 +4292,39 @@ def render_card_view(docs):
                      title="Quantum Ethics Assessment Score: {q_ethics_display} - Evaluates ethical considerations in quantum technology development and deployment">
                     Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
                 </div>
-                <div style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer; grid-column: 1 / -1; margin-top: 5px;"
-                     onclick="setTimeout(() => {{
-                         const buttons = document.querySelectorAll('button[data-testid=\"baseButton-secondary\"]');
-                         for(let btn of buttons) {{
-                             if(btn.getAttribute('aria-label') === 'Content Preview {unique_id}') {{
-                                 btn.click();
-                                 break;
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; grid-column: 1 / -1; margin-top: 5px;">
+                    <div style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
+                         onclick="setTimeout(() => {{
+                             const buttons = document.querySelectorAll('button[data-testid=\"baseButton-secondary\"]');
+                             for(let btn of buttons) {{
+                                 if(btn.getAttribute('aria-label') === 'Content Preview {unique_id}') {{
+                                     btn.click();
+                                     break;
+                                 }}
                              }}
-                         }}
-                     }}, 50)"
-                     title="Click to view content preview">
-                    📄 Content Preview
+                         }}, 50)"
+                         title="Click to view content preview">
+                        📄 Content Preview
+                    </div>
+                    <div style="background: #f3e5f5; border: 1px solid #9c27b0; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
+                         onclick="setTimeout(() => {{
+                             const buttons = document.querySelectorAll('button[data-testid=\"baseButton-secondary\"]');
+                             for(let btn of buttons) {{
+                                 if(btn.getAttribute('aria-label') === 'Translate {unique_id}') {{
+                                     btn.click();
+                                     break;
+                                 }}
+                             }}
+                         }}, 50)"
+                         title="Translate document to other languages">
+                        🌐 Translate
+                    </div>
                 </div>
             </div>
             """, height=160)
             st.markdown("</div>", unsafe_allow_html=True)
             
-            # CSS to hide the Streamlit button
+            # CSS to hide the Streamlit buttons
             st.markdown(f"""
                 <style>
                 button[aria-label="Content Preview {unique_id}"] {{
@@ -4317,23 +4332,38 @@ def render_card_view(docs):
                     position: absolute;
                     left: -9999px;
                 }}
+                button[aria-label="Translate {unique_id}"] {{
+                    display: none !important;
+                    position: absolute;
+                    left: -9999px;
+                }}
                 </style>
             """, unsafe_allow_html=True)
             
-            # Hidden Streamlit button
-            if st.button("", key=f"preview_{unique_id}", help=f"Content Preview {unique_id}", type="secondary"):
-                
-                with st.expander("Content Preview", expanded=True):
-                    st.write("**Intelligent Summary:**")
-                    if content_preview_text:
-                        st.markdown(f"<div style='font-size:14px;line-height:1.5;color:#444;background:#f8f9fa;padding:12px;border-radius:6px'>{content_preview_text}</div>", unsafe_allow_html=True)
-                    else:
-                        st.text("Content analysis in progress...")
+            # Hidden Streamlit buttons
+            col_hidden1, col_hidden2 = st.columns(2)
+            
+            with col_hidden1:
+                if st.button("", key=f"preview_{unique_id}", help=f"Content Preview {unique_id}", type="secondary"):
+                    with st.expander("Content Preview", expanded=True):
+                        st.write("**Intelligent Summary:**")
+                        if content_preview_text:
+                            st.markdown(f"<div style='font-size:14px;line-height:1.5;color:#444;background:#f8f9fa;padding:12px;border-radius:6px'>{content_preview_text}</div>", unsafe_allow_html=True)
+                        else:
+                            st.text("Content analysis in progress...")
+                        
+                        st.write("**Raw Content Sample:**")
+                        clean_content = re.sub(r'<[^>]+>', '', raw_content)
+                        clean_content = re.sub(r'\s+', ' ', clean_content).strip()
+                        st.text(clean_content[:500] + "..." if len(clean_content) > 500 else clean_content)
+            
+            with col_hidden2:
+                if st.button("", key=f"translate_{unique_id}", help=f"Translate {unique_id}", type="secondary"):
+                    from components.document_translator import DocumentTranslator
+                    translator = DocumentTranslator()
                     
-                    st.write("**Raw Content Sample:**")
-                    clean_content = re.sub(r'<[^>]+>', '', raw_content)
-                    clean_content = re.sub(r'\s+', ' ', clean_content).strip()
-                    st.text(clean_content[:500] + "..." if len(clean_content) > 500 else clean_content)
+                    with st.expander("Document Translation", expanded=True):
+                        translator.render_translation_interface(raw_content, title)
             
             # Add spacing between cards
             st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
