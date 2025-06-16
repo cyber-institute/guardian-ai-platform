@@ -405,42 +405,143 @@ def render():
     </style>
     """, unsafe_allow_html=True)
     
-    # Add CSS-based color coding for specific scoring patterns
+    # Add comprehensive color styling using both CSS and JavaScript
     st.markdown("""
     <style>
-    /* Color coding for Tier-based scores */
-    button[title*="Tier 1"], button:contains("Tier 1"),
-    button[title*="Tier 2"], button:contains("Tier 2") {
+    /* Enhanced CSS with class-based targeting */
+    .score-button-red {
         background-color: #dc3545 !important;
         color: #ffffff !important;
         border-color: #dc3545 !important;
+        background-image: none !important;
     }
     
-    button[title*="Tier 3"], button:contains("Tier 3") {
+    .score-button-orange {
         background-color: #fd7e14 !important;
         color: #ffffff !important;
         border-color: #fd7e14 !important;
+        background-image: none !important;
     }
     
-    button[title*="Tier 4"], button:contains("Tier 4"),
-    button[title*="Tier 5"], button:contains("Tier 5") {
+    .score-button-green {
         background-color: #28a745 !important;
         color: #ffffff !important;
         border-color: #28a745 !important;
+        background-image: none !important;
     }
     
-    /* Color coding for N/A scores */
-    button:contains("N/A") {
+    .score-button-gray {
         background-color: #6c757d !important;
         color: #ffffff !important;
         border-color: #6c757d !important;
+        background-image: none !important;
     }
     
-    /* Force color application with maximum specificity */
-    .stApp .main .stButton button {
-        transition: background-color 0.1s ease !important;
+    /* Force application on all button types */
+    button.score-button-red,
+    button.score-button-orange,
+    button.score-button-green,
+    button.score-button-gray,
+    .stButton button.score-button-red,
+    .stButton button.score-button-orange,
+    .stButton button.score-button-green,
+    .stButton button.score-button-gray {
+        background-color: inherit !important;
+        color: inherit !important;
+        border-color: inherit !important;
+        background-image: none !important;
     }
     </style>
+    
+    <script>
+    function applyButtonColors() {
+        const buttons = document.querySelectorAll('button');
+        let coloredCount = 0;
+        
+        buttons.forEach(button => {
+            const text = button.textContent || button.innerText || '';
+            
+            // Skip if not a scoring button
+            if (!text.includes('/100') && !text.includes('Tier') && !text.includes('N/A') && 
+                !text.includes('AI Cyber') && !text.includes('AI Ethics') && 
+                !text.includes('Q Cyber') && !text.includes('Q Ethics')) {
+                return;
+            }
+            
+            // Remove existing color classes
+            button.classList.remove('score-button-red', 'score-button-orange', 'score-button-green', 'score-button-gray');
+            
+            let colorClass = '';
+            
+            // Determine color based on content
+            if (text.includes('Tier 1') || text.includes('Tier 2')) {
+                colorClass = 'score-button-red';
+            } else if (text.includes('Tier 3')) {
+                colorClass = 'score-button-orange';
+            } else if (text.includes('Tier 4') || text.includes('Tier 5')) {
+                colorClass = 'score-button-green';
+            } else if (text.includes('N/A')) {
+                colorClass = 'score-button-gray';
+            } else {
+                // Check for numeric scores
+                const scoreMatch = text.match(/(\\d+)\\/100/);
+                if (scoreMatch) {
+                    const score = parseInt(scoreMatch[1]);
+                    if (score >= 75) {
+                        colorClass = 'score-button-green';
+                    } else if (score >= 50) {
+                        colorClass = 'score-button-orange';
+                    } else {
+                        colorClass = 'score-button-red';
+                    }
+                }
+            }
+            
+            // Apply color class
+            if (colorClass) {
+                button.classList.add(colorClass);
+                coloredCount++;
+                
+                // Also apply inline styles as backup
+                const colors = {
+                    'score-button-red': { bg: '#dc3545', text: '#ffffff', border: '#dc3545' },
+                    'score-button-orange': { bg: '#fd7e14', text: '#ffffff', border: '#fd7e14' },
+                    'score-button-green': { bg: '#28a745', text: '#ffffff', border: '#28a745' },
+                    'score-button-gray': { bg: '#6c757d', text: '#ffffff', border: '#6c757d' }
+                };
+                
+                if (colors[colorClass]) {
+                    const color = colors[colorClass];
+                    button.style.setProperty('background-color', color.bg, 'important');
+                    button.style.setProperty('color', color.text, 'important');
+                    button.style.setProperty('border-color', color.border, 'important');
+                    button.style.setProperty('background-image', 'none', 'important');
+                }
+            }
+        });
+        
+        console.log(`Applied colors to ${coloredCount} scoring buttons`);
+    }
+    
+    // Apply immediately
+    applyButtonColors();
+    
+    // Apply on DOM changes
+    const observer = new MutationObserver(() => {
+        setTimeout(applyButtonColors, 50);
+    });
+    
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+    
+    // Apply multiple times to ensure coverage
+    setTimeout(applyButtonColors, 100);
+    setTimeout(applyButtonColors, 500);
+    setTimeout(applyButtonColors, 1000);
+    setTimeout(applyButtonColors, 2000);
+    </script>
     """, unsafe_allow_html=True)
     
     # Add custom CSS for help tooltips
