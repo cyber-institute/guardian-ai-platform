@@ -32,10 +32,15 @@ class URLContentExtractor:
             response = self.session.get(url, timeout=30)
             response.raise_for_status()
             
-            # Extract content using trafilatura
-            text_content = trafilatura.extract(response.text)
-            if not text_content:
-                return self._error_result("Could not extract readable content from URL")
+            # Extract content using trafilatura with enhanced fallback methods
+            text_content = trafilatura.extract(response.text, include_comments=False, include_tables=True)
+            
+            # If trafilatura fails, try alternative extraction methods
+            if not text_content or len(text_content.strip()) < 50:
+                text_content = self._fallback_content_extraction(response.text, url)
+            
+            if not text_content or len(text_content.strip()) < 50:
+                return self._error_result("Could not extract sufficient readable content from URL")
             
             # Enhanced metadata extraction using multi-LLM system
             from utils.enhanced_metadata_extractor import extract_enhanced_metadata
