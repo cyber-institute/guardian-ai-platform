@@ -4474,42 +4474,40 @@ def render_card_view(docs):
             
             <script>
                 // Dragging functionality
-                let isDragging_{unique_id} = false;
-                let currentX_{unique_id};
-                let currentY_{unique_id};
-                let initialX_{unique_id};
-                let initialY_{unique_id};
-                let xOffset_{unique_id} = 0;
-                let yOffset_{unique_id} = 0;
+                var isDragging_{unique_id} = false;
+                var currentX_{unique_id};
+                var currentY_{unique_id};
+                var initialX_{unique_id};
+                var initialY_{unique_id};
+                var xOffset_{unique_id} = 0;
+                var yOffset_{unique_id} = 0;
                 
-                function getScoreColor(score, isQuantum) {{
+                function getScoreColor_{unique_id}(score, isQuantum) {{
                     if (score === 'N/A') return '#666';
                     
                     if (isQuantum) {{
-                        // Quantum scoring: Tier 1-5
-                        const tier = parseInt(score.replace('Tier ', ''));
-                        if (tier >= 4) return '#28a745'; // Green
-                        if (tier >= 3) return '#ffc107'; // Orange  
-                        return '#dc3545'; // Red
+                        var tier = parseInt(score.replace('Tier ', ''));
+                        if (tier >= 4) return '#28a745';
+                        if (tier >= 3) return '#ffc107';
+                        return '#dc3545';
                     }} else {{
-                        // AI scoring: 0-100
-                        const num = parseInt(score.replace('/100', ''));
-                        if (num >= 75) return '#28a745'; // Green
-                        if (num >= 50) return '#ffc107'; // Orange
-                        return '#dc3545'; // Red
+                        var num = parseInt(score.replace('/100', ''));
+                        if (num >= 75) return '#28a745';
+                        if (num >= 50) return '#ffc107';
+                        return '#dc3545';
                     }}
                 }}
                 
                 function showModal_{unique_id}(type) {{
-                    const modal = document.getElementById('modal_{unique_id}');
-                    const modalTitle = document.getElementById('modalTitle_{unique_id}');
-                    const content = document.getElementById('modalContent_{unique_id}');
-                    const modalWindow = document.getElementById('modalWindow_{unique_id}');
+                    var modal = document.getElementById('modal_{unique_id}');
+                    var modalTitle = document.getElementById('modalTitle_{unique_id}');
+                    var content = document.getElementById('modalContent_{unique_id}');
+                    var modalWindow = document.getElementById('modalWindow_{unique_id}');
                     
-                    let title = '';
-                    let score = '';
-                    let analysis = '';
-                    let isQuantum = false;
+                    var title = '';
+                    var score = '';
+                    var analysis = '';
+                    var isQuantum = false;
                     
                     switch(type) {{
                         case 'ai_cyber':
@@ -4545,40 +4543,42 @@ def render_card_view(docs):
                             break;
                     }}
                     
-                    const scoreColor = getScoreColor(score, isQuantum);
+                    var scoreColor = getScoreColor_{unique_id}(score, isQuantum);
                     modalTitle.textContent = title;
                     
-                    content.innerHTML = `
-                        ${{score !== 'N/A' ? '<div style="margin-bottom: 12px;"><b>Score: <span style="color: ' + scoreColor + '; font-weight: bold;">' + score + '</span></b></div>' : ''}}
-                        <div>${{analysis}}</div>
-                    `;
+                    content.innerHTML = (score !== 'N/A' ? '<div style="margin-bottom: 12px;"><b>Score: <span style="color: ' + scoreColor + '; font-weight: bold;">' + score + '</span></b></div>' : '') + '<div>' + analysis + '</div>';
                     
                     // Reset position
                     modalWindow.style.left = '10px';
                     modalWindow.style.top = '10px';
+                    modalWindow.style.transform = 'translate3d(0px, 0px, 0)';
                     xOffset_{unique_id} = 0;
                     yOffset_{unique_id} = 0;
                     
                     modal.style.display = 'block';
+                    
+                    // Setup drag functionality after modal is shown
+                    setTimeout(function() {{
+                        var header = document.getElementById('modalHeader_{unique_id}');
+                        if (header && !header.hasAttribute('data-drag-setup')) {{
+                            header.setAttribute('data-drag-setup', 'true');
+                            header.onmousedown = dragStart_{unique_id};
+                        }}
+                    }}, 10);
                 }}
                 
                 function closeModal_{unique_id}() {{
                     document.getElementById('modal_{unique_id}').style.display = 'none';
                 }}
                 
-                // Dragging event listeners
-                document.getElementById('modalHeader_{unique_id}').addEventListener('mousedown', dragStart_{unique_id});
-                document.addEventListener('mousemove', drag_{unique_id});
-                document.addEventListener('mouseup', dragEnd_{unique_id});
-                
                 function dragStart_{unique_id}(e) {{
                     initialX_{unique_id} = e.clientX - xOffset_{unique_id};
                     initialY_{unique_id} = e.clientY - yOffset_{unique_id};
+                    isDragging_{unique_id} = true;
                     
-                    if (e.target === document.getElementById('modalHeader_{unique_id}') || 
-                        e.target === document.getElementById('modalTitle_{unique_id}')) {{
-                        isDragging_{unique_id} = true;
-                    }}
+                    document.onmousemove = drag_{unique_id};
+                    document.onmouseup = dragEnd_{unique_id};
+                    e.preventDefault();
                 }}
                 
                 function drag_{unique_id}(e) {{
@@ -4589,8 +4589,10 @@ def render_card_view(docs):
                         xOffset_{unique_id} = currentX_{unique_id};
                         yOffset_{unique_id} = currentY_{unique_id};
                         
-                        const modalWindow = document.getElementById('modalWindow_{unique_id}');
-                        modalWindow.style.transform = `translate3d(${{currentX_{unique_id}}}px, ${{currentY_{unique_id}}}px, 0)`;
+                        var modalWindow = document.getElementById('modalWindow_{unique_id}');
+                        if (modalWindow) {{
+                            modalWindow.style.transform = 'translate3d(' + currentX_{unique_id} + 'px, ' + currentY_{unique_id} + 'px, 0)';
+                        }}
                     }}
                 }}
                 
@@ -4598,6 +4600,8 @@ def render_card_view(docs):
                     initialX_{unique_id} = currentX_{unique_id};
                     initialY_{unique_id} = currentY_{unique_id};
                     isDragging_{unique_id} = false;
+                    document.onmousemove = null;
+                    document.onmouseup = null;
                 }}
             </script>
             """
