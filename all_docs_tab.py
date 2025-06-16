@@ -4294,17 +4294,13 @@ def render_card_view(docs):
                      title="Quantum Ethics Assessment">
                     Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
                 </div>
-                <div style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer; grid-column: 1 / -1; margin-top: 5px;"
-                     onclick="document.getElementById('preview_{unique_id}').click()"
-                     title="Click to view content preview">
-                    📄 Content Preview
-                </div>
+
             </div>
-            """, height=160)
+            """, height=120)
             st.markdown("</div>", unsafe_allow_html=True)
             
-            # Hidden button for HTML to trigger
-            if st.button("", key=f"preview_{unique_id}", help="Content Preview", type="secondary", use_container_width=False):
+            # Content Preview functionality
+            if st.button("📄 Preview Content", key=f"preview_{unique_id}", help="View intelligent content summary", use_container_width=True):
                 with st.expander("Content Preview", expanded=True):
                     st.write("**Intelligent Summary:**")
                     if content_preview_text:
@@ -4316,15 +4312,6 @@ def render_card_view(docs):
                     clean_content = re.sub(r'<[^>]+>', '', raw_content)
                     clean_content = re.sub(r'\s+', ' ', clean_content).strip()
                     st.text(clean_content[:500] + "..." if len(clean_content) > 500 else clean_content)
-            
-            # Hide the preview button with CSS
-            st.markdown(f"""
-                <style>
-                button[data-testid="baseButton-secondary"][aria-label="Content Preview"] {{
-                    display: none !important;
-                }}
-                </style>
-            """, unsafe_allow_html=True)
             
             # Add spacing between cards
             st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
