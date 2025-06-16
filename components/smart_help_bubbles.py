@@ -264,7 +264,7 @@ class SmartHelpBubbles:
         """Render help that adapts to user's current section and progress"""
         section_helps = {
             'policy_repository': {
-                'newcomer': "Welcome! Start by exploring policy documents using the filters below. Click on any document card to see high level analysis.",
+                'newcomer': "",
                 'explorer': "Pro tip: Use the View Mode options (Cards, Compact, Table) to customize how you browse documents.",
                 'expert': ""
             },
