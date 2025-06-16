@@ -4462,8 +4462,8 @@ def render_card_view(docs):
             </div>
             
             <!-- Fixed positioned modal that appears above everything -->
-            <div id="testModal_{unique_id}" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); z-index: 999999;">
-                <div id="testModalWindow_{unique_id}" style="position: fixed; top: 50px; left: 50px; background-color: white; border: 2px solid #333; border-radius: 8px; width: 450px; max-height: 350px; overflow-y: auto; box-shadow: 0 8px 16px rgba(0,0,0,0.3); font-family: Arial, sans-serif;">
+            <div id="testModal_{unique_id}" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); z-index: 2147483647;">
+                <div id="testModalWindow_{unique_id}" style="position: fixed; top: 50px; left: 50px; background-color: white; border: 2px solid #333; border-radius: 8px; width: 450px; max-height: 350px; overflow-y: auto; box-shadow: 0 8px 16px rgba(0,0,0,0.3); font-family: Arial, sans-serif; z-index: 2147483647;">
                     <div id="testModalHeader_{unique_id}" style="background-color: #f8f9fa; padding: 12px 16px; border-bottom: 2px solid #ddd; cursor: move; font-weight: bold; border-radius: 6px 6px 0 0; position: relative;">
                         <span id="testModalTitle_{unique_id}" style="font-size: 16px;">Analysis</span>
                         <span onclick="closeTestModal_{unique_id}()" style="position: absolute; right: 12px; top: 8px; color: #666; font-size: 24px; font-weight: bold; cursor: pointer; line-height: 1; width: 25px; height: 25px; text-align: center;">&times;</span>
