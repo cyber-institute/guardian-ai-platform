@@ -144,30 +144,26 @@ class DocumentTranslator:
         st.markdown(f"**Detected Language:** {current_lang_info['flag']} {current_lang_info['name']}")
         
         # Language selection
-        col1, col2 = st.columns([1, 2])
+        st.markdown("**Translate to:**")
         
-        with col1:
-            st.markdown("**Translate to:**")
-            
-        with col2:
-            # Create language options with flags
-            language_options = []
-            language_codes = []
-            
-            for code, info in self.supported_languages.items():
-                if code != detected_lang:  # Don't show current language
-                    language_options.append(f"{info['flag']} {info['name']}")
-                    language_codes.append(code)
-            
-            selected_idx = st.selectbox(
-                "Choose target language",
-                range(len(language_options)),
-                format_func=lambda x: language_options[x],
-                label_visibility="collapsed"
-            )
-            
-            target_lang_code = language_codes[selected_idx]
-            target_lang_info = self.supported_languages[target_lang_code]
+        # Create language options with flags
+        language_options = []
+        language_codes = []
+        
+        for code, info in self.supported_languages.items():
+            if code != detected_lang:  # Don't show current language
+                language_options.append(f"{info['flag']} {info['name']}")
+                language_codes.append(code)
+        
+        selected_idx = st.selectbox(
+            "Choose target language",
+            range(len(language_options)),
+            format_func=lambda x: language_options[x],
+            label_visibility="collapsed"
+        )
+        
+        target_lang_code = language_codes[selected_idx]
+        target_lang_info = self.supported_languages[target_lang_code]
         
         # Translation button with animation
         if st.button(f"🔄 Translate to {target_lang_info['name']}", key=f"translate_{document_title}"):
@@ -276,27 +272,23 @@ class DocumentTranslator:
                     f"{self.supported_languages[translation['target_lang']]['flag']} "
                     f"{translation['target_lang_name']} Translation"
                 ):
-                    col1, col2 = st.columns(2)
+                    st.markdown(f"**Original ({translation['source_lang_name']}):**")
+                    st.text_area(
+                        "Original", 
+                        translation['original_text'][:500] + "...", 
+                        height=100,
+                        disabled=True,
+                        key=f"orig_{key}"
+                    )
                     
-                    with col1:
-                        st.markdown(f"**Original ({translation['source_lang_name']}):**")
-                        st.text_area(
-                            "Original", 
-                            translation['original_text'][:500] + "...", 
-                            height=150,
-                            disabled=True,
-                            key=f"orig_{key}"
-                        )
-                    
-                    with col2:
-                        st.markdown(f"**Translation ({translation['target_lang_name']}):**")
-                        st.text_area(
-                            "Translation", 
-                            translation['translated_text'][:500] + "...", 
-                            height=150,
-                            disabled=True,
-                            key=f"trans_{key}"
-                        )
+                    st.markdown(f"**Translation ({translation['target_lang_name']}):**")
+                    st.text_area(
+                        "Translation", 
+                        translation['translated_text'][:500] + "...", 
+                        height=100,
+                        disabled=True,
+                        key=f"trans_{key}"
+                    )
                     
                     st.download_button(
                         label=f"💾 Download Full Translation",
