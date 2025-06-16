@@ -4280,9 +4280,19 @@ def render_card_view(docs):
                 </div>
             </div>
             """, height=120)
-            
             st.markdown("</div>", unsafe_allow_html=True)
-            # ISOLATED STEP 4: Display clean content preview (completely separate from scoring)
+            st.markdown("""
+                <style>
+                .streamlit-expanderHeader {
+                    margin-top: 0px !important;
+                    padding-top: 0px !important;
+                }
+                div[data-testid="stExpander"] {
+                    margin-top: 0px !important;
+                    padding-top: 0px !important;
+                }
+                </style>
+            """, unsafe_allow_html=True)
             with st.expander("Content Preview"):
                 # Generate intelligent content summary from entire document
                 try:
