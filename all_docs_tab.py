@@ -3042,70 +3042,52 @@ def render_compact_cards(docs):
                 </div>
             """, unsafe_allow_html=True)
             
-            # Multiple colored display options
-            # Option 1: Progress bars with colors
-            st.markdown("**Assessment Scores:**")
+            # Debug: Show actual scores first
+            st.write("DEBUG - Raw scores:", scores)
             
-            # AI Cybersecurity
-            ai_cyber = scores.get('ai_cybersecurity', 'N/A')
-            if ai_cyber != 'N/A':
-                progress_value = ai_cyber / 100
-                st.markdown(f"**AI Cybersecurity:** {ai_cyber}/100")
-                st.progress(progress_value)
-            else:
-                st.markdown("**AI Cybersecurity:** N/A")
+            # Simple color test with Plotly
+            import plotly.graph_objects as go
             
-            # Option 2: Colored text with markdown
-            ai_ethics = scores.get('ai_ethics', 'N/A')
-            if ai_ethics != 'N/A':
-                if ai_ethics >= 75:
-                    color = "green"
-                elif ai_ethics >= 50:
-                    color = "orange"
-                else:
-                    color = "red"
-                st.markdown(f"**AI Ethics:** <span style='color:{color}; font-weight:bold'>{ai_ethics}/100</span>", unsafe_allow_html=True)
-            else:
-                st.markdown("**AI Ethics:** N/A")
+            # Create a simple colored chart
+            ai_cyber = scores.get('ai_cybersecurity', 0)
+            ai_ethics = scores.get('ai_ethics', 0)
+            q_cyber = scores.get('quantum_cybersecurity', 0)
+            q_ethics = scores.get('quantum_ethics', 0)
             
-            # Option 3: Color-coded containers
-            q_cyber = scores.get('quantum_cybersecurity', 'N/A')
-            if q_cyber != 'N/A':
-                if q_cyber >= 4:
-                    container_color = "#d4edda"
-                    text_color = "#155724"
-                elif q_cyber >= 3:
-                    container_color = "#fff3cd"
-                    text_color = "#856404"
-                else:
-                    container_color = "#f8d7da"
-                    text_color = "#721c24"
-                
-                st.markdown(f"""
-                <div style='background-color: {container_color}; 
-                           color: {text_color}; 
-                           padding: 8px; 
-                           border-radius: 4px; 
-                           margin: 4px 0;
-                           border: 1px solid {text_color}20;'>
-                    <strong>Quantum Cybersecurity: Tier {q_cyber}</strong>
-                </div>
-                """, unsafe_allow_html=True)
-            else:
-                st.markdown("**Quantum Cybersecurity:** N/A")
+            # Convert values for display
+            if ai_cyber == 'N/A': ai_cyber = 0
+            if ai_ethics == 'N/A': ai_ethics = 0
+            if q_cyber == 'N/A': q_cyber = 0
+            if q_ethics == 'N/A': q_ethics = 0
             
-            # Option 4: Streamlit balloons and snow (visual indicators)
-            q_ethics = scores.get('quantum_ethics', 'N/A')
-            if q_ethics != 'N/A':
-                st.markdown(f"**Quantum Ethics:** {q_ethics}/100")
-                if q_ethics >= 75:
-                    st.write("🟢 High Score")
-                elif q_ethics >= 50:
-                    st.write("🟡 Medium Score")
-                else:
-                    st.write("🔴 Low Score")
-            else:
-                st.markdown("**Quantum Ethics:** N/A")
+            fig = go.Figure(data=[
+                go.Bar(
+                    x=['AI Cyber', 'AI Ethics', 'Q Cyber', 'Q Ethics'],
+                    y=[ai_cyber, ai_ethics, q_cyber * 20, q_ethics],  # Scale Q Cyber for visibility
+                    marker_color=['red' if ai_cyber < 50 else 'orange' if ai_cyber < 75 else 'green',
+                                  'red' if ai_ethics < 50 else 'orange' if ai_ethics < 75 else 'green',
+                                  'red' if q_cyber < 3 else 'orange' if q_cyber < 4 else 'green',
+                                  'red' if q_ethics < 50 else 'orange' if q_ethics < 75 else 'green']
+                )
+            ])
+            
+            fig.update_layout(
+                title="Assessment Scores",
+                height=200,
+                showlegend=False
+            )
+            
+            st.plotly_chart(fig, use_container_width=True)
+            
+            # Alternative: Simple text with color
+            st.markdown(f"""
+            <div style="font-family: monospace; font-size: 14px;">
+                <span style="color: red;">●</span> AI Cyber: {scores.get('ai_cybersecurity', 'N/A')}<br>
+                <span style="color: orange;">●</span> AI Ethics: {scores.get('ai_ethics', 'N/A')}<br>
+                <span style="color: green;">●</span> Quantum: {scores.get('quantum_cybersecurity', 'N/A')}<br>
+                <span style="color: blue;">●</span> Q Ethics: {scores.get('quantum_ethics', 'N/A')}
+            </div>
+            """, unsafe_allow_html=True)
             
             st.markdown("</div>", unsafe_allow_html=True)
             
