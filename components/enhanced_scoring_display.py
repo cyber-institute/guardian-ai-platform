@@ -115,14 +115,81 @@ class EnhancedScoringDisplay:
         """
         st.markdown(button_css, unsafe_allow_html=True)
         
-        # Create Streamlit button with color emoji indicators
-        button_clicked = st.button(
-            f"{colors['icon']} {label}: {display_value}",
-            key=f"{framework_type}_{unique_id}",
-            help=help_text,
-            type="secondary",
-            use_container_width=True
-        )
+        # Generate unique CSS ID for this specific button
+        button_id = f"btn_{framework_type}_{unique_id}_{hash(label)}"
+        
+        # Add button-specific CSS styling
+        st.markdown(f"""
+        <style>
+        #{button_id} {{
+            background-color: {colors['bg']} !important;
+            color: {colors['text']} !important;
+            border: 1px solid {colors['border']} !important;
+            background-image: none !important;
+        }}
+        </style>
+        """, unsafe_allow_html=True)
+        
+        # Create HTML div with button styling that matches Streamlit buttons
+        button_html = f"""
+        <div class="stButton" style="width: 100%; margin: 0px; padding: 0px;">
+            <button id="{button_id}" 
+                    style="
+                        background-color: {colors['bg']} !important;
+                        color: {colors['text']} !important;
+                        border: 1px solid {colors['border']} !important;
+                        background-image: none !important;
+                        height: 18px !important;
+                        padding: 2px 4px !important;
+                        font-size: 8px !important;
+                        font-weight: bold !important;
+                        font-family: inherit !important;
+                        line-height: 1.0 !important;
+                        margin: 0px !important;
+                        border-radius: 0px !important;
+                        width: 100% !important;
+                        cursor: pointer;
+                        transition: opacity 0.2s ease;
+                    " 
+                    onclick="
+                        // Trigger the hidden Streamlit button
+                        const hiddenBtn = document.querySelector('button[data-testid*=\\'{framework_type}_{unique_id}\\']');
+                        if (hiddenBtn) hiddenBtn.click();
+                        // Store click state
+                        window.streamlitButtonClicked = '{framework_type}_{unique_id}';
+                    "
+                    onmouseover="this.style.opacity='0.8'" 
+                    onmouseout="this.style.opacity='1'"
+                    title="{help_text}">
+                {colors['icon']} {label}: {display_value}
+            </button>
+        </div>
+        """
+        
+        st.markdown(button_html, unsafe_allow_html=True)
+        
+        # Hidden Streamlit button for state management
+        if st.button("", key=f"{framework_type}_{unique_id}", help="", type="secondary"):
+            button_clicked = True
+        else:
+            button_clicked = False
+            
+        # Check for JavaScript click trigger
+        if 'streamlitButtonClicked' in st.session_state and st.session_state.get('streamlitButtonClicked') == f"{framework_type}_{unique_id}":
+            button_clicked = True
+            del st.session_state['streamlitButtonClicked']
+        
+        # Hide the Streamlit button completely
+        st.markdown(f"""
+        <style>
+        button[data-testid*="{framework_type}_{unique_id}"] {{
+            display: none !important;
+            visibility: hidden !important;
+            position: absolute !important;
+            left: -9999px !important;
+        }}
+        </style>
+        """, unsafe_allow_html=True)
         
         if button_clicked:
             # Store data for modal popup
