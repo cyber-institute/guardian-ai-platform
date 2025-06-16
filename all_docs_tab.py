@@ -4430,34 +4430,34 @@ def render_card_view(docs):
             q_ethics_analysis_js = str(q_ethics_analysis).replace("'", "\\'").replace('"', '\\"').replace('\n', '<br>')
             preview_content_js = str(preview_content).replace("'", "\\'").replace('"', '\\"')
             
-            # Original HTML buttons with exact styling and working modal popups
+            # Working HTML buttons with debugging
             button_html = f"""
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em;">
-                <div onclick="showModal_{unique_id}('ai_cyber')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                <button onclick="window.showModal_{unique_id}('ai_cyber'); return false;" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
                      title="Click for detailed AI Cybersecurity analysis">
                     AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
-                </div>
-                <div onclick="showModal_{unique_id}('q_cyber')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                </button>
+                <button onclick="window.showModal_{unique_id}('q_cyber'); return false;" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
                      title="Click for detailed Quantum Cybersecurity analysis">
                     Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
-                </div>
-                <div onclick="showModal_{unique_id}('ai_ethics')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                </button>
+                <button onclick="window.showModal_{unique_id}('ai_ethics'); return false;" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
                      title="Click for detailed AI Ethics analysis">
                     AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
-                </div>
-                <div onclick="showModal_{unique_id}('q_ethics')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                </button>
+                <button onclick="window.showModal_{unique_id}('q_ethics'); return false;" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
                      title="Click for detailed Quantum Ethics analysis">
                     Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
-                </div>
+                </button>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; grid-column: 1 / -1; margin-top: 5px;">
-                    <div onclick="showModal_{unique_id}('preview')" style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
+                    <button onclick="window.showModal_{unique_id}('preview'); return false;" style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
                          title="Click to view content preview">
-                        📄 Content Preview
-                    </div>
-                    <div onclick="showModal_{unique_id}('translate')" style="background: #f3e5f5; border: 1px solid #9c27b0; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
+                        Content Preview
+                    </button>
+                    <button onclick="window.showModal_{unique_id}('translate'); return false;" style="background: #f3e5f5; border: 1px solid #9c27b0; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
                          title="Translate document to other languages">
-                        🌐 Translate
-                    </div>
+                        Translate
+                    </button>
                 </div>
             </div>
             
@@ -4473,36 +4473,17 @@ def render_card_view(docs):
             </div>
             
             <script>
-                // Dragging functionality
-                var isDragging_{unique_id} = false;
-                var currentX_{unique_id};
-                var currentY_{unique_id};
-                var initialX_{unique_id};
-                var initialY_{unique_id};
-                var xOffset_{unique_id} = 0;
-                var yOffset_{unique_id} = 0;
-                
-                function getScoreColor_{unique_id}(score, isQuantum) {{
-                    if (score === 'N/A') return '#666';
-                    
-                    if (isQuantum) {{
-                        var tier = parseInt(score.replace('Tier ', ''));
-                        if (tier >= 4) return '#28a745';
-                        if (tier >= 3) return '#ffc107';
-                        return '#dc3545';
-                    }} else {{
-                        var num = parseInt(score.replace('/100', ''));
-                        if (num >= 75) return '#28a745';
-                        if (num >= 50) return '#ffc107';
-                        return '#dc3545';
-                    }}
-                }}
-                
-                function showModal_{unique_id}(type) {{
+                // Define functions on window object for global access
+                window.showModal_{unique_id} = function(type) {{
                     var modal = document.getElementById('modal_{unique_id}');
                     var modalTitle = document.getElementById('modalTitle_{unique_id}');
                     var content = document.getElementById('modalContent_{unique_id}');
                     var modalWindow = document.getElementById('modalWindow_{unique_id}');
+                    
+                    if (!modal || !modalTitle || !content || !modalWindow) {{
+                        console.error('Modal elements not found for {unique_id}');
+                        return;
+                    }}
                     
                     var title = '';
                     var score = '';
@@ -4543,66 +4524,76 @@ def render_card_view(docs):
                             break;
                     }}
                     
-                    var scoreColor = getScoreColor_{unique_id}(score, isQuantum);
-                    modalTitle.textContent = title;
+                    // Get score color
+                    var scoreColor = '#666';
+                    if (score !== 'N/A') {{
+                        if (isQuantum) {{
+                            var tier = parseInt(score.replace('Tier ', ''));
+                            if (tier >= 4) scoreColor = '#28a745';
+                            else if (tier >= 3) scoreColor = '#ffc107';
+                            else scoreColor = '#dc3545';
+                        }} else {{
+                            var num = parseInt(score.replace('/100', ''));
+                            if (num >= 75) scoreColor = '#28a745';
+                            else if (num >= 50) scoreColor = '#ffc107';
+                            else scoreColor = '#dc3545';
+                        }}
+                    }}
                     
+                    modalTitle.textContent = title;
                     content.innerHTML = (score !== 'N/A' ? '<div style="margin-bottom: 12px;"><b>Score: <span style="color: ' + scoreColor + '; font-weight: bold;">' + score + '</span></b></div>' : '') + '<div>' + analysis + '</div>';
                     
                     // Reset position
                     modalWindow.style.left = '10px';
                     modalWindow.style.top = '10px';
                     modalWindow.style.transform = 'translate3d(0px, 0px, 0)';
-                    xOffset_{unique_id} = 0;
-                    yOffset_{unique_id} = 0;
                     
                     modal.style.display = 'block';
                     
-                    // Setup drag functionality after modal is shown
+                    // Setup dragging
                     setTimeout(function() {{
                         var header = document.getElementById('modalHeader_{unique_id}');
-                        if (header && !header.hasAttribute('data-drag-setup')) {{
-                            header.setAttribute('data-drag-setup', 'true');
-                            header.onmousedown = dragStart_{unique_id};
+                        if (header && !header.draggingSetup) {{
+                            header.draggingSetup = true;
+                            var isDragging = false;
+                            var currentX = 0;
+                            var currentY = 0;
+                            var initialX = 0;
+                            var initialY = 0;
+                            var xOffset = 0;
+                            var yOffset = 0;
+                            
+                            header.onmousedown = function(e) {{
+                                initialX = e.clientX - xOffset;
+                                initialY = e.clientY - yOffset;
+                                isDragging = true;
+                                e.preventDefault();
+                            }};
+                            
+                            document.onmousemove = function(e) {{
+                                if (isDragging) {{
+                                    e.preventDefault();
+                                    currentX = e.clientX - initialX;
+                                    currentY = e.clientY - initialY;
+                                    xOffset = currentX;
+                                    yOffset = currentY;
+                                    modalWindow.style.transform = 'translate3d(' + currentX + 'px, ' + currentY + 'px, 0)';
+                                }}
+                            }};
+                            
+                            document.onmouseup = function() {{
+                                isDragging = false;
+                            }};
                         }}
-                    }}, 10);
-                }}
+                    }}, 50);
+                }};
                 
-                function closeModal_{unique_id}() {{
-                    document.getElementById('modal_{unique_id}').style.display = 'none';
-                }}
-                
-                function dragStart_{unique_id}(e) {{
-                    initialX_{unique_id} = e.clientX - xOffset_{unique_id};
-                    initialY_{unique_id} = e.clientY - yOffset_{unique_id};
-                    isDragging_{unique_id} = true;
-                    
-                    document.onmousemove = drag_{unique_id};
-                    document.onmouseup = dragEnd_{unique_id};
-                    e.preventDefault();
-                }}
-                
-                function drag_{unique_id}(e) {{
-                    if (isDragging_{unique_id}) {{
-                        e.preventDefault();
-                        currentX_{unique_id} = e.clientX - initialX_{unique_id};
-                        currentY_{unique_id} = e.clientY - initialY_{unique_id};
-                        xOffset_{unique_id} = currentX_{unique_id};
-                        yOffset_{unique_id} = currentY_{unique_id};
-                        
-                        var modalWindow = document.getElementById('modalWindow_{unique_id}');
-                        if (modalWindow) {{
-                            modalWindow.style.transform = 'translate3d(' + currentX_{unique_id} + 'px, ' + currentY_{unique_id} + 'px, 0)';
-                        }}
+                window.closeModal_{unique_id} = function() {{
+                    var modal = document.getElementById('modal_{unique_id}');
+                    if (modal) {{
+                        modal.style.display = 'none';
                     }}
-                }}
-                
-                function dragEnd_{unique_id}(e) {{
-                    initialX_{unique_id} = currentX_{unique_id};
-                    initialY_{unique_id} = currentY_{unique_id};
-                    isDragging_{unique_id} = false;
-                    document.onmousemove = null;
-                    document.onmouseup = null;
-                }}
+                }};
             </script>
             """
             
