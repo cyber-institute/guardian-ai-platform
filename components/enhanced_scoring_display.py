@@ -208,22 +208,16 @@ class EnhancedScoringDisplay:
         
         with col1:
             # AI Cybersecurity Score
-            score_col, help_col = st.columns([4, 1])
-            with score_col:
-                clicked = self.render_enhanced_score_button(
-                    score=scores.get('ai_cybersecurity', 'N/A'),
-                    label="AI Cyber",
-                    framework_type="ai_cybersecurity",
-                    unique_id=unique_id,
-                    help_text="AI Cybersecurity Framework Assessment - Click for detailed analysis",
-                    on_click_data=document_data
-                )
-                if clicked:
-                    st.rerun()
-            
-            with help_col:
-                if help_tooltips:
-                    help_tooltips.render_help_icon('ai_cybersecurity_score', size="small")
+            clicked = self.render_enhanced_score_button(
+                score=scores.get('ai_cybersecurity', 'N/A'),
+                label="AI Cyber",
+                framework_type="ai_cybersecurity",
+                unique_id=unique_id,
+                help_text="AI Cybersecurity Framework Assessment - Click for detailed analysis",
+                on_click_data=document_data
+            )
+            if clicked:
+                st.rerun()
             
             # AI Ethics Score
             score_col, help_col = st.columns([4, 1])

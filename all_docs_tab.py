@@ -408,49 +408,56 @@ def render():
     # Add comprehensive color styling using both CSS and JavaScript
     st.markdown("""
     <style>
-    /* Enhanced CSS with class-based targeting */
-    .score-button-red {
+    /* Enhanced CSS with maximum specificity targeting */
+    .score-button-red,
+    button.score-button-red,
+    .stButton > button.score-button-red,
+    div[data-testid="stButton"] > button.score-button-red {
         background-color: #dc3545 !important;
         color: #ffffff !important;
         border-color: #dc3545 !important;
         background-image: none !important;
+        background-gradient: none !important;
     }
     
-    .score-button-orange {
+    .score-button-orange,
+    button.score-button-orange,
+    .stButton > button.score-button-orange,
+    div[data-testid="stButton"] > button.score-button-orange {
         background-color: #fd7e14 !important;
         color: #ffffff !important;
         border-color: #fd7e14 !important;
         background-image: none !important;
+        background-gradient: none !important;
     }
     
-    .score-button-green {
+    .score-button-green,
+    button.score-button-green,
+    .stButton > button.score-button-green,
+    div[data-testid="stButton"] > button.score-button-green {
         background-color: #28a745 !important;
         color: #ffffff !important;
         border-color: #28a745 !important;
         background-image: none !important;
+        background-gradient: none !important;
     }
     
-    .score-button-gray {
+    .score-button-gray,
+    button.score-button-gray,
+    .stButton > button.score-button-gray,
+    div[data-testid="stButton"] > button.score-button-gray {
         background-color: #6c757d !important;
         color: #ffffff !important;
         border-color: #6c757d !important;
         background-image: none !important;
+        background-gradient: none !important;
     }
     
-    /* Force application on all button types */
-    button.score-button-red,
-    button.score-button-orange,
-    button.score-button-green,
-    button.score-button-gray,
-    .stButton button.score-button-red,
-    .stButton button.score-button-orange,
-    .stButton button.score-button-green,
-    .stButton button.score-button-gray {
-        background-color: inherit !important;
-        color: inherit !important;
-        border-color: inherit !important;
-        background-image: none !important;
-    }
+    /* Additional targeting for nested structures */
+    .stButton button[data-testid*="button"].score-button-red { background-color: #dc3545 !important; color: #ffffff !important; }
+    .stButton button[data-testid*="button"].score-button-orange { background-color: #fd7e14 !important; color: #ffffff !important; }
+    .stButton button[data-testid*="button"].score-button-green { background-color: #28a745 !important; color: #ffffff !important; }
+    .stButton button[data-testid*="button"].score-button-gray { background-color: #6c757d !important; color: #ffffff !important; }
     </style>
     
     <script>
@@ -472,75 +479,89 @@ def render():
             button.classList.remove('score-button-red', 'score-button-orange', 'score-button-green', 'score-button-gray');
             
             let colorClass = '';
+            let bgColor = '';
             
             // Determine color based on content
             if (text.includes('Tier 1') || text.includes('Tier 2')) {
                 colorClass = 'score-button-red';
+                bgColor = '#dc3545';
             } else if (text.includes('Tier 3')) {
                 colorClass = 'score-button-orange';
+                bgColor = '#fd7e14';
             } else if (text.includes('Tier 4') || text.includes('Tier 5')) {
                 colorClass = 'score-button-green';
+                bgColor = '#28a745';
             } else if (text.includes('N/A')) {
                 colorClass = 'score-button-gray';
+                bgColor = '#6c757d';
             } else {
-                // Check for numeric scores
-                const scoreMatch = text.match(/(\\d+)\\/100/);
+                // Check for numeric scores - corrected regex
+                const scoreMatch = text.match(/(\\d+)\/100/);
                 if (scoreMatch) {
                     const score = parseInt(scoreMatch[1]);
                     if (score >= 75) {
                         colorClass = 'score-button-green';
+                        bgColor = '#28a745';
                     } else if (score >= 50) {
                         colorClass = 'score-button-orange';
+                        bgColor = '#fd7e14';
                     } else {
                         colorClass = 'score-button-red';
+                        bgColor = '#dc3545';
                     }
                 }
             }
             
-            // Apply color class
-            if (colorClass) {
+            // Apply styles directly
+            if (bgColor) {
                 button.classList.add(colorClass);
+                button.style.setProperty('background-color', bgColor, 'important');
+                button.style.setProperty('color', '#ffffff', 'important');
+                button.style.setProperty('border-color', bgColor, 'important');
+                button.style.setProperty('background-image', 'none', 'important');
+                button.style.setProperty('background-gradient', 'none', 'important');
                 coloredCount++;
-                
-                // Also apply inline styles as backup
-                const colors = {
-                    'score-button-red': { bg: '#dc3545', text: '#ffffff', border: '#dc3545' },
-                    'score-button-orange': { bg: '#fd7e14', text: '#ffffff', border: '#fd7e14' },
-                    'score-button-green': { bg: '#28a745', text: '#ffffff', border: '#28a745' },
-                    'score-button-gray': { bg: '#6c757d', text: '#ffffff', border: '#6c757d' }
-                };
-                
-                if (colors[colorClass]) {
-                    const color = colors[colorClass];
-                    button.style.setProperty('background-color', color.bg, 'important');
-                    button.style.setProperty('color', color.text, 'important');
-                    button.style.setProperty('border-color', color.border, 'important');
-                    button.style.setProperty('background-image', 'none', 'important');
-                }
             }
         });
         
         console.log(`Applied colors to ${coloredCount} scoring buttons`);
     }
     
-    // Apply immediately
-    applyButtonColors();
+    // Enhanced application strategy
+    function initButtonColorSystem() {
+        applyButtonColors();
+        
+        // Set up mutation observer for dynamic content
+        const observer = new MutationObserver((mutations) => {
+            let shouldUpdate = false;
+            mutations.forEach(mutation => {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    shouldUpdate = true;
+                }
+            });
+            if (shouldUpdate) {
+                setTimeout(applyButtonColors, 100);
+            }
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        
+        // Multiple application attempts
+        setTimeout(applyButtonColors, 200);
+        setTimeout(applyButtonColors, 600);
+        setTimeout(applyButtonColors, 1200);
+        setTimeout(applyButtonColors, 2500);
+    }
     
-    // Apply on DOM changes
-    const observer = new MutationObserver(() => {
-        setTimeout(applyButtonColors, 50);
-    });
-    
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
-    
-    // Apply multiple times to ensure coverage
-    setTimeout(applyButtonColors, 100);
-    setTimeout(applyButtonColors, 500);
-    setTimeout(applyButtonColors, 1000);
-    setTimeout(applyButtonColors, 2000);
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initButtonColorSystem);
+    } else {
+        initButtonColorSystem();
+    }
     </script>
     """, unsafe_allow_html=True)
     
