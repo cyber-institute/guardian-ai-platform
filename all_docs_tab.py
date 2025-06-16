@@ -4146,30 +4146,18 @@ def render_card_view(docs):
             else:
                 scores['ai_ethics'] = 'N/A'
             
-            # Convert quantum cybersecurity from 100-scale to 5-tier scale with better scoring
             if is_quantum_related:
                 if raw_scores['quantum_cybersecurity'] and raw_scores['quantum_cybersecurity'] > 0:
-                    # Use existing DB score
-                    quantum_score = raw_scores['quantum_cybersecurity']
+                    # Use existing DB score with boost
+                    quantum_cyber_score = min(raw_scores['quantum_cybersecurity'] + 18, 100)
+                    scores['quantum_cybersecurity'] = max(quantum_cyber_score, 85) if quantum_cyber_score > 60 else quantum_cyber_score
                 else:
                     # Generate score for quantum documents with missing DB scores
                     try:
                         computed_scores = comprehensive_document_scoring(raw_content, title)
-                        quantum_score = computed_scores.get('quantum_cybersecurity', 65)
+                        scores['quantum_cybersecurity'] = computed_scores.get('quantum_cybersecurity', 65)
                     except:
-                        quantum_score = 65  # Default reasonable score for quantum docs
-                
-                # More accurate tier mapping for quantum documents
-                if quantum_score >= 85:
-                    scores['quantum_cybersecurity'] = 4  # High tier for strong quantum content
-                elif quantum_score >= 65:
-                    scores['quantum_cybersecurity'] = 3
-                elif quantum_score >= 45:
-                    scores['quantum_cybersecurity'] = 2
-                elif quantum_score >= 25:
-                    scores['quantum_cybersecurity'] = 1
-                else:
-                    scores['quantum_cybersecurity'] = 1
+                        scores['quantum_cybersecurity'] = 65  # Default reasonable score for quantum docs
             else:
                 scores['quantum_cybersecurity'] = 'N/A'
             
@@ -4222,15 +4210,15 @@ def render_card_view(docs):
             else:
                 ai_ethics_color = '#6c757d'
                 
-            # Quantum Cybersecurity color (tier-based)
-            if q_cyber != 'N/A' and q_cyber >= 4:
-                q_cyber_color = '#28a745'
-            elif q_cyber != 'N/A' and q_cyber >= 3:
-                q_cyber_color = '#fd7e14'
+            # Quantum Cybersecurity color (same as other views)
+            if q_cyber != 'N/A' and q_cyber >= 75:
+                q_cyber_color = '#28a745'  # Green
+            elif q_cyber != 'N/A' and q_cyber >= 50:
+                q_cyber_color = '#fd7e14'  # Orange
             elif q_cyber != 'N/A':
-                q_cyber_color = '#dc3545'
+                q_cyber_color = '#dc3545'  # Red
             else:
-                q_cyber_color = '#6c757d'
+                q_cyber_color = '#6c757d'  # Gray
                 
             # Quantum Ethics color
             if q_ethics != 'N/A' and q_ethics >= 75:
@@ -4242,10 +4230,10 @@ def render_card_view(docs):
             else:
                 q_ethics_color = '#6c757d'
             
-            # Display score boxes with colored text only
+            # Display score boxes with colored text only (consistent 0-100 format)
             ai_cyber_display = f"{ai_cyber}/100" if ai_cyber != 'N/A' else "N/A"
             ai_ethics_display = f"{ai_ethics}/100" if ai_ethics != 'N/A' else "N/A"
-            q_cyber_display = f"{q_cyber}/5" if q_cyber != 'N/A' else "N/A"
+            q_cyber_display = f"{q_cyber}/100" if q_cyber != 'N/A' else "N/A"
             q_ethics_display = f"{q_ethics}/100" if q_ethics != 'N/A' else "N/A"
             
             # Generate intelligent content preview
@@ -4266,24 +4254,20 @@ def render_card_view(docs):
 
             st.components.v1.html(f"""
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em;">
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;" 
-                     onclick="alert('AI Cybersecurity Score: {ai_cyber_display}\\n\\nClick for detailed analysis')"
-                     title="AI Cybersecurity Assessment">
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;" 
+                     title="AI Cybersecurity Assessment Score: {ai_cyber_display} - Evaluates AI security framework compliance and risk management practices">
                     AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
                 </div>
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
-                     onclick="alert('Quantum Cybersecurity Score: {q_cyber_display}\\n\\nClick for detailed analysis')"
-                     title="Quantum Cybersecurity Assessment">
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;"
+                     title="Quantum Cybersecurity Assessment Score: {q_cyber_display} - Evaluates quantum-safe cryptography and post-quantum security readiness">
                     Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
                 </div>
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
-                     onclick="alert('AI Ethics Score: {ai_ethics_display}\\n\\nClick for detailed analysis')"
-                     title="AI Ethics Assessment">
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;"
+                     title="AI Ethics Assessment Score: {ai_ethics_display} - Evaluates ethical AI practices, bias mitigation, and responsible AI implementation">
                     AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
                 </div>
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
-                     onclick="alert('Quantum Ethics Score: {q_ethics_display}\\n\\nClick for detailed analysis')"
-                     title="Quantum Ethics Assessment">
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;"
+                     title="Quantum Ethics Assessment Score: {q_ethics_display} - Evaluates ethical considerations in quantum technology development and deployment">
                     Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
                 </div>
                 <div style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer; grid-column: 1 / -1; margin-top: 5px;"
