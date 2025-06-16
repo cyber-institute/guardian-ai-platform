@@ -4,6 +4,7 @@ from utils.db import fetch_documents
 from components.help_tooltips import HelpTooltips
 from components.enhanced_scoring_display import EnhancedScoringDisplay
 from components.compact_layout import apply_ultra_compact_css
+from components.smart_help_bubbles import smart_help
 
 # Initialize help tooltips and enhanced scoring display
 help_tooltips = HelpTooltips()
@@ -632,9 +633,17 @@ def render():
         'differential_privacy', 'explainable_ai', 'ai_safety', 'privacy_engineering', 'model_governance'
     ]
     
-    # Title without help icon
-    st.markdown("<h1 style='font-size: 2rem; margin-bottom: 0.5rem;'>Policy Repository</h1>", unsafe_allow_html=True)
+    # Title with smart help bubble integration
+    title_html = smart_help.render_smart_tooltip(
+        "Policy Repository", 
+        "document_scoring",
+        style="bubble"
+    )
+    st.markdown(f"<h1 style='font-size: 2rem; margin-bottom: 0.5rem;'>{title_html}</h1>", unsafe_allow_html=True)
     st.markdown("Repository with comprehensive document analysis and risk assessment frameworks.")
+    
+    # Render progress-aware help for this section
+    smart_help.render_progress_aware_help('policy_repository')
 
     try:
         # Force refresh documents - clear all caching mechanisms
@@ -816,7 +825,13 @@ def render():
     filter_col1, filter_col2, filter_col3, filter_col4, filter_col5 = st.columns([2, 2, 1.5, 1.5, 1])
     
     with filter_col1:
-        st.markdown('<span title="Policy: Government/organizational policies. Standard: Industry standards (NIST, ISO). Regulation: Legal regulations and laws. Guidance: Best practice documents. Research: Academic papers and studies." style="margin-bottom: -10px; display: block;">Document Type</span>', unsafe_allow_html=True)
+        # Add smart help bubble to filter label
+        filter_help_html = smart_help.render_smart_tooltip(
+            "Document Type", 
+            "filter_usage",
+            style="minimal"
+        )
+        st.markdown(f'<div style="margin-bottom: -10px; display: block;">{filter_help_html}</div>', unsafe_allow_html=True)
         st.session_state["filters"]["selected_types"] = st.multiselect(
             "Document Type", 
             doc_types,
@@ -828,7 +843,12 @@ def render():
     with filter_col2:
         # Show top organizations only to avoid clutter
         top_orgs = organizations[:12] if len(organizations) > 12 else organizations
-        st.markdown('<span title="The organization, agency, or entity that published or authored the document (e.g., NIST, ISO, government agencies, research institutions)." style="margin-bottom: -10px; display: block;">Author/Organization</span>', unsafe_allow_html=True)
+        org_help_html = smart_help.render_smart_tooltip(
+            "Author/Organization", 
+            "filter_usage",
+            style="minimal"
+        )
+        st.markdown(f'<div style="margin-bottom: -10px; display: block;">{org_help_html}</div>', unsafe_allow_html=True)
         st.session_state["filters"]["selected_orgs"] = st.multiselect(
             "Author/Organization", 
             top_orgs,
