@@ -18,10 +18,12 @@ class SmartHelpBubbles:
             st.session_state.help_interactions = {}
         if 'user_help_preferences' not in st.session_state:
             st.session_state.user_help_preferences = {
-                'detail_level': 'medium',  # basic, medium, detailed
-                'shown_helps': set(),
-                'dismissed_helps': set(),
-                'preferred_formats': ['tooltip', 'expandable']
+                'detail_level': 'adaptive',  # adaptive, minimal, comprehensive
+                'shown_helps': [],
+                'dismissed_helps': [],
+                'preferred_formats': ['tooltip', 'expandable'],
+                'interaction_count': 0,
+                'first_visit': True
             }
         
         self.context_definitions = {
@@ -108,7 +110,8 @@ class SmartHelpBubbles:
                 'dismissed_helps': [],
                 'shown_helps': [],
                 'interaction_count': 0,
-                'first_visit': True
+                'first_visit': True,
+                'detail_level': 'adaptive'
             }
         
         prefs = st.session_state.user_help_preferences
@@ -133,8 +136,18 @@ class SmartHelpBubbles:
         if context_key not in self.context_definitions:
             return ""
         
+        # Initialize user help preferences if not present
+        if 'user_help_preferences' not in st.session_state:
+            st.session_state.user_help_preferences = {
+                'dismissed_helps': [],
+                'shown_helps': [],
+                'interaction_count': 0,
+                'first_visit': True,
+                'detail_level': 'adaptive'
+            }
+        
         prefs = st.session_state.user_help_preferences
-        detail_level = custom_detail_level or prefs['detail_level']
+        detail_level = custom_detail_level or prefs.get('detail_level', 'adaptive')
         
         return self.context_definitions[context_key].get(detail_level, 
                self.context_definitions[context_key]['medium'])
@@ -337,12 +350,17 @@ class SmartHelpBubbles:
     def _dismiss_help(self, help_key: str):
         """Dismiss help and remember user preference"""
         prefs = st.session_state.user_help_preferences
-        prefs['dismissed_helps'].add(help_key)
+        if help_key not in prefs['dismissed_helps']:
+            prefs['dismissed_helps'].append(help_key)
         self._track_help_interaction(help_key, 'dismissed')
         st.rerun()
     
     def _track_help_interaction(self, help_key: str, action: str):
         """Track user interactions with help system"""
+        # Initialize help_interactions if not present
+        if 'help_interactions' not in st.session_state:
+            st.session_state.help_interactions = {}
+        
         interactions = st.session_state.help_interactions
         if help_key not in interactions:
             interactions[help_key] = []
@@ -354,7 +372,8 @@ class SmartHelpBubbles:
         
         # Mark as shown
         if action in ['tooltip_shown', 'bubble_shown']:
-            st.session_state.user_help_preferences['shown_helps'].add(help_key)
+            if help_key not in st.session_state.user_help_preferences['shown_helps']:
+                st.session_state.user_help_preferences['shown_helps'].append(help_key)
     
     def render_help_settings(self):
         """Render help system preferences"""
