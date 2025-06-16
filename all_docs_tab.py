@@ -4287,27 +4287,45 @@ def render_card_view(docs):
             </div>
             """, unsafe_allow_html=True)
             
-            # Hidden Streamlit buttons that get triggered by JavaScript
+            # Hidden Streamlit buttons styled to be invisible
+            st.markdown(f"""
+            <style>
+            button[data-baseweb="button"]:has-text("ai_cyber_{unique_id}"),
+            button[data-baseweb="button"]:has-text("ai_ethics_{unique_id}"),
+            button[data-baseweb="button"]:has-text("q_cyber_{unique_id}"),
+            button[data-baseweb="button"]:has-text("q_ethics_{unique_id}"),
+            button[data-baseweb="button"]:has-text("preview_{unique_id}"),
+            button[data-baseweb="button"]:has-text("translate_{unique_id}") {{
+                display: none !important;
+                position: absolute;
+                left: -9999px;
+                width: 0;
+                height: 0;
+                opacity: 0;
+            }}
+            </style>
+            """, unsafe_allow_html=True)
+            
             col_hidden1, col_hidden2, col_hidden3 = st.columns([1,1,1])
             with col_hidden1:
-                if st.button("AI Cyber", key=f"ai_cyber_{unique_id}", label_visibility="hidden"):
+                if st.button(f"ai_cyber_{unique_id}", key=f"ai_cyber_{unique_id}"):
                     st.session_state[f'show_ai_cyber_{unique_id}'] = True
                     st.rerun()
-                if st.button("AI Ethics", key=f"ai_ethics_{unique_id}", label_visibility="hidden"):
+                if st.button(f"ai_ethics_{unique_id}", key=f"ai_ethics_{unique_id}"):
                     st.session_state[f'show_ai_ethics_{unique_id}'] = True
                     st.rerun()
             with col_hidden2:
-                if st.button("Q Cyber", key=f"q_cyber_{unique_id}", label_visibility="hidden"):
+                if st.button(f"q_cyber_{unique_id}", key=f"q_cyber_{unique_id}"):
                     st.session_state[f'show_q_cyber_{unique_id}'] = True
                     st.rerun()
-                if st.button("Q Ethics", key=f"q_ethics_{unique_id}", label_visibility="hidden"):
+                if st.button(f"q_ethics_{unique_id}", key=f"q_ethics_{unique_id}"):
                     st.session_state[f'show_q_ethics_{unique_id}'] = True
                     st.rerun()
             with col_hidden3:
-                if st.button("Preview", key=f"preview_{unique_id}", label_visibility="hidden"):
+                if st.button(f"preview_{unique_id}", key=f"preview_{unique_id}"):
                     st.session_state[f'show_preview_{unique_id}'] = True
                     st.rerun()
-                if st.button("Translate", key=f"translate_{unique_id}", label_visibility="hidden"):
+                if st.button(f"translate_{unique_id}", key=f"translate_{unique_id}"):
                     st.session_state[f'show_translate_{unique_id}'] = True
                     st.rerun()
             
@@ -4325,22 +4343,22 @@ def render_card_view(docs):
                 }}
                 
                 document.getElementById('ai_cyber_btn_{unique_id}').onclick = function() {{
-                    findAndClickButton('AI Cyber');
+                    findAndClickButton('ai_cyber_{unique_id}');
                 }};
                 document.getElementById('q_cyber_btn_{unique_id}').onclick = function() {{
-                    findAndClickButton('Q Cyber');
+                    findAndClickButton('q_cyber_{unique_id}');
                 }};
                 document.getElementById('ai_ethics_btn_{unique_id}').onclick = function() {{
-                    findAndClickButton('AI Ethics');
+                    findAndClickButton('ai_ethics_{unique_id}');
                 }};
                 document.getElementById('q_ethics_btn_{unique_id}').onclick = function() {{
-                    findAndClickButton('Q Ethics');
+                    findAndClickButton('q_ethics_{unique_id}');
                 }};
                 document.getElementById('preview_btn_{unique_id}').onclick = function() {{
-                    findAndClickButton('Preview');
+                    findAndClickButton('preview_{unique_id}');
                 }};
                 document.getElementById('translate_btn_{unique_id}').onclick = function() {{
-                    findAndClickButton('Translate');
+                    findAndClickButton('translate_{unique_id}');
                 }};
             </script>
             """, unsafe_allow_html=True)
