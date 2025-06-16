@@ -4256,6 +4256,22 @@ def render_card_view(docs):
             q_cyber_display = f"{q_cyber}/5" if q_cyber != 'N/A' else "N/A"
             q_ethics_display = f"{q_ethics}/100" if q_ethics != 'N/A' else "N/A"
             
+            # Generate intelligent content preview
+            content_preview_text = ""
+            try:
+                from utils.intelligent_content_summarizer import generate_intelligent_content_preview
+                intelligent_summary = generate_intelligent_content_preview(
+                    content=raw_content,
+                    title=title,
+                    doc_type=doc.get('document_type', 'Document')
+                )
+                if intelligent_summary and len(intelligent_summary.strip()) > 10:
+                    content_preview_text = intelligent_summary[:300] + ("..." if len(intelligent_summary) > 300 else "")
+                else:
+                    content_preview_text = raw_content[:300] + ("..." if len(raw_content) > 300 else "")
+            except:
+                content_preview_text = raw_content[:300] + ("..." if len(raw_content) > 300 else "")
+
             st.components.v1.html(f"""
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em;">
                 <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;" 
@@ -4278,58 +4294,13 @@ def render_card_view(docs):
                      title="Quantum Ethics Assessment">
                     Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
                 </div>
+                <div style="background: #ffffff; border: 1px solid #dee2e6; padding: 12px; border-radius: 5px; grid-column: 1 / -1; margin-top: 5px;">
+                    <div style="font-weight: bold; color: #495057; margin-bottom: 8px; font-size: 0.9em;">Content Preview</div>
+                    <div style="color: #6c757d; line-height: 1.4; font-size: 0.85em;">{content_preview_text}</div>
+                </div>
             </div>
-            """, height=120)
+            """, height=200)
             st.markdown("</div>", unsafe_allow_html=True)
-            st.markdown("""
-                <style>
-                .streamlit-expanderHeader {
-                    margin-top: 0px !important;
-                    padding-top: 0px !important;
-                }
-                div[data-testid="stExpander"] {
-                    margin-top: 0px !important;
-                    padding-top: 0px !important;
-                }
-                </style>
-            """, unsafe_allow_html=True)
-            with st.expander("Content Preview"):
-                # Generate intelligent content summary from entire document
-                try:
-                    from utils.intelligent_content_summarizer import generate_intelligent_content_preview
-                    
-                    # Use the new intelligent summarizer that analyzes the full document
-                    intelligent_summary = generate_intelligent_content_preview(
-                        content=raw_content,
-                        title=title,
-                        doc_type=doc.get('document_type', 'Document')
-                    )
-                    
-                    if intelligent_summary and len(intelligent_summary.strip()) > 10:
-                        st.markdown(f"<div style='font-size:14px;line-height:1.5;color:#444;background:#f8f9fa;padding:12px;border-radius:6px'>{intelligent_summary}</div>", unsafe_allow_html=True)
-                    else:
-                        # Fallback to basic extraction if summarizer fails
-                        bypass_content = re.sub(r'<[^>]*>', '', raw_content)
-                        bypass_content = re.sub(r'&[a-zA-Z0-9#]+;?', ' ', bypass_content)
-                        bypass_content = re.sub(r'\s+', ' ', bypass_content).strip()
-                        
-                        sentences = bypass_content.split('.')[:3]
-                        clean_sentences = []
-                        for sentence in sentences:
-                            sentence = sentence.strip()
-                            if len(sentence) > 20 and any(c.isalpha() for c in sentence):
-                                clean_sentences.append(sentence)
-                        
-                        if clean_sentences:
-                            final_text = '. '.join(clean_sentences) + '.'
-                            if len(final_text) > 200:
-                                final_text = final_text[:197] + '...'
-                            st.text(final_text)
-                        else:
-                            st.text("Content analysis in progress...")
-                            
-                except Exception as e:
-                    st.text("Content analysis in progress...")
             
             # Add spacing between cards
             st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
