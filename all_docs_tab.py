@@ -3042,52 +3042,57 @@ def render_compact_cards(docs):
                 </div>
             """, unsafe_allow_html=True)
             
-            # Debug: Show actual scores first
-            st.write("DEBUG - Raw scores:", scores)
-            
-            # Simple color test with Plotly
-            import plotly.graph_objects as go
-            
-            # Create a simple colored chart
-            ai_cyber = scores.get('ai_cybersecurity', 0)
-            ai_ethics = scores.get('ai_ethics', 0)
-            q_cyber = scores.get('quantum_cybersecurity', 0)
-            q_ethics = scores.get('quantum_ethics', 0)
-            
-            # Convert values for display
-            if ai_cyber == 'N/A': ai_cyber = 0
-            if ai_ethics == 'N/A': ai_ethics = 0
-            if q_cyber == 'N/A': q_cyber = 0
-            if q_ethics == 'N/A': q_ethics = 0
-            
-            fig = go.Figure(data=[
-                go.Bar(
-                    x=['AI Cyber', 'AI Ethics', 'Q Cyber', 'Q Ethics'],
-                    y=[ai_cyber, ai_ethics, q_cyber * 20, q_ethics],  # Scale Q Cyber for visibility
-                    marker_color=['red' if ai_cyber < 50 else 'orange' if ai_cyber < 75 else 'green',
-                                  'red' if ai_ethics < 50 else 'orange' if ai_ethics < 75 else 'green',
-                                  'red' if q_cyber < 3 else 'orange' if q_cyber < 4 else 'green',
-                                  'red' if q_ethics < 50 else 'orange' if q_ethics < 75 else 'green']
-                )
-            ])
-            
-            fig.update_layout(
-                title="Assessment Scores",
-                height=200,
-                showlegend=False
-            )
-            
-            st.plotly_chart(fig, use_container_width=True)
-            
-            # Alternative: Simple text with color
-            st.markdown(f"""
-            <div style="font-family: monospace; font-size: 14px;">
-                <span style="color: red;">●</span> AI Cyber: {scores.get('ai_cybersecurity', 'N/A')}<br>
-                <span style="color: orange;">●</span> AI Ethics: {scores.get('ai_ethics', 'N/A')}<br>
-                <span style="color: green;">●</span> Quantum: {scores.get('quantum_cybersecurity', 'N/A')}<br>
-                <span style="color: blue;">●</span> Q Ethics: {scores.get('quantum_ethics', 'N/A')}
+            # Test direct HTML components approach
+            st.components.v1.html(f"""
+            <div style="padding: 10px; font-family: Arial;">
+                <h4>Assessment Scores (Direct HTML)</h4>
+                <div style="background: red; color: white; padding: 5px; margin: 2px; border-radius: 3px;">
+                    AI Cybersecurity: {scores.get('ai_cybersecurity', 'N/A')}
+                </div>
+                <div style="background: orange; color: white; padding: 5px; margin: 2px; border-radius: 3px;">
+                    AI Ethics: {scores.get('ai_ethics', 'N/A')}
+                </div>
+                <div style="background: green; color: white; padding: 5px; margin: 2px; border-radius: 3px;">
+                    Quantum Cyber: {scores.get('quantum_cybersecurity', 'N/A')}
+                </div>
+                <div style="background: blue; color: white; padding: 5px; margin: 2px; border-radius: 3px;">
+                    Quantum Ethics: {scores.get('quantum_ethics', 'N/A')}
+                </div>
             </div>
-            """, unsafe_allow_html=True)
+            """, height=200)
+            
+            # Also try with image-based approach
+            import matplotlib.pyplot as plt
+            import matplotlib.patches as patches
+            import io
+            import base64
+            
+            fig, ax = plt.subplots(1, 1, figsize=(6, 2))
+            ax.set_xlim(0, 10)
+            ax.set_ylim(0, 2)
+            ax.axis('off')
+            
+            # Create colored rectangles
+            colors = ['red', 'orange', 'green', 'blue']
+            labels = ['AI Cyber', 'AI Ethics', 'Q Cyber', 'Q Ethics']
+            values = [scores.get('ai_cybersecurity', 'N/A'), 
+                     scores.get('ai_ethics', 'N/A'),
+                     scores.get('quantum_cybersecurity', 'N/A'),
+                     scores.get('quantum_ethics', 'N/A')]
+            
+            for i, (color, label, value) in enumerate(zip(colors, labels, values)):
+                rect = patches.Rectangle((i*2.5, 0.5), 2, 1, linewidth=1, 
+                                       edgecolor='black', facecolor=color, alpha=0.7)
+                ax.add_patch(rect)
+                ax.text(i*2.5 + 1, 1, f"{label}\n{value}", ha='center', va='center', 
+                       fontsize=8, color='white', weight='bold')
+            
+            plt.tight_layout()
+            st.pyplot(fig)
+            plt.close()
+            
+            # Debug raw scores
+            st.write("DEBUG - Raw scores:", scores)
             
             st.markdown("</div>", unsafe_allow_html=True)
             
