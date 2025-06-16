@@ -220,59 +220,41 @@ class EnhancedScoringDisplay:
                 st.rerun()
             
             # AI Ethics Score
-            score_col, help_col = st.columns([4, 1])
-            with score_col:
-                clicked = self.render_enhanced_score_button(
-                    score=scores.get('ai_ethics', 'N/A'),
-                    label="AI Ethics",
-                    framework_type="ai_ethics",
-                    unique_id=unique_id,
-                    help_text="AI Ethics Evaluation Framework - Click for detailed analysis",
-                    on_click_data=document_data
-                )
-                if clicked:
-                    st.rerun()
-            
-            with help_col:
-                if help_tooltips:
-                    help_tooltips.render_help_icon('ai_ethics_score', size="small")
+            clicked = self.render_enhanced_score_button(
+                score=scores.get('ai_ethics', 'N/A'),
+                label="AI Ethics",
+                framework_type="ai_ethics",
+                unique_id=unique_id,
+                help_text="AI Ethics Evaluation Framework - Click for detailed analysis",
+                on_click_data=document_data
+            )
+            if clicked:
+                st.rerun()
         
         with col2:
             # Quantum Cybersecurity Score
-            score_col, help_col = st.columns([4, 1])
-            with score_col:
-                clicked = self.render_enhanced_score_button(
-                    score=scores.get('quantum_cybersecurity', 'N/A'),
-                    label="Q Cyber",
-                    framework_type="quantum_cybersecurity",
-                    unique_id=unique_id,
-                    help_text="Quantum Cybersecurity Maturity Assessment - Click for detailed analysis",
-                    on_click_data=document_data
-                )
-                if clicked:
-                    st.rerun()
-            
-            with help_col:
-                if help_tooltips:
-                    help_tooltips.render_help_icon('quantum_cybersecurity_score', size="small")
+            clicked = self.render_enhanced_score_button(
+                score=scores.get('quantum_cybersecurity', 'N/A'),
+                label="Q Cyber",
+                framework_type="quantum_cybersecurity",
+                unique_id=unique_id,
+                help_text="Quantum Cybersecurity Maturity Assessment - Click for detailed analysis",
+                on_click_data=document_data
+            )
+            if clicked:
+                st.rerun()
             
             # Quantum Ethics Score
-            score_col, help_col = st.columns([4, 1])
-            with score_col:
-                clicked = self.render_enhanced_score_button(
-                    score=scores.get('quantum_ethics', 'N/A'),
-                    label="Q Ethics",
-                    framework_type="quantum_ethics",
-                    unique_id=unique_id,
-                    help_text="Quantum Ethics Framework Assessment - Click for detailed analysis",
-                    on_click_data=document_data
-                )
-                if clicked:
-                    st.rerun()
-            
-            with help_col:
-                if help_tooltips:
-                    help_tooltips.render_help_icon('quantum_ethics_score', size="small")
+            clicked = self.render_enhanced_score_button(
+                score=scores.get('quantum_ethics', 'N/A'),
+                label="Q Ethics",
+                framework_type="quantum_ethics",
+                unique_id=unique_id,
+                help_text="Quantum Ethics Framework Assessment - Click for detailed analysis",
+                on_click_data=document_data
+            )
+            if clicked:
+                st.rerun()
     
     def render_analysis_popup(self, unique_id: str) -> None:
         """Render detailed analysis popup when score button is clicked"""
