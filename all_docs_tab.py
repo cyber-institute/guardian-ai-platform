@@ -632,13 +632,9 @@ def render():
         'differential_privacy', 'explainable_ai', 'ai_safety', 'privacy_engineering', 'model_governance'
     ]
     
-    # Title with help icon
-    col1, col2 = st.columns([6, 1])
-    with col1:
-        st.markdown("<h1 style='font-size: 2rem; margin-bottom: 0.5rem;'>Policy Repository</h1>", unsafe_allow_html=True)
-        st.markdown("Repository with comprehensive document analysis and risk assessment frameworks.")
-    with col2:
-        help_tooltips.render_help_icon('risk_assessment', size="medium")
+    # Title without help icon
+    st.markdown("<h1 style='font-size: 2rem; margin-bottom: 0.5rem;'>Policy Repository</h1>", unsafe_allow_html=True)
+    st.markdown("Repository with comprehensive document analysis and risk assessment frameworks.")
 
     try:
         # Force refresh documents - clear all caching mechanisms
