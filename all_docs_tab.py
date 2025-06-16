@@ -4174,33 +4174,33 @@ def render_card_view(docs):
             else:
                 q_ethics_color = '#6c757d'
             
-            # Display colored score boxes
+            # Display score boxes with colored text only
             ai_cyber_display = f"{ai_cyber}/100" if ai_cyber != 'N/A' else "N/A"
             ai_ethics_display = f"{ai_ethics}/100" if ai_ethics != 'N/A' else "N/A"
-            q_cyber_display = f"Tier {q_cyber}" if q_cyber != 'N/A' else "N/A"
+            q_cyber_display = f"{q_cyber}/5" if q_cyber != 'N/A' else "N/A"
             q_ethics_display = f"{q_ethics}/100" if q_ethics != 'N/A' else "N/A"
             
             st.components.v1.html(f"""
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0;">
-                <div style="background: {ai_cyber_color}; color: white; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; cursor: pointer;" 
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;" 
                      onclick="alert('AI Cybersecurity Score: {ai_cyber_display}\\n\\nClick for detailed analysis')"
                      title="AI Cybersecurity Assessment">
-                    AI Cybersecurity: {ai_cyber_display}
+                    AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
                 </div>
-                <div style="background: {q_cyber_color}; color: white; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; cursor: pointer;"
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
                      onclick="alert('Quantum Cybersecurity Score: {q_cyber_display}\\n\\nClick for detailed analysis')"
                      title="Quantum Cybersecurity Assessment">
-                    Quantum Cyber: {q_cyber_display}
+                    Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
                 </div>
-                <div style="background: {ai_ethics_color}; color: white; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; cursor: pointer;"
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
                      onclick="alert('AI Ethics Score: {ai_ethics_display}\\n\\nClick for detailed analysis')"
                      title="AI Ethics Assessment">
-                    AI Ethics: {ai_ethics_display}
+                    AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
                 </div>
-                <div style="background: {q_ethics_color}; color: white; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; cursor: pointer;"
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
                      onclick="alert('Quantum Ethics Score: {q_ethics_display}\\n\\nClick for detailed analysis')"
                      title="Quantum Ethics Assessment">
-                    Quantum Ethics: {q_ethics_display}
+                    Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
                 </div>
             </div>
             """, height=120)
