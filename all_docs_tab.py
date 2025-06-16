@@ -4339,7 +4339,7 @@ def render_card_view(docs):
             except:
                 content_preview_text = raw_content[:300] + ("..." if len(raw_content) > 300 else "")
 
-            # Generate simple analysis content for modal popups
+            # Generate compact analysis content for modal popups
             def get_ai_cyber_analysis(content, score):
                 try:
                     score_num = int(str(score).replace('/100', ''))
@@ -4348,15 +4348,15 @@ def render_card_view(docs):
                 
                 return f"""This document demonstrates an AI Cybersecurity maturity score of {score}/100.
 
-**Key Analysis:**
-- Document addresses AI security considerations and risk assessment frameworks
-- Content includes guidance on AI system protection and threat mitigation
-- Assessment shows {'excellent' if score_num >= 75 else 'good' if score_num >= 50 else 'developing'} AI cybersecurity practices
+<b>Key Analysis:</b><br>
+• Document addresses AI security considerations and risk assessment frameworks<br>
+• Content includes guidance on AI system protection and threat mitigation<br>
+• Assessment shows {'excellent' if score_num >= 75 else 'good' if score_num >= 50 else 'developing'} AI cybersecurity practices<br><br>
 
-**Recommendations:**
-- Continue implementing robust AI security measures
-- Regular assessment of AI system vulnerabilities
-- Integration with existing cybersecurity frameworks"""
+<b>Recommendations:</b><br>
+• Continue implementing robust AI security measures<br>
+• Regular assessment of AI system vulnerabilities<br>
+• Integration with existing cybersecurity frameworks"""
 
             def get_q_cyber_analysis(content, score):
                 try:
@@ -4366,15 +4366,15 @@ def render_card_view(docs):
                 
                 return f"""This document demonstrates Quantum Cybersecurity maturity of {score}/5.
 
-**Key Analysis:**
-- Document addresses quantum-safe cryptography and post-quantum security measures
-- Content includes quantum threat assessment and mitigation strategies
-- Assessment shows {'advanced' if score_num >= 4 else 'intermediate' if score_num >= 3 else 'basic'} quantum cybersecurity readiness
+<b>Key Analysis:</b><br>
+• Document addresses quantum-safe cryptography and post-quantum security measures<br>
+• Content includes quantum threat assessment and mitigation strategies<br>
+• Assessment shows {'advanced' if score_num >= 4 else 'intermediate' if score_num >= 3 else 'basic'} quantum cybersecurity readiness<br><br>
 
-**Recommendations:**
-- Implement post-quantum cryptographic standards
-- Prepare for quantum computing threats
-- Regular quantum security assessments"""
+<b>Recommendations:</b><br>
+• Implement post-quantum cryptographic standards<br>
+• Prepare for quantum computing threats<br>
+• Regular quantum security assessments"""
 
             def get_ai_ethics_analysis(content, score):
                 try:
@@ -4384,15 +4384,15 @@ def render_card_view(docs):
                 
                 return f"""This document demonstrates an AI Ethics score of {score}/100.
 
-**Key Analysis:**
-- Document addresses ethical AI considerations and bias prevention measures
-- Content includes fairness, transparency, and accountability frameworks
-- Assessment shows {'excellent' if score_num >= 75 else 'good' if score_num >= 50 else 'developing'} AI ethics practices
+<b>Key Analysis:</b><br>
+• Document addresses ethical AI considerations and bias prevention measures<br>
+• Content includes fairness, transparency, and accountability frameworks<br>
+• Assessment shows {'excellent' if score_num >= 75 else 'good' if score_num >= 50 else 'developing'} AI ethics practices<br><br>
 
-**Recommendations:**
-- Implement comprehensive bias detection systems
-- Regular ethical AI audits and assessments
-- Stakeholder engagement in AI ethics governance"""
+<b>Recommendations:</b><br>
+• Implement comprehensive bias detection systems<br>
+• Regular ethical AI audits and assessments<br>
+• Stakeholder engagement in AI ethics governance"""
 
             def get_q_ethics_analysis(content, score):
                 try:
@@ -4402,15 +4402,15 @@ def render_card_view(docs):
                 
                 return f"""This document demonstrates Quantum Ethics considerations scoring {score}/100.
 
-**Key Analysis:**
-- Document addresses quantum computing ethics and access equity concerns
-- Content includes quantum technology governance and societal impact
-- Assessment shows {'excellent' if score_num >= 75 else 'good' if score_num >= 50 else 'developing'} quantum ethics considerations
+<b>Key Analysis:</b><br>
+• Document addresses quantum computing ethics and access equity concerns<br>
+• Content includes quantum technology governance and societal impact<br>
+• Assessment shows {'excellent' if score_num >= 75 else 'good' if score_num >= 50 else 'developing'} quantum ethics considerations<br><br>
 
-**Recommendations:**
-- Ensure equitable access to quantum technologies
-- Address quantum computing's societal implications
-- Develop quantum governance frameworks"""
+<b>Recommendations:</b><br>
+• Ensure equitable access to quantum technologies<br>
+• Address quantum computing's societal implications<br>
+• Develop quantum governance frameworks"""
 
             # Generate analysis content using local functions
             ai_cyber_analysis = get_ai_cyber_analysis(raw_content, ai_cyber) if ai_cyber != 'N/A' else "No AI cybersecurity assessment available for this document."
@@ -4461,61 +4461,103 @@ def render_card_view(docs):
                 </div>
             </div>
             
-            <!-- Modal popup window -->
-            <div id="modal_{unique_id}" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
-                <div style="background-color: white; margin: 5% auto; padding: 20px; border-radius: 10px; width: 80%; max-width: 600px; max-height: 80%; overflow-y: auto; position: relative;">
-                    <span onclick="closeModal_{unique_id}()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; right: 15px; top: 10px;">&times;</span>
-                    <div id="modalContent_{unique_id}" style="margin-top: 30px;"></div>
+            <!-- Draggable Modal popup window -->
+            <div id="modal_{unique_id}" style="display: none; position: fixed; z-index: 10000;">
+                <div id="modalWindow_{unique_id}" style="background-color: white; border: 2px solid #ccc; border-radius: 8px; width: 500px; max-height: 400px; overflow-y: auto; position: absolute; top: 10px; left: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
+                    <div id="modalHeader_{unique_id}" style="background-color: #f8f9fa; padding: 10px 15px; border-bottom: 1px solid #ddd; cursor: move; font-family: Arial, sans-serif; font-weight: bold; border-radius: 6px 6px 0 0;">
+                        <span id="modalTitle_{unique_id}">Analysis</span>
+                        <span onclick="closeModal_{unique_id}()" style="color: #666; float: right; font-size: 20px; font-weight: bold; cursor: pointer; line-height: 1;">&times;</span>
+                    </div>
+                    <div id="modalContent_{unique_id}" style="padding: 15px; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.4;"></div>
                 </div>
             </div>
             
             <script>
+                // Dragging functionality
+                let isDragging_{unique_id} = false;
+                let currentX_{unique_id};
+                let currentY_{unique_id};
+                let initialX_{unique_id};
+                let initialY_{unique_id};
+                let xOffset_{unique_id} = 0;
+                let yOffset_{unique_id} = 0;
+                
+                function getScoreColor(score, isQuantum) {{
+                    if (score === 'N/A') return '#666';
+                    
+                    if (isQuantum) {{
+                        // Quantum scoring: Tier 1-5
+                        const tier = parseInt(score.replace('Tier ', ''));
+                        if (tier >= 4) return '#28a745'; // Green
+                        if (tier >= 3) return '#ffc107'; // Orange  
+                        return '#dc3545'; // Red
+                    }} else {{
+                        // AI scoring: 0-100
+                        const num = parseInt(score.replace('/100', ''));
+                        if (num >= 75) return '#28a745'; // Green
+                        if (num >= 50) return '#ffc107'; // Orange
+                        return '#dc3545'; // Red
+                    }}
+                }}
+                
                 function showModal_{unique_id}(type) {{
                     const modal = document.getElementById('modal_{unique_id}');
+                    const modalTitle = document.getElementById('modalTitle_{unique_id}');
                     const content = document.getElementById('modalContent_{unique_id}');
+                    const modalWindow = document.getElementById('modalWindow_{unique_id}');
                     
                     let title = '';
                     let score = '';
                     let analysis = '';
+                    let isQuantum = false;
                     
                     switch(type) {{
                         case 'ai_cyber':
-                            title = '🔒 AI Cybersecurity Analysis';
+                            title = 'AI Cybersecurity Analysis';
                             score = '{ai_cyber_display}';
                             analysis = '{ai_cyber_analysis_js}';
                             break;
                         case 'q_cyber':
-                            title = '🔐 Quantum Cybersecurity Analysis';
+                            title = 'Quantum Cybersecurity Analysis';
                             score = '{q_cyber_display}';
                             analysis = '{q_cyber_analysis_js}';
+                            isQuantum = true;
                             break;
                         case 'ai_ethics':
-                            title = '⚖️ AI Ethics Analysis';
+                            title = 'AI Ethics Analysis';
                             score = '{ai_ethics_display}';
                             analysis = '{ai_ethics_analysis_js}';
                             break;
                         case 'q_ethics':
-                            title = '⚖️ Quantum Ethics Analysis';
+                            title = 'Quantum Ethics Analysis';
                             score = '{q_ethics_display}';
                             analysis = '{q_ethics_analysis_js}';
                             break;
                         case 'preview':
-                            title = '📄 Content Preview';
+                            title = 'Content Preview';
                             score = 'N/A';
                             analysis = '{preview_content_js}';
                             break;
                         case 'translate':
-                            title = '🌐 Document Translation';
+                            title = 'Document Translation';
                             score = 'N/A';
                             analysis = 'Translation features coming soon. This document can be translated into multiple languages.';
                             break;
                     }}
                     
+                    const scoreColor = getScoreColor(score, isQuantum);
+                    modalTitle.textContent = title;
+                    
                     content.innerHTML = `
-                        <h3 style="margin-top: 0;">${{title}}</h3>
-                        ${{score !== 'N/A' ? '<p><strong>Score: ' + score + '</strong></p>' : ''}}
-                        <div style="margin-top: 15px; line-height: 1.6;">${{analysis}}</div>
+                        ${{score !== 'N/A' ? '<div style="margin-bottom: 12px;"><b>Score: <span style="color: ' + scoreColor + '; font-weight: bold;">' + score + '</span></b></div>' : ''}}
+                        <div>${{analysis}}</div>
                     `;
+                    
+                    // Reset position
+                    modalWindow.style.left = '10px';
+                    modalWindow.style.top = '10px';
+                    xOffset_{unique_id} = 0;
+                    yOffset_{unique_id} = 0;
                     
                     modal.style.display = 'block';
                 }}
@@ -4524,12 +4566,38 @@ def render_card_view(docs):
                     document.getElementById('modal_{unique_id}').style.display = 'none';
                 }}
                 
-                // Close modal when clicking outside of it
-                window.onclick = function(event) {{
-                    const modal = document.getElementById('modal_{unique_id}');
-                    if (event.target == modal) {{
-                        modal.style.display = 'none';
+                // Dragging event listeners
+                document.getElementById('modalHeader_{unique_id}').addEventListener('mousedown', dragStart_{unique_id});
+                document.addEventListener('mousemove', drag_{unique_id});
+                document.addEventListener('mouseup', dragEnd_{unique_id});
+                
+                function dragStart_{unique_id}(e) {{
+                    initialX_{unique_id} = e.clientX - xOffset_{unique_id};
+                    initialY_{unique_id} = e.clientY - yOffset_{unique_id};
+                    
+                    if (e.target === document.getElementById('modalHeader_{unique_id}') || 
+                        e.target === document.getElementById('modalTitle_{unique_id}')) {{
+                        isDragging_{unique_id} = true;
                     }}
+                }}
+                
+                function drag_{unique_id}(e) {{
+                    if (isDragging_{unique_id}) {{
+                        e.preventDefault();
+                        currentX_{unique_id} = e.clientX - initialX_{unique_id};
+                        currentY_{unique_id} = e.clientY - initialY_{unique_id};
+                        xOffset_{unique_id} = currentX_{unique_id};
+                        yOffset_{unique_id} = currentY_{unique_id};
+                        
+                        const modalWindow = document.getElementById('modalWindow_{unique_id}');
+                        modalWindow.style.transform = `translate3d(${{currentX_{unique_id}}}px, ${{currentY_{unique_id}}}px, 0)`;
+                    }}
+                }}
+                
+                function dragEnd_{unique_id}(e) {{
+                    initialX_{unique_id} = currentX_{unique_id};
+                    initialY_{unique_id} = currentY_{unique_id};
+                    isDragging_{unique_id} = false;
                 }}
             </script>
             """
