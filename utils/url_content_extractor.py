@@ -49,8 +49,7 @@ class URLContentExtractor:
             enhanced_metadata = extract_enhanced_metadata(
                 title="",  # Will be extracted from content
                 content=text_content,
-                url=url,
-                filename=parsed_url.path.split('/')[-1] if parsed_url.path else ""
+                url=url
             )
             
             # Use enhanced metadata with fallback to basic extraction
@@ -226,6 +225,99 @@ class URLContentExtractor:
             return 'Report'
         else:
             return 'Web Document'
+    
+    def _fallback_content_extraction(self, html_content: str, url: str) -> str:
+        """Fallback content extraction for JavaScript-heavy sites"""
+        
+        from bs4 import BeautifulSoup
+        
+        try:
+            soup = BeautifulSoup(html_content, 'html.parser')
+            
+            # Remove script and style elements
+            for script in soup(["script", "style", "noscript"]):
+                script.decompose()
+            
+            # Extract text from specific containers commonly used for content
+            content_selectors = [
+                'main', 'article', '.content', '#content', '.main-content',
+                '.post-content', '.entry-content', '.page-content',
+                '[role="main"]', '.container', '.wrapper'
+            ]
+            
+            extracted_text = ""
+            
+            for selector in content_selectors:
+                elements = soup.select(selector)
+                for element in elements:
+                    text = element.get_text(strip=True, separator=' ')
+                    if len(text) > len(extracted_text):
+                        extracted_text = text
+            
+            # If no specific containers found, extract all text
+            if not extracted_text or len(extracted_text.strip()) < 100:
+                extracted_text = soup.get_text(strip=True, separator=' ')
+            
+            # Clean up the extracted text
+            lines = extracted_text.split('\n')
+            meaningful_lines = []
+            
+            for line in lines:
+                line = line.strip()
+                # Skip very short lines, navigation items, and common web elements
+                if (len(line) > 20 and 
+                    not line.lower().startswith(('menu', 'navigation', 'home', 'about', 'contact')) and
+                    not re.match(r'^[A-Z\s]{2,20}$', line)):  # Skip all-caps navigation
+                    meaningful_lines.append(line)
+            
+            result = ' '.join(meaningful_lines)
+            
+            # For TikTok and similar sites, extract from JSON-LD or other structured data
+            if 'tiktok.com' in url.lower():
+                result = self._extract_tiktok_content(soup, result)
+            
+            return result[:10000]  # Limit content length
+            
+        except Exception as e:
+            # Last resort - basic text extraction
+            text = re.sub(r'<[^>]+>', '', html_content)
+            text = re.sub(r'\s+', ' ', text).strip()
+            return text[:5000]
+    
+    def _extract_tiktok_content(self, soup, fallback_text: str) -> str:
+        """Extract content specifically from TikTok transparency pages"""
+        
+        # Look for JSON-LD structured data
+        json_scripts = soup.find_all('script', type='application/ld+json')
+        for script in json_scripts:
+            try:
+                import json
+                data = json.loads(script.string)
+                if isinstance(data, dict) and 'description' in data:
+                    return data['description']
+            except:
+                continue
+        
+        # Look for meta descriptions and content
+        meta_desc = soup.find('meta', attrs={'name': 'description'})
+        if meta_desc and meta_desc.get('content'):
+            description = meta_desc['content']
+            if len(description) > 100:
+                return f"TikTok Transparency: {description}\n\n{fallback_text[:2000]}"
+        
+        # Look for specific TikTok content sections
+        content_sections = soup.find_all(['div', 'section'], class_=re.compile(r'content|policy|transparency'))
+        if content_sections:
+            tiktok_content = []
+            for section in content_sections:
+                text = section.get_text(strip=True, separator=' ')
+                if len(text) > 50:
+                    tiktok_content.append(text)
+            
+            if tiktok_content:
+                return ' '.join(tiktok_content)
+        
+        return fallback_text
     
     def _error_result(self, error_message: str) -> Dict[str, any]:
         """Return error result structure"""
