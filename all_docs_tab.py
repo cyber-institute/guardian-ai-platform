@@ -3042,60 +3042,70 @@ def render_compact_cards(docs):
                 </div>
             """, unsafe_allow_html=True)
             
-            # Use Streamlit status indicators for colored display
-            col1, col2, col3, col4 = st.columns(4)
+            # Multiple colored display options
+            # Option 1: Progress bars with colors
+            st.markdown("**Assessment Scores:**")
             
-            with col1:
-                # AI Cybersecurity
-                ai_cyber = scores.get('ai_cybersecurity', 'N/A')
-                if ai_cyber != 'N/A':
-                    if ai_cyber >= 75:
-                        st.success(f"AI: {ai_cyber}/100")
-                    elif ai_cyber >= 50:
-                        st.warning(f"AI: {ai_cyber}/100")
-                    else:
-                        st.error(f"AI: {ai_cyber}/100")
-                else:
-                    st.info("AI: N/A")
+            # AI Cybersecurity
+            ai_cyber = scores.get('ai_cybersecurity', 'N/A')
+            if ai_cyber != 'N/A':
+                progress_value = ai_cyber / 100
+                st.markdown(f"**AI Cybersecurity:** {ai_cyber}/100")
+                st.progress(progress_value)
+            else:
+                st.markdown("**AI Cybersecurity:** N/A")
             
-            with col2:
-                # AI Ethics  
-                ai_ethics = scores.get('ai_ethics', 'N/A')
-                if ai_ethics != 'N/A':
-                    if ai_ethics >= 75:
-                        st.success(f"Ethics: {ai_ethics}/100")
-                    elif ai_ethics >= 50:
-                        st.warning(f"Ethics: {ai_ethics}/100")
-                    else:
-                        st.error(f"Ethics: {ai_ethics}/100")
+            # Option 2: Colored text with markdown
+            ai_ethics = scores.get('ai_ethics', 'N/A')
+            if ai_ethics != 'N/A':
+                if ai_ethics >= 75:
+                    color = "green"
+                elif ai_ethics >= 50:
+                    color = "orange"
                 else:
-                    st.info("Ethics: N/A")
+                    color = "red"
+                st.markdown(f"**AI Ethics:** <span style='color:{color}; font-weight:bold'>{ai_ethics}/100</span>", unsafe_allow_html=True)
+            else:
+                st.markdown("**AI Ethics:** N/A")
             
-            with col3:
-                # Quantum Cybersecurity
-                q_cyber = scores.get('quantum_cybersecurity', 'N/A')
-                if q_cyber != 'N/A':
-                    if q_cyber >= 4:
-                        st.success(f"Q: Tier {q_cyber}")
-                    elif q_cyber >= 3:
-                        st.warning(f"Q: Tier {q_cyber}")
-                    else:
-                        st.error(f"Q: Tier {q_cyber}")
+            # Option 3: Color-coded containers
+            q_cyber = scores.get('quantum_cybersecurity', 'N/A')
+            if q_cyber != 'N/A':
+                if q_cyber >= 4:
+                    container_color = "#d4edda"
+                    text_color = "#155724"
+                elif q_cyber >= 3:
+                    container_color = "#fff3cd"
+                    text_color = "#856404"
                 else:
-                    st.info("Q: N/A")
+                    container_color = "#f8d7da"
+                    text_color = "#721c24"
+                
+                st.markdown(f"""
+                <div style='background-color: {container_color}; 
+                           color: {text_color}; 
+                           padding: 8px; 
+                           border-radius: 4px; 
+                           margin: 4px 0;
+                           border: 1px solid {text_color}20;'>
+                    <strong>Quantum Cybersecurity: Tier {q_cyber}</strong>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown("**Quantum Cybersecurity:** N/A")
             
-            with col4:
-                # Quantum Ethics
-                q_ethics = scores.get('quantum_ethics', 'N/A')
-                if q_ethics != 'N/A':
-                    if q_ethics >= 75:
-                        st.success(f"QE: {q_ethics}/100")
-                    elif q_ethics >= 50:
-                        st.warning(f"QE: {q_ethics}/100")
-                    else:
-                        st.error(f"QE: {q_ethics}/100")
+            # Option 4: Streamlit balloons and snow (visual indicators)
+            q_ethics = scores.get('quantum_ethics', 'N/A')
+            if q_ethics != 'N/A':
+                st.markdown(f"**Quantum Ethics:** {q_ethics}/100")
+                if q_ethics >= 75:
+                    st.write("🟢 High Score")
+                elif q_ethics >= 50:
+                    st.write("🟡 Medium Score")
                 else:
-                    st.info("QE: N/A")
+                    st.write("🔴 Low Score")
+            else:
+                st.markdown("**Quantum Ethics:** N/A")
             
             st.markdown("</div>", unsafe_allow_html=True)
             
