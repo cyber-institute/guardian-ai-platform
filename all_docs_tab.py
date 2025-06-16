@@ -4430,57 +4430,43 @@ def render_card_view(docs):
             q_ethics_analysis_js = str(q_ethics_analysis).replace("'", "\\'").replace('"', '\\"').replace('\n', '<br>')
             preview_content_js = str(preview_content).replace("'", "\\'").replace('"', '\\"')
             
-            # Simplified working buttons with proper modal functionality
+            # Buttons that create modals dynamically on document body
             button_html = f"""
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em; position: relative; z-index: 1;">
-                <button onclick="testModal_{unique_id}('ai_cyber')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;"
+                <button onclick="createGlobalModal_{unique_id}('ai_cyber')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;"
                      title="Click for detailed AI Cybersecurity analysis">
                     AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
                 </button>
-                <button onclick="testModal_{unique_id}('q_cyber')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;"
+                <button onclick="createGlobalModal_{unique_id}('q_cyber')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;"
                      title="Click for detailed Quantum Cybersecurity analysis">
                     Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
                 </button>
-                <button onclick="testModal_{unique_id}('ai_ethics')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;"
+                <button onclick="createGlobalModal_{unique_id}('ai_ethics')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;"
                      title="Click for detailed AI Ethics analysis">
                     AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
                 </button>
-                <button onclick="testModal_{unique_id}('q_ethics')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;"
+                <button onclick="createGlobalModal_{unique_id}('q_ethics')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;"
                      title="Click for detailed Quantum Ethics analysis">
                     Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
                 </button>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; grid-column: 1 / -1; margin-top: 8px;">
-                    <button onclick="testModal_{unique_id}('preview')" style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;"
+                    <button onclick="createGlobalModal_{unique_id}('preview')" style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;"
                          title="Click to view content preview">
                         Content Preview
                     </button>
-                    <button onclick="testModal_{unique_id}('translate')" style="background: #f3e5f5; border: 1px solid #9c27b0; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;"
+                    <button onclick="createGlobalModal_{unique_id}('translate')" style="background: #f3e5f5; border: 1px solid #9c27b0; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;"
                          title="Translate document to other languages">
                         Translate
                     </button>
                 </div>
             </div>
             
-            <!-- Fixed positioned modal that appears above everything -->
-            <div id="testModal_{unique_id}" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); z-index: 2147483647;">
-                <div id="testModalWindow_{unique_id}" style="position: fixed; top: 50px; left: 50px; background-color: white; border: 2px solid #333; border-radius: 8px; width: 450px; max-height: 350px; overflow-y: auto; box-shadow: 0 8px 16px rgba(0,0,0,0.3); font-family: Arial, sans-serif; z-index: 2147483647;">
-                    <div id="testModalHeader_{unique_id}" style="background-color: #f8f9fa; padding: 12px 16px; border-bottom: 2px solid #ddd; cursor: move; font-weight: bold; border-radius: 6px 6px 0 0; position: relative;">
-                        <span id="testModalTitle_{unique_id}" style="font-size: 16px;">Analysis</span>
-                        <span onclick="closeTestModal_{unique_id}()" style="position: absolute; right: 12px; top: 8px; color: #666; font-size: 24px; font-weight: bold; cursor: pointer; line-height: 1; width: 25px; height: 25px; text-align: center;">&times;</span>
-                    </div>
-                    <div id="testModalContent_{unique_id}" style="padding: 16px; font-size: 14px; line-height: 1.5;"></div>
-                </div>
-            </div>
-            
             <script>
-                function testModal_{unique_id}(type) {{
-                    var modal = document.getElementById('testModal_{unique_id}');
-                    var title = document.getElementById('testModalTitle_{unique_id}');
-                    var content = document.getElementById('testModalContent_{unique_id}');
-                    
-                    if (!modal || !title || !content) {{
-                        alert('Modal elements not found');
-                        return;
+                function createGlobalModal_{unique_id}(type) {{
+                    // Remove any existing global modal
+                    var existingModal = document.getElementById('globalModal_{unique_id}');
+                    if (existingModal) {{
+                        existingModal.remove();
                     }}
                     
                     var analysisTitle = '';
@@ -4522,23 +4508,52 @@ def render_card_view(docs):
                         analysis = 'Translation features coming soon. This document can be translated into multiple languages.';
                     }}
                     
-                    title.textContent = analysisTitle;
-                    content.innerHTML = (score !== 'N/A' ? '<div style="margin-bottom: 15px;"><b>Score: <span style="color: ' + scoreColor + '; font-weight: bold;">' + score + '</span></b></div>' : '') + '<div>' + analysis + '</div>';
+                    // Create modal structure and append to body
+                    var modalOverlay = document.createElement('div');
+                    modalOverlay.id = 'globalModal_{unique_id}';
+                    modalOverlay.style.cssText = 'display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); z-index: 2147483647;';
                     
-                    modal.style.display = 'block';
+                    var modalWindow = document.createElement('div');
+                    modalWindow.style.cssText = 'position: fixed; top: 80px; left: 100px; background-color: white; border: 2px solid #333; border-radius: 8px; width: 450px; max-height: 400px; overflow-y: auto; box-shadow: 0 8px 16px rgba(0,0,0,0.3); font-family: Arial, sans-serif; z-index: 2147483647;';
                     
-                    // Simple drag functionality
-                    var header = document.getElementById('testModalHeader_{unique_id}');
-                    var modalWindow = document.getElementById('testModalWindow_{unique_id}');
+                    var modalHeader = document.createElement('div');
+                    modalHeader.style.cssText = 'background-color: #f8f9fa; padding: 12px 16px; border-bottom: 2px solid #ddd; cursor: move; font-weight: bold; border-radius: 6px 6px 0 0; position: relative;';
+                    
+                    var modalTitle = document.createElement('span');
+                    modalTitle.style.cssText = 'font-size: 16px;';
+                    modalTitle.textContent = analysisTitle;
+                    
+                    var closeButton = document.createElement('span');
+                    closeButton.style.cssText = 'position: absolute; right: 12px; top: 8px; color: #666; font-size: 24px; font-weight: bold; cursor: pointer; line-height: 1; width: 25px; height: 25px; text-align: center;';
+                    closeButton.innerHTML = '&times;';
+                    closeButton.onclick = function() {{
+                        modalOverlay.remove();
+                    }};
+                    
+                    var modalContent = document.createElement('div');
+                    modalContent.style.cssText = 'padding: 16px; font-size: 14px; line-height: 1.5;';
+                    modalContent.innerHTML = (score !== 'N/A' ? '<div style="margin-bottom: 15px;"><b>Score: <span style="color: ' + scoreColor + '; font-weight: bold;">' + score + '</span></b></div>' : '') + '<div>' + analysis + '</div>';
+                    
+                    // Assemble modal
+                    modalHeader.appendChild(modalTitle);
+                    modalHeader.appendChild(closeButton);
+                    modalWindow.appendChild(modalHeader);
+                    modalWindow.appendChild(modalContent);
+                    modalOverlay.appendChild(modalWindow);
+                    
+                    // Add to body for global positioning
+                    document.body.appendChild(modalOverlay);
+                    
+                    // Drag functionality
                     var isDragging = false;
                     var startX, startY, startLeft, startTop;
                     
-                    header.onmousedown = function(e) {{
+                    modalHeader.onmousedown = function(e) {{
                         isDragging = true;
                         startX = e.clientX;
                         startY = e.clientY;
-                        startLeft = parseInt(modalWindow.style.left) || 50;
-                        startTop = parseInt(modalWindow.style.top) || 50;
+                        startLeft = parseInt(modalWindow.style.left) || 100;
+                        startTop = parseInt(modalWindow.style.top) || 80;
                         e.preventDefault();
                     }};
                     
@@ -4546,26 +4561,22 @@ def render_card_view(docs):
                         if (isDragging) {{
                             var newLeft = startLeft + (e.clientX - startX);
                             var newTop = startTop + (e.clientY - startY);
-                            modalWindow.style.left = Math.max(0, newLeft) + 'px';
-                            modalWindow.style.top = Math.max(0, newTop) + 'px';
+                            modalWindow.style.left = Math.max(0, Math.min(window.innerWidth - 450, newLeft)) + 'px';
+                            modalWindow.style.top = Math.max(0, Math.min(window.innerHeight - 100, newTop)) + 'px';
                         }}
                     }};
                     
                     document.onmouseup = function() {{
                         isDragging = false;
                     }};
+                    
+                    // Close on background click
+                    modalOverlay.onclick = function(e) {{
+                        if (e.target === modalOverlay) {{
+                            modalOverlay.remove();
+                        }}
+                    }};
                 }}
-                
-                function closeTestModal_{unique_id}() {{
-                    document.getElementById('testModal_{unique_id}').style.display = 'none';
-                }}
-                
-                // Close on background click
-                document.getElementById('testModal_{unique_id}').onclick = function(e) {{
-                    if (e.target === this) {{
-                        closeTestModal_{unique_id}();
-                    }}
-                }};
             </script>
             """
             
