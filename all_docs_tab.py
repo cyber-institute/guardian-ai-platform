@@ -4580,174 +4580,93 @@ def render_card_view(docs):
             </script>
             """
             
-            # Enhanced HTML approach with improved modal positioning
-            button_html = f"""
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em; position: relative;">
-                <button onclick="showModal_{unique_id}('ai_cyber')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;">
-                    AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
-                </button>
-                <button onclick="showModal_{unique_id}('q_cyber')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;">
-                    Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
-                </button>
-                <button onclick="showModal_{unique_id}('ai_ethics')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;">
-                    AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
-                </button>
-                <button onclick="showModal_{unique_id}('q_ethics')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;">
-                    Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
-                </button>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; grid-column: 1 / -1; margin-top: 8px;">
-                    <button onclick="showModal_{unique_id}('preview')" style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;">
-                        Content Preview
-                    </button>
-                    <button onclick="showModal_{unique_id}('translate')" style="background: #f3e5f5; border: 1px solid #9c27b0; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;">
-                        Translate
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Modal with enhanced positioning -->
-            <div id="modal_{unique_id}" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.4); z-index: 2147483647; overflow: hidden;">
-                <div id="modalWindow_{unique_id}" style="position: absolute; top: 50px; left: 50px; background-color: white; border: 2px solid #333; border-radius: 8px; width: 450px; max-height: 400px; overflow-y: auto; box-shadow: 0 8px 16px rgba(0,0,0,0.3); font-family: Arial, sans-serif;">
-                    <div id="modalHeader_{unique_id}" style="background-color: #f8f9fa; padding: 12px 16px; border-bottom: 2px solid #ddd; cursor: move; font-weight: bold; border-radius: 6px 6px 0 0; position: relative;">
-                        <span id="modalTitle_{unique_id}" style="font-size: 16px;">Analysis</span>
-                        <span onclick="closeModal_{unique_id}()" style="position: absolute; right: 12px; top: 8px; color: #666; font-size: 24px; font-weight: bold; cursor: pointer; line-height: 1;">&times;</span>
-                    </div>
-                    <div id="modalContent_{unique_id}" style="padding: 16px; font-size: 14px; line-height: 1.5;"></div>
-                </div>
-            </div>
-            
-            <script>
-                // Global variable to track open modals and prevent conflicts
-                window.currentModal_{unique_id} = null;
-                
-                function closeAllModals_{unique_id}() {{
-                    // Close any existing modals from this component
-                    var existingModals = document.querySelectorAll('[id^="modal_"]');
-                    existingModals.forEach(function(modal) {{
-                        if (modal.id.includes('{unique_id}')) {{
-                            modal.style.display = 'none';
-                        }}
-                    }});
-                }}
-                
-                function showModal_{unique_id}(type) {{
-                    // Close any existing modals first
-                    closeAllModals_{unique_id}();
+            # Use native Streamlit buttons to avoid iframe overlap issues
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button(f"AI Cybersecurity: {ai_cyber_display}", 
+                           key=f"ai_cyber_{unique_id}", 
+                           help="Click for detailed AI Cybersecurity analysis"):
+                    st.session_state[f"modal_open"] = True
+                    st.session_state[f"modal_type"] = "ai_cyber"
+                    st.session_state[f"modal_data"] = {
+                        "title": "AI Cybersecurity Analysis",
+                        "score": ai_cyber_display,
+                        "analysis": ai_cyber_analysis,
+                        "color": ai_cyber_color
+                    }
+                    st.rerun()
                     
-                    var modal = document.getElementById('modal_{unique_id}');
-                    var title = document.getElementById('modalTitle_{unique_id}');
-                    var content = document.getElementById('modalContent_{unique_id}');
-                    var modalWindow = document.getElementById('modalWindow_{unique_id}');
+            with col2:
+                if st.button(f"Quantum Cybersecurity: {q_cyber_display}", 
+                           key=f"q_cyber_{unique_id}", 
+                           help="Click for detailed Quantum Cybersecurity analysis"):
+                    st.session_state[f"modal_open"] = True
+                    st.session_state[f"modal_type"] = "q_cyber"
+                    st.session_state[f"modal_data"] = {
+                        "title": "Quantum Cybersecurity Analysis",
+                        "score": q_cyber_display,
+                        "analysis": q_cyber_analysis,
+                        "color": q_cyber_color
+                    }
+                    st.rerun()
                     
-                    if (!modal || !title || !content || !modalWindow) return;
+            col3, col4 = st.columns(2)
+            with col3:
+                if st.button(f"AI Ethics: {ai_ethics_display}", 
+                           key=f"ai_ethics_{unique_id}", 
+                           help="Click for detailed AI Ethics analysis"):
+                    st.session_state[f"modal_open"] = True
+                    st.session_state[f"modal_type"] = "ai_ethics"
+                    st.session_state[f"modal_data"] = {
+                        "title": "AI Ethics Analysis",
+                        "score": ai_ethics_display,
+                        "analysis": ai_ethics_analysis,
+                        "color": ai_ethics_color
+                    }
+                    st.rerun()
                     
-                    window.currentModal_{unique_id} = type;
+            with col4:
+                if st.button(f"Quantum Ethics: {q_ethics_display}", 
+                           key=f"q_ethics_{unique_id}", 
+                           help="Click for detailed Quantum Ethics analysis"):
+                    st.session_state[f"modal_open"] = True
+                    st.session_state[f"modal_type"] = "q_ethics"
+                    st.session_state[f"modal_data"] = {
+                        "title": "Quantum Ethics Analysis",
+                        "score": q_ethics_display,
+                        "analysis": q_ethics_analysis,
+                        "color": q_ethics_color
+                    }
+                    st.rerun()
                     
-                    var analysisTitle = '';
-                    var score = '';
-                    var analysis = '';
-                    var scoreColor = '#666';
+            col5, col6 = st.columns(2)
+            with col5:
+                if st.button("Content Preview", 
+                           key=f"preview_{unique_id}", 
+                           help="Click to view content preview"):
+                    st.session_state[f"modal_open"] = True
+                    st.session_state[f"modal_type"] = "preview"
+                    st.session_state[f"modal_data"] = {
+                        "title": "Content Preview",
+                        "score": "N/A",
+                        "analysis": f"<b>Title:</b> {title}<br><br><b>Content:</b> {raw_content[:500]}...",
+                        "color": "#666"
+                    }
+                    st.rerun()
                     
-                    if (type === 'ai_cyber') {{
-                        analysisTitle = 'AI Cybersecurity Analysis';
-                        score = '{ai_cyber_display}';
-                        analysis = '{ai_cyber_analysis_js}';
-                        var num = parseInt(score.replace('/100', '')) || 0;
-                        scoreColor = num >= 75 ? '#28a745' : (num >= 50 ? '#ffc107' : '#dc3545');
-                    }} else if (type === 'q_cyber') {{
-                        analysisTitle = 'Quantum Cybersecurity Analysis';
-                        score = '{q_cyber_display}';
-                        analysis = '{q_cyber_analysis_js}';
-                        var tier = parseInt(score.replace('Tier ', '')) || 0;
-                        scoreColor = tier >= 4 ? '#28a745' : (tier >= 3 ? '#ffc107' : '#dc3545');
-                    }} else if (type === 'ai_ethics') {{
-                        analysisTitle = 'AI Ethics Analysis';
-                        score = '{ai_ethics_display}';
-                        analysis = '{ai_ethics_analysis_js}';
-                        var num = parseInt(score.replace('/100', '')) || 0;
-                        scoreColor = num >= 75 ? '#28a745' : (num >= 50 ? '#ffc107' : '#dc3545');
-                    }} else if (type === 'q_ethics') {{
-                        analysisTitle = 'Quantum Ethics Analysis';
-                        score = '{q_ethics_display}';
-                        analysis = '{q_ethics_analysis_js}';
-                        var num = parseInt(score.replace('/100', '')) || 0;
-                        scoreColor = num >= 75 ? '#28a745' : (num >= 50 ? '#ffc107' : '#dc3545');
-                    }} else if (type === 'preview') {{
-                        analysisTitle = 'Content Preview';
-                        score = 'N/A';
-                        analysis = '{preview_content_js}';
-                    }} else if (type === 'translate') {{
-                        analysisTitle = 'Document Translation';
-                        score = 'N/A';
-                        analysis = 'Translation features coming soon.';
-                    }}
-                    
-                    title.textContent = analysisTitle;
-                    content.innerHTML = (score !== 'N/A' ? '<div style="margin-bottom: 15px;"><b>Score: <span style="color: ' + scoreColor + '; font-weight: bold;">' + score + '</span></b></div>' : '') + '<div>' + analysis + '</div>';
-                    
-                    // Position modal with offset to avoid overlapping
-                    var offsetX = Math.floor(Math.random() * 100) + 50; // Random position between 50-150px
-                    var offsetY = Math.floor(Math.random() * 50) + 30;   // Random position between 30-80px
-                    
-                    modalWindow.style.left = offsetX + 'px';
-                    modalWindow.style.top = offsetY + 'px';
-                    
-                    modal.style.display = 'block';
-                    
-                    // Drag functionality
-                    var isDragging = false;
-                    var startX, startY, startLeft, startTop;
-                    
-                    var header = document.getElementById('modalHeader_{unique_id}');
-                    if (header) {{
-                        header.onmousedown = function(e) {{
-                            isDragging = true;
-                            startX = e.clientX;
-                            startY = e.clientY;
-                            startLeft = parseInt(modalWindow.style.left) || offsetX;
-                            startTop = parseInt(modalWindow.style.top) || offsetY;
-                            e.preventDefault();
-                        }};
-                    }}
-                    
-                    document.onmousemove = function(e) {{
-                        if (isDragging && window.currentModal_{unique_id} === type) {{
-                            var newLeft = startLeft + (e.clientX - startX);
-                            var newTop = startTop + (e.clientY - startY);
-                            
-                            // Keep within reasonable bounds
-                            var maxLeft = Math.max(200, window.innerWidth - 450);
-                            var maxTop = Math.max(200, window.innerHeight - 100);
-                            
-                            modalWindow.style.left = Math.max(0, Math.min(maxLeft, newLeft)) + 'px';
-                            modalWindow.style.top = Math.max(0, Math.min(maxTop, newTop)) + 'px';
-                        }}
-                    }};
-                    
-                    document.onmouseup = function() {{
-                        isDragging = false;
-                    }};
-                }}
-                
-                function closeModal_{unique_id}() {{
-                    document.getElementById('modal_{unique_id}').style.display = 'none';
-                    window.currentModal_{unique_id} = null;
-                }}
-                
-                // Close on background click
-                document.getElementById('modal_{unique_id}').onclick = function(e) {{
-                    if (e.target === this) closeModal_{unique_id}();
-                }};
-                
-                // Prevent event bubbling on modal content
-                document.getElementById('modalWindow_{unique_id}').onclick = function(e) {{
-                    e.stopPropagation();
-                }};
-            </script>
-            """
-            
-            import streamlit.components.v1 as components
-            components.html(button_html, height=180)
+            with col6:
+                if st.button("Translate", 
+                           key=f"translate_{unique_id}", 
+                           help="Translate document to other languages"):
+                    st.session_state[f"modal_open"] = True
+                    st.session_state[f"modal_type"] = "translate"
+                    st.session_state[f"modal_data"] = {
+                        "title": "Document Translation",
+                        "score": "N/A",
+                        "analysis": "Translation features coming soon. This document can be translated into multiple languages.",
+                        "color": "#666"
+                    }
+                    st.rerun()
             
 
             
@@ -4755,3 +4674,73 @@ def render_card_view(docs):
             
             # Add spacing between cards
             st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
+
+    # Global modal display at end of render function
+    if "modal_open" in st.session_state and st.session_state["modal_open"]:
+        modal_data = st.session_state.get("modal_data", {})
+        
+        # Create modal overlay
+        st.markdown("""
+        <style>
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 999999;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 50px;
+        }
+        .modal-content {
+            background-color: white;
+            border: 2px solid #333;
+            border-radius: 8px;
+            width: 450px;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            font-family: Arial, sans-serif;
+            position: relative;
+        }
+        .modal-header {
+            background-color: #f8f9fa;
+            padding: 12px 16px;
+            border-bottom: 2px solid #ddd;
+            font-weight: bold;
+            border-radius: 6px 6px 0 0;
+            font-size: 16px;
+        }
+        .modal-body {
+            padding: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        # Display modal content
+        title = modal_data.get("title", "Analysis")
+        score = modal_data.get("score", "N/A")
+        analysis = modal_data.get("analysis", "No analysis available")
+        color = modal_data.get("color", "#666")
+        
+        st.markdown(f"""
+        <div class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">{title}</div>
+                <div class="modal-body">
+                    {f'<div style="margin-bottom: 15px;"><b>Score: <span style="color: {color}; font-weight: bold;">{score}</span></b></div>' if score != 'N/A' else ''}
+                    <div>{analysis}</div>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Close button
+        if st.button("Close Analysis", key="close_modal"):
+            st.session_state["modal_open"] = False
+            st.rerun()
