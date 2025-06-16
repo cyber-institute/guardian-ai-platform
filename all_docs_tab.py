@@ -4238,7 +4238,7 @@ def render_card_view(docs):
             q_ethics_display = f"{q_ethics}/100" if q_ethics != 'N/A' else "N/A"
             
             st.components.v1.html(f"""
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif;">
                 <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;" 
                      onclick="alert('AI Cybersecurity Score: {ai_cyber_display}\\n\\nClick for detailed analysis')"
                      title="AI Cybersecurity Assessment">
