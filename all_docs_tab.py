@@ -4274,65 +4274,76 @@ def render_card_view(docs):
             except:
                 content_preview_text = raw_content[:300] + ("..." if len(raw_content) > 300 else "")
 
-            # Interactive Score Buttons with Analysis
-            score_cols = st.columns(2)
+            st.components.v1.html(f"""
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em;">
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;" 
+                     title="AI Cybersecurity Assessment Score: {ai_cyber_display} - Evaluates AI security framework compliance and risk management practices">
+                    AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
+                </div>
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;"
+                     title="Quantum Cybersecurity Assessment Score: {q_cyber_display} - Evaluates quantum-safe cryptography and post-quantum security readiness">
+                    Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
+                </div>
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;"
+                     title="AI Ethics Assessment Score: {ai_ethics_display} - Evaluates ethical AI practices, bias mitigation, and responsible AI implementation">
+                    AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
+                </div>
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;"
+                     title="Quantum Ethics Assessment Score: {q_ethics_display} - Evaluates ethical considerations in quantum technology development and deployment">
+                    Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; grid-column: 1 / -1; margin-top: 5px;">
+                    <div style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
+                         onclick="setTimeout(() => {{
+                             const buttons = document.querySelectorAll('button[data-testid=\"baseButton-secondary\"]');
+                             for(let btn of buttons) {{
+                                 if(btn.getAttribute('aria-label') === 'Content Preview {unique_id}') {{
+                                     btn.click();
+                                     break;
+                                 }}
+                             }}
+                         }}, 50)"
+                         title="Click to view content preview">
+                        📄 Content Preview
+                    </div>
+                    <div style="background: #f3e5f5; border: 1px solid #9c27b0; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
+                         onclick="setTimeout(() => {{
+                             const buttons = document.querySelectorAll('button[data-testid=\"baseButton-secondary\"]');
+                             for(let btn of buttons) {{
+                                 if(btn.getAttribute('aria-label') === 'Translate {unique_id}') {{
+                                     btn.click();
+                                     break;
+                                 }}
+                             }}
+                         }}, 50)"
+                         title="Translate document to other languages">
+                        🌐 Translate
+                    </div>
+                </div>
+            </div>
+            """, height=160)
             
-            with score_cols[0]:
-                # AI Cybersecurity Score Button
-                if st.button(f"🔒 AI Cyber: {ai_cyber_display}", 
-                           key=f"ai_cyber_{unique_id}",
-                           help="Click for detailed AI Cybersecurity analysis"):
-                    with st.expander("🔒 AI Cybersecurity Analysis", expanded=True):
-                        st.markdown(f"**Score: {ai_cyber_display}**")
-                        if ai_cyber != 'N/A':
-                            analysis = analyze_ai_cybersecurity_content(raw_content, ai_cyber)
-                            st.markdown(analysis)
-                        else:
-                            st.info("No AI cybersecurity assessment available for this document.")
-                
-                # AI Ethics Score Button  
-                if st.button(f"⚖️ AI Ethics: {ai_ethics_display}", 
-                           key=f"ai_ethics_{unique_id}",
-                           help="Click for detailed AI Ethics analysis"):
-                    with st.expander("⚖️ AI Ethics Analysis", expanded=True):
-                        st.markdown(f"**Score: {ai_ethics_display}**")
-                        if ai_ethics != 'N/A':
-                            analysis = analyze_ai_ethics_content(raw_content, ai_ethics)
-                            st.markdown(analysis)
-                        else:
-                            st.info("No AI ethics assessment available for this document.")
+            # CSS to hide the Streamlit buttons
+            st.markdown(f"""
+                <style>
+                button[aria-label="Content Preview {unique_id}"] {{
+                    display: none !important;
+                    position: absolute;
+                    left: -9999px;
+                }}
+                button[aria-label="Translate {unique_id}"] {{
+                    display: none !important;
+                    position: absolute;
+                    left: -9999px;
+                }}
+                </style>
+            """, unsafe_allow_html=True)
             
-            with score_cols[1]:
-                # Quantum Cybersecurity Score Button
-                if st.button(f"🔐 Q Cyber: {q_cyber_display}", 
-                           key=f"q_cyber_{unique_id}",
-                           help="Click for detailed Quantum Cybersecurity analysis"):
-                    with st.expander("🔐 Quantum Cybersecurity Analysis", expanded=True):
-                        st.markdown(f"**Score: {q_cyber_display}**")
-                        if q_cyber != 'N/A':
-                            analysis = analyze_quantum_cybersecurity_content(raw_content, q_cyber)
-                            st.markdown(analysis)
-                        else:
-                            st.info("No quantum cybersecurity assessment available for this document.")
-                
-                # Quantum Ethics Score Button
-                if st.button(f"⚗️ Q Ethics: {q_ethics_display}", 
-                           key=f"q_ethics_{unique_id}",
-                           help="Click for detailed Quantum Ethics analysis"):
-                    with st.expander("⚗️ Quantum Ethics Analysis", expanded=True):
-                        st.markdown(f"**Score: {q_ethics_display}**")
-                        if q_ethics != 'N/A':
-                            analysis = analyze_quantum_ethics_content(raw_content, q_ethics)
-                            st.markdown(analysis)
-                        else:
-                            st.info("No quantum ethics assessment available for this document.")
+            # Hidden Streamlit buttons
+            col_hidden1, col_hidden2 = st.columns(2)
             
-            # Content Preview and Translation Buttons
-            action_cols = st.columns(2)
-            
-            with action_cols[0]:
-                if st.button("📄 Content Preview", key=f"preview_{unique_id}", 
-                           help="View document content analysis"):
+            with col_hidden1:
+                if st.button("", key=f"preview_{unique_id}", help=f"Content Preview {unique_id}", type="secondary"):
                     with st.expander("Content Preview", expanded=True):
                         st.write("**Intelligent Summary:**")
                         if content_preview_text:
@@ -4345,9 +4356,8 @@ def render_card_view(docs):
                         clean_content = re.sub(r'\s+', ' ', clean_content).strip()
                         st.text(clean_content[:500] + "..." if len(clean_content) > 500 else clean_content)
             
-            with action_cols[1]:
-                if st.button("🌐 Translate", key=f"translate_{unique_id}", 
-                           help="Translate document to other languages"):
+            with col_hidden2:
+                if st.button("", key=f"translate_{unique_id}", help=f"Translate {unique_id}", type="secondary"):
                     from components.document_translator import DocumentTranslator
                     translator = DocumentTranslator()
                     
