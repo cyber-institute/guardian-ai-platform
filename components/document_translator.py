@@ -263,7 +263,7 @@ class DocumentTranslator:
     
     def render_translation_history(self):
         """Display translation history for the current session"""
-        translation_keys = [key for key in st.session_state.keys() if key.startswith("translation_")]
+        translation_keys = [key for key in st.session_state.keys() if isinstance(key, str) and key.startswith("translation_")]
         
         if translation_keys:
             st.markdown("### 📚 Translation History")
@@ -328,4 +328,4 @@ def render_document_translation_button(document_content, document_title, doc_id)
             
             if st.button("❌ Close Translation", key=f"close_translate_{doc_id}"):
                 st.session_state[f"show_translation_{doc_id}"] = False
-                st.experimental_rerun()
+                st.rerun()
