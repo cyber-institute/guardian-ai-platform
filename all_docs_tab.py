@@ -4255,43 +4255,95 @@ def render_card_view(docs):
             except:
                 content_preview_text = raw_content[:300] + ("..." if len(raw_content) > 300 else "")
 
-            # Display score buttons with exact same appearance but using Streamlit buttons
-            col1, col2 = st.columns(2)
-            with col1:
-                if st.button(f"AI Cybersecurity: {ai_cyber_display}", key=f"ai_cyber_{unique_id}", 
-                           use_container_width=True, help="Click for detailed AI Cybersecurity analysis"):
+            # Original styled buttons with working backend
+            st.markdown(f"""
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em;">
+                <div id="ai_cyber_btn_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                     title="Click for detailed AI Cybersecurity analysis">
+                    AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
+                </div>
+                <div id="q_cyber_btn_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                     title="Click for detailed Quantum Cybersecurity analysis">
+                    Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
+                </div>
+                <div id="ai_ethics_btn_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                     title="Click for detailed AI Ethics analysis">
+                    AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
+                </div>
+                <div id="q_ethics_btn_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                     title="Click for detailed Quantum Ethics analysis">
+                    Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; grid-column: 1 / -1; margin-top: 5px;">
+                    <div id="preview_btn_{unique_id}" style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
+                         title="Click to view content preview">
+                        📄 Content Preview
+                    </div>
+                    <div id="translate_btn_{unique_id}" style="background: #f3e5f5; border: 1px solid #9c27b0; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
+                         title="Translate document to other languages">
+                        🌐 Translate
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Hidden Streamlit buttons that get triggered by JavaScript
+            col_hidden1, col_hidden2, col_hidden3 = st.columns([1,1,1])
+            with col_hidden1:
+                if st.button("AI Cyber", key=f"ai_cyber_{unique_id}", label_visibility="hidden"):
                     st.session_state[f'show_ai_cyber_{unique_id}'] = True
                     st.rerun()
-                
-                if st.button(f"AI Ethics: {ai_ethics_display}", key=f"ai_ethics_{unique_id}", 
-                           use_container_width=True, help="Click for detailed AI Ethics analysis"):
+                if st.button("AI Ethics", key=f"ai_ethics_{unique_id}", label_visibility="hidden"):
                     st.session_state[f'show_ai_ethics_{unique_id}'] = True
                     st.rerun()
-            
-            with col2:
-                if st.button(f"Quantum Cybersecurity: {q_cyber_display}", key=f"q_cyber_{unique_id}", 
-                           use_container_width=True, help="Click for detailed Quantum Cybersecurity analysis"):
+            with col_hidden2:
+                if st.button("Q Cyber", key=f"q_cyber_{unique_id}", label_visibility="hidden"):
                     st.session_state[f'show_q_cyber_{unique_id}'] = True
                     st.rerun()
-                
-                if st.button(f"Quantum Ethics: {q_ethics_display}", key=f"q_ethics_{unique_id}", 
-                           use_container_width=True, help="Click for detailed Quantum Ethics analysis"):
+                if st.button("Q Ethics", key=f"q_ethics_{unique_id}", label_visibility="hidden"):
                     st.session_state[f'show_q_ethics_{unique_id}'] = True
                     st.rerun()
-            
-            # Content preview and translate buttons
-            col3, col4 = st.columns(2)
-            with col3:
-                if st.button("📄 Content Preview", key=f"preview_{unique_id}", 
-                           use_container_width=True, help="Click to view content preview"):
+            with col_hidden3:
+                if st.button("Preview", key=f"preview_{unique_id}", label_visibility="hidden"):
                     st.session_state[f'show_preview_{unique_id}'] = True
                     st.rerun()
-            
-            with col4:
-                if st.button("🌐 Translate", key=f"translate_{unique_id}", 
-                           use_container_width=True, help="Translate document to other languages"):
+                if st.button("Translate", key=f"translate_{unique_id}", label_visibility="hidden"):
                     st.session_state[f'show_translate_{unique_id}'] = True
                     st.rerun()
+            
+            # JavaScript to connect styled buttons to hidden Streamlit buttons
+            st.markdown(f"""
+            <script>
+                function findAndClickButton(buttonText) {{
+                    const buttons = window.parent.document.querySelectorAll('button');
+                    for (let btn of buttons) {{
+                        if (btn.textContent.trim() === buttonText) {{
+                            btn.click();
+                            break;
+                        }}
+                    }}
+                }}
+                
+                document.getElementById('ai_cyber_btn_{unique_id}').onclick = function() {{
+                    findAndClickButton('AI Cyber');
+                }};
+                document.getElementById('q_cyber_btn_{unique_id}').onclick = function() {{
+                    findAndClickButton('Q Cyber');
+                }};
+                document.getElementById('ai_ethics_btn_{unique_id}').onclick = function() {{
+                    findAndClickButton('AI Ethics');
+                }};
+                document.getElementById('q_ethics_btn_{unique_id}').onclick = function() {{
+                    findAndClickButton('Q Ethics');
+                }};
+                document.getElementById('preview_btn_{unique_id}').onclick = function() {{
+                    findAndClickButton('Preview');
+                }};
+                document.getElementById('translate_btn_{unique_id}').onclick = function() {{
+                    findAndClickButton('Translate');
+                }};
+            </script>
+            """, unsafe_allow_html=True)
             
             # Display modal windows based on session state
             if st.session_state.get(f'show_ai_cyber_{unique_id}', False):
