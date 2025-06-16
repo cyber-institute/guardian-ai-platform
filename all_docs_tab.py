@@ -4276,20 +4276,56 @@ def render_card_view(docs):
 
             st.components.v1.html(f"""
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em;">
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;" 
-                     title="AI Cybersecurity Assessment Score: {ai_cyber_display} - Evaluates AI security framework compliance and risk management practices">
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;" 
+                     onclick="setTimeout(() => {{
+                         const buttons = document.querySelectorAll('button[data-testid=\"baseButton-secondary\"]');
+                         for(let btn of buttons) {{
+                             if(btn.getAttribute('aria-label') === 'AI Cyber Analysis {unique_id}') {{
+                                 btn.click();
+                                 break;
+                             }}
+                         }}
+                     }}, 50)"
+                     title="Click for detailed AI Cybersecurity analysis">
                     AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
                 </div>
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;"
-                     title="Quantum Cybersecurity Assessment Score: {q_cyber_display} - Evaluates quantum-safe cryptography and post-quantum security readiness">
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                     onclick="setTimeout(() => {{
+                         const buttons = document.querySelectorAll('button[data-testid=\"baseButton-secondary\"]');
+                         for(let btn of buttons) {{
+                             if(btn.getAttribute('aria-label') === 'Quantum Cyber Analysis {unique_id}') {{
+                                 btn.click();
+                                 break;
+                             }}
+                         }}
+                     }}, 50)"
+                     title="Click for detailed Quantum Cybersecurity analysis">
                     Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
                 </div>
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;"
-                     title="AI Ethics Assessment Score: {ai_ethics_display} - Evaluates ethical AI practices, bias mitigation, and responsible AI implementation">
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                     onclick="setTimeout(() => {{
+                         const buttons = document.querySelectorAll('button[data-testid=\"baseButton-secondary\"]');
+                         for(let btn of buttons) {{
+                             if(btn.getAttribute('aria-label') === 'AI Ethics Analysis {unique_id}') {{
+                                 btn.click();
+                                 break;
+                             }}
+                         }}
+                     }}, 50)"
+                     title="Click for detailed AI Ethics analysis">
                     AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
                 </div>
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;"
-                     title="Quantum Ethics Assessment Score: {q_ethics_display} - Evaluates ethical considerations in quantum technology development and deployment">
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                     onclick="setTimeout(() => {{
+                         const buttons = document.querySelectorAll('button[data-testid=\"baseButton-secondary\"]');
+                         for(let btn of buttons) {{
+                             if(btn.getAttribute('aria-label') === 'Quantum Ethics Analysis {unique_id}') {{
+                                 btn.click();
+                                 break;
+                             }}
+                         }}
+                     }}, 50)"
+                     title="Click for detailed Quantum Ethics analysis">
                     Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; grid-column: 1 / -1; margin-top: 5px;">
@@ -4336,11 +4372,31 @@ def render_card_view(docs):
                     position: absolute;
                     left: -9999px;
                 }}
+                button[aria-label="AI Cyber Analysis {unique_id}"] {{
+                    display: none !important;
+                    position: absolute;
+                    left: -9999px;
+                }}
+                button[aria-label="Quantum Cyber Analysis {unique_id}"] {{
+                    display: none !important;
+                    position: absolute;
+                    left: -9999px;
+                }}
+                button[aria-label="AI Ethics Analysis {unique_id}"] {{
+                    display: none !important;
+                    position: absolute;
+                    left: -9999px;
+                }}
+                button[aria-label="Quantum Ethics Analysis {unique_id}"] {{
+                    display: none !important;
+                    position: absolute;
+                    left: -9999px;
+                }}
                 </style>
             """, unsafe_allow_html=True)
             
             # Hidden Streamlit buttons
-            col_hidden1, col_hidden2 = st.columns(2)
+            col_hidden1, col_hidden2, col_hidden3 = st.columns(3)
             
             with col_hidden1:
                 if st.button("", key=f"preview_{unique_id}", help=f"Content Preview {unique_id}", type="secondary"):
@@ -4363,6 +4419,47 @@ def render_card_view(docs):
                     
                     with st.expander("Document Translation", expanded=True):
                         translator.render_translation_interface(raw_content, title)
+            
+            with col_hidden3:
+                # AI Cybersecurity Analysis Button
+                if st.button("", key=f"ai_cyber_analysis_{unique_id}", help=f"AI Cyber Analysis {unique_id}", type="secondary"):
+                    with st.expander("AI Cybersecurity Analysis", expanded=True):
+                        st.markdown(f"**Score: {ai_cyber_display}**")
+                        if ai_cyber != 'N/A':
+                            analysis = analyze_ai_cybersecurity_content(raw_content, ai_cyber)
+                            st.markdown(analysis)
+                        else:
+                            st.info("No AI cybersecurity assessment available for this document.")
+                
+                # Quantum Cybersecurity Analysis Button
+                if st.button("", key=f"q_cyber_analysis_{unique_id}", help=f"Quantum Cyber Analysis {unique_id}", type="secondary"):
+                    with st.expander("Quantum Cybersecurity Analysis", expanded=True):
+                        st.markdown(f"**Score: {q_cyber_display}**")
+                        if q_cyber != 'N/A':
+                            analysis = analyze_quantum_cybersecurity_content(raw_content, q_cyber)
+                            st.markdown(analysis)
+                        else:
+                            st.info("No quantum cybersecurity assessment available for this document.")
+                
+                # AI Ethics Analysis Button
+                if st.button("", key=f"ai_ethics_analysis_{unique_id}", help=f"AI Ethics Analysis {unique_id}", type="secondary"):
+                    with st.expander("AI Ethics Analysis", expanded=True):
+                        st.markdown(f"**Score: {ai_ethics_display}**")
+                        if ai_ethics != 'N/A':
+                            analysis = analyze_ai_ethics_content(raw_content, ai_ethics)
+                            st.markdown(analysis)
+                        else:
+                            st.info("No AI ethics assessment available for this document.")
+                
+                # Quantum Ethics Analysis Button
+                if st.button("", key=f"q_ethics_analysis_{unique_id}", help=f"Quantum Ethics Analysis {unique_id}", type="secondary"):
+                    with st.expander("Quantum Ethics Analysis", expanded=True):
+                        st.markdown(f"**Score: {q_ethics_display}**")
+                        if q_ethics != 'N/A':
+                            analysis = analyze_quantum_ethics_content(raw_content, q_ethics)
+                            st.markdown(analysis)
+                        else:
+                            st.info("No quantum ethics assessment available for this document.")
             
             st.markdown("</div>", unsafe_allow_html=True)
             
