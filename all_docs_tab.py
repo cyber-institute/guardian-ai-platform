@@ -4339,13 +4339,61 @@ def render_card_view(docs):
             except:
                 content_preview_text = raw_content[:300] + ("..." if len(raw_content) > 300 else "")
 
-            # Interactive scoring buttons with modal popups (unified approach)
-            col1, col2 = st.columns(2)
+            # Original HTML buttons with exact styling - use clickable session state tracking
+            button_html = f"""
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em;">
+                <div onclick="window.streamlit_clicked_button = 'ai_cyber_{unique_id}'; window.parent.location.reload();" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                     title="Click for detailed AI Cybersecurity analysis">
+                    AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
+                </div>
+                <div onclick="window.streamlit_clicked_button = 'q_cyber_{unique_id}'; window.parent.location.reload();" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                     title="Click for detailed Quantum Cybersecurity analysis">
+                    Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
+                </div>
+                <div onclick="window.streamlit_clicked_button = 'ai_ethics_{unique_id}'; window.parent.location.reload();" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                     title="Click for detailed AI Ethics analysis">
+                    AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
+                </div>
+                <div onclick="window.streamlit_clicked_button = 'q_ethics_{unique_id}'; window.parent.location.reload();" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                     title="Click for detailed Quantum Ethics analysis">
+                    Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; grid-column: 1 / -1; margin-top: 5px;">
+                    <div onclick="window.streamlit_clicked_button = 'preview_{unique_id}'; window.parent.location.reload();" style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
+                         title="Click to view content preview">
+                        📄 Content Preview
+                    </div>
+                    <div onclick="window.streamlit_clicked_button = 'translate_{unique_id}'; window.parent.location.reload();" style="background: #f3e5f5; border: 1px solid #9c27b0; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
+                         title="Translate document to other languages">
+                        🌐 Translate
+                    </div>
+                </div>
+            </div>
+            """
             
-            with col1:
-                if st.button(f"AI Cybersecurity: {ai_cyber_display}", key=f"ai_cyber_{unique_id}", 
-                           help="Click for detailed AI Cybersecurity analysis",
-                           use_container_width=True):
+            import streamlit.components.v1 as components
+            button_result = components.html(button_html, height=120)
+            
+            # Check for button clicks and show analysis below buttons
+            button_clicked = None
+            if hasattr(st, 'query_params'):
+                params = dict(st.query_params)
+                for param in params:
+                    if param.startswith(f'clicked_') and unique_id in param:
+                        button_clicked = param.replace('clicked_', '')
+                        break
+            
+            # Also check session state for button clicks
+            for key in st.session_state:
+                if key.startswith(f'clicked_') and unique_id in key:
+                    button_clicked = key.replace('clicked_', '')
+                    break
+            
+            # Show analysis based on button click
+            if button_clicked:
+                button_type = button_clicked.replace(f'_{unique_id}', '')
+                
+                if button_type == 'ai_cyber':
                     with st.expander("🔒 AI Cybersecurity Analysis", expanded=True):
                         st.markdown(f"**Score: {ai_cyber_display}**")
                         if ai_cyber != 'N/A':
@@ -4354,21 +4402,7 @@ def render_card_view(docs):
                         else:
                             st.info("No AI cybersecurity assessment available for this document.")
                 
-                if st.button(f"AI Ethics: {ai_ethics_display}", key=f"ai_ethics_{unique_id}",
-                           help="Click for detailed AI Ethics analysis",
-                           use_container_width=True):
-                    with st.expander("⚖️ AI Ethics Analysis", expanded=True):
-                        st.markdown(f"**Score: {ai_ethics_display}**")
-                        if ai_ethics != 'N/A':
-                            analysis = analyze_ai_ethics_content(raw_content, ai_ethics)
-                            st.markdown(analysis)
-                        else:
-                            st.info("No AI ethics assessment available for this document.")
-            
-            with col2:
-                if st.button(f"Quantum Cybersecurity: {q_cyber_display}", key=f"q_cyber_{unique_id}",
-                           help="Click for detailed Quantum Cybersecurity analysis",
-                           use_container_width=True):
+                elif button_type == 'q_cyber':
                     with st.expander("🔐 Quantum Cybersecurity Analysis", expanded=True):
                         st.markdown(f"**Score: {q_cyber_display}**")
                         if q_cyber != 'N/A':
@@ -4377,9 +4411,16 @@ def render_card_view(docs):
                         else:
                             st.info("No quantum cybersecurity assessment available for this document.")
                 
-                if st.button(f"Quantum Ethics: {q_ethics_display}", key=f"q_ethics_{unique_id}",
-                           help="Click for detailed Quantum Ethics analysis",
-                           use_container_width=True):
+                elif button_type == 'ai_ethics':
+                    with st.expander("⚖️ AI Ethics Analysis", expanded=True):
+                        st.markdown(f"**Score: {ai_ethics_display}**")
+                        if ai_ethics != 'N/A':
+                            analysis = analyze_ai_ethics_content(raw_content, ai_ethics)
+                            st.markdown(analysis)
+                        else:
+                            st.info("No AI ethics assessment available for this document.")
+                
+                elif button_type == 'q_ethics':
                     with st.expander("⚖️ Quantum Ethics Analysis", expanded=True):
                         st.markdown(f"**Score: {q_ethics_display}**")
                         if q_ethics != 'N/A':
@@ -4387,11 +4428,8 @@ def render_card_view(docs):
                             st.markdown(analysis)
                         else:
                             st.info("No quantum ethics assessment available for this document.")
-            
-            # Additional action buttons
-            col3, col4 = st.columns(2)
-            with col3:
-                if st.button("📄 Content Preview", key=f"preview_{unique_id}", use_container_width=True):
+                
+                elif button_type == 'preview':
                     with st.expander("📄 Content Preview", expanded=True):
                         st.write("**Intelligent Summary:**")
                         if content_preview_text:
@@ -4403,9 +4441,8 @@ def render_card_view(docs):
                         clean_content = re.sub(r'<[^>]+>', '', raw_content)
                         clean_content = re.sub(r'\s+', ' ', clean_content).strip()
                         st.text(clean_content[:500] + "..." if len(clean_content) > 500 else clean_content)
-            
-            with col4:
-                if st.button("🌐 Translate", key=f"translate_{unique_id}", use_container_width=True):
+                
+                elif button_type == 'translate':
                     with st.expander("🌐 Document Translation", expanded=True):
                         from components.document_translator import DocumentTranslator
                         translator = DocumentTranslator()
