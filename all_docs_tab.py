@@ -4255,130 +4255,120 @@ def render_card_view(docs):
             except:
                 content_preview_text = raw_content[:300] + ("..." if len(raw_content) > 300 else "")
 
-            # Interactive HTML buttons that communicate with Streamlit backend
+            # Clean text data for JavaScript
+            safe_title = title.replace("'", "\\'").replace('"', '\\"')
+            safe_content = raw_content[:1000].replace("'", "\\'").replace('"', '\\"').replace("`", "\\`")
+            
+            # Pure HTML buttons with direct API communication
             button_html = f"""
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em;">
-                <div onclick="handleButtonClick('ai_cyber', '{unique_id}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                <div onclick="handleButtonClick('ai_cyber', '{unique_id}', '{ai_cyber}', '{ai_cyber_display}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
                      title="Click for detailed AI Cybersecurity analysis">
                     AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
                 </div>
-                <div onclick="handleButtonClick('q_cyber', '{unique_id}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                <div onclick="handleButtonClick('q_cyber', '{unique_id}', '{q_cyber}', '{q_cyber_display}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
                      title="Click for detailed Quantum Cybersecurity analysis">
                     Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
                 </div>
-                <div onclick="handleButtonClick('ai_ethics', '{unique_id}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                <div onclick="handleButtonClick('ai_ethics', '{unique_id}', '{ai_ethics}', '{ai_ethics_display}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
                      title="Click for detailed AI Ethics analysis">
                     AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
                 </div>
-                <div onclick="handleButtonClick('q_ethics', '{unique_id}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                <div onclick="handleButtonClick('q_ethics', '{unique_id}', '{q_ethics}', '{q_ethics_display}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
                      title="Click for detailed Quantum Ethics analysis">
                     Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; grid-column: 1 / -1; margin-top: 5px;">
-                    <div onclick="handleButtonClick('preview', '{unique_id}')" style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
+                    <div onclick="handleButtonClick('preview', '{unique_id}', 'N/A', 'N/A')" style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
                          title="Click to view content preview">
                         📄 Content Preview
                     </div>
-                    <div onclick="handleButtonClick('translate', '{unique_id}')" style="background: #f3e5f5; border: 1px solid #9c27b0; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
+                    <div onclick="handleButtonClick('translate', '{unique_id}', 'N/A', 'N/A')" style="background: #f3e5f5; border: 1px solid #9c27b0; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
                          title="Translate document to other languages">
                         🌐 Translate
                     </div>
                 </div>
             </div>
             
+            <!-- Modal for displaying analysis results -->
+            <div id="analysisModal_{unique_id}" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+                <div style="background-color: #fff; margin: 5% auto; padding: 20px; border-radius: 10px; width: 80%; max-width: 600px; position: relative; max-height: 80%; overflow-y: auto;">
+                    <span onclick="closeModal('{unique_id}')" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+                    <div id="modalContent_{unique_id}"></div>
+                </div>
+            </div>
+            
             <script>
-                function handleButtonClick(type, docId) {{
-                    // Store the click data in session storage for Streamlit to read
-                    window.parent.postMessage({{
-                        'type': 'button_click',
-                        'button_type': type,
-                        'doc_id': docId
-                    }}, '*');
+                const docData_{unique_id} = {{
+                    title: "{safe_title}",
+                    content: "{safe_content}..."
+                }};
+                
+                function handleButtonClick(type, docId, score, scoreDisplay) {{
+                    const modal = document.getElementById('analysisModal_' + docId);
+                    const content = document.getElementById('modalContent_' + docId);
+                    content.innerHTML = '<h3>Loading Analysis...</h3><p>Please wait while we analyze the document.</p>';
+                    modal.style.display = 'block';
                     
-                    // Also try to trigger Streamlit rerun by setting a query parameter
-                    const url = new URL(window.parent.location);
-                    url.searchParams.set('clicked_button', type + '_' + docId);
-                    window.parent.history.replaceState(null, null, url);
-                    
-                    // Try to trigger streamlit rerun
-                    if (window.parent.streamlit) {{
-                        window.parent.streamlit.setComponentValue({{
-                            'button_type': type,
-                            'doc_id': docId,
-                            'timestamp': Date.now()
-                        }});
-                    }}
+                    fetch('http://localhost:5001/analyze', {{
+                        method: 'POST',
+                        headers: {{
+                            'Content-Type': 'application/json',
+                        }},
+                        body: JSON.stringify({{
+                            button_type: type,
+                            content: docData_{unique_id}.content,
+                            title: docData_{unique_id}.title,
+                            score: score,
+                            score_display: scoreDisplay
+                        }})
+                    }})
+                    .then(response => response.json())
+                    .then(data => {{
+                        if (data.success) {{
+                            let title = '';
+                            switch(type) {{
+                                case 'ai_cyber': title = '🔒 AI Cybersecurity Analysis'; break;
+                                case 'q_cyber': title = '🔐 Quantum Cybersecurity Analysis'; break;
+                                case 'ai_ethics': title = '⚖️ AI Ethics Analysis'; break;
+                                case 'q_ethics': title = '⚖️ Quantum Ethics Analysis'; break;
+                                case 'preview': title = '📄 Content Preview'; break;
+                                case 'translate': title = '🌐 Document Translation'; break;
+                            }}
+                            
+                            const analysisText = data.analysis.replace(/\\n/g, '<br>');
+                            content.innerHTML = `
+                                <h3>${{title}}</h3>
+                                <p><strong>Score: ${{data.score}}</strong></p>
+                                <div style="margin-top: 15px; line-height: 1.6;">${{analysisText}}</div>
+                            `;
+                        }} else {{
+                            content.innerHTML = `
+                                <h3>Error</h3>
+                                <p>Failed to load analysis: ${{data.error}}</p>
+                            `;
+                        }}
+                    }})
+                    .catch(error => {{
+                        content.innerHTML = `
+                            <h3>Connection Error</h3>
+                            <p>Could not connect to analysis service. Please try again later.</p>
+                            <p>Error: ${{error.message}}</p>
+                        `;
+                    }});
+                }}
+                
+                function closeModal(docId) {{
+                    document.getElementById('analysisModal_' + docId).style.display = 'none';
                 }}
             </script>
             """
             
             # Use streamlit-elements or components.html to render interactive HTML
             import streamlit.components.v1 as components
-            button_result = components.html(button_html, height=120)
+            button_result = components.html(button_html, height=140)
             
-            # Check for button clicks via URL parameters or session state
-            import urllib.parse
-            query_params = st.experimental_get_query_params() if hasattr(st, 'experimental_get_query_params') else {}
-            clicked_button = query_params.get('clicked_button', [None])[0]
-            
-            # Display analysis based on button clicks
-            if clicked_button and unique_id in clicked_button:
-                button_type = clicked_button.replace(f'_{unique_id}', '')
-                
-                if button_type == 'ai_cyber':
-                    with st.expander("🔒 AI Cybersecurity Analysis", expanded=True):
-                        st.markdown(f"**Score: {ai_cyber_display}**")
-                        if ai_cyber != 'N/A':
-                            analysis = analyze_ai_cybersecurity_content(raw_content, ai_cyber)
-                            st.markdown(analysis)
-                        else:
-                            st.info("No AI cybersecurity assessment available for this document.")
-                
-                elif button_type == 'q_cyber':
-                    with st.expander("🔐 Quantum Cybersecurity Analysis", expanded=True):
-                        st.markdown(f"**Score: {q_cyber_display}**")
-                        if q_cyber != 'N/A':
-                            analysis = analyze_quantum_cybersecurity_content(raw_content, q_cyber)
-                            st.markdown(analysis)
-                        else:
-                            st.info("No quantum cybersecurity assessment available for this document.")
-                
-                elif button_type == 'ai_ethics':
-                    with st.expander("⚖️ AI Ethics Analysis", expanded=True):
-                        st.markdown(f"**Score: {ai_ethics_display}**")
-                        if ai_ethics != 'N/A':
-                            analysis = analyze_ai_ethics_content(raw_content, ai_ethics)
-                            st.markdown(analysis)
-                        else:
-                            st.info("No AI ethics assessment available for this document.")
-                
-                elif button_type == 'q_ethics':
-                    with st.expander("⚖️ Quantum Ethics Analysis", expanded=True):
-                        st.markdown(f"**Score: {q_ethics_display}**")
-                        if q_ethics != 'N/A':
-                            analysis = analyze_quantum_ethics_content(raw_content, q_ethics)
-                            st.markdown(analysis)
-                        else:
-                            st.info("No quantum ethics assessment available for this document.")
-                
-                elif button_type == 'preview':
-                    with st.expander("📄 Content Preview", expanded=True):
-                        st.write("**Intelligent Summary:**")
-                        if content_preview_text:
-                            st.markdown(f"<div style='font-size:14px;line-height:1.5;color:#444;background:#f8f9fa;padding:12px;border-radius:6px'>{content_preview_text}</div>", unsafe_allow_html=True)
-                        else:
-                            st.text("Content analysis in progress...")
-                        
-                        st.write("**Raw Content Sample:**")
-                        clean_content = re.sub(r'<[^>]+>', '', raw_content)
-                        clean_content = re.sub(r'\s+', ' ', clean_content).strip()
-                        st.text(clean_content[:500] + "..." if len(clean_content) > 500 else clean_content)
-                
-                elif button_type == 'translate':
-                    with st.expander("🌐 Document Translation", expanded=True):
-                        from components.document_translator import DocumentTranslator
-                        translator = DocumentTranslator()
-                        translator.render_translation_interface(raw_content, title)
+
             
             st.markdown("</div>", unsafe_allow_html=True)
             
