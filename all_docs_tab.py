@@ -3006,16 +3006,27 @@ def render_compact_cards(docs):
             
             if is_quantum_related:
                 if raw_scores['quantum_cybersecurity'] and raw_scores['quantum_cybersecurity'] > 0:
-                    # Use existing DB score with boost
-                    quantum_cyber_score = min(raw_scores['quantum_cybersecurity'] + 18, 100)
-                    scores['quantum_cybersecurity'] = max(quantum_cyber_score, 85) if quantum_cyber_score > 60 else quantum_cyber_score
+                    # Use existing DB score
+                    quantum_score = raw_scores['quantum_cybersecurity']
                 else:
                     # Generate score for quantum documents with missing DB scores
                     try:
                         computed_scores = comprehensive_document_scoring(raw_content, title)
-                        scores['quantum_cybersecurity'] = computed_scores.get('quantum_cybersecurity', 65)
+                        quantum_score = computed_scores.get('quantum_cybersecurity', 65)
                     except:
-                        scores['quantum_cybersecurity'] = 65  # Default reasonable score for quantum docs
+                        quantum_score = 65  # Default reasonable score for quantum docs
+                
+                # Convert to tier system (1-5)
+                if quantum_score >= 85:
+                    scores['quantum_cybersecurity'] = 5
+                elif quantum_score >= 70:
+                    scores['quantum_cybersecurity'] = 4
+                elif quantum_score >= 55:
+                    scores['quantum_cybersecurity'] = 3
+                elif quantum_score >= 40:
+                    scores['quantum_cybersecurity'] = 2
+                else:
+                    scores['quantum_cybersecurity'] = 1
             else:
                 scores['quantum_cybersecurity'] = 'N/A'
             
@@ -4148,16 +4159,27 @@ def render_card_view(docs):
             
             if is_quantum_related:
                 if raw_scores['quantum_cybersecurity'] and raw_scores['quantum_cybersecurity'] > 0:
-                    # Use existing DB score with boost
-                    quantum_cyber_score = min(raw_scores['quantum_cybersecurity'] + 18, 100)
-                    scores['quantum_cybersecurity'] = max(quantum_cyber_score, 85) if quantum_cyber_score > 60 else quantum_cyber_score
+                    # Use existing DB score
+                    quantum_score = raw_scores['quantum_cybersecurity']
                 else:
                     # Generate score for quantum documents with missing DB scores
                     try:
                         computed_scores = comprehensive_document_scoring(raw_content, title)
-                        scores['quantum_cybersecurity'] = computed_scores.get('quantum_cybersecurity', 65)
+                        quantum_score = computed_scores.get('quantum_cybersecurity', 65)
                     except:
-                        scores['quantum_cybersecurity'] = 65  # Default reasonable score for quantum docs
+                        quantum_score = 65  # Default reasonable score for quantum docs
+                
+                # Convert to tier system (1-5)
+                if quantum_score >= 85:
+                    scores['quantum_cybersecurity'] = 5
+                elif quantum_score >= 70:
+                    scores['quantum_cybersecurity'] = 4
+                elif quantum_score >= 55:
+                    scores['quantum_cybersecurity'] = 3
+                elif quantum_score >= 40:
+                    scores['quantum_cybersecurity'] = 2
+                else:
+                    scores['quantum_cybersecurity'] = 1
             else:
                 scores['quantum_cybersecurity'] = 'N/A'
             
@@ -4210,10 +4232,10 @@ def render_card_view(docs):
             else:
                 ai_ethics_color = '#6c757d'
                 
-            # Quantum Cybersecurity color (same as other views)
-            if q_cyber != 'N/A' and q_cyber >= 75:
+            # Quantum Cybersecurity color (tier-based 1-5)
+            if q_cyber != 'N/A' and q_cyber >= 4:
                 q_cyber_color = '#28a745'  # Green
-            elif q_cyber != 'N/A' and q_cyber >= 50:
+            elif q_cyber != 'N/A' and q_cyber >= 3:
                 q_cyber_color = '#fd7e14'  # Orange
             elif q_cyber != 'N/A':
                 q_cyber_color = '#dc3545'  # Red
