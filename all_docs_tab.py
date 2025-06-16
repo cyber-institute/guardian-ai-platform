@@ -408,56 +408,91 @@ def render():
     # Add comprehensive color styling using both CSS and JavaScript
     st.markdown("""
     <style>
-    /* Enhanced CSS with maximum specificity targeting */
+    /* Ultra-high specificity CSS targeting for score buttons */
+    button[data-testid="baseButton-secondary"]:has-text("/100"),
+    button[data-testid="baseButton-secondary"]:has-text("Tier"),
+    button[data-testid="baseButton-secondary"]:has-text("N/A"),
+    .stButton > button:has-text("/100"),
+    .stButton > button:has-text("Tier"),
+    .stButton > button:has-text("N/A") {
+        font-size: 8px !important;
+        font-weight: bold !important;
+        padding: 2px 6px !important;
+        margin: 1px !important;
+        border-radius: 4px !important;
+    }
+    
+    /* Color classes with maximum specificity */
     .score-button-red,
     button.score-button-red,
     .stButton > button.score-button-red,
-    div[data-testid="stButton"] > button.score-button-red {
+    div[data-testid="stButton"] > button.score-button-red,
+    button[data-testid="baseButton-secondary"].score-button-red {
         background-color: #dc3545 !important;
         color: #ffffff !important;
         border-color: #dc3545 !important;
         background-image: none !important;
-        background-gradient: none !important;
+        background: #dc3545 !important;
     }
     
     .score-button-orange,
     button.score-button-orange,
     .stButton > button.score-button-orange,
-    div[data-testid="stButton"] > button.score-button-orange {
+    div[data-testid="stButton"] > button.score-button-orange,
+    button[data-testid="baseButton-secondary"].score-button-orange {
         background-color: #fd7e14 !important;
         color: #ffffff !important;
         border-color: #fd7e14 !important;
         background-image: none !important;
-        background-gradient: none !important;
+        background: #fd7e14 !important;
     }
     
     .score-button-green,
     button.score-button-green,
     .stButton > button.score-button-green,
-    div[data-testid="stButton"] > button.score-button-green {
+    div[data-testid="stButton"] > button.score-button-green,
+    button[data-testid="baseButton-secondary"].score-button-green {
         background-color: #28a745 !important;
         color: #ffffff !important;
         border-color: #28a745 !important;
         background-image: none !important;
-        background-gradient: none !important;
+        background: #28a745 !important;
     }
     
     .score-button-gray,
     button.score-button-gray,
     .stButton > button.score-button-gray,
-    div[data-testid="stButton"] > button.score-button-gray {
+    div[data-testid="stButton"] > button.score-button-gray,
+    button[data-testid="baseButton-secondary"].score-button-gray {
         background-color: #6c757d !important;
         color: #ffffff !important;
         border-color: #6c757d !important;
         background-image: none !important;
-        background-gradient: none !important;
+        background: #6c757d !important;
     }
     
-    /* Additional targeting for nested structures */
-    .stButton button[data-testid*="button"].score-button-red { background-color: #dc3545 !important; color: #ffffff !important; }
-    .stButton button[data-testid*="button"].score-button-orange { background-color: #fd7e14 !important; color: #ffffff !important; }
-    .stButton button[data-testid*="button"].score-button-green { background-color: #28a745 !important; color: #ffffff !important; }
-    .stButton button[data-testid*="button"].score-button-gray { background-color: #6c757d !important; color: #ffffff !important; }
+    /* Direct targeting by button text content */
+    button:contains("75/100"), button:contains("76/100"), button:contains("77/100"), button:contains("78/100"), button:contains("79/100"),
+    button:contains("80/100"), button:contains("81/100"), button:contains("82/100"), button:contains("83/100"), button:contains("84/100"),
+    button:contains("85/100"), button:contains("86/100"), button:contains("87/100"), button:contains("88/100"), button:contains("89/100"),
+    button:contains("90/100"), button:contains("91/100"), button:contains("92/100"), button:contains("93/100"), button:contains("94/100"),
+    button:contains("95/100"), button:contains("96/100"), button:contains("97/100"), button:contains("98/100"), button:contains("99/100"), button:contains("100/100"),
+    button:contains("Tier 4"), button:contains("Tier 5") {
+        background-color: #28a745 !important;
+        color: #ffffff !important;
+        border-color: #28a745 !important;
+    }
+    
+    button:contains("50/100"), button:contains("51/100"), button:contains("52/100"), button:contains("53/100"), button:contains("54/100"),
+    button:contains("55/100"), button:contains("56/100"), button:contains("57/100"), button:contains("58/100"), button:contains("59/100"),
+    button:contains("60/100"), button:contains("61/100"), button:contains("62/100"), button:contains("63/100"), button:contains("64/100"),
+    button:contains("65/100"), button:contains("66/100"), button:contains("67/100"), button:contains("68/100"), button:contains("69/100"),
+    button:contains("70/100"), button:contains("71/100"), button:contains("72/100"), button:contains("73/100"), button:contains("74/100"),
+    button:contains("Tier 3") {
+        background-color: #fd7e14 !important;
+        color: #ffffff !important;
+        border-color: #fd7e14 !important;
+    }
     </style>
     
     <script>
@@ -495,8 +530,8 @@ def render():
                 colorClass = 'score-button-gray';
                 bgColor = '#6c757d';
             } else {
-                // Check for numeric scores - corrected regex
-                const scoreMatch = text.match(/(\\d+)\/100/);
+                // Check for numeric scores - fixed regex pattern
+                const scoreMatch = text.match(/(\d+)\/100/);
                 if (scoreMatch) {
                     const score = parseInt(scoreMatch[1]);
                     if (score >= 75) {
@@ -3007,25 +3042,84 @@ def render_compact_cards(docs):
                 </div>
             """, unsafe_allow_html=True)
             
-            # Enhanced scoring display with visual indicators and analysis popups
+            # Simple colored score badges display
             doc_id = doc.get('id', str(hash(title + doc.get('url', ''))))
-            unique_id = f"compact_{doc_id}"
             
-            # Use enhanced scoring display component with zero spacing
-            st.markdown("<div style='margin:0px;padding:0px;background:#f8f9fa;border-radius:0px'>", unsafe_allow_html=True)
+            # Create simple colored score display
+            score_html = f"""
+            <div style='display: flex; gap: 2px; margin: 2px 0; justify-content: center;'>
+            """
             
-            # Prepare document data for enhanced scoring
-            document_data = {
-                'title': title,
-                'scores': scores,
-                'content': raw_content
-            }
+            # AI Cybersecurity
+            ai_cyber = scores.get('ai_cybersecurity', 'N/A')
+            if ai_cyber != 'N/A' and ai_cyber >= 75:
+                ai_color = '#28a745'
+            elif ai_cyber != 'N/A' and ai_cyber >= 50:
+                ai_color = '#fd7e14'
+            elif ai_cyber != 'N/A':
+                ai_color = '#dc3545'
+            else:
+                ai_color = '#6c757d'
             
-            # Render enhanced score grid with visual indicators
-            enhanced_scoring.render_score_grid(scores, document_data, unique_id, help_tooltips)
+            score_html += f"""
+                <span style='background: {ai_color}; color: white; padding: 2px 4px; font-size: 8px; font-weight: bold; border-radius: 2px;'>
+                    AI: {ai_cyber if ai_cyber != 'N/A' else 'N/A'}
+                </span>
+            """
             
-            # Render analysis popup if triggered
-            enhanced_scoring.render_analysis_popup(unique_id)
+            # AI Ethics
+            ai_ethics = scores.get('ai_ethics', 'N/A')
+            if ai_ethics != 'N/A' and ai_ethics >= 75:
+                ethics_color = '#28a745'
+            elif ai_ethics != 'N/A' and ai_ethics >= 50:
+                ethics_color = '#fd7e14'
+            elif ai_ethics != 'N/A':
+                ethics_color = '#dc3545'
+            else:
+                ethics_color = '#6c757d'
+                
+            score_html += f"""
+                <span style='background: {ethics_color}; color: white; padding: 2px 4px; font-size: 8px; font-weight: bold; border-radius: 2px;'>
+                    Ethics: {ai_ethics if ai_ethics != 'N/A' else 'N/A'}
+                </span>
+            """
+            
+            # Quantum Cybersecurity  
+            q_cyber = scores.get('quantum_cybersecurity', 'N/A')
+            if q_cyber != 'N/A' and q_cyber >= 4:
+                q_color = '#28a745'
+            elif q_cyber != 'N/A' and q_cyber >= 3:
+                q_color = '#fd7e14'
+            elif q_cyber != 'N/A':
+                q_color = '#dc3545'
+            else:
+                q_color = '#6c757d'
+                
+            score_html += f"""
+                <span style='background: {q_color}; color: white; padding: 2px 4px; font-size: 8px; font-weight: bold; border-radius: 2px;'>
+                    Q: {f'T{q_cyber}' if q_cyber != 'N/A' else 'N/A'}
+                </span>
+            """
+            
+            # Quantum Ethics
+            q_ethics = scores.get('quantum_ethics', 'N/A')
+            if q_ethics != 'N/A' and q_ethics >= 75:
+                q_eth_color = '#28a745'
+            elif q_ethics != 'N/A' and q_ethics >= 50:
+                q_eth_color = '#fd7e14'
+            elif q_ethics != 'N/A':
+                q_eth_color = '#dc3545'
+            else:
+                q_eth_color = '#6c757d'
+                
+            score_html += f"""
+                <span style='background: {q_eth_color}; color: white; padding: 2px 4px; font-size: 8px; font-weight: bold; border-radius: 2px;'>
+                    QE: {q_ethics if q_ethics != 'N/A' else 'N/A'}
+                </span>
+            </div>
+            """
+            
+            st.markdown(score_html, unsafe_allow_html=True)
             
             st.markdown("</div>", unsafe_allow_html=True)
             
