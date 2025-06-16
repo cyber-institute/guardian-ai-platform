@@ -4617,13 +4617,31 @@ def render_card_view(docs):
             </div>
             
             <script>
+                // Global variable to track open modals and prevent conflicts
+                window.currentModal_{unique_id} = null;
+                
+                function closeAllModals_{unique_id}() {{
+                    // Close any existing modals from this component
+                    var existingModals = document.querySelectorAll('[id^="modal_"]');
+                    existingModals.forEach(function(modal) {{
+                        if (modal.id.includes('{unique_id}')) {{
+                            modal.style.display = 'none';
+                        }}
+                    }});
+                }}
+                
                 function showModal_{unique_id}(type) {{
+                    // Close any existing modals first
+                    closeAllModals_{unique_id}();
+                    
                     var modal = document.getElementById('modal_{unique_id}');
                     var title = document.getElementById('modalTitle_{unique_id}');
                     var content = document.getElementById('modalContent_{unique_id}');
                     var modalWindow = document.getElementById('modalWindow_{unique_id}');
                     
                     if (!modal || !title || !content || !modalWindow) return;
+                    
+                    window.currentModal_{unique_id} = type;
                     
                     var analysisTitle = '';
                     var score = '';
@@ -4667,9 +4685,12 @@ def render_card_view(docs):
                     title.textContent = analysisTitle;
                     content.innerHTML = (score !== 'N/A' ? '<div style="margin-bottom: 15px;"><b>Score: <span style="color: ' + scoreColor + '; font-weight: bold;">' + score + '</span></b></div>' : '') + '<div>' + analysis + '</div>';
                     
-                    // Position modal at top-left initially
-                    modalWindow.style.left = '50px';
-                    modalWindow.style.top = '50px';
+                    // Position modal with offset to avoid overlapping
+                    var offsetX = Math.floor(Math.random() * 100) + 50; // Random position between 50-150px
+                    var offsetY = Math.floor(Math.random() * 50) + 30;   // Random position between 30-80px
+                    
+                    modalWindow.style.left = offsetX + 'px';
+                    modalWindow.style.top = offsetY + 'px';
                     
                     modal.style.display = 'block';
                     
@@ -4677,23 +4698,26 @@ def render_card_view(docs):
                     var isDragging = false;
                     var startX, startY, startLeft, startTop;
                     
-                    document.getElementById('modalHeader_{unique_id}').onmousedown = function(e) {{
-                        isDragging = true;
-                        startX = e.clientX;
-                        startY = e.clientY;
-                        startLeft = parseInt(modalWindow.style.left) || 50;
-                        startTop = parseInt(modalWindow.style.top) || 50;
-                        e.preventDefault();
-                    }};
+                    var header = document.getElementById('modalHeader_{unique_id}');
+                    if (header) {{
+                        header.onmousedown = function(e) {{
+                            isDragging = true;
+                            startX = e.clientX;
+                            startY = e.clientY;
+                            startLeft = parseInt(modalWindow.style.left) || offsetX;
+                            startTop = parseInt(modalWindow.style.top) || offsetY;
+                            e.preventDefault();
+                        }};
+                    }}
                     
                     document.onmousemove = function(e) {{
-                        if (isDragging) {{
+                        if (isDragging && window.currentModal_{unique_id} === type) {{
                             var newLeft = startLeft + (e.clientX - startX);
                             var newTop = startTop + (e.clientY - startY);
                             
-                            // Keep within viewport bounds
-                            var maxLeft = window.innerWidth - 450;
-                            var maxTop = window.innerHeight - 100;
+                            // Keep within reasonable bounds
+                            var maxLeft = Math.max(200, window.innerWidth - 450);
+                            var maxTop = Math.max(200, window.innerHeight - 100);
                             
                             modalWindow.style.left = Math.max(0, Math.min(maxLeft, newLeft)) + 'px';
                             modalWindow.style.top = Math.max(0, Math.min(maxTop, newTop)) + 'px';
@@ -4707,11 +4731,17 @@ def render_card_view(docs):
                 
                 function closeModal_{unique_id}() {{
                     document.getElementById('modal_{unique_id}').style.display = 'none';
+                    window.currentModal_{unique_id} = null;
                 }}
                 
                 // Close on background click
                 document.getElementById('modal_{unique_id}').onclick = function(e) {{
                     if (e.target === this) closeModal_{unique_id}();
+                }};
+                
+                // Prevent event bubbling on modal content
+                document.getElementById('modalWindow_{unique_id}').onclick = function(e) {{
+                    e.stopPropagation();
                 }};
             </script>
             """
