@@ -604,26 +604,7 @@ def render():
     # Add custom CSS for help tooltips
     help_tooltips.add_custom_css()
     
-    # Enhanced contextual help system for complex risk calculation terms
-    with st.sidebar:
-        st.markdown("### 🎯 Risk Calculation Help")
-        st.markdown("*Click any help icon for detailed explanations*")
-        
-        # Compact help reference for key terms
-        help_categories = {
-            "🔒 Cybersecurity": ['threat_modeling', 'adversarial_robustness', 'quantum_cryptography'],
-            "🧠 AI Ethics": ['algorithmic_accountability', 'explainable_ai', 'ai_safety'], 
-            "🔐 Privacy": ['differential_privacy', 'homomorphic_encryption', 'zero_knowledge_proofs'],
-            "⚡ Quantum": ['quantum_supremacy_risk', 'quantum_error_correction'],
-            "📊 Assessment": ['risk_quantification', 'multi_framework_scoring', 'policy_gap_analysis']
-        }
-        
-        for category, terms in help_categories.items():
-            st.markdown(f"**{category}**")
-            cols = st.columns(len(terms))
-            for i, term in enumerate(terms):
-                with cols[i]:
-                    help_tooltips.render_help_icon(term, size="small")
+
     
     # Add contextual help tooltips throughout the interface
     visible_terms = [
