@@ -4255,44 +4255,77 @@ def render_card_view(docs):
             except:
                 content_preview_text = raw_content[:300] + ("..." if len(raw_content) > 300 else "")
 
-            # Original button styling with direct modal integration
-            st.markdown(f"""
+            # Interactive HTML buttons that communicate with Streamlit backend
+            button_html = f"""
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em;">
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                <div onclick="handleButtonClick('ai_cyber', '{unique_id}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
                      title="Click for detailed AI Cybersecurity analysis">
                     AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
                 </div>
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                <div onclick="handleButtonClick('q_cyber', '{unique_id}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
                      title="Click for detailed Quantum Cybersecurity analysis">
                     Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
                 </div>
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                <div onclick="handleButtonClick('ai_ethics', '{unique_id}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
                      title="Click for detailed AI Ethics analysis">
                     AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
                 </div>
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                <div onclick="handleButtonClick('q_ethics', '{unique_id}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
                      title="Click for detailed Quantum Ethics analysis">
                     Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; grid-column: 1 / -1; margin-top: 5px;">
-                    <div style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
+                    <div onclick="handleButtonClick('preview', '{unique_id}')" style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
                          title="Click to view content preview">
                         📄 Content Preview
                     </div>
-                    <div style="background: #f3e5f5; border: 1px solid #9c27b0; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
+                    <div onclick="handleButtonClick('translate', '{unique_id}')" style="background: #f3e5f5; border: 1px solid #9c27b0; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
                          title="Translate document to other languages">
                         🌐 Translate
                     </div>
                 </div>
             </div>
-            """, unsafe_allow_html=True)
             
-            # Working analysis buttons using Streamlit components
-            col1, col2, col3, col4 = st.columns(4)
+            <script>
+                function handleButtonClick(type, docId) {{
+                    // Store the click data in session storage for Streamlit to read
+                    window.parent.postMessage({{
+                        'type': 'button_click',
+                        'button_type': type,
+                        'doc_id': docId
+                    }}, '*');
+                    
+                    // Also try to trigger Streamlit rerun by setting a query parameter
+                    const url = new URL(window.parent.location);
+                    url.searchParams.set('clicked_button', type + '_' + docId);
+                    window.parent.history.replaceState(null, null, url);
+                    
+                    // Try to trigger streamlit rerun
+                    if (window.parent.streamlit) {{
+                        window.parent.streamlit.setComponentValue({{
+                            'button_type': type,
+                            'doc_id': docId,
+                            'timestamp': Date.now()
+                        }});
+                    }}
+                }}
+            </script>
+            """
             
-            with col1:
-                if st.button(f"AI Cyber: {ai_cyber_display}", key=f"ai_cyber_btn_{unique_id}", 
-                           type="secondary", help="Click for AI Cybersecurity analysis"):
+            # Use streamlit-elements or components.html to render interactive HTML
+            import streamlit.components.v1 as components
+            button_result = components.html(button_html, height=120)
+            
+            # Check for button clicks via URL parameters or session state
+            import urllib.parse
+            query_params = st.experimental_get_query_params() if hasattr(st, 'experimental_get_query_params') else {}
+            clicked_button = query_params.get('clicked_button', [None])[0]
+            
+            # Display analysis based on button clicks
+            if clicked_button and unique_id in clicked_button:
+                button_type = clicked_button.replace(f'_{unique_id}', '')
+                
+                if button_type == 'ai_cyber':
                     with st.expander("🔒 AI Cybersecurity Analysis", expanded=True):
                         st.markdown(f"**Score: {ai_cyber_display}**")
                         if ai_cyber != 'N/A':
@@ -4300,10 +4333,8 @@ def render_card_view(docs):
                             st.markdown(analysis)
                         else:
                             st.info("No AI cybersecurity assessment available for this document.")
-            
-            with col2:
-                if st.button(f"Quantum Cyber: {q_cyber_display}", key=f"q_cyber_btn_{unique_id}", 
-                           type="secondary", help="Click for Quantum Cybersecurity analysis"):
+                
+                elif button_type == 'q_cyber':
                     with st.expander("🔐 Quantum Cybersecurity Analysis", expanded=True):
                         st.markdown(f"**Score: {q_cyber_display}**")
                         if q_cyber != 'N/A':
@@ -4311,10 +4342,8 @@ def render_card_view(docs):
                             st.markdown(analysis)
                         else:
                             st.info("No quantum cybersecurity assessment available for this document.")
-            
-            with col3:
-                if st.button(f"AI Ethics: {ai_ethics_display}", key=f"ai_ethics_btn_{unique_id}", 
-                           type="secondary", help="Click for AI Ethics analysis"):
+                
+                elif button_type == 'ai_ethics':
                     with st.expander("⚖️ AI Ethics Analysis", expanded=True):
                         st.markdown(f"**Score: {ai_ethics_display}**")
                         if ai_ethics != 'N/A':
@@ -4322,10 +4351,8 @@ def render_card_view(docs):
                             st.markdown(analysis)
                         else:
                             st.info("No AI ethics assessment available for this document.")
-            
-            with col4:
-                if st.button(f"Quantum Ethics: {q_ethics_display}", key=f"q_ethics_btn_{unique_id}", 
-                           type="secondary", help="Click for Quantum Ethics analysis"):
+                
+                elif button_type == 'q_ethics':
                     with st.expander("⚖️ Quantum Ethics Analysis", expanded=True):
                         st.markdown(f"**Score: {q_ethics_display}**")
                         if q_ethics != 'N/A':
@@ -4333,12 +4360,8 @@ def render_card_view(docs):
                             st.markdown(analysis)
                         else:
                             st.info("No quantum ethics assessment available for this document.")
-            
-            # Content and translation buttons
-            col5, col6 = st.columns(2)
-            with col5:
-                if st.button("📄 Content Preview", key=f"preview_btn_{unique_id}", 
-                           type="secondary", help="View content preview"):
+                
+                elif button_type == 'preview':
                     with st.expander("📄 Content Preview", expanded=True):
                         st.write("**Intelligent Summary:**")
                         if content_preview_text:
@@ -4350,10 +4373,8 @@ def render_card_view(docs):
                         clean_content = re.sub(r'<[^>]+>', '', raw_content)
                         clean_content = re.sub(r'\s+', ' ', clean_content).strip()
                         st.text(clean_content[:500] + "..." if len(clean_content) > 500 else clean_content)
-            
-            with col6:
-                if st.button("🌐 Translate", key=f"translate_btn_{unique_id}", 
-                           type="secondary", help="Translate document"):
+                
+                elif button_type == 'translate':
                     with st.expander("🌐 Document Translation", expanded=True):
                         from components.document_translator import DocumentTranslator
                         translator = DocumentTranslator()
