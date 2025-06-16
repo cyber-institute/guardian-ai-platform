@@ -3042,25 +3042,82 @@ def render_compact_cards(docs):
                 </div>
             """, unsafe_allow_html=True)
             
-            # Enhanced scoring display with visual indicators and analysis popups
+            # Compact scoring display with colored text
             doc_id = doc.get('id', str(hash(title + doc.get('url', ''))))
             unique_id = f"compact_{doc_id}"
             
-            # Use enhanced scoring display component with zero spacing
-            st.markdown("<div style='margin:0px;padding:0px;background:#f8f9fa;border-radius:0px'>", unsafe_allow_html=True)
+            # Determine colors for each score (same logic as Card View)
+            ai_cyber = scores.get('ai_cybersecurity', 'N/A')
+            ai_ethics = scores.get('ai_ethics', 'N/A')
+            q_cyber = scores.get('quantum_cybersecurity', 'N/A')
+            q_ethics = scores.get('quantum_ethics', 'N/A')
             
-            # Prepare document data for enhanced scoring
-            document_data = {
-                'title': title,
-                'scores': scores,
-                'content': raw_content
-            }
+            # AI Cybersecurity color
+            if ai_cyber != 'N/A' and ai_cyber >= 75:
+                ai_cyber_color = '#28a745'  # Green
+            elif ai_cyber != 'N/A' and ai_cyber >= 50:
+                ai_cyber_color = '#fd7e14'  # Orange
+            elif ai_cyber != 'N/A':
+                ai_cyber_color = '#dc3545'  # Red
+            else:
+                ai_cyber_color = '#6c757d'  # Gray
+                
+            # AI Ethics color
+            if ai_ethics != 'N/A' and ai_ethics >= 75:
+                ai_ethics_color = '#28a745'
+            elif ai_ethics != 'N/A' and ai_ethics >= 50:
+                ai_ethics_color = '#fd7e14'
+            elif ai_ethics != 'N/A':
+                ai_ethics_color = '#dc3545'
+            else:
+                ai_ethics_color = '#6c757d'
+                
+            # Quantum Cybersecurity color (tier-based)
+            if q_cyber != 'N/A' and q_cyber >= 4:
+                q_cyber_color = '#28a745'
+            elif q_cyber != 'N/A' and q_cyber >= 3:
+                q_cyber_color = '#fd7e14'
+            elif q_cyber != 'N/A':
+                q_cyber_color = '#dc3545'
+            else:
+                q_cyber_color = '#6c757d'
+                
+            # Quantum Ethics color
+            if q_ethics != 'N/A' and q_ethics >= 75:
+                q_ethics_color = '#28a745'
+            elif q_ethics != 'N/A' and q_ethics >= 50:
+                q_ethics_color = '#fd7e14'
+            elif q_ethics != 'N/A':
+                q_ethics_color = '#dc3545'
+            else:
+                q_ethics_color = '#6c757d'
             
-            # Render enhanced score grid with visual indicators
-            enhanced_scoring.render_score_grid(scores, document_data, unique_id, help_tooltips)
+            # Display compact colored scores
+            ai_cyber_display = f"{ai_cyber}/100" if ai_cyber != 'N/A' else "N/A"
+            ai_ethics_display = f"{ai_ethics}/100" if ai_ethics != 'N/A' else "N/A"
+            q_cyber_display = f"{q_cyber}/5" if q_cyber != 'N/A' else "N/A"
+            q_ethics_display = f"{q_ethics}/100" if q_ethics != 'N/A' else "N/A"
             
-            # Render analysis popup if triggered
-            enhanced_scoring.render_analysis_popup(unique_id)
+            st.components.v1.html(f"""
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 5px 0; font-size: 13px;">
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 6px; border-radius: 3px; text-align: center;" 
+                     title="AI Cybersecurity Assessment">
+                    AI Cyber: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
+                </div>
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 6px; border-radius: 3px; text-align: center;"
+                     title="Quantum Cybersecurity Assessment">
+                    Q Cyber: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
+                </div>
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 6px; border-radius: 3px; text-align: center;"
+                     title="AI Ethics Assessment">
+                    AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
+                </div>
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 6px; border-radius: 3px; text-align: center;"
+                     title="Quantum Ethics Assessment">
+                    Q Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
+                </div>
+            </div>
+            """, height=80)
             
             st.markdown("</div>", unsafe_allow_html=True)
             
