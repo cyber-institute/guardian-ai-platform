@@ -4430,175 +4430,147 @@ def render_card_view(docs):
             q_ethics_analysis_js = str(q_ethics_analysis).replace("'", "\\'").replace('"', '\\"').replace('\n', '<br>')
             preview_content_js = str(preview_content).replace("'", "\\'").replace('"', '\\"')
             
-            # Working HTML buttons with debugging
+            # Simplified working buttons with proper modal functionality
             button_html = f"""
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em;">
-                <button onclick="window.showModal_{unique_id}('ai_cyber'); return false;" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em; position: relative; z-index: 1;">
+                <button onclick="testModal_{unique_id}('ai_cyber')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;"
                      title="Click for detailed AI Cybersecurity analysis">
                     AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
                 </button>
-                <button onclick="window.showModal_{unique_id}('q_cyber'); return false;" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                <button onclick="testModal_{unique_id}('q_cyber')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;"
                      title="Click for detailed Quantum Cybersecurity analysis">
                     Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
                 </button>
-                <button onclick="window.showModal_{unique_id}('ai_ethics'); return false;" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                <button onclick="testModal_{unique_id}('ai_ethics')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;"
                      title="Click for detailed AI Ethics analysis">
                     AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
                 </button>
-                <button onclick="window.showModal_{unique_id}('q_ethics'); return false;" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                <button onclick="testModal_{unique_id}('q_ethics')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;"
                      title="Click for detailed Quantum Ethics analysis">
                     Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
                 </button>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; grid-column: 1 / -1; margin-top: 5px;">
-                    <button onclick="window.showModal_{unique_id}('preview'); return false;" style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; grid-column: 1 / -1; margin-top: 8px;">
+                    <button onclick="testModal_{unique_id}('preview')" style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;"
                          title="Click to view content preview">
                         Content Preview
                     </button>
-                    <button onclick="window.showModal_{unique_id}('translate'); return false;" style="background: #f3e5f5; border: 1px solid #9c27b0; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
+                    <button onclick="testModal_{unique_id}('translate')" style="background: #f3e5f5; border: 1px solid #9c27b0; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer; font-family: Arial, sans-serif;"
                          title="Translate document to other languages">
                         Translate
                     </button>
                 </div>
             </div>
             
-            <!-- Draggable Modal popup window -->
-            <div id="modal_{unique_id}" style="display: none; position: fixed; z-index: 10000;">
-                <div id="modalWindow_{unique_id}" style="background-color: white; border: 2px solid #ccc; border-radius: 8px; width: 500px; max-height: 400px; overflow-y: auto; position: absolute; top: 10px; left: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
-                    <div id="modalHeader_{unique_id}" style="background-color: #f8f9fa; padding: 10px 15px; border-bottom: 1px solid #ddd; cursor: move; font-family: Arial, sans-serif; font-weight: bold; border-radius: 6px 6px 0 0;">
-                        <span id="modalTitle_{unique_id}">Analysis</span>
-                        <span onclick="closeModal_{unique_id}()" style="color: #666; float: right; font-size: 20px; font-weight: bold; cursor: pointer; line-height: 1;">&times;</span>
+            <!-- Fixed positioned modal that appears above everything -->
+            <div id="testModal_{unique_id}" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); z-index: 999999;">
+                <div id="testModalWindow_{unique_id}" style="position: fixed; top: 50px; left: 50px; background-color: white; border: 2px solid #333; border-radius: 8px; width: 450px; max-height: 350px; overflow-y: auto; box-shadow: 0 8px 16px rgba(0,0,0,0.3); font-family: Arial, sans-serif;">
+                    <div id="testModalHeader_{unique_id}" style="background-color: #f8f9fa; padding: 12px 16px; border-bottom: 2px solid #ddd; cursor: move; font-weight: bold; border-radius: 6px 6px 0 0; position: relative;">
+                        <span id="testModalTitle_{unique_id}" style="font-size: 16px;">Analysis</span>
+                        <span onclick="closeTestModal_{unique_id}()" style="position: absolute; right: 12px; top: 8px; color: #666; font-size: 24px; font-weight: bold; cursor: pointer; line-height: 1; width: 25px; height: 25px; text-align: center;">&times;</span>
                     </div>
-                    <div id="modalContent_{unique_id}" style="padding: 15px; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.4;"></div>
+                    <div id="testModalContent_{unique_id}" style="padding: 16px; font-size: 14px; line-height: 1.5;"></div>
                 </div>
             </div>
             
             <script>
-                // Define functions on window object for global access
-                window.showModal_{unique_id} = function(type) {{
-                    var modal = document.getElementById('modal_{unique_id}');
-                    var modalTitle = document.getElementById('modalTitle_{unique_id}');
-                    var content = document.getElementById('modalContent_{unique_id}');
-                    var modalWindow = document.getElementById('modalWindow_{unique_id}');
+                function testModal_{unique_id}(type) {{
+                    var modal = document.getElementById('testModal_{unique_id}');
+                    var title = document.getElementById('testModalTitle_{unique_id}');
+                    var content = document.getElementById('testModalContent_{unique_id}');
                     
-                    if (!modal || !modalTitle || !content || !modalWindow) {{
-                        console.error('Modal elements not found for {unique_id}');
+                    if (!modal || !title || !content) {{
+                        alert('Modal elements not found');
                         return;
                     }}
                     
-                    var title = '';
+                    var analysisTitle = '';
                     var score = '';
                     var analysis = '';
-                    var isQuantum = false;
-                    
-                    switch(type) {{
-                        case 'ai_cyber':
-                            title = 'AI Cybersecurity Analysis';
-                            score = '{ai_cyber_display}';
-                            analysis = '{ai_cyber_analysis_js}';
-                            break;
-                        case 'q_cyber':
-                            title = 'Quantum Cybersecurity Analysis';
-                            score = '{q_cyber_display}';
-                            analysis = '{q_cyber_analysis_js}';
-                            isQuantum = true;
-                            break;
-                        case 'ai_ethics':
-                            title = 'AI Ethics Analysis';
-                            score = '{ai_ethics_display}';
-                            analysis = '{ai_ethics_analysis_js}';
-                            break;
-                        case 'q_ethics':
-                            title = 'Quantum Ethics Analysis';
-                            score = '{q_ethics_display}';
-                            analysis = '{q_ethics_analysis_js}';
-                            break;
-                        case 'preview':
-                            title = 'Content Preview';
-                            score = 'N/A';
-                            analysis = '{preview_content_js}';
-                            break;
-                        case 'translate':
-                            title = 'Document Translation';
-                            score = 'N/A';
-                            analysis = 'Translation features coming soon. This document can be translated into multiple languages.';
-                            break;
-                    }}
-                    
-                    // Get score color
                     var scoreColor = '#666';
-                    if (score !== 'N/A') {{
-                        if (isQuantum) {{
-                            var tier = parseInt(score.replace('Tier ', ''));
-                            if (tier >= 4) scoreColor = '#28a745';
-                            else if (tier >= 3) scoreColor = '#ffc107';
-                            else scoreColor = '#dc3545';
-                        }} else {{
-                            var num = parseInt(score.replace('/100', ''));
-                            if (num >= 75) scoreColor = '#28a745';
-                            else if (num >= 50) scoreColor = '#ffc107';
-                            else scoreColor = '#dc3545';
-                        }}
+                    
+                    if (type === 'ai_cyber') {{
+                        analysisTitle = 'AI Cybersecurity Analysis';
+                        score = '{ai_cyber_display}';
+                        analysis = '{ai_cyber_analysis_js}';
+                        var num = parseInt(score.replace('/100', '')) || 0;
+                        scoreColor = num >= 75 ? '#28a745' : (num >= 50 ? '#ffc107' : '#dc3545');
+                    }} else if (type === 'q_cyber') {{
+                        analysisTitle = 'Quantum Cybersecurity Analysis';
+                        score = '{q_cyber_display}';
+                        analysis = '{q_cyber_analysis_js}';
+                        var tier = parseInt(score.replace('Tier ', '')) || 0;
+                        scoreColor = tier >= 4 ? '#28a745' : (tier >= 3 ? '#ffc107' : '#dc3545');
+                    }} else if (type === 'ai_ethics') {{
+                        analysisTitle = 'AI Ethics Analysis';
+                        score = '{ai_ethics_display}';
+                        analysis = '{ai_ethics_analysis_js}';
+                        var num = parseInt(score.replace('/100', '')) || 0;
+                        scoreColor = num >= 75 ? '#28a745' : (num >= 50 ? '#ffc107' : '#dc3545');
+                    }} else if (type === 'q_ethics') {{
+                        analysisTitle = 'Quantum Ethics Analysis';
+                        score = '{q_ethics_display}';
+                        analysis = '{q_ethics_analysis_js}';
+                        var num = parseInt(score.replace('/100', '')) || 0;
+                        scoreColor = num >= 75 ? '#28a745' : (num >= 50 ? '#ffc107' : '#dc3545');
+                    }} else if (type === 'preview') {{
+                        analysisTitle = 'Content Preview';
+                        score = 'N/A';
+                        analysis = '{preview_content_js}';
+                    }} else if (type === 'translate') {{
+                        analysisTitle = 'Document Translation';
+                        score = 'N/A';
+                        analysis = 'Translation features coming soon. This document can be translated into multiple languages.';
                     }}
                     
-                    modalTitle.textContent = title;
-                    content.innerHTML = (score !== 'N/A' ? '<div style="margin-bottom: 12px;"><b>Score: <span style="color: ' + scoreColor + '; font-weight: bold;">' + score + '</span></b></div>' : '') + '<div>' + analysis + '</div>';
-                    
-                    // Reset position
-                    modalWindow.style.left = '10px';
-                    modalWindow.style.top = '10px';
-                    modalWindow.style.transform = 'translate3d(0px, 0px, 0)';
+                    title.textContent = analysisTitle;
+                    content.innerHTML = (score !== 'N/A' ? '<div style="margin-bottom: 15px;"><b>Score: <span style="color: ' + scoreColor + '; font-weight: bold;">' + score + '</span></b></div>' : '') + '<div>' + analysis + '</div>';
                     
                     modal.style.display = 'block';
                     
-                    // Setup dragging
-                    setTimeout(function() {{
-                        var header = document.getElementById('modalHeader_{unique_id}');
-                        if (header && !header.draggingSetup) {{
-                            header.draggingSetup = true;
-                            var isDragging = false;
-                            var currentX = 0;
-                            var currentY = 0;
-                            var initialX = 0;
-                            var initialY = 0;
-                            var xOffset = 0;
-                            var yOffset = 0;
-                            
-                            header.onmousedown = function(e) {{
-                                initialX = e.clientX - xOffset;
-                                initialY = e.clientY - yOffset;
-                                isDragging = true;
-                                e.preventDefault();
-                            }};
-                            
-                            document.onmousemove = function(e) {{
-                                if (isDragging) {{
-                                    e.preventDefault();
-                                    currentX = e.clientX - initialX;
-                                    currentY = e.clientY - initialY;
-                                    xOffset = currentX;
-                                    yOffset = currentY;
-                                    modalWindow.style.transform = 'translate3d(' + currentX + 'px, ' + currentY + 'px, 0)';
-                                }}
-                            }};
-                            
-                            document.onmouseup = function() {{
-                                isDragging = false;
-                            }};
+                    // Simple drag functionality
+                    var header = document.getElementById('testModalHeader_{unique_id}');
+                    var modalWindow = document.getElementById('testModalWindow_{unique_id}');
+                    var isDragging = false;
+                    var startX, startY, startLeft, startTop;
+                    
+                    header.onmousedown = function(e) {{
+                        isDragging = true;
+                        startX = e.clientX;
+                        startY = e.clientY;
+                        startLeft = parseInt(modalWindow.style.left) || 50;
+                        startTop = parseInt(modalWindow.style.top) || 50;
+                        e.preventDefault();
+                    }};
+                    
+                    document.onmousemove = function(e) {{
+                        if (isDragging) {{
+                            var newLeft = startLeft + (e.clientX - startX);
+                            var newTop = startTop + (e.clientY - startY);
+                            modalWindow.style.left = Math.max(0, newLeft) + 'px';
+                            modalWindow.style.top = Math.max(0, newTop) + 'px';
                         }}
-                    }}, 50);
-                }};
+                    }};
+                    
+                    document.onmouseup = function() {{
+                        isDragging = false;
+                    }};
+                }}
                 
-                window.closeModal_{unique_id} = function() {{
-                    var modal = document.getElementById('modal_{unique_id}');
-                    if (modal) {{
-                        modal.style.display = 'none';
+                function closeTestModal_{unique_id}() {{
+                    document.getElementById('testModal_{unique_id}').style.display = 'none';
+                }}
+                
+                // Close on background click
+                document.getElementById('testModal_{unique_id}').onclick = function(e) {{
+                    if (e.target === this) {{
+                        closeTestModal_{unique_id}();
                     }}
                 }};
             </script>
             """
             
             import streamlit.components.v1 as components
-            button_result = components.html(button_html, height=120)
+            button_result = components.html(button_html, height=180)
             
 
             
