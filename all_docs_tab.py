@@ -1165,7 +1165,6 @@ def render():
 
     
     # Summary statistics
-    st.markdown("---")
     st.markdown("### Collection Summary")
     
     col1, col2, col3, col4 = st.columns(4)
