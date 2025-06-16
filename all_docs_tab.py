@@ -4074,7 +4074,7 @@ def render_card_view(docs):
                    class="doc-link"
                    style="text-decoration: none; color: #2563eb; cursor: pointer; transition: all 0.2s ease;" 
                    title="Click to open document: {final_url}">
-                   {html.escape(title)}
+                   {html.escape(title)} 🔗
                 </a>'''
             elif source_url and url_valid is False:
                 title_html = f'{html.escape(title)} <span style="color: #dc2626; font-size: 12px;" title="Link unavailable: {url_status}">Link unavailable</span>'
