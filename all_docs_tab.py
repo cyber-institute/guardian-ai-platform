@@ -4264,8 +4264,6 @@ def render_card_view(docs):
             
             st.markdown("</div>", unsafe_allow_html=True)
             
-
-            
             # ISOLATED STEP 4: Display clean content preview (completely separate from scoring)
             with st.expander("Content Preview"):
                 # Generate intelligent content summary from entire document
@@ -4304,3 +4302,6 @@ def render_card_view(docs):
                             
                 except Exception as e:
                     st.text("Content analysis in progress...")
+            
+            # Add spacing between cards
+            st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
