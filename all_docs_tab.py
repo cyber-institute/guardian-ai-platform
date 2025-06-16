@@ -4294,13 +4294,23 @@ def render_card_view(docs):
                      title="Quantum Ethics Assessment">
                     Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
                 </div>
-
+                <div style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer; grid-column: 1 / -1; margin-top: 5px;"
+                     onclick="window.parent.postMessage({{type: 'streamlit:setComponentValue', value: '{unique_id}'}}, '*')"
+                     title="Click to view content preview">
+                    📄 Content Preview
+                </div>
             </div>
-            """, height=120)
+            """, height=160)
             st.markdown("</div>", unsafe_allow_html=True)
             
-            # Content Preview functionality
-            if st.button("📄 Preview Content", key=f"preview_{unique_id}", help="View intelligent content summary", use_container_width=True):
+            # Check if this card's preview was clicked
+            preview_clicked = st.session_state.get(f"preview_clicked_{unique_id}", False)
+            
+            # Streamlit button to trigger content preview (always rendered but conditionally shown)
+            if st.button("📄 Preview Content", key=f"preview_{unique_id}", help="View intelligent content summary") or preview_clicked:
+                # Reset the session state flag
+                st.session_state[f"preview_clicked_{unique_id}"] = False
+                
                 with st.expander("Content Preview", expanded=True):
                     st.write("**Intelligent Summary:**")
                     if content_preview_text:
