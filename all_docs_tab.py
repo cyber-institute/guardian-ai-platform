@@ -635,7 +635,7 @@ def render():
     # Title with help icon
     col1, col2 = st.columns([6, 1])
     with col1:
-        st.title("Policy Repository")
+        st.markdown("<h1 style='font-size: 2rem; margin-bottom: 0.5rem;'>Policy Repository</h1>", unsafe_allow_html=True)
         st.markdown("Repository with comprehensive document analysis and risk assessment frameworks.")
     with col2:
         help_tooltips.render_help_icon('risk_assessment', size="medium")
