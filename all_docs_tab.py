@@ -4255,199 +4255,152 @@ def render_card_view(docs):
             except:
                 content_preview_text = raw_content[:300] + ("..." if len(raw_content) > 300 else "")
 
-            # Original styled buttons with working backend
+            # Original button styling with direct modal integration
             st.markdown(f"""
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em;">
-                <div id="ai_cyber_btn_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                <div onclick="showModal('ai_cyber_{unique_id}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
                      title="Click for detailed AI Cybersecurity analysis">
                     AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
                 </div>
-                <div id="q_cyber_btn_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                <div onclick="showModal('q_cyber_{unique_id}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
                      title="Click for detailed Quantum Cybersecurity analysis">
                     Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
                 </div>
-                <div id="ai_ethics_btn_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                <div onclick="showModal('ai_ethics_{unique_id}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
                      title="Click for detailed AI Ethics analysis">
                     AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
                 </div>
-                <div id="q_ethics_btn_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
+                <div onclick="showModal('q_ethics_{unique_id}')" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;"
                      title="Click for detailed Quantum Ethics analysis">
                     Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; grid-column: 1 / -1; margin-top: 5px;">
-                    <div id="preview_btn_{unique_id}" style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
+                    <div onclick="showModal('preview_{unique_id}')" style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
                          title="Click to view content preview">
                         📄 Content Preview
                     </div>
-                    <div id="translate_btn_{unique_id}" style="background: #f3e5f5; border: 1px solid #9c27b0; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
+                    <div onclick="showModal('translate_{unique_id}')" style="background: #f3e5f5; border: 1px solid #9c27b0; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer;"
                          title="Translate document to other languages">
                         🌐 Translate
                     </div>
                 </div>
             </div>
-            """, unsafe_allow_html=True)
             
-            # Hidden Streamlit buttons styled to be invisible
-            st.markdown(f"""
-            <style>
-            button[data-baseweb="button"]:has-text("ai_cyber_{unique_id}"),
-            button[data-baseweb="button"]:has-text("ai_ethics_{unique_id}"),
-            button[data-baseweb="button"]:has-text("q_cyber_{unique_id}"),
-            button[data-baseweb="button"]:has-text("q_ethics_{unique_id}"),
-            button[data-baseweb="button"]:has-text("preview_{unique_id}"),
-            button[data-baseweb="button"]:has-text("translate_{unique_id}") {{
-                display: none !important;
-                position: absolute;
-                left: -9999px;
-                width: 0;
-                height: 0;
-                opacity: 0;
-            }}
-            </style>
-            """, unsafe_allow_html=True)
-            
-            col_hidden1, col_hidden2, col_hidden3 = st.columns([1,1,1])
-            with col_hidden1:
-                if st.button(f"ai_cyber_{unique_id}", key=f"ai_cyber_{unique_id}"):
-                    st.session_state[f'show_ai_cyber_{unique_id}'] = True
-                    st.rerun()
-                if st.button(f"ai_ethics_{unique_id}", key=f"ai_ethics_{unique_id}"):
-                    st.session_state[f'show_ai_ethics_{unique_id}'] = True
-                    st.rerun()
-            with col_hidden2:
-                if st.button(f"q_cyber_{unique_id}", key=f"q_cyber_{unique_id}"):
-                    st.session_state[f'show_q_cyber_{unique_id}'] = True
-                    st.rerun()
-                if st.button(f"q_ethics_{unique_id}", key=f"q_ethics_{unique_id}"):
-                    st.session_state[f'show_q_ethics_{unique_id}'] = True
-                    st.rerun()
-            with col_hidden3:
-                if st.button(f"preview_{unique_id}", key=f"preview_{unique_id}"):
-                    st.session_state[f'show_preview_{unique_id}'] = True
-                    st.rerun()
-                if st.button(f"translate_{unique_id}", key=f"translate_{unique_id}"):
-                    st.session_state[f'show_translate_{unique_id}'] = True
-                    st.rerun()
-            
-            # JavaScript to connect styled buttons to hidden Streamlit buttons
-            st.markdown(f"""
             <script>
-                function findAndClickButton(buttonText) {{
-                    const buttons = window.parent.document.querySelectorAll('button');
-                    for (let btn of buttons) {{
-                        if (btn.textContent.trim() === buttonText) {{
-                            btn.click();
-                            break;
-                        }}
+                function showModal(modalType) {{
+                    if (modalType.includes('ai_cyber_')) {{
+                        document.getElementById('modal_ai_cyber_{unique_id}').style.display = 'block';
+                    }} else if (modalType.includes('q_cyber_')) {{
+                        document.getElementById('modal_q_cyber_{unique_id}').style.display = 'block';
+                    }} else if (modalType.includes('ai_ethics_')) {{
+                        document.getElementById('modal_ai_ethics_{unique_id}').style.display = 'block';
+                    }} else if (modalType.includes('q_ethics_')) {{
+                        document.getElementById('modal_q_ethics_{unique_id}').style.display = 'block';
+                    }} else if (modalType.includes('preview_')) {{
+                        document.getElementById('modal_preview_{unique_id}').style.display = 'block';
+                    }} else if (modalType.includes('translate_')) {{
+                        document.getElementById('modal_translate_{unique_id}').style.display = 'block';
                     }}
                 }}
                 
-                document.getElementById('ai_cyber_btn_{unique_id}').onclick = function() {{
-                    findAndClickButton('ai_cyber_{unique_id}');
-                }};
-                document.getElementById('q_cyber_btn_{unique_id}').onclick = function() {{
-                    findAndClickButton('q_cyber_{unique_id}');
-                }};
-                document.getElementById('ai_ethics_btn_{unique_id}').onclick = function() {{
-                    findAndClickButton('ai_ethics_{unique_id}');
-                }};
-                document.getElementById('q_ethics_btn_{unique_id}').onclick = function() {{
-                    findAndClickButton('q_ethics_{unique_id}');
-                }};
-                document.getElementById('preview_btn_{unique_id}').onclick = function() {{
-                    findAndClickButton('preview_{unique_id}');
-                }};
-                document.getElementById('translate_btn_{unique_id}').onclick = function() {{
-                    findAndClickButton('translate_{unique_id}');
-                }};
+                function closeModal(modalId) {{
+                    document.getElementById(modalId).style.display = 'none';
+                }}
             </script>
             """, unsafe_allow_html=True)
             
-            # Display modal windows based on session state
-            if st.session_state.get(f'show_ai_cyber_{unique_id}', False):
-                with st.container():
-                    st.markdown("---")
-                    st.markdown("### AI Cybersecurity Analysis")
-                    st.markdown(f"**Score: {ai_cyber_display}**")
-                    if ai_cyber != 'N/A':
-                        analysis = analyze_ai_cybersecurity_content(raw_content, ai_cyber)
-                        st.markdown(analysis)
-                    else:
-                        st.info("No AI cybersecurity assessment available for this document.")
-                    if st.button("Close", key=f"close_ai_cyber_{unique_id}"):
-                        st.session_state[f'show_ai_cyber_{unique_id}'] = False
-                        st.rerun()
+            # Generate analysis content for HTML modals
+            ai_cyber_analysis = ""
+            if ai_cyber != 'N/A':
+                ai_cyber_analysis = analyze_ai_cybersecurity_content(raw_content, ai_cyber)
+            else:
+                ai_cyber_analysis = "No AI cybersecurity assessment available for this document."
             
-            if st.session_state.get(f'show_q_cyber_{unique_id}', False):
-                with st.container():
-                    st.markdown("---")
-                    st.markdown("### Quantum Cybersecurity Analysis")
-                    st.markdown(f"**Score: {q_cyber_display}**")
-                    if q_cyber != 'N/A':
-                        analysis = analyze_quantum_cybersecurity_content(raw_content, q_cyber)
-                        st.markdown(analysis)
-                    else:
-                        st.info("No quantum cybersecurity assessment available for this document.")
-                    if st.button("Close", key=f"close_q_cyber_{unique_id}"):
-                        st.session_state[f'show_q_cyber_{unique_id}'] = False
-                        st.rerun()
+            q_cyber_analysis = ""
+            if q_cyber != 'N/A':
+                q_cyber_analysis = analyze_quantum_cybersecurity_content(raw_content, q_cyber)
+            else:
+                q_cyber_analysis = "No quantum cybersecurity assessment available for this document."
             
-            if st.session_state.get(f'show_ai_ethics_{unique_id}', False):
-                with st.container():
-                    st.markdown("---")
-                    st.markdown("### AI Ethics Analysis")
-                    st.markdown(f"**Score: {ai_ethics_display}**")
-                    if ai_ethics != 'N/A':
-                        analysis = analyze_ai_ethics_content(raw_content, ai_ethics)
-                        st.markdown(analysis)
-                    else:
-                        st.info("No AI ethics assessment available for this document.")
-                    if st.button("Close", key=f"close_ai_ethics_{unique_id}"):
-                        st.session_state[f'show_ai_ethics_{unique_id}'] = False
-                        st.rerun()
+            ai_ethics_analysis = ""
+            if ai_ethics != 'N/A':
+                ai_ethics_analysis = analyze_ai_ethics_content(raw_content, ai_ethics)
+            else:
+                ai_ethics_analysis = "No AI ethics assessment available for this document."
             
-            if st.session_state.get(f'show_q_ethics_{unique_id}', False):
-                with st.container():
-                    st.markdown("---")
-                    st.markdown("### Quantum Ethics Analysis")
-                    st.markdown(f"**Score: {q_ethics_display}**")
-                    if q_ethics != 'N/A':
-                        analysis = analyze_quantum_ethics_content(raw_content, q_ethics)
-                        st.markdown(analysis)
-                    else:
-                        st.info("No quantum ethics assessment available for this document.")
-                    if st.button("Close", key=f"close_q_ethics_{unique_id}"):
-                        st.session_state[f'show_q_ethics_{unique_id}'] = False
-                        st.rerun()
+            q_ethics_analysis = ""
+            if q_ethics != 'N/A':
+                q_ethics_analysis = analyze_quantum_ethics_content(raw_content, q_ethics)
+            else:
+                q_ethics_analysis = "No quantum ethics assessment available for this document."
             
-            if st.session_state.get(f'show_preview_{unique_id}', False):
-                with st.container():
-                    st.markdown("---")
-                    st.markdown("### Content Preview")
-                    st.write("**Intelligent Summary:**")
-                    if content_preview_text:
-                        st.markdown(f"<div style='font-size:14px;line-height:1.5;color:#444;background:#f8f9fa;padding:12px;border-radius:6px'>{content_preview_text}</div>", unsafe_allow_html=True)
-                    else:
-                        st.text("Content analysis in progress...")
-                    
-                    st.write("**Raw Content Sample:**")
-                    clean_content = re.sub(r'<[^>]+>', '', raw_content)
-                    clean_content = re.sub(r'\s+', ' ', clean_content).strip()
-                    st.text(clean_content[:500] + "..." if len(clean_content) > 500 else clean_content)
-                    if st.button("Close", key=f"close_preview_{unique_id}"):
-                        st.session_state[f'show_preview_{unique_id}'] = False
-                        st.rerun()
+            # Clean content for preview
+            clean_content = re.sub(r'<[^>]+>', '', raw_content)
+            clean_content = re.sub(r'\s+', ' ', clean_content).strip()
+            preview_content = clean_content[:500] + "..." if len(clean_content) > 500 else clean_content
             
-            if st.session_state.get(f'show_translate_{unique_id}', False):
-                with st.container():
-                    st.markdown("---")
-                    st.markdown("### Document Translation")
-                    from components.document_translator import DocumentTranslator
-                    translator = DocumentTranslator()
-                    translator.render_translation_interface(raw_content, title)
-                    if st.button("Close", key=f"close_translate_{unique_id}"):
-                        st.session_state[f'show_translate_{unique_id}'] = False
-                        st.rerun()
+            # HTML Modal overlays
+            st.markdown(f"""
+            <!-- Modal overlays for each button -->
+            <div id="modal_ai_cyber_{unique_id}" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.5)">
+                <div style="background-color:#fff;margin:5% auto;padding:20px;border-radius:10px;width:80%;max-width:600px;position:relative">
+                    <span onclick="closeModal('modal_ai_cyber_{unique_id}')" style="color:#aaa;float:right;font-size:28px;font-weight:bold;cursor:pointer">&times;</span>
+                    <h3>AI Cybersecurity Analysis</h3>
+                    <p><strong>Score: {ai_cyber_display}</strong></p>
+                    <div style="margin-top:15px">{ai_cyber_analysis}</div>
+                </div>
+            </div>
+            
+            <div id="modal_q_cyber_{unique_id}" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.5)">
+                <div style="background-color:#fff;margin:5% auto;padding:20px;border-radius:10px;width:80%;max-width:600px;position:relative">
+                    <span onclick="closeModal('modal_q_cyber_{unique_id}')" style="color:#aaa;float:right;font-size:28px;font-weight:bold;cursor:pointer">&times;</span>
+                    <h3>Quantum Cybersecurity Analysis</h3>
+                    <p><strong>Score: {q_cyber_display}</strong></p>
+                    <div style="margin-top:15px">{q_cyber_analysis}</div>
+                </div>
+            </div>
+            
+            <div id="modal_ai_ethics_{unique_id}" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.5)">
+                <div style="background-color:#fff;margin:5% auto;padding:20px;border-radius:10px;width:80%;max-width:600px;position:relative">
+                    <span onclick="closeModal('modal_ai_ethics_{unique_id}')" style="color:#aaa;float:right;font-size:28px;font-weight:bold;cursor:pointer">&times;</span>
+                    <h3>AI Ethics Analysis</h3>
+                    <p><strong>Score: {ai_ethics_display}</strong></p>
+                    <div style="margin-top:15px">{ai_ethics_analysis}</div>
+                </div>
+            </div>
+            
+            <div id="modal_q_ethics_{unique_id}" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.5)">
+                <div style="background-color:#fff;margin:5% auto;padding:20px;border-radius:10px;width:80%;max-width:600px;position:relative">
+                    <span onclick="closeModal('modal_q_ethics_{unique_id}')" style="color:#aaa;float:right;font-size:28px;font-weight:bold;cursor:pointer">&times;</span>
+                    <h3>Quantum Ethics Analysis</h3>
+                    <p><strong>Score: {q_ethics_display}</strong></p>
+                    <div style="margin-top:15px">{q_ethics_analysis}</div>
+                </div>
+            </div>
+            
+            <div id="modal_preview_{unique_id}" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.5)">
+                <div style="background-color:#fff;margin:5% auto;padding:20px;border-radius:10px;width:80%;max-width:600px;position:relative">
+                    <span onclick="closeModal('modal_preview_{unique_id}')" style="color:#aaa;float:right;font-size:28px;font-weight:bold;cursor:pointer">&times;</span>
+                    <h3>Content Preview</h3>
+                    <p><strong>Intelligent Summary:</strong></p>
+                    <div style="font-size:14px;line-height:1.5;color:#444;background:#f8f9fa;padding:12px;border-radius:6px;margin:10px 0">{content_preview_text}</div>
+                    <p><strong>Raw Content Sample:</strong></p>
+                    <div style="font-family:monospace;font-size:12px;background:#f8f9fa;padding:10px;border-radius:4px;max-height:200px;overflow-y:auto">{preview_content}</div>
+                </div>
+            </div>
+            
+            <div id="modal_translate_{unique_id}" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.5)">
+                <div style="background-color:#fff;margin:5% auto;padding:20px;border-radius:10px;width:80%;max-width:600px;position:relative">
+                    <span onclick="closeModal('modal_translate_{unique_id}')" style="color:#aaa;float:right;font-size:28px;font-weight:bold;cursor:pointer">&times;</span>
+                    <h3>Document Translation</h3>
+                    <p>Translation feature coming soon. This will provide multi-language document translation.</p>
+                    <div style="margin-top:15px;padding:10px;background:#e3f2fd;border-radius:5px">
+                        <strong>Document:</strong> {title}<br>
+                        <strong>Content Length:</strong> {len(raw_content)} characters
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             
             st.markdown("</div>", unsafe_allow_html=True)
             
