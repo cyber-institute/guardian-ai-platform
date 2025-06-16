@@ -4282,7 +4282,6 @@ def render_card_view(docs):
             """, height=120)
             
             st.markdown("</div>", unsafe_allow_html=True)
-            
             # ISOLATED STEP 4: Display clean content preview (completely separate from scoring)
             with st.expander("Content Preview"):
                 # Generate intelligent content summary from entire document
