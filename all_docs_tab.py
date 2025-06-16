@@ -4295,7 +4295,15 @@ def render_card_view(docs):
                     Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
                 </div>
                 <div style="background: #e3f2fd; border: 1px solid #2196f3; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer; grid-column: 1 / -1; margin-top: 5px;"
-                     onclick="window.parent.postMessage({{type: 'streamlit:setComponentValue', value: '{unique_id}'}}, '*')"
+                     onclick="setTimeout(() => {{
+                         const buttons = document.querySelectorAll('button[data-testid=\"baseButton-secondary\"]');
+                         for(let btn of buttons) {{
+                             if(btn.getAttribute('aria-label') === 'Content Preview {unique_id}') {{
+                                 btn.click();
+                                 break;
+                             }}
+                         }}
+                     }}, 50)"
                      title="Click to view content preview">
                     📄 Content Preview
                 </div>
@@ -4303,13 +4311,19 @@ def render_card_view(docs):
             """, height=160)
             st.markdown("</div>", unsafe_allow_html=True)
             
-            # Check if this card's preview was clicked
-            preview_clicked = st.session_state.get(f"preview_clicked_{unique_id}", False)
+            # CSS to hide the Streamlit button
+            st.markdown(f"""
+                <style>
+                button[aria-label="Content Preview {unique_id}"] {{
+                    display: none !important;
+                    position: absolute;
+                    left: -9999px;
+                }}
+                </style>
+            """, unsafe_allow_html=True)
             
-            # Streamlit button to trigger content preview (always rendered but conditionally shown)
-            if st.button("📄 Preview Content", key=f"preview_{unique_id}", help="View intelligent content summary") or preview_clicked:
-                # Reset the session state flag
-                st.session_state[f"preview_clicked_{unique_id}"] = False
+            # Hidden Streamlit button
+            if st.button("", key=f"preview_{unique_id}", help=f"Content Preview {unique_id}", type="secondary"):
                 
                 with st.expander("Content Preview", expanded=True):
                     st.write("**Intelligent Summary:**")
