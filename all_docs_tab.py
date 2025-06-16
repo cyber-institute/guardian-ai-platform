@@ -816,9 +816,9 @@ def render():
     filter_col1, filter_col2, filter_col3, filter_col4, filter_col5 = st.columns([2, 2, 1.5, 1.5, 1])
     
     with filter_col1:
-        st.markdown('<span title="Policy: Government/organizational policies. Standard: Industry standards (NIST, ISO). Regulation: Legal regulations and laws. Guidance: Best practice documents. Research: Academic papers and studies.">Document Type</span>', unsafe_allow_html=True)
+        st.markdown('<span title="Policy: Government/organizational policies. Standard: Industry standards (NIST, ISO). Regulation: Legal regulations and laws. Guidance: Best practice documents. Research: Academic papers and studies." style="margin-bottom: -10px; display: block;">Document Type</span>', unsafe_allow_html=True)
         st.session_state["filters"]["selected_types"] = st.multiselect(
-            "", 
+            "Document Type", 
             doc_types,
             default=st.session_state["filters"]["selected_types"],
             key="type_multiselect",
@@ -828,9 +828,9 @@ def render():
     with filter_col2:
         # Show top organizations only to avoid clutter
         top_orgs = organizations[:12] if len(organizations) > 12 else organizations
-        st.markdown('<span title="The organization, agency, or entity that published or authored the document (e.g., NIST, ISO, government agencies, research institutions).">Author/Organization</span>', unsafe_allow_html=True)
+        st.markdown('<span title="The organization, agency, or entity that published or authored the document (e.g., NIST, ISO, government agencies, research institutions)." style="margin-bottom: -10px; display: block;">Author/Organization</span>', unsafe_allow_html=True)
         st.session_state["filters"]["selected_orgs"] = st.multiselect(
-            "", 
+            "Author/Organization", 
             top_orgs,
             default=st.session_state["filters"]["selected_orgs"],
             key="org_multiselect",
@@ -839,9 +839,9 @@ def render():
         )
     
     with filter_col3:
-        st.markdown('<span title="Publication year of the document (when it was officially released or last updated).">Year</span>', unsafe_allow_html=True)
+        st.markdown('<span title="Publication year of the document (when it was officially released or last updated)." style="margin-bottom: -10px; display: block;">Year</span>', unsafe_allow_html=True)
         st.session_state["filters"]["selected_years"] = st.multiselect(
-            "", 
+            "Year", 
             years,
             default=st.session_state["filters"]["selected_years"],
             key="year_multiselect",
@@ -849,9 +849,9 @@ def render():
         )
     
     with filter_col4:
-        st.markdown('<span title="Geographic region or jurisdiction that issued the document (e.g., US, EU, International, specific countries or regions).">Region</span>', unsafe_allow_html=True)
+        st.markdown('<span title="Geographic region or jurisdiction that issued the document (e.g., US, EU, International, specific countries or regions)." style="margin-bottom: -10px; display: block;">Region</span>', unsafe_allow_html=True)
         st.session_state["filters"]["selected_regions"] = st.multiselect(
-            "", 
+            "Region", 
             regions,
             default=st.session_state["filters"]["selected_regions"],
             key="region_multiselect",
