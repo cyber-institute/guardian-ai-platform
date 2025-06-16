@@ -102,6 +102,15 @@ class SmartHelpBubbles:
         if force:
             return True
         
+        # Initialize user help preferences if not present
+        if 'user_help_preferences' not in st.session_state:
+            st.session_state.user_help_preferences = {
+                'dismissed_helps': [],
+                'shown_helps': [],
+                'interaction_count': 0,
+                'first_visit': True
+            }
+        
         prefs = st.session_state.user_help_preferences
         
         # Don't show if user dismissed this help
