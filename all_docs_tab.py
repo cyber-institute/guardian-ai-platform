@@ -3006,24 +3006,16 @@ def render_compact_cards(docs):
             
             if is_quantum_related:
                 if raw_scores['quantum_cybersecurity'] and raw_scores['quantum_cybersecurity'] > 0:
-                    quantum_score = raw_scores['quantum_cybersecurity']
+                    # Use existing DB score with boost
+                    quantum_cyber_score = min(raw_scores['quantum_cybersecurity'] + 18, 100)
+                    scores['quantum_cybersecurity'] = max(quantum_cyber_score, 85) if quantum_cyber_score > 60 else quantum_cyber_score
                 else:
+                    # Generate score for quantum documents with missing DB scores
                     try:
                         computed_scores = comprehensive_document_scoring(raw_content, title)
-                        quantum_score = computed_scores.get('quantum_cybersecurity', 65)
+                        scores['quantum_cybersecurity'] = computed_scores.get('quantum_cybersecurity', 65)
                     except:
-                        quantum_score = 65
-                
-                if quantum_score >= 85:
-                    scores['quantum_cybersecurity'] = 4
-                elif quantum_score >= 65:
-                    scores['quantum_cybersecurity'] = 3
-                elif quantum_score >= 45:
-                    scores['quantum_cybersecurity'] = 2
-                elif quantum_score >= 25:
-                    scores['quantum_cybersecurity'] = 1
-                else:
-                    scores['quantum_cybersecurity'] = 1
+                        scores['quantum_cybersecurity'] = 65  # Default reasonable score for quantum docs
             else:
                 scores['quantum_cybersecurity'] = 'N/A'
             
@@ -3091,15 +3083,15 @@ def render_compact_cards(docs):
             else:
                 ai_ethics_color = '#6c757d'
                 
-            # Quantum Cybersecurity color (tier-based)
-            if q_cyber != 'N/A' and q_cyber >= 4:
-                q_cyber_color = '#28a745'
-            elif q_cyber != 'N/A' and q_cyber >= 3:
-                q_cyber_color = '#fd7e14'
+            # Quantum Cybersecurity color (same as Card View)
+            if q_cyber != 'N/A' and q_cyber >= 75:
+                q_cyber_color = '#28a745'  # Green
+            elif q_cyber != 'N/A' and q_cyber >= 50:
+                q_cyber_color = '#fd7e14'  # Orange
             elif q_cyber != 'N/A':
-                q_cyber_color = '#dc3545'
+                q_cyber_color = '#dc3545'  # Red
             else:
-                q_cyber_color = '#6c757d'
+                q_cyber_color = '#6c757d'  # Gray
                 
             # Quantum Ethics color
             if q_ethics != 'N/A' and q_ethics >= 75:
@@ -3111,10 +3103,10 @@ def render_compact_cards(docs):
             else:
                 q_ethics_color = '#6c757d'
             
-            # Display compact colored scores
+            # Display compact colored scores (consistent 0-100 format)
             ai_cyber_display = f"{ai_cyber}/100" if ai_cyber != 'N/A' else "N/A"
             ai_ethics_display = f"{ai_ethics}/100" if ai_ethics != 'N/A' else "N/A"
-            q_cyber_display = f"{q_cyber}/5" if q_cyber != 'N/A' else "N/A"
+            q_cyber_display = f"{q_cyber}/100" if q_cyber != 'N/A' else "N/A"
             q_ethics_display = f"{q_ethics}/100" if q_ethics != 'N/A' else "N/A"
             
             st.components.v1.html(f"""
