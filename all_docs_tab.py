@@ -4294,13 +4294,48 @@ def render_card_view(docs):
                      title="Quantum Ethics Assessment">
                     Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
                 </div>
-                <div style="background: #ffffff; border: 1px solid #dee2e6; padding: 12px; border-radius: 5px; grid-column: 1 / -1; margin-top: 5px;">
-                    <div style="font-weight: bold; color: #495057; margin-bottom: 8px; font-size: 0.9em;">Content Preview</div>
-                    <div style="color: #6c757d; line-height: 1.4; font-size: 0.85em;">{content_preview_text}</div>
-                </div>
             </div>
-            """, height=200)
+            """, height=120)
             st.markdown("</div>", unsafe_allow_html=True)
+            
+            # Action buttons row
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                if st.button("View", key=f"view_{unique_id}", help="View document details"):
+                    with st.expander("Document Details", expanded=True):
+                        st.write("**Document Information:**")
+                        st.write(f"**Title:** {title}")
+                        st.write(f"**Type:** {doc.get('document_type', 'Unknown')}")
+                        st.write(f"**Author/Org:** {author_org}")
+                        st.write(f"**Date:** {pub_date}")
+            
+            with col2:
+                if st.button("Content Preview", key=f"content_{unique_id}", help="View intelligent content summary"):
+                    with st.expander("Content Preview", expanded=True):
+                        st.write("**Intelligent Summary:**")
+                        if content_preview_text:
+                            st.markdown(f"<div style='font-size:14px;line-height:1.5;color:#444;background:#f8f9fa;padding:12px;border-radius:6px'>{content_preview_text}</div>", unsafe_allow_html=True)
+                        else:
+                            st.text("Content analysis in progress...")
+                        
+                        st.write("**Raw Content Sample:**")
+                        clean_content = re.sub(r'<[^>]+>', '', raw_content)
+                        clean_content = re.sub(r'\s+', ' ', clean_content).strip()
+                        st.text(clean_content[:500] + "..." if len(clean_content) > 500 else clean_content)
+            
+            with col3:
+                if st.button("Report", key=f"report_{unique_id}", help="Generate risk report"):
+                    try:
+                        from components.risk_report_interface import RiskReportInterface
+                        interface = RiskReportInterface()
+                        interface._generate_quick_report(doc)
+                    except:
+                        st.info("Risk report functionality available in full version")
+            
+            with col4:
+                if st.button("Email", key=f"email_{unique_id}", help="Email document analysis"):
+                    st.info("Email functionality available in enterprise version")
             
             # Add spacing between cards
             st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
