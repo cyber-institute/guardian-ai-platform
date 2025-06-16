@@ -3042,57 +3042,25 @@ def render_compact_cards(docs):
                 </div>
             """, unsafe_allow_html=True)
             
-            # Test direct HTML components approach
-            st.components.v1.html(f"""
-            <div style="padding: 10px; font-family: Arial;">
-                <h4>Assessment Scores (Direct HTML)</h4>
-                <div style="background: red; color: white; padding: 5px; margin: 2px; border-radius: 3px;">
-                    AI Cybersecurity: {scores.get('ai_cybersecurity', 'N/A')}
-                </div>
-                <div style="background: orange; color: white; padding: 5px; margin: 2px; border-radius: 3px;">
-                    AI Ethics: {scores.get('ai_ethics', 'N/A')}
-                </div>
-                <div style="background: green; color: white; padding: 5px; margin: 2px; border-radius: 3px;">
-                    Quantum Cyber: {scores.get('quantum_cybersecurity', 'N/A')}
-                </div>
-                <div style="background: blue; color: white; padding: 5px; margin: 2px; border-radius: 3px;">
-                    Quantum Ethics: {scores.get('quantum_ethics', 'N/A')}
-                </div>
-            </div>
-            """, height=200)
+            # Enhanced scoring display with visual indicators and analysis popups
+            doc_id = doc.get('id', str(hash(title + doc.get('url', ''))))
+            unique_id = f"compact_{doc_id}"
             
-            # Also try with image-based approach
-            import matplotlib.pyplot as plt
-            import matplotlib.patches as patches
-            import io
-            import base64
+            # Use enhanced scoring display component with zero spacing
+            st.markdown("<div style='margin:0px;padding:0px;background:#f8f9fa;border-radius:0px'>", unsafe_allow_html=True)
             
-            fig, ax = plt.subplots(1, 1, figsize=(6, 2))
-            ax.set_xlim(0, 10)
-            ax.set_ylim(0, 2)
-            ax.axis('off')
+            # Prepare document data for enhanced scoring
+            document_data = {
+                'title': title,
+                'scores': scores,
+                'content': raw_content
+            }
             
-            # Create colored rectangles
-            colors = ['red', 'orange', 'green', 'blue']
-            labels = ['AI Cyber', 'AI Ethics', 'Q Cyber', 'Q Ethics']
-            values = [scores.get('ai_cybersecurity', 'N/A'), 
-                     scores.get('ai_ethics', 'N/A'),
-                     scores.get('quantum_cybersecurity', 'N/A'),
-                     scores.get('quantum_ethics', 'N/A')]
+            # Render enhanced score grid with visual indicators
+            enhanced_scoring.render_score_grid(scores, document_data, unique_id, help_tooltips)
             
-            for i, (color, label, value) in enumerate(zip(colors, labels, values)):
-                rect = patches.Rectangle((i*2.5, 0.5), 2, 1, linewidth=1, 
-                                       edgecolor='black', facecolor=color, alpha=0.7)
-                ax.add_patch(rect)
-                ax.text(i*2.5 + 1, 1, f"{label}\n{value}", ha='center', va='center', 
-                       fontsize=8, color='white', weight='bold')
-            
-            plt.tight_layout()
-            st.pyplot(fig)
-            plt.close()
-            
-            # Debug raw scores
-            st.write("DEBUG - Raw scores:", scores)
+            # Render analysis popup if triggered
+            enhanced_scoring.render_analysis_popup(unique_id)
             
             st.markdown("</div>", unsafe_allow_html=True)
             
@@ -4157,68 +4125,85 @@ def render_card_view(docs):
             doc_id = doc.get('id', str(hash(title + doc.get('url', ''))))
             unique_id = f"doc_{doc_id}"
             
-            # Create clean grid layout with clickable score buttons
+            # Create colored score display using HTML components (Card View)
             st.markdown("<div style='margin:8px;padding:8px;background:#f8f9fa;border-radius:6px'>", unsafe_allow_html=True)
             
-            col1, col2 = st.columns(2)
+            # Determine colors for each score
+            ai_cyber = scores.get('ai_cybersecurity', 'N/A')
+            ai_ethics = scores.get('ai_ethics', 'N/A')
+            q_cyber = scores.get('quantum_cybersecurity', 'N/A')
+            q_ethics = scores.get('quantum_ethics', 'N/A')
             
-            with col1:
-                # AI Cybersecurity button - display actual score value
-                ai_cyber_display = f"{scores['ai_cybersecurity']}/100" if scores['ai_cybersecurity'] != 'N/A' else "N/A"
-                if st.button(f"AI Cybersecurity: {ai_cyber_display}", 
-                           key=f"ai_cyber_{unique_id}", 
-                           help="AI Cybersecurity Assessment (0-100) - Click for detailed analysis",
-                           use_container_width=True):
-                    # Store document data for global modal
-                    st.session_state[f"modal_doc_data_{unique_id}"] = {
-                        'title': title,
-                        'scores': scores,
-                        'content': raw_content
-                    }
-                    st.session_state[f"show_analysis_{unique_id}"] = 'ai_cybersecurity'
+            # AI Cybersecurity color
+            if ai_cyber != 'N/A' and ai_cyber >= 75:
+                ai_cyber_color = '#28a745'  # Green
+            elif ai_cyber != 'N/A' and ai_cyber >= 50:
+                ai_cyber_color = '#fd7e14'  # Orange
+            elif ai_cyber != 'N/A':
+                ai_cyber_color = '#dc3545'  # Red
+            else:
+                ai_cyber_color = '#6c757d'  # Gray
                 
-                # AI Ethics button - display actual score value
-                ai_ethics_display = f"{scores['ai_ethics']}/100" if scores['ai_ethics'] != 'N/A' else "N/A"
-                if st.button(f"AI Ethics: {ai_ethics_display}", 
-                           key=f"ai_ethics_{unique_id}",
-                           help="AI Ethics Evaluation (0-100) - Click for detailed analysis", 
-                           use_container_width=True):
-                    # Store document data for global modal
-                    st.session_state[f"modal_doc_data_{unique_id}"] = {
-                        'title': title,
-                        'scores': scores,
-                        'content': raw_content
-                    }
-                    st.session_state[f"show_analysis_{unique_id}"] = 'ai_ethics'
+            # AI Ethics color
+            if ai_ethics != 'N/A' and ai_ethics >= 75:
+                ai_ethics_color = '#28a745'
+            elif ai_ethics != 'N/A' and ai_ethics >= 50:
+                ai_ethics_color = '#fd7e14'
+            elif ai_ethics != 'N/A':
+                ai_ethics_color = '#dc3545'
+            else:
+                ai_ethics_color = '#6c757d'
+                
+            # Quantum Cybersecurity color (tier-based)
+            if q_cyber != 'N/A' and q_cyber >= 4:
+                q_cyber_color = '#28a745'
+            elif q_cyber != 'N/A' and q_cyber >= 3:
+                q_cyber_color = '#fd7e14'
+            elif q_cyber != 'N/A':
+                q_cyber_color = '#dc3545'
+            else:
+                q_cyber_color = '#6c757d'
+                
+            # Quantum Ethics color
+            if q_ethics != 'N/A' and q_ethics >= 75:
+                q_ethics_color = '#28a745'
+            elif q_ethics != 'N/A' and q_ethics >= 50:
+                q_ethics_color = '#fd7e14'
+            elif q_ethics != 'N/A':
+                q_ethics_color = '#dc3545'
+            else:
+                q_ethics_color = '#6c757d'
             
-            with col2:
-                # Quantum Cybersecurity button - display actual score value
-                quantum_cyber_display = f"Tier {scores['quantum_cybersecurity']}/5" if scores['quantum_cybersecurity'] != 'N/A' else "N/A"
-                if st.button(f"Quantum Cybersecurity: {quantum_cyber_display}", 
-                           key=f"quantum_cyber_{unique_id}",
-                           help="Quantum Cybersecurity Assessment (Tier 1-5) - Click for detailed analysis",
-                           use_container_width=True):
-                    # Store document data for global modal
-                    st.session_state[f"modal_doc_data_{unique_id}"] = {
-                        'title': title,
-                        'scores': scores,
-                        'content': raw_content
-                    }
-                    st.session_state[f"show_analysis_{unique_id}"] = 'quantum_cybersecurity'
-                
-                # Quantum Ethics button - display actual score value
-                quantum_ethics_display = f"{scores['quantum_ethics']}/100" if scores['quantum_ethics'] != 'N/A' else "N/A"
-                if st.button(f"Quantum Ethics: {quantum_ethics_display}", 
-                           key=f"quantum_ethics_{unique_id}",
-                           help="Quantum Ethics Assessment (0-100) - Click for detailed analysis",
-                           use_container_width=True):
-                    # Store document data for global modal
-                    st.session_state[f"modal_doc_data_{unique_id}"] = {
-                        'title': title,
-                        'scores': scores,
-                        'content': raw_content
-                    }
-                    st.session_state[f"show_analysis_{unique_id}"] = 'quantum_ethics'
+            # Display colored score boxes
+            ai_cyber_display = f"{ai_cyber}/100" if ai_cyber != 'N/A' else "N/A"
+            ai_ethics_display = f"{ai_ethics}/100" if ai_ethics != 'N/A' else "N/A"
+            q_cyber_display = f"Tier {q_cyber}" if q_cyber != 'N/A' else "N/A"
+            q_ethics_display = f"{q_ethics}/100" if q_ethics != 'N/A' else "N/A"
+            
+            st.components.v1.html(f"""
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0;">
+                <div style="background: {ai_cyber_color}; color: white; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; cursor: pointer;" 
+                     onclick="alert('AI Cybersecurity Score: {ai_cyber_display}\\n\\nClick for detailed analysis')"
+                     title="AI Cybersecurity Assessment">
+                    AI Cybersecurity: {ai_cyber_display}
+                </div>
+                <div style="background: {q_cyber_color}; color: white; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; cursor: pointer;"
+                     onclick="alert('Quantum Cybersecurity Score: {q_cyber_display}\\n\\nClick for detailed analysis')"
+                     title="Quantum Cybersecurity Assessment">
+                    Quantum Cyber: {q_cyber_display}
+                </div>
+                <div style="background: {ai_ethics_color}; color: white; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; cursor: pointer;"
+                     onclick="alert('AI Ethics Score: {ai_ethics_display}\\n\\nClick for detailed analysis')"
+                     title="AI Ethics Assessment">
+                    AI Ethics: {ai_ethics_display}
+                </div>
+                <div style="background: {q_ethics_color}; color: white; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; cursor: pointer;"
+                     onclick="alert('Quantum Ethics Score: {q_ethics_display}\\n\\nClick for detailed analysis')"
+                     title="Quantum Ethics Assessment">
+                    Quantum Ethics: {q_ethics_display}
+                </div>
+            </div>
+            """, height=120)
             
             st.markdown("</div>", unsafe_allow_html=True)
             
