@@ -374,19 +374,36 @@ def analyze_with_enhanced_patterns(text: str, title: str) -> Dict[str, int]:
     
     base_score = 0
     if any(term in combined for term in ['cybersecurity', 'security']) and any(term in combined for term in ['ai', 'artificial intelligence']):
-        base_score = 40
+        # Matured scoring - more stringent base requirements
+        base_score = 20  # Reduced base score
         
-        # Add points for specific AI security concepts
-        base_score += sum(5 for indicator in ai_cyber_indicators if indicator in combined)
+        # Core AI security concepts - require multiple for higher scores
+        ai_security_count = sum(1 for indicator in ai_cyber_indicators if indicator in combined)
+        if ai_security_count >= 3:
+            base_score += ai_security_count * 4  # Reward comprehensive AI security coverage
+        elif ai_security_count >= 1:
+            base_score += ai_security_count * 2  # Lower reward for limited coverage
         
-        # Bonus for implementation depth
-        base_score += sum(8 for indicator in implementation_depth if indicator in combined)
+        # Implementation depth - critical for high scores
+        implementation_count = sum(1 for indicator in implementation_depth if indicator in combined)
+        if implementation_count >= 2:
+            base_score += implementation_count * 8  # High value for real implementation
         
-        # Bonus for framework quality
-        base_score += sum(6 for indicator in framework_quality if indicator in combined)
+        # Framework quality indicators
+        quality_count = sum(1 for indicator in framework_quality if indicator in combined)
+        if quality_count >= 1:
+            base_score += quality_count * 6
         
-        # Bonus for standards compliance
-        base_score += sum(7 for indicator in standards_compliance if indicator in combined)
+        # Standards compliance - important for enterprise readiness
+        standards_count = sum(1 for indicator in standards_compliance if indicator in combined)
+        if standards_count >= 1:
+            base_score += standards_count * 7
+        
+        # Maturity penalty for policy documents without technical depth
+        if ('recommendation' in combined and 'implementation' not in combined and 
+            'technical' not in combined and 'system' not in combined and
+            'deployment' not in combined):
+            base_score = max(0, base_score - 20)  # Significant penalty for policy-only documents
     
     scores['ai_cybersecurity'] = min(100, base_score) if base_score > 0 else 0
     
