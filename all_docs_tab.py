@@ -4450,7 +4450,7 @@ def render_card_view(docs):
                 except:
                     score_num = 0
                 
-                return f"""This document demonstrates an AI Cybersecurity maturity score of {score}/100. • Document addresses AI security considerations and risk assessment frameworks • Content includes guidance on AI system protection and threat mitigation • Assessment shows {'excellent' if score_num >= 75 else 'good' if score_num >= 50 else 'developing'} AI cybersecurity practices <b>Recommendations:</b> • Continue implementing robust AI security measures • Regular assessment of AI system vulnerabilities • Integration with existing cybersecurity frameworks"""
+                return f"""This document demonstrates an AI Cybersecurity maturity score of {score}/100. • Document addresses AI security considerations and risk assessment frameworks • Content includes guidance on AI system protection and threat mitigation • Assessment shows {'excellent' if score_num >= 75 else 'good' if score_num >= 50 else 'developing'} AI cybersecurity practices <b>RECOMMENDATIONS:</b> <br> • Continue implementing robust AI security measures • Regular assessment of AI system vulnerabilities • Integration with existing cybersecurity frameworks"""
 
             def get_q_cyber_analysis(content, score):
                 try:
@@ -4458,7 +4458,7 @@ def render_card_view(docs):
                 except:
                     score_num = 0
                 
-                return f"""This document demonstrates Quantum Cybersecurity maturity of {score}/5. • Document addresses quantum-safe cryptography and post-quantum security measures • Content includes quantum threat assessment and mitigation strategies • Assessment shows {'advanced' if score_num >= 4 else 'intermediate' if score_num >= 3 else 'basic'} quantum cybersecurity readiness <b>Recommendations:</b> • Implement post-quantum cryptographic standards • Prepare for quantum computing threats • Regular quantum security assessments"""
+                return f"""This document demonstrates Quantum Cybersecurity maturity of {score}/5. • Document addresses quantum-safe cryptography and post-quantum security measures • Content includes quantum threat assessment and mitigation strategies • Assessment shows {'advanced' if score_num >= 4 else 'intermediate' if score_num >= 3 else 'basic'} quantum cybersecurity readiness <b>RECOMMENDATIONS:</b> <br> • Implement post-quantum cryptographic standards • Prepare for quantum computing threats • Regular quantum security assessments"""
 
             def get_ai_ethics_analysis(content, score):
                 try:
@@ -4466,7 +4466,7 @@ def render_card_view(docs):
                 except:
                     score_num = 0
                 
-                return f"""This document demonstrates an AI Ethics score of {score}/100. • Document addresses ethical AI considerations and bias prevention measures • Content includes fairness, transparency, and accountability frameworks • Assessment shows {'excellent' if score_num >= 75 else 'good' if score_num >= 50 else 'developing'} AI ethics practices <b>Recommendations:</b> • Implement comprehensive bias detection systems • Regular ethical AI audits and assessments • Stakeholder engagement in AI ethics governance"""
+                return f"""This document demonstrates an AI Ethics score of {score}/100. • Document addresses ethical AI considerations and bias prevention measures • Content includes fairness, transparency, and accountability frameworks • Assessment shows {'excellent' if score_num >= 75 else 'good' if score_num >= 50 else 'developing'} AI ethics practices <b>RECOMMENDATIONS:</b> <br> • Implement comprehensive bias detection systems • Regular ethical AI audits and assessments • Stakeholder engagement in AI ethics governance"""
 
             def get_q_ethics_analysis(content, score):
                 try:
@@ -4474,7 +4474,7 @@ def render_card_view(docs):
                 except:
                     score_num = 0
                 
-                return f"""This document demonstrates Quantum Ethics considerations scoring {score}/100. • Document addresses quantum computing ethics and access equity concerns • Content includes quantum technology governance and societal impact • Assessment shows {'excellent' if score_num >= 75 else 'good' if score_num >= 50 else 'developing'} quantum ethics considerations <b>Recommendations:</b> • Ensure equitable access to quantum technologies • Address quantum computing's societal implications • Develop quantum governance frameworks"""
+                return f"""This document demonstrates Quantum Ethics considerations scoring {score}/100. • Document addresses quantum computing ethics and access equity concerns • Content includes quantum technology governance and societal impact • Assessment shows {'excellent' if score_num >= 75 else 'good' if score_num >= 50 else 'developing'} quantum ethics considerations <b>RECOMMENDATIONS:</b> <br> • Ensure equitable access to quantum technologies • Address quantum computing's societal implications • Develop quantum governance frameworks"""
 
             # Calculate database averages for NORM comparison
             db_averages = calculate_database_averages()
