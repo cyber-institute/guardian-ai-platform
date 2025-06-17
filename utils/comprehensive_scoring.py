@@ -357,47 +357,131 @@ def analyze_with_enhanced_patterns(text: str, title: str) -> Dict[str, int]:
     
     scores = {}
     
-    # AI Cybersecurity - Realistic scoring
+    # AI Cybersecurity - Advanced pattern matching with quality assessment
     ai_cyber_indicators = [
         'ai security', 'ai threat', 'ai vulnerability', 'ai attack', 'adversarial',
         'machine learning security', 'artificial intelligence security', 'model security',
         'ai governance', 'ai compliance', 'ai monitoring', 'secure ai', 'ai authentication'
     ]
-    ai_cyber_weight = sum(2 for indicator in ai_cyber_indicators if indicator in combined)
-    if any(term in combined for term in ['cybersecurity', 'security']) and any(term in combined for term in ['ai', 'artificial intelligence']):
-        ai_cyber_weight += 8
-    # Cap at realistic range 25-75
-    scores['ai_cybersecurity'] = min(75, max(25, ai_cyber_weight * 2 + 25))
     
-    # Quantum Cybersecurity - Only score if quantum content is present
+    # Quality indicators for comprehensive coverage
+    implementation_depth = ['implementation', 'deployed', 'operational', 'tested', 'validated']
+    framework_quality = ['comprehensive', 'systematic', 'robust', 'enterprise', 'scalable']
+    standards_compliance = ['nist', 'iso', 'framework', 'standards', 'best practices']
+    
+    base_score = 0
+    if any(term in combined for term in ['cybersecurity', 'security']) and any(term in combined for term in ['ai', 'artificial intelligence']):
+        base_score = 40
+        
+        # Add points for specific AI security concepts
+        base_score += sum(5 for indicator in ai_cyber_indicators if indicator in combined)
+        
+        # Bonus for implementation depth
+        base_score += sum(8 for indicator in implementation_depth if indicator in combined)
+        
+        # Bonus for framework quality
+        base_score += sum(6 for indicator in framework_quality if indicator in combined)
+        
+        # Bonus for standards compliance
+        base_score += sum(7 for indicator in standards_compliance if indicator in combined)
+    
+    scores['ai_cybersecurity'] = min(100, base_score) if base_score > 0 else 0
+    
+    # Quantum Cybersecurity - Sophisticated tier assessment
     quantum_indicators = [
         'quantum cryptography', 'post-quantum', 'quantum-safe', 'quantum security',
         'quantum key distribution', 'quantum resistant', 'lattice cryptography'
     ]
-    quantum_weight = sum(1 for indicator in quantum_indicators if indicator in combined)
-    if quantum_weight > 0 or 'quantum' in combined:
-        # Realistic tier scoring (1-4, avoid perfect 5s)
-        scores['quantum_cybersecurity'] = max(1, min(4, quantum_weight + 1))
+    
+    # Advanced quantum maturity indicators
+    quantum_advanced = ['quantum supremacy', 'quantum advantage', 'quantum protocols', 'quantum standards']
+    quantum_implementation = ['quantum migration', 'quantum deployment', 'quantum integration']
+    quantum_governance = ['quantum policy', 'quantum compliance', 'quantum framework']
+    
+    if any(indicator in combined for indicator in quantum_indicators) or 'quantum' in combined:
+        tier_score = 1  # Base tier
+        
+        # Tier 2: Basic quantum awareness
+        basic_count = sum(1 for indicator in quantum_indicators if indicator in combined)
+        if basic_count >= 2:
+            tier_score = 2
+            
+        # Tier 3: Advanced quantum concepts
+        if any(indicator in combined for indicator in quantum_advanced) or basic_count >= 4:
+            tier_score = 3
+            
+        # Tier 4: Implementation readiness
+        if any(indicator in combined for indicator in quantum_implementation):
+            tier_score = 4
+            
+        # Tier 5: Comprehensive quantum governance
+        if (any(indicator in combined for indicator in quantum_governance) and 
+            tier_score >= 3 and basic_count >= 3):
+            tier_score = 5
+            
+        scores['quantum_cybersecurity'] = tier_score
     # Note: No score assigned for non-quantum documents (returns None)
     
-    # AI Ethics - Realistic ethical framework detection
+    # AI Ethics - Comprehensive ethical assessment
     ethics_indicators = [
         'ai ethics', 'algorithmic bias', 'fairness', 'transparency', 'explainable ai',
         'responsible ai', 'ethical ai', 'ai accountability', 'trustworthy ai'
     ]
-    ethics_weight = sum(2 for indicator in ethics_indicators if indicator in combined)
-    if any(term in combined for term in ['ethics', 'ethical', 'bias']) and any(term in combined for term in ['ai', 'algorithm']):
-        ethics_weight += 10
-    # Cap at realistic range 30-75
-    scores['ai_ethics'] = min(75, max(30, ethics_weight * 2 + 30))
     
-    # Quantum Ethics - Only score if quantum content is present
+    # Advanced ethics concepts
+    bias_mitigation = ['bias detection', 'bias mitigation', 'algorithmic fairness', 'demographic parity']
+    transparency_concepts = ['explainability', 'interpretability', 'algorithmic transparency', 'decision transparency']
+    governance_frameworks = ['ai governance', 'ethical oversight', 'ai audit', 'compliance framework']
+    human_oversight = ['human oversight', 'human-in-the-loop', 'human control', 'meaningful human review']
+    
+    ethics_score = 0
+    if any(term in combined for term in ['ethics', 'ethical', 'bias']) and any(term in combined for term in ['ai', 'algorithm']):
+        ethics_score = 35  # Base score for AI ethics content
+        
+        # Core ethics indicators
+        ethics_score += sum(6 for indicator in ethics_indicators if indicator in combined)
+        
+        # Advanced bias mitigation
+        ethics_score += sum(8 for indicator in bias_mitigation if indicator in combined)
+        
+        # Transparency and explainability
+        ethics_score += sum(7 for indicator in transparency_concepts if indicator in combined)
+        
+        # Governance frameworks
+        ethics_score += sum(9 for indicator in governance_frameworks if indicator in combined)
+        
+        # Human oversight mechanisms
+        ethics_score += sum(8 for indicator in human_oversight if indicator in combined)
+    
+    scores['ai_ethics'] = min(100, ethics_score) if ethics_score > 0 else 0
+    
+    # Quantum Ethics - Advanced quantum ethical assessment
     quantum_ethics_indicators = ['quantum ethics', 'quantum responsibility', 'quantum access', 'quantum equity']
-    qe_weight = sum(3 for indicator in quantum_ethics_indicators if indicator in combined)
-    if qe_weight > 0 or ('quantum' in combined and any(term in combined for term in ['ethics', 'responsibility', 'access', 'equity'])):
-        # Cap at realistic range 25-65
-        scores['quantum_ethics'] = min(65, max(25, qe_weight * 5 + 25))
-    # Note: No score assigned for non-quantum documents (returns None)
+    quantum_privacy = ['quantum privacy', 'quantum data protection', 'quantum anonymity']
+    quantum_fairness = ['quantum advantage distribution', 'quantum digital divide', 'equitable quantum access']
+    quantum_governance = ['quantum ethical framework', 'quantum oversight', 'quantum compliance']
+    
+    quantum_ethics_score = 0
+    if 'quantum' in combined and any(term in combined for term in ['ethics', 'responsibility', 'access', 'equity', 'fairness']):
+        quantum_ethics_score = 30  # Base score for quantum ethics content
+        
+        # Core quantum ethics concepts
+        quantum_ethics_score += sum(8 for indicator in quantum_ethics_indicators if indicator in combined)
+        
+        # Privacy considerations
+        quantum_ethics_score += sum(10 for indicator in quantum_privacy if indicator in combined)
+        
+        # Fairness and access issues
+        quantum_ethics_score += sum(12 for indicator in quantum_fairness if indicator in combined)
+        
+        # Governance frameworks
+        quantum_ethics_score += sum(10 for indicator in quantum_governance if indicator in combined)
+        
+        # Bonus for comprehensive quantum policy discussion
+        if any(term in combined for term in ['quantum policy', 'quantum strategy', 'quantum initiative']):
+            quantum_ethics_score += 15
+    
+    scores['quantum_ethics'] = min(100, quantum_ethics_score) if quantum_ethics_score > 0 else None
     
     return scores
 
@@ -409,35 +493,92 @@ def analyze_with_contextual_understanding(text: str, title: str) -> Dict[str, in
     
     scores = {}
     
-    # Context-aware AI Cybersecurity scoring with realistic ranges
-    if 'joint guidance' in title_lower and 'ai systems securely' in title_lower:
-        scores['ai_cybersecurity'] = 68  # High-authority guidance document
-    elif any(term in combined for term in ['dhs', 'cisa', 'ncsc', 'joint guidelines']):
-        scores['ai_cybersecurity'] = 60  # Government cybersecurity guidance
-    else:
-        base_score = 45 if any(term in combined for term in ['ai', 'artificial intelligence']) else 0
-        scores['ai_cybersecurity'] = base_score
+    # Context-aware AI Cybersecurity scoring based on document authority and depth
+    ai_cyber_score = 0
     
-    # Quantum cybersecurity - Only score if quantum content is present
-    if any(term in combined for term in ['post-quantum', 'quantum-safe', 'quantum cryptography']):
-        scores['quantum_cybersecurity'] = 4
-    elif 'quantum' in combined:
-        scores['quantum_cybersecurity'] = 2
-    # Note: No score assigned for non-quantum documents (returns None)
+    # Check for AI + cybersecurity content
+    if any(term in combined for term in ['ai', 'artificial intelligence']) and any(term in combined for term in ['security', 'cybersecurity']):
+        ai_cyber_score = 35  # Base for AI security content
+        
+        # High-authority government guidance
+        if 'joint guidance' in title_lower and 'ai systems securely' in title_lower:
+            ai_cyber_score += 45  # Exceptional authoritative guidance
+        elif any(term in combined for term in ['dhs', 'cisa', 'ncsc', 'joint guidelines']):
+            ai_cyber_score += 30  # Government authority bonus
+        
+        # Technical depth indicators
+        if any(term in combined for term in ['implementation', 'framework', 'standards', 'best practices']):
+            ai_cyber_score += 15
+            
+        # Comprehensive coverage indicators
+        if any(term in combined for term in ['comprehensive', 'systematic', 'enterprise', 'robust']):
+            ai_cyber_score += 10
     
-    # AI Ethics with realistic document authority context
-    if any(term in combined for term in ['guidance', 'framework', 'standards']):
-        if any(term in combined for term in ['ai', 'artificial intelligence']):
-            scores['ai_ethics'] = 55  # Realistic for guidance documents
+    scores['ai_cybersecurity'] = min(100, ai_cyber_score) if ai_cyber_score > 0 else 0
+    
+    # Quantum cybersecurity - Sophisticated tier assessment
+    quantum_cyber_score = None
+    if 'quantum' in combined:
+        quantum_indicators = ['post-quantum', 'quantum-safe', 'quantum cryptography', 'quantum security', 'quantum key distribution']
+        advanced_quantum = ['quantum supremacy', 'quantum advantage', 'lattice cryptography', 'quantum protocols']
+        implementation_quantum = ['quantum migration', 'quantum deployment', 'quantum integration']
+        
+        indicator_count = sum(1 for term in quantum_indicators if term in combined)
+        advanced_count = sum(1 for term in advanced_quantum if term in combined)
+        impl_count = sum(1 for term in implementation_quantum if term in combined)
+        
+        if indicator_count >= 3 and advanced_count >= 1 and impl_count >= 1:
+            quantum_cyber_score = 5
+        elif indicator_count >= 2 and (advanced_count >= 1 or impl_count >= 1):
+            quantum_cyber_score = 4
+        elif indicator_count >= 2:
+            quantum_cyber_score = 3
+        elif indicator_count >= 1:
+            quantum_cyber_score = 2
         else:
-            scores['ai_ethics'] = 35
-    else:
-        scores['ai_ethics'] = 35  # Baseline for AI content
+            quantum_cyber_score = 1
     
-    # Quantum Ethics - Only score if quantum content is present
-    if 'quantum' in combined and any(term in combined for term in ['ethics', 'responsibility']):
-        scores['quantum_ethics'] = 45  # Realistic quantum ethics score
-    # Note: No score assigned for non-quantum documents (returns None)
+    scores['quantum_cybersecurity'] = quantum_cyber_score
+    
+    # AI Ethics - Authority and depth-based assessment
+    ai_ethics_score = 0
+    if any(term in combined for term in ['ai', 'artificial intelligence']) and any(term in combined for term in ['ethics', 'ethical', 'bias', 'fairness']):
+        ai_ethics_score = 30  # Base for AI ethics content
+        
+        # Document authority bonus
+        if any(term in combined for term in ['guidance', 'framework', 'standards']):
+            ai_ethics_score += 25
+            
+        # Comprehensive coverage indicators
+        ethics_concepts = ['bias mitigation', 'transparency', 'accountability', 'explainability', 'fairness']
+        ai_ethics_score += sum(8 for concept in ethics_concepts if concept in combined)
+        
+        # Implementation depth
+        if any(term in combined for term in ['implementation', 'deployment', 'operational', 'systematic']):
+            ai_ethics_score += 15
+    
+    scores['ai_ethics'] = min(100, ai_ethics_score) if ai_ethics_score > 0 else 0
+    
+    # Quantum Ethics - Comprehensive quantum ethical assessment
+    quantum_ethics_score = None
+    if 'quantum' in combined and any(term in combined for term in ['ethics', 'responsibility', 'access', 'equity', 'fairness']):
+        quantum_ethics_score = 25  # Base for quantum ethics content
+        
+        # Specific quantum ethics concepts
+        quantum_ethics_concepts = ['quantum ethics', 'quantum responsibility', 'quantum access', 'quantum equity']
+        quantum_ethics_score += sum(15 for concept in quantum_ethics_concepts if concept in combined)
+        
+        # Advanced considerations
+        if any(term in combined for term in ['quantum policy', 'quantum governance', 'quantum oversight']):
+            quantum_ethics_score += 20
+            
+        # Implementation considerations
+        if any(term in combined for term in ['quantum strategy', 'quantum initiative', 'quantum framework']):
+            quantum_ethics_score += 15
+        
+        quantum_ethics_score = min(100, quantum_ethics_score)
+    
+    scores['quantum_ethics'] = quantum_ethics_score
     
     return scores
 
@@ -571,22 +712,31 @@ def fallback_scoring(text: str, title: str) -> Dict[str, Optional[int]]:
     
     scores = {}
     
-    # AI Cybersecurity scoring with realistic range (30-70)
+    # AI Cybersecurity - Comprehensive pattern-based assessment
     if applicability['ai_cybersecurity']:
-        score = 30  # Baseline for AI cyber content
-        # Basic keyword scoring
+        score = 25  # Base score for applicable AI cybersecurity content
+        
+        # Core AI security concepts
         ai_security_keywords = ['encryption', 'authentication', 'ai security', 'model protection', 'threat detection']
-        score += min(15, sum(3 for kw in ai_security_keywords if kw in text_lower))
+        score += sum(8 for kw in ai_security_keywords if kw in text_lower)
         
-        # Advanced concepts
-        advanced_keywords = ['federated learning', 'differential privacy', 'adversarial', 'secure computation']
-        score += min(15, sum(4 for kw in advanced_keywords if kw in text_lower))
+        # Advanced AI security concepts
+        advanced_keywords = ['federated learning', 'differential privacy', 'adversarial', 'secure computation', 'homomorphic encryption']
+        score += sum(12 for kw in advanced_keywords if kw in text_lower)
         
-        # Implementation indicators
-        impl_keywords = ['implementation', 'deployed', 'operational', 'monitoring']
-        score += min(10, sum(2 for kw in impl_keywords if kw in text_lower))
+        # Implementation and operational security
+        impl_keywords = ['implementation', 'deployed', 'operational', 'monitoring', 'audit', 'compliance']
+        score += sum(6 for kw in impl_keywords if kw in text_lower)
         
-        scores['ai_cybersecurity'] = min(70, score)
+        # Framework and standards compliance
+        standards_keywords = ['nist', 'iso', 'framework', 'best practices', 'guidelines', 'standards']
+        score += sum(10 for kw in standards_keywords if kw in text_lower)
+        
+        # Risk management and governance
+        governance_keywords = ['risk management', 'governance', 'policy', 'oversight', 'assessment']
+        score += sum(7 for kw in governance_keywords if kw in text_lower)
+        
+        scores['ai_cybersecurity'] = min(100, score)
     else:
         scores['ai_cybersecurity'] = None
     
@@ -594,44 +744,83 @@ def fallback_scoring(text: str, title: str) -> Dict[str, Optional[int]]:
     if applicability['quantum_cybersecurity']:
         score = 1  # Base level
         
-        # Level indicators with realistic caps
-        if any(kw in text_lower for kw in ['post-quantum', 'pqc', 'quantum-safe']):
-            score = max(score, 2)
-        if any(kw in text_lower for kw in ['implementation', 'deployment', 'migration']):
-            score = max(score, 3)
-        if any(kw in text_lower for kw in ['integrated', 'enterprise-wide', 'systematic']):
-            score = max(score, 4)
+        # Sophisticated quantum maturity assessment
+        quantum_basic = ['post-quantum', 'pqc', 'quantum-safe', 'quantum cryptography']
+        quantum_advanced = ['quantum protocols', 'quantum standards', 'lattice cryptography', 'quantum supremacy']
+        quantum_implementation = ['implementation', 'deployment', 'migration', 'integration']
+        quantum_governance = ['integrated', 'enterprise-wide', 'systematic', 'governance', 'compliance']
+        
+        basic_count = sum(1 for kw in quantum_basic if kw in text_lower)
+        advanced_count = sum(1 for kw in quantum_advanced if kw in text_lower)
+        impl_count = sum(1 for kw in quantum_implementation if kw in text_lower)
+        gov_count = sum(1 for kw in quantum_governance if kw in text_lower)
+        
+        if basic_count >= 2 and advanced_count >= 1 and impl_count >= 1 and gov_count >= 1:
+            score = 5
+        elif basic_count >= 2 and (advanced_count >= 1 or impl_count >= 1):
+            score = 4
+        elif basic_count >= 1 and impl_count >= 1:
+            score = 3
+        elif basic_count >= 1:
+            score = 2
             
         scores['quantum_cybersecurity'] = score
     else:
         scores['quantum_cybersecurity'] = None
     
-    # AI Ethics scoring with realistic range (35-65)
+    # AI Ethics - Comprehensive ethical framework assessment
     if applicability['ai_ethics']:
-        score = 35  # Baseline for AI ethics content
+        score = 20  # Base score for applicable AI ethics content
+        
+        # Core ethics concepts
         ethics_keywords = ['fairness', 'bias', 'transparency', 'accountability', 'explainable']
-        score += min(15, sum(3 for kw in ethics_keywords if kw in text_lower))
+        score += sum(10 for kw in ethics_keywords if kw in text_lower)
         
-        advanced_ethics = ['algorithmic auditing', 'ethical AI', 'responsible AI', 'human oversight']
-        score += min(10, sum(3 for kw in advanced_ethics if kw in text_lower))
+        # Advanced ethical AI concepts
+        advanced_ethics = ['algorithmic auditing', 'ethical AI', 'responsible AI', 'human oversight', 'bias mitigation']
+        score += sum(12 for kw in advanced_ethics if kw in text_lower)
         
-        governance_keywords = ['governance', 'oversight', 'compliance', 'monitoring']
-        score += min(5, sum(2 for kw in governance_keywords if kw in text_lower))
+        # Governance and compliance frameworks
+        governance_keywords = ['governance', 'oversight', 'compliance', 'monitoring', 'audit', 'assessment']
+        score += sum(8 for kw in governance_keywords if kw in text_lower)
         
-        scores['ai_ethics'] = min(65, score)
+        # Implementation and operational considerations
+        implementation_keywords = ['implementation', 'deployment', 'operational', 'systematic', 'framework']
+        score += sum(6 for kw in implementation_keywords if kw in text_lower)
+        
+        # Standards and best practices
+        standards_keywords = ['standards', 'best practices', 'guidelines', 'principles', 'policy']
+        score += sum(7 for kw in standards_keywords if kw in text_lower)
+        
+        scores['ai_ethics'] = min(100, score)
     else:
         scores['ai_ethics'] = None
     
-    # Quantum Ethics scoring with realistic range (30-60)
+    # Quantum Ethics - Advanced quantum ethical considerations
     if applicability['quantum_ethics']:
-        score = 30  # Baseline for quantum ethics content
+        score = 15  # Base score for applicable quantum ethics content
+        
+        # Core quantum ethics concepts
         quantum_ethics_keywords = ['quantum ethics', 'quantum access', 'quantum equity', 'quantum governance']
-        score += min(20, sum(5 for kw in quantum_ethics_keywords if kw in text_lower))
+        score += sum(15 for kw in quantum_ethics_keywords if kw in text_lower)
         
+        # Quantum privacy and security ethics
+        quantum_privacy = ['quantum privacy', 'quantum security ethics', 'quantum data protection']
+        score += sum(18 for kw in quantum_privacy if kw in text_lower)
+        
+        # Quantum fairness and accessibility
+        quantum_fairness = ['quantum digital divide', 'equitable quantum access', 'quantum advantage distribution']
+        score += sum(20 for kw in quantum_fairness if kw in text_lower)
+        
+        # General ethical considerations in quantum context
         general_ethics = ['ethical', 'responsible', 'equitable', 'fair access']
-        score += min(10, sum(2 for kw in general_ethics if kw in text_lower))
+        score += sum(8 for kw in general_ethics if kw in text_lower)
         
-        scores['quantum_ethics'] = min(60, score)
+        # Policy and governance frameworks
+        quantum_governance = ['quantum policy', 'quantum strategy', 'quantum oversight', 'quantum compliance']
+        score += sum(12 for kw in quantum_governance if kw in text_lower)
+        
+        scores['quantum_ethics'] = min(100, score)
     else:
         scores['quantum_ethics'] = None
     
