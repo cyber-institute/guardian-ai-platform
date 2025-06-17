@@ -56,10 +56,16 @@ class URLDiscoverySystem:
         title_lower = title.lower()
         org_lower = organization.lower()
         
-        # UNESCO documents
+        # UNESCO documents with specific patterns
         if 'unesco' in org_lower or 'unesco' in title_lower:
+            # Specific URL for "Quantum Science for Inclusion and Sustainability"
+            if 'quantum science for inclusion' in title_lower:
+                specific_url = "https://unesdoc.unesco.org/ark:/48223/pf0000393921/PDF/393921eng.pdf.multi"
+                if self._validate_url(specific_url):
+                    return specific_url
+            
+            # General UNESCO patterns
             unesco_patterns = [
-                f"https://unesdoc.unesco.org/ark:/48223/pf0000{self._extract_doc_number(title)}",
                 "https://www.unesco.org/en/artificial-intelligence/recommendation-ethics",
                 "https://unesdoc.unesco.org/search/quantum",
                 "https://www.unesco.org/reports/science/2021/en/quantum-technologies.html"
