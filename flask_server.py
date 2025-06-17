@@ -41,8 +41,8 @@ def get_documents():
             result.append({
                 'id': doc['id'],
                 'title': doc['title'] or 'Untitled Document',
-                'organization': doc['organization'] or 'Unknown Organization', 
-                'publication_date': str(doc['publication_date']) if doc['publication_date'] else 'Date not available',
+                'organization': doc['author_organization'] or 'Unknown Organization', 
+                'publication_date': str(doc['publish_date']) if doc['publish_date'] else 'Date not available',
                 'ai_cybersecurity_score': safe_score(doc['ai_cybersecurity_score']),
                 'quantum_cybersecurity_score': safe_score(doc['quantum_cybersecurity_score']),
                 'ai_ethics_score': safe_score(doc['ai_ethics_score']),
