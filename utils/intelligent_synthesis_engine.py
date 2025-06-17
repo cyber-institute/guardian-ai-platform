@@ -279,8 +279,11 @@ class IntelligentSynthesisEngine:
                 else:
                     synthesized_scores[metric] = round(max(0, min(100, posterior_mean)), 2)
         
-        # Calculate consensus score
-        consensus_score = sum(synthesized_scores.values()) / len(synthesized_scores) if synthesized_scores else 0
+        # Calculate consensus score with safe division
+        if synthesized_scores and len(synthesized_scores) > 0:
+            consensus_score = sum(synthesized_scores.values()) / len(synthesized_scores)
+        else:
+            consensus_score = 0
         synthesized_scores['consensus_score'] = round(consensus_score, 2)
         
         return {
@@ -521,8 +524,11 @@ class IntelligentSynthesisEngine:
         if not responses:
             return 0.0
         
-        # Base confidence from response confidences
-        avg_confidence = sum(r['confidence'] for r in responses) / len(responses)
+        # Base confidence from response confidences with safe division
+        if len(responses) > 0:
+            avg_confidence = sum(r['confidence'] for r in responses) / len(responses)
+        else:
+            avg_confidence = 0.0
         
         # Consensus factor (lower variance = higher confidence)
         score_variances = []
@@ -534,14 +540,14 @@ class IntelligentSynthesisEngine:
                     normalized_variance = min(variance / 100, 1.0)
                     score_variances.append(normalized_variance)
         
-        if score_variances:
+        if score_variances and len(score_variances) > 0:
             avg_variance = sum(score_variances) / len(score_variances)
             consensus_factor = 1.0 - avg_variance
         else:
             consensus_factor = 1.0
         
-        # Response count factor
-        count_factor = min(len(responses) / 5, 1.0)
+        # Response count factor with safe division
+        count_factor = min(len(responses) / max(5, 1), 1.0)
         
         # Combined confidence
         final_confidence = (

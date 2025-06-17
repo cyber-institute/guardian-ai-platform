@@ -76,7 +76,7 @@ class AIAssistantMascot:
         return random.choice(context_messages)
 
     def render_floating_assistant(self):
-        """Render the floating assistant mascot"""
+        """Render the floating assistant mascot using Streamlit native components"""
         self.initialize_session_state()
         
         if not st.session_state.assistant_visible:
@@ -86,151 +86,34 @@ class AIAssistantMascot:
         current_page = st.session_state.get('current_page', 'documents')
         message = self.get_contextual_message(st.session_state.assistant_context)
         
-        # Floating assistant CSS and HTML
-        assistant_html = f"""
-        <div id="ai-assistant-mascot" style="
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 320px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 20px;
-            padding: 15px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            z-index: 1000;
-            color: white;
-            font-family: Arial, sans-serif;
-            animation: float 3s ease-in-out infinite;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-        ">
-            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                <div style="
-                    width: 40px;
-                    height: 40px;
-                    background: linear-gradient(45deg, #ff6b6b, #feca57);
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    margin-right: 12px;
-                    font-size: 20px;
-                    animation: pulse 2s infinite;
-                ">
-                    🤖
-                </div>
-                <div>
-                    <div style="font-weight: bold; font-size: 14px;">ARIA Assistant</div>
-                    <div style="font-size: 11px; opacity: 0.8;">AI Risk Assessment Guide</div>
-                </div>
-                <button onclick="toggleAssistant()" style="
-                    background: none;
-                    border: none;
-                    color: white;
-                    font-size: 18px;
-                    margin-left: auto;
-                    cursor: pointer;
-                    opacity: 0.7;
-                    padding: 5px;
-                    border-radius: 50%;
-                    width: 30px;
-                    height: 30px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                ">×</button>
-            </div>
+        # Create a container for the assistant in the sidebar
+        with st.sidebar:
+            st.markdown("---")
+            st.markdown("### 🤖 ARIA Assistant")
+            st.markdown("*AI Risk Assessment Guide*")
             
-            <div style="
-                font-size: 13px;
-                line-height: 1.4;
-                margin-bottom: 12px;
-                padding: 10px;
-                background: rgba(255,255,255,0.1);
-                border-radius: 10px;
-                border-left: 3px solid #feca57;
-            ">
-                {message}
-            </div>
+            # Display contextual message
+            st.info(message)
             
-            <div style="display: flex; gap: 8px; justify-content: space-between;">
-                <button onclick="getNewTip()" style="
-                    background: rgba(255,255,255,0.2);
-                    border: none;
-                    color: white;
-                    padding: 6px 12px;
-                    border-radius: 15px;
-                    font-size: 11px;
-                    cursor: pointer;
-                    flex: 1;
-                    transition: all 0.3s ease;
-                ">💡 New Tip</button>
-                <button onclick="showHelp()" style="
-                    background: rgba(255,255,255,0.2);
-                    border: none;
-                    color: white;
-                    padding: 6px 12px;
-                    border-radius: 15px;
-                    font-size: 11px;
-                    cursor: pointer;
-                    flex: 1;
-                    transition: all 0.3s ease;
-                ">❓ Help</button>
-            </div>
-        </div>
+            # Interactive buttons
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("💡 New Tip", key="aria_new_tip"):
+                    # Generate new tip by updating context
+                    contexts = ['documents_view', 'analysis_modal', 'recommendations', 'patent_technology']
+                    import random
+                    new_context = random.choice(contexts)
+                    st.session_state.assistant_context = new_context
+                    st.rerun()
+            
+            with col2:
+                if st.button("❓ Help", key="aria_help"):
+                    st.session_state.show_aria_help = True
         
-        <style>
-        @keyframes float {{
-            0%, 100% {{ transform: translateY(0px); }}
-            50% {{ transform: translateY(-10px); }}
-        }}
-        
-        @keyframes pulse {{
-            0%, 100% {{ transform: scale(1); }}
-            50% {{ transform: scale(1.1); }}
-        }}
-        
-        #ai-assistant-mascot button:hover {{
-            background: rgba(255,255,255,0.3) !important;
-            transform: scale(1.05);
-        }}
-        
-        @media (max-width: 768px) {{
-            #ai-assistant-mascot {{
-                width: 280px;
-                bottom: 10px;
-                right: 10px;
-                font-size: 12px;
-            }}
-        }}
-        </style>
-        
-        <script>
-        function toggleAssistant() {{
-            const assistant = document.getElementById('ai-assistant-mascot');
-            if (assistant) {{
-                assistant.style.display = 'none';
-            }}
-        }}
-        
-        function getNewTip() {{
-            // Trigger Streamlit rerun to get new tip
-            window.parent.postMessage({{
-                type: 'streamlit:setComponentValue',
-                value: 'new_tip_' + Date.now()
-            }}, '*');
-        }}
-        
-        function showHelp() {{
-            window.parent.postMessage({{
-                type: 'streamlit:setComponentValue', 
-                value: 'show_help_' + Date.now()
-            }}, '*');
-        }}
-        </script>
-        """
-        
-        st.markdown(assistant_html, unsafe_allow_html=True)
+        # Show help modal if requested
+        if st.session_state.get('show_aria_help', False):
+            self.show_help_modal()
+            st.session_state.show_aria_help = False
 
     def update_context(self, new_context, user_action=None):
         """Update the assistant's context for more relevant guidance"""
@@ -240,8 +123,7 @@ class AIAssistantMascot:
 
     def show_help_modal(self):
         """Show comprehensive help modal when requested"""
-        with st.sidebar:
-            st.markdown("### 🤖 ARIA Assistant Help")
+        with st.expander("🤖 ARIA Assistant Help", expanded=True):
             st.markdown("""
             **What I can do:**
             - Provide contextual tips based on your current page
