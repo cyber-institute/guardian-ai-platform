@@ -121,8 +121,8 @@ def generate_enhanced_preview(doc: dict) -> str:
     if not content:
         return "No content available for preview"
     
-    # Generate comprehensive preview with strategic insights
-    enhanced_preview = create_strategic_preview(content, title, max_length=1200)
+    # Generate comprehensive preview with strategic insights - increased length for much more detail
+    enhanced_preview = create_strategic_preview(content, title, max_length=2500)
     
     # Add contextual framework analysis
     frameworks = analyze_framework_coverage(content)
@@ -132,7 +132,7 @@ def generate_enhanced_preview(doc: dict) -> str:
     
     return enhanced_preview
 
-def create_strategic_preview(content: str, title: str = "", max_length: int = 1200) -> str:
+def create_strategic_preview(content: str, title: str = "", max_length: int = 2500) -> str:
     """Create strategic preview focusing on policy implications and recommendations"""
     if not content:
         return "No content available for preview"
@@ -144,72 +144,126 @@ def create_strategic_preview(content: str, title: str = "", max_length: int = 12
     clean_text = re.sub(r'#+\s*', '', clean_text)
     clean_text = re.sub(r'\s+', ' ', clean_text).strip()
     
-    # Strategic analysis keywords with high relevance
+    # Enhanced strategic analysis keywords with expanded coverage
     strategic_keywords = {
-        'objective': ['objective', 'goal', 'purpose', 'aim', 'mission'],
-        'approach': ['approach', 'methodology', 'strategy', 'framework', 'model'],
-        'implementation': ['implementation', 'deployment', 'execution', 'operationalization'],
-        'compliance': ['compliance', 'adherence', 'conformance', 'requirement', 'standard'],
-        'risk': ['risk', 'threat', 'vulnerability', 'challenge', 'concern'],
-        'recommendation': ['recommend', 'suggest', 'propose', 'advise', 'guideline'],
-        'governance': ['governance', 'oversight', 'management', 'administration', 'control'],
-        'assessment': ['assessment', 'evaluation', 'analysis', 'review', 'examination']
+        'executive_summary': ['executive summary', 'key findings', 'main conclusions', 'primary outcomes', 'summary'],
+        'objective': ['objective', 'goal', 'purpose', 'aim', 'mission', 'intent', 'target'],
+        'approach': ['approach', 'methodology', 'strategy', 'framework', 'model', 'method', 'technique'],
+        'implementation': ['implementation', 'deployment', 'execution', 'operationalization', 'rollout', 'adoption'],
+        'compliance': ['compliance', 'adherence', 'conformance', 'requirement', 'standard', 'regulation'],
+        'risk': ['risk', 'threat', 'vulnerability', 'challenge', 'concern', 'hazard', 'exposure'],
+        'recommendation': ['recommend', 'suggest', 'propose', 'advise', 'guideline', 'best practice'],
+        'governance': ['governance', 'oversight', 'management', 'administration', 'control', 'supervision'],
+        'assessment': ['assessment', 'evaluation', 'analysis', 'review', 'examination', 'audit'],
+        'policy_implications': ['policy', 'implications', 'considerations', 'impact', 'consequences'],
+        'technical_requirements': ['requirements', 'specifications', 'criteria', 'standards', 'capabilities'],
+        'stakeholder_impact': ['stakeholders', 'organizations', 'entities', 'users', 'practitioners']
     }
     
-    # Extract sentences and categorize by strategic value
+    # Extract sentences and categorize by strategic value with enhanced scoring
     sentences = re.split(r'[.!?]+', clean_text)
     categorized_sentences = {category: [] for category in strategic_keywords.keys()}
     general_sentences = []
     
     for sentence in sentences:
         sentence = sentence.strip()
-        if len(sentence) > 30:
+        if len(sentence) > 25:  # Slightly lower threshold for more content
             sentence_lower = sentence.lower()
             categorized = False
             
-            for category, keywords in strategic_keywords.items():
-                if any(keyword in sentence_lower for keyword in keywords):
-                    categorized_sentences[category].append(sentence)
-                    categorized = True
-                    break
+            # Score sentences for relevance
+            sentence_score = 0
+            best_category = None
             
-            if not categorized:
+            for category, keywords in strategic_keywords.items():
+                category_matches = sum(1 for keyword in keywords if keyword in sentence_lower)
+                if category_matches > 0:
+                    # Prefer sentences with multiple keyword matches
+                    category_score = category_matches * 2
+                    
+                    # Bonus for sentences with numbers, percentages, or specific data
+                    if any(char.isdigit() for char in sentence) or '%' in sentence:
+                        category_score += 1
+                    
+                    # Bonus for longer, more informative sentences
+                    if len(sentence) > 80:
+                        category_score += 1
+                    
+                    if category_score > sentence_score:
+                        sentence_score = category_score
+                        best_category = category
+                        categorized = True
+            
+            if categorized and best_category:
+                categorized_sentences[best_category].append((sentence_score, sentence))
+            elif not categorized:
                 general_sentences.append(sentence)
     
-    # Build strategic preview prioritizing key insights
+    # Sort sentences within each category by score
+    for category in categorized_sentences:
+        categorized_sentences[category].sort(key=lambda x: x[0], reverse=True)
+    
+    # Build comprehensive strategic preview
     preview_parts = []
     current_length = 0
     
-    # Priority order for strategic content
-    priority_categories = ['objective', 'approach', 'implementation', 'recommendation', 'governance', 'assessment', 'compliance', 'risk']
+    # Priority order for strategic content - focusing on most valuable insights first
+    priority_categories = [
+        'executive_summary', 'objective', 'approach', 'recommendation', 
+        'implementation', 'governance', 'policy_implications', 'assessment', 
+        'compliance', 'risk', 'technical_requirements', 'stakeholder_impact'
+    ]
     
+    # Add top sentences from each priority category
     for category in priority_categories:
         if categorized_sentences[category] and current_length < max_length:
-            # Select best sentence from category
-            best_sentence = max(categorized_sentences[category], 
-                              key=lambda s: len(s) if len(s) < 200 else 100)
+            # Take multiple sentences from high-priority categories
+            sentences_to_add = 3 if category in ['executive_summary', 'objective', 'recommendation'] else 2
             
-            if current_length + len(best_sentence) + 2 <= max_length:
-                preview_parts.append(best_sentence)
-                current_length += len(best_sentence) + 2
+            for i, (score, sentence) in enumerate(categorized_sentences[category][:sentences_to_add]):
+                if current_length + len(sentence) + 2 <= max_length:
+                    preview_parts.append(sentence)
+                    current_length += len(sentence) + 2
+                else:
+                    break
     
-    # Add general sentences if space allows
+    # Add high-quality general sentences focusing on policy and strategic content
+    policy_terms = ['policy', 'regulation', 'law', 'act', 'directive', 'order', 'guidance', 'principle']
+    strategic_terms = ['strategic', 'critical', 'essential', 'important', 'significant', 'key', 'primary']
+    
+    # Score general sentences for relevance
+    scored_general = []
     for sentence in general_sentences:
-        if current_length + len(sentence) + 2 <= max_length:
-            # Prefer sentences with policy-relevant terms
-            policy_terms = ['policy', 'regulation', 'law', 'act', 'directive', 'order']
-            if any(term in sentence.lower() for term in policy_terms):
-                preview_parts.append(sentence)
-                current_length += len(sentence) + 2
-        else:
-            break
+        sentence_lower = sentence.lower()
+        score = 0
+        
+        # Policy relevance
+        if any(term in sentence_lower for term in policy_terms):
+            score += 3
+        
+        # Strategic relevance
+        if any(term in sentence_lower for term in strategic_terms):
+            score += 2
+        
+        # Information density
+        if len(sentence) > 60:
+            score += 1
+        
+        # Specific data or examples
+        if any(char.isdigit() for char in sentence) or '%' in sentence:
+            score += 1
+        
+        if score > 0:
+            scored_general.append((score, sentence))
     
-    # Fill remaining space with highest-quality general content
-    remaining_sentences = [s for s in general_sentences if s not in preview_parts]
-    for sentence in remaining_sentences[:3]:  # Limit to avoid overwhelming
+    # Sort and add best general sentences
+    scored_general.sort(key=lambda x: x[0], reverse=True)
+    for score, sentence in scored_general[:5]:  # Increased limit
         if current_length + len(sentence) + 2 <= max_length:
             preview_parts.append(sentence)
             current_length += len(sentence) + 2
+        else:
+            break
     
     if preview_parts:
         preview = '. '.join(preview_parts)
@@ -217,7 +271,7 @@ def create_strategic_preview(content: str, title: str = "", max_length: int = 12
             preview += '.'
         return preview
     else:
-        # Intelligent fallback
+        # Enhanced fallback with more content
         return clean_and_enhance_preview(content, max_length)
 
 def analyze_framework_coverage(content: str) -> list:
