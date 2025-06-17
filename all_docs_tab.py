@@ -4883,7 +4883,7 @@ def render_card_view(docs):
                             </div>
                             <div style="padding: 12px; font-size: 13px; line-height: 1.4;">
                                 ${{data.score !== 'N/A' ? '<div style="margin-bottom: 8px;"><b>SCORE: <span style="color: ' + data.color + '; font-weight: bold;">' + data.score + '</span></b></div>' : ''}}
-                                <div style="margin-bottom: 4px;"><b>KEY ANALYSIS:</b></div>
+
                                 <div style="margin-bottom: 8px;">${{data.analysis}}</div>
                                 ${{data.norm ? '<div style="padding: 6px; background-color: #f8f9fa; border-left: 3px solid #007bff; font-size: 12px;"><b>NORM:</b> ' + data.norm + '</div>' : ''}}
                             </div>
