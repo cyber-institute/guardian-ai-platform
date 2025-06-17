@@ -14,6 +14,10 @@ externalPort = 80
 localPort = 5001
 externalPort = 3000
 
+[[ports]]
+localPort = 5002
+externalPort = 3001
+
 [workflows]
 runButton = "Project"
 
@@ -28,7 +32,7 @@ args = "GUARDIAN App"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "API Server"
+args = "Flask Document Server"
 
 [[workflows.workflow]]
 name = "GUARDIAN App"
@@ -40,13 +44,13 @@ args = "streamlit run app.py --server.port 5000"
 waitForPort = 5000
 
 [[workflows.workflow]]
-name = "API Server"
+name = "Flask Document Server"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python api_server.py"
-waitForPort = 5001
+args = "python flask_server.py"
+waitForPort = 5002
 
 [deployment]
 run = ["sh", "-c", "streamlit run app.py --server.port 5000"]
