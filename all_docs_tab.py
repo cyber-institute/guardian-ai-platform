@@ -1561,18 +1561,40 @@ def render():
                             if result and result.get('success'):
                                 st.info("Content extracted successfully")
                                 
-                                # Extract content and metadata
+                                # Extract content and basic metadata
                                 content = result.get('content', '')
-                                title = result.get('metadata', {}).get('title') or uploaded_file.name
-                                author = result.get('metadata', {}).get('author', 'Unknown')
+                                basic_metadata = result.get('metadata', {})
                                 
                                 if len(content.strip()) > 50:
-                                    st.info("Calculating comprehensive scores...")
+                                    st.info("Applying enhanced metadata extraction...")
                                     
-                                    # Import required modules
+                                    # Use enhanced OCR metadata extraction
+                                    from utils.enhanced_ocr_metadata import extract_enhanced_metadata_from_content
                                     from utils.comprehensive_scoring import comprehensive_document_scoring
                                     from utils.database import db_manager
                                     import uuid
+                                    
+                                    # Apply enhanced metadata extraction
+                                    enhanced_metadata = extract_enhanced_metadata_from_content(content, basic_metadata)
+                                    
+                                    title = enhanced_metadata.get('title', uploaded_file.name)
+                                    organization = enhanced_metadata.get('author_organization', 'Unknown')
+                                    doc_type = enhanced_metadata.get('document_type', result.get('file_type', 'Document'))
+                                    pub_date = enhanced_metadata.get('publish_date', None)
+                                    
+                                    # Set author based on organization for institutional documents
+                                    if organization != 'Unknown':
+                                        author = organization
+                                    else:
+                                        author = basic_metadata.get('author', 'Unknown')
+                                    
+                                    st.success(f"Enhanced metadata extracted:")
+                                    st.info(f"Title: {title}")
+                                    st.info(f"Organization: {organization}")
+                                    st.info(f"Type: {doc_type}")
+                                    st.info(f"Author: {author}")
+                                    
+                                    st.info("Calculating comprehensive scores...")
                                     
                                     # Generate scores
                                     scores = comprehensive_document_scoring(content, title)
@@ -1586,13 +1608,18 @@ def render():
                                         'content': content,
                                         'clean_content': content,
                                         'text_content': content,
-                                        'document_type': result.get('file_type', 'Unknown'),
+                                        'document_type': doc_type,
                                         'author': author,
+                                        'author_organization': organization,
+                                        'organization': organization,
+                                        'publish_date': pub_date,
+                                        'publication_date': pub_date,
                                         'filename': uploaded_file.name,
                                         'ai_cybersecurity_score': scores.get('ai_cybersecurity', 0),
                                         'quantum_cybersecurity_score': scores.get('quantum_cybersecurity', 0),
                                         'ai_ethics_score': scores.get('ai_ethics', 0),
-                                        'quantum_ethics_score': scores.get('quantum_ethics', 0)
+                                        'quantum_ethics_score': scores.get('quantum_ethics', 0),
+                                        'extraction_method': 'FILE_ENHANCED_OCR'
                                     }
                                     
                                     st.info("Saving document to database...")
@@ -1600,10 +1627,11 @@ def render():
                                     
                                     if save_result:
                                         st.success("Document processed successfully!")
-                                        st.info("Document added to collection.")
+                                        st.info("Document added to collection with enhanced metadata.")
                                         # Clear cache to show new document immediately
-                                        st.cache_data.clear()
-                                        st.balloons()
+                                        if hasattr(st, 'cache_data'):
+                                            st.cache_data.clear()
+                                        st.rerun()
                                     else:
                                         st.error("Failed to save document to database")
                                 else:
