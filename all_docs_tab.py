@@ -3237,23 +3237,20 @@ def render_compact_cards(docs):
             
             doc_type = ultra_clean_metadata(doc.get('document_type', 'Unknown'))
             
-            # Generate enhanced content preview on-the-fly
-            content_preview = doc.get('content_preview', '')
-            if not content_preview or len(content_preview) < 200:
-                # Generate comprehensive preview directly
-                if raw_content and len(raw_content) > 100:
-                    # Create strategic analysis preview
-                    sentences = raw_content.replace('\n', ' ').split('. ')
-                    key_sentences = [s for s in sentences if any(term in s.lower() for term in 
-                                   ['framework', 'security', 'risk', 'governance', 'implementation', 'strategy', 'compliance', 'standard', 'guideline', 'principle'])]
-                    
-                    if key_sentences:
-                        content_preview = f"This document provides strategic guidance on {title.lower()}, addressing critical implementation challenges and governance frameworks. Key focus areas include {', '.join(key_sentences[:2])}. The document offers comprehensive methodologies for risk assessment, compliance requirements, and practical deployment strategies essential for organizational success."
-                    else:
-                        content_preview = f"This comprehensive document examines {title.lower()}, providing detailed analysis of implementation strategies, governance frameworks, and risk management approaches. The content delivers actionable insights for practitioners and decision-makers, covering technical requirements, compliance considerations, and strategic deployment guidance essential for effective organizational adoption."
-                else:
-                    content_preview = "Strategic document providing comprehensive guidance on implementation frameworks, governance structures, and risk management methodologies for organizational decision-making and policy development."
+            # Generate comprehensive intelligent content preview
+            from utils.content_preview import generate_enhanced_preview
             
+            # Create enhanced document for preview generation
+            preview_doc = {
+                'content': raw_content,
+                'title': title,
+                'content_preview': doc.get('content_preview', '')
+            }
+            
+            # Generate comprehensive strategic preview
+            content_preview = generate_enhanced_preview(preview_doc)
+            
+            # Ensure preview is properly cleaned
             content_preview = ultra_clean_metadata(content_preview)
             
             # Use smart caching system for maximum performance
@@ -3358,7 +3355,7 @@ def render_compact_cards(docs):
                 box-shadow:0 1px 3px rgba(0,0,0,0.1);height:auto;overflow:hidden'>
                     <div style='font-weight:bold;font-size:12px;margin-bottom:2px;line-height:1.1'>{safe_title[:32]}{'...' if len(safe_title) > 32 else ''}</div>
                     <div style='font-size:9px;color:#666;margin-bottom:2px' title='Document Type: {safe_doc_type} • Author/Organization: {safe_author_org}'>{safe_doc_type} • {safe_author_org[:15]}{'...' if len(safe_author_org) > 15 else ''}</div>
-                    <div style='font-size:10px;color:#555;margin-bottom:2px;line-height:1.2'>{safe_content_preview[:100]}{'...' if len(safe_content_preview) > 100 else ''}</div>
+                    <div style='font-size:10px;color:#555;margin-bottom:2px;line-height:1.2'>{safe_content_preview[:400]}{'...' if len(safe_content_preview) > 400 else ''}</div>
                     <div style='font-size:8px;color:#888;margin-bottom:0px'>{safe_pub_date if safe_pub_date != 'Date not available' else 'Date not available'}</div>
                 </div>
             """, unsafe_allow_html=True)
@@ -3502,7 +3499,19 @@ def render_grid_view(docs):
             pub_date = clean_date_safely(doc)
             
             doc_type = ultra_clean_metadata(doc.get('document_type', 'Unknown'))
-            content_preview = ultra_clean_metadata(doc.get('content_preview', 'No preview available') or 'No preview available')
+            # Generate comprehensive intelligent content preview for card view
+            from utils.content_preview import generate_enhanced_preview
+            
+            # Create enhanced document for preview generation
+            preview_doc = {
+                'content': content,
+                'title': title,
+                'content_preview': doc.get('content_preview', '')
+            }
+            
+            # Generate comprehensive strategic preview
+            content_preview = generate_enhanced_preview(preview_doc)
+            content_preview = ultra_clean_metadata(content_preview)
             
             # Use actual database scores with intelligent N/A detection
             raw_scores = {
