@@ -177,13 +177,32 @@ def generate_norm_analysis(score_type, current_score, averages):
     
     # Extract numeric value from score
     if score_type == 'q_cyber':
-        # For Quantum Cybersecurity (Tier system)
-        current_numeric = int(current_score.replace('Tier ', '')) if 'Tier' in current_score else 0
+        # For Quantum Cybersecurity (Tier system) - Safe None handling
+        if current_score == 'None' or current_score is None or 'None' in str(current_score):
+            current_numeric = 0
+        elif 'Tier' in str(current_score):
+            try:
+                current_numeric = int(current_score.replace('Tier ', ''))
+            except (ValueError, AttributeError):
+                current_numeric = 0
+        else:
+            try:
+                current_numeric = int(current_score) if current_score != 'N/A' else 0
+            except (ValueError, AttributeError):
+                current_numeric = 0
         avg_numeric = averages['q_cyber_avg']
         score_format = "Tier"
     else:
-        # For other scores (/100 system)
-        current_numeric = int(current_score.split('/')[0]) if '/' in current_score else 0
+        # For other scores (/100 system) - Safe None handling
+        if current_score == 'None' or current_score is None or 'None' in str(current_score):
+            current_numeric = 0
+        elif '/' in current_score:
+            try:
+                current_numeric = int(current_score.split('/')[0])
+            except (ValueError, AttributeError):
+                current_numeric = 0
+        else:
+            current_numeric = 0
         if score_type == 'ai_cyber':
             avg_numeric = averages['ai_cyber_avg']
         elif score_type == 'ai_ethics':
@@ -4428,10 +4447,10 @@ def render_card_view(docs):
                 q_ethics_color = '#6c757d'
             
             # Display score boxes with colored text (tier system for quantum cyber)
-            ai_cyber_display = f"{ai_cyber}/100" if ai_cyber != 'N/A' else "N/A"
-            ai_ethics_display = f"{ai_ethics}/100" if ai_ethics != 'N/A' else "N/A"
-            q_cyber_display = f"{q_cyber}/5" if q_cyber != 'N/A' else "N/A"
-            q_ethics_display = f"{q_ethics}/100" if q_ethics != 'N/A' else "N/A"
+            ai_cyber_display = f"{ai_cyber}/100" if ai_cyber != 'N/A' and ai_cyber is not None else "N/A"
+            ai_ethics_display = f"{ai_ethics}/100" if ai_ethics != 'N/A' and ai_ethics is not None else "N/A"
+            q_cyber_display = f"{q_cyber}/5" if q_cyber != 'N/A' and q_cyber is not None else "N/A"
+            q_ethics_display = f"{q_ethics}/100" if q_ethics != 'N/A' and q_ethics is not None else "N/A"
             
             # Generate intelligent content preview
             content_preview_text = ""
