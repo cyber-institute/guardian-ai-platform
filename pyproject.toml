@@ -34,6 +34,7 @@ dependencies = [
     "schedule>=1.2.2",
     "boto3>=1.38.36",
     "flask-cors>=6.0.1",
+    "pycryptodome>=3.23.0",
 ]
 
 [[tool.uv.index]]
