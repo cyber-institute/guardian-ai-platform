@@ -357,16 +357,17 @@ def analyze_with_enhanced_patterns(text: str, title: str) -> Dict[str, int]:
     
     scores = {}
     
-    # AI Cybersecurity - Enhanced detection
+    # AI Cybersecurity - Realistic scoring
     ai_cyber_indicators = [
         'ai security', 'ai threat', 'ai vulnerability', 'ai attack', 'adversarial',
         'machine learning security', 'artificial intelligence security', 'model security',
         'ai governance', 'ai compliance', 'ai monitoring', 'secure ai', 'ai authentication'
     ]
-    ai_cyber_weight = sum(3 for indicator in ai_cyber_indicators if indicator in combined)
+    ai_cyber_weight = sum(2 for indicator in ai_cyber_indicators if indicator in combined)
     if any(term in combined for term in ['cybersecurity', 'security']) and any(term in combined for term in ['ai', 'artificial intelligence']):
-        ai_cyber_weight += 15
-    scores['ai_cybersecurity'] = min(100, ai_cyber_weight * 4)
+        ai_cyber_weight += 8
+    # Cap at realistic range 25-75
+    scores['ai_cybersecurity'] = min(75, max(25, ai_cyber_weight * 2 + 25))
     
     # Quantum Cybersecurity - Only score if quantum content is present
     quantum_indicators = [
@@ -375,24 +376,27 @@ def analyze_with_enhanced_patterns(text: str, title: str) -> Dict[str, int]:
     ]
     quantum_weight = sum(1 for indicator in quantum_indicators if indicator in combined)
     if quantum_weight > 0 or 'quantum' in combined:
-        scores['quantum_cybersecurity'] = max(1, min(5, quantum_weight + 1))
+        # Realistic tier scoring (1-4, avoid perfect 5s)
+        scores['quantum_cybersecurity'] = max(1, min(4, quantum_weight + 1))
     # Note: No score assigned for non-quantum documents (returns None)
     
-    # AI Ethics - Enhanced ethical framework detection
+    # AI Ethics - Realistic ethical framework detection
     ethics_indicators = [
         'ai ethics', 'algorithmic bias', 'fairness', 'transparency', 'explainable ai',
         'responsible ai', 'ethical ai', 'ai accountability', 'trustworthy ai'
     ]
-    ethics_weight = sum(4 for indicator in ethics_indicators if indicator in combined)
+    ethics_weight = sum(2 for indicator in ethics_indicators if indicator in combined)
     if any(term in combined for term in ['ethics', 'ethical', 'bias']) and any(term in combined for term in ['ai', 'algorithm']):
-        ethics_weight += 20
-    scores['ai_ethics'] = min(100, ethics_weight * 3)
+        ethics_weight += 10
+    # Cap at realistic range 30-75
+    scores['ai_ethics'] = min(75, max(30, ethics_weight * 2 + 30))
     
     # Quantum Ethics - Only score if quantum content is present
     quantum_ethics_indicators = ['quantum ethics', 'quantum responsibility', 'quantum access', 'quantum equity']
-    qe_weight = sum(10 for indicator in quantum_ethics_indicators if indicator in combined)
-    if qe_weight > 0 or 'quantum' in combined:
-        scores['quantum_ethics'] = min(100, qe_weight * 5)
+    qe_weight = sum(3 for indicator in quantum_ethics_indicators if indicator in combined)
+    if qe_weight > 0 or ('quantum' in combined and any(term in combined for term in ['ethics', 'responsibility', 'access', 'equity'])):
+        # Cap at realistic range 25-65
+        scores['quantum_ethics'] = min(65, max(25, qe_weight * 5 + 25))
     # Note: No score assigned for non-quantum documents (returns None)
     
     return scores
@@ -405,13 +409,13 @@ def analyze_with_contextual_understanding(text: str, title: str) -> Dict[str, in
     
     scores = {}
     
-    # Context-aware AI Cybersecurity scoring
+    # Context-aware AI Cybersecurity scoring with realistic ranges
     if 'joint guidance' in title_lower and 'ai systems securely' in title_lower:
-        scores['ai_cybersecurity'] = 85  # High-authority guidance document
+        scores['ai_cybersecurity'] = 68  # High-authority guidance document
     elif any(term in combined for term in ['dhs', 'cisa', 'ncsc', 'joint guidelines']):
-        scores['ai_cybersecurity'] = 75  # Government cybersecurity guidance
+        scores['ai_cybersecurity'] = 60  # Government cybersecurity guidance
     else:
-        base_score = 30 if any(term in combined for term in ['ai', 'artificial intelligence']) else 0
+        base_score = 45 if any(term in combined for term in ['ai', 'artificial intelligence']) else 0
         scores['ai_cybersecurity'] = base_score
     
     # Quantum cybersecurity - Only score if quantum content is present

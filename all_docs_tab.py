@@ -3145,50 +3145,54 @@ def render_compact_cards(docs):
             quantum_count = sum(1 for term in quantum_terms if term in content_text)
             is_quantum_related = is_quantum_in_title or quantum_count >= 1 or 'quantum' in content_text
             
-            # Apply smarter scoring logic - generate scores for relevant content even if DB scores are missing
+            # Apply realistic scoring logic based on actual content analysis
             if is_ai_related:
                 if raw_scores['ai_cybersecurity'] and raw_scores['ai_cybersecurity'] > 0:
-                    ai_cyber_score = min(raw_scores['ai_cybersecurity'] + 15, 100)
-                    scores['ai_cybersecurity'] = max(ai_cyber_score, 85) if ai_cyber_score > 60 else ai_cyber_score
+                    # Use database score as-is without artificial inflation
+                    scores['ai_cybersecurity'] = raw_scores['ai_cybersecurity']
                 else:
                     from utils.comprehensive_scoring import comprehensive_document_scoring
                     try:
                         computed_scores = comprehensive_document_scoring(raw_content, title)
-                        scores['ai_cybersecurity'] = computed_scores.get('ai_cybersecurity', 75)
+                        # Cap computed scores at realistic ranges (30-80)
+                        ai_cyber_computed = computed_scores.get('ai_cybersecurity', 45)
+                        scores['ai_cybersecurity'] = min(max(ai_cyber_computed, 25), 80)
                     except:
-                        scores['ai_cybersecurity'] = 75
+                        scores['ai_cybersecurity'] = 45  # Realistic default
             else:
                 scores['ai_cybersecurity'] = 'N/A'
                 
             if is_ai_related:
                 if raw_scores['ai_ethics'] and raw_scores['ai_ethics'] > 0:
-                    ai_ethics_score = min(raw_scores['ai_ethics'] + 12, 100)
-                    scores['ai_ethics'] = max(ai_ethics_score, 85) if ai_ethics_score > 65 else ai_ethics_score
+                    # Use database score as-is without artificial inflation
+                    scores['ai_ethics'] = raw_scores['ai_ethics']
                 else:
                     try:
                         computed_scores = comprehensive_document_scoring(raw_content, title)
-                        scores['ai_ethics'] = computed_scores.get('ai_ethics', 70)
+                        # Cap computed scores at realistic ranges (30-80)
+                        ai_ethics_computed = computed_scores.get('ai_ethics', 50)
+                        scores['ai_ethics'] = min(max(ai_ethics_computed, 30), 80)
                     except:
-                        scores['ai_ethics'] = 70
+                        scores['ai_ethics'] = 50  # Realistic default
             else:
                 scores['ai_ethics'] = 'N/A'
             
             if is_quantum_related:
                 if raw_scores['quantum_cybersecurity'] and raw_scores['quantum_cybersecurity'] > 0:
-                    # Use existing DB score
+                    # Use existing DB score as-is
                     quantum_score = raw_scores['quantum_cybersecurity']
                 else:
-                    # Generate score for quantum documents with missing DB scores
+                    # Generate realistic score for quantum documents
                     try:
                         computed_scores = comprehensive_document_scoring(raw_content, title)
-                        quantum_score = computed_scores.get('quantum_cybersecurity', 65)
+                        # Cap at realistic ranges (30-75 for quantum docs)
+                        quantum_computed = computed_scores.get('quantum_cybersecurity', 45)
+                        quantum_score = min(max(quantum_computed, 30), 75)
                     except:
-                        quantum_score = 65  # Default reasonable score for quantum docs
+                        quantum_score = 45  # Realistic default
                 
-                # Convert to tier system (1-5)
-                if quantum_score >= 85:
-                    scores['quantum_cybersecurity'] = 5
-                elif quantum_score >= 70:
+                # Convert to tier system (1-5) with realistic thresholds
+                if quantum_score >= 70:
                     scores['quantum_cybersecurity'] = 4
                 elif quantum_score >= 55:
                     scores['quantum_cybersecurity'] = 3
@@ -3201,14 +3205,16 @@ def render_compact_cards(docs):
             
             if is_quantum_related:
                 if raw_scores['quantum_ethics'] and raw_scores['quantum_ethics'] > 0:
-                    quantum_ethics_score = min(raw_scores['quantum_ethics'] + 10, 100)
-                    scores['quantum_ethics'] = max(quantum_ethics_score, 85) if quantum_ethics_score > 70 else quantum_ethics_score
+                    # Use database score as-is without artificial inflation
+                    scores['quantum_ethics'] = raw_scores['quantum_ethics']
                 else:
                     try:
                         computed_scores = comprehensive_document_scoring(raw_content, title)
-                        scores['quantum_ethics'] = computed_scores.get('quantum_ethics', 68)
+                        # Cap at realistic ranges (25-70 for quantum ethics)
+                        quantum_ethics_computed = computed_scores.get('quantum_ethics', 40)
+                        scores['quantum_ethics'] = min(max(quantum_ethics_computed, 25), 70)
                     except:
-                        scores['quantum_ethics'] = 68
+                        scores['quantum_ethics'] = 40  # Realistic default
             else:
                 scores['quantum_ethics'] = 'N/A'
             
