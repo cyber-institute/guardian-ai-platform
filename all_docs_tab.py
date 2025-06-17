@@ -3193,7 +3193,10 @@ def render_compact_cards(docs):
                         computed_scores = comprehensive_document_scoring(raw_content, title)
                         # Cap computed scores at realistic ranges (30-80)
                         ai_ethics_computed = computed_scores.get('ai_ethics', 50)
-                        scores['ai_ethics'] = min(max(ai_ethics_computed, 30), 80)
+                        if ai_ethics_computed is not None:
+                            scores['ai_ethics'] = min(max(ai_ethics_computed, 30), 80)
+                        else:
+                            scores['ai_ethics'] = 50
                     except:
                         scores['ai_ethics'] = 50  # Realistic default
             else:
@@ -3209,7 +3212,10 @@ def render_compact_cards(docs):
                         computed_scores = comprehensive_document_scoring(raw_content, title)
                         # Cap at realistic ranges (30-75 for quantum docs)
                         quantum_computed = computed_scores.get('quantum_cybersecurity', 45)
-                        quantum_score = min(max(quantum_computed, 30), 75)
+                        if quantum_computed is not None:
+                            quantum_score = min(max(quantum_computed, 30), 75)
+                        else:
+                            quantum_score = 45
                     except:
                         quantum_score = 45  # Realistic default
                 
@@ -3234,7 +3240,10 @@ def render_compact_cards(docs):
                         computed_scores = comprehensive_document_scoring(raw_content, title)
                         # Cap at realistic ranges (25-70 for quantum ethics)
                         quantum_ethics_computed = computed_scores.get('quantum_ethics', 40)
-                        scores['quantum_ethics'] = min(max(quantum_ethics_computed, 25), 70)
+                        if quantum_ethics_computed is not None:
+                            scores['quantum_ethics'] = min(max(quantum_ethics_computed, 25), 70)
+                        else:
+                            scores['quantum_ethics'] = 40
                     except:
                         scores['quantum_ethics'] = 40  # Realistic default
             else:
