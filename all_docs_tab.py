@@ -1203,7 +1203,7 @@ def render():
     per_page_options = [5, 10, 20, 50]
     per_page = st.session_state.get("per_page", 5)  # Default to 5 for fastest loading
     
-    # Performance control sidebar
+    # Performance control sidebar with cache management
     with st.sidebar:
         st.subheader("Performance Settings")
         new_per_page = st.selectbox(
@@ -1215,6 +1215,22 @@ def render():
         if new_per_page != per_page:
             st.session_state["per_page"] = new_per_page
             st.session_state["doc_page"] = 0  # Reset to first page
+            st.rerun()
+        
+        # Score cache management
+        st.markdown("---")
+        st.subheader("Score Cache")
+        
+        from utils.score_cache import score_cache
+        cache_stats = score_cache.get_cache_stats()
+        
+        st.metric("Cached Documents", cache_stats['cached_documents'])
+        if cache_stats['cache_hits'] + cache_stats['cache_misses'] > 0:
+            st.metric("Cache Hit Rate", f"{cache_stats['hit_rate']}%")
+        
+        if st.button("🔄 Refresh All Scores", use_container_width=True):
+            score_cache.clear_cache()
+            st.success("Score cache cleared - scores will be recalculated")
             st.rerun()
     
     page = st.session_state.get("doc_page", 0)
@@ -3203,13 +3219,10 @@ def render_compact_cards(docs):
             doc_type = ultra_clean_metadata(doc.get('document_type', 'Unknown'))
             content_preview = ultra_clean_metadata(doc.get('content_preview', 'No preview available') or 'No preview available')
             
-            # Apply the same smart scoring logic as CARD view
-            raw_scores = {
-                'ai_cybersecurity': doc.get('ai_cybersecurity_score'),
-                'quantum_cybersecurity': doc.get('quantum_cybersecurity_score'),
-                'ai_ethics': doc.get('ai_ethics_score'),
-                'quantum_ethics': doc.get('quantum_ethics_score')
-            }
+            # Use smart caching system for maximum performance
+            from utils.smart_scoring import get_smart_scores, apply_topic_filtering
+            scores = get_smart_scores(doc)
+            scores = apply_topic_filtering(scores, doc)
             
             # Apply intelligent N/A logic based on document topic relevance
             scores = {}
