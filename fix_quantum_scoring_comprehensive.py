@@ -12,7 +12,7 @@ import os
 import sys
 import psycopg2
 from utils.comprehensive_scoring import comprehensive_document_scoring
-from utils.database import get_db_connection
+from utils.database import DatabaseManager
 
 def extract_proper_title_from_content(content):
     """Extract proper title from document content using enhanced patterns"""
@@ -59,13 +59,12 @@ def extract_proper_title_from_content(content):
 def fix_quantum_document_scoring():
     """Fix quantum document scoring and metadata extraction"""
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        db = DatabaseManager()
         
         print("Starting comprehensive quantum scoring fix...")
         
         # Get all documents with quantum content
-        cursor.execute("""
+        query = """
             SELECT id, title, content, topic, ai_cybersecurity_score, quantum_cybersecurity_score, 
                    ai_ethics_score, quantum_ethics_score 
             FROM documents 
@@ -73,9 +72,13 @@ def fix_quantum_document_scoring():
                OR title ILIKE '%quantum%'
                OR topic = 'Quantum'
             ORDER BY id
-        """)
+        """
         
-        quantum_docs = cursor.fetchall()
+        quantum_docs = db.execute_query(query)
+        if not quantum_docs:
+            print("No quantum documents found")
+            return False
+            
         print(f"Found {len(quantum_docs)} quantum-related documents to fix")
         
         fixed_count = 0
@@ -138,16 +141,28 @@ def fix_quantum_document_scoring():
                         new_quantum_ethics = max(new_quantum_ethics or 0, 55)  # Minimum for quantum content
                 
                 # Update database
-                cursor.execute("""
+                update_query = """
                     UPDATE documents SET 
-                        title = %s,
-                        topic = %s,
-                        ai_cybersecurity_score = %s,
-                        quantum_cybersecurity_score = %s,
-                        ai_ethics_score = %s,
-                        quantum_ethics_score = %s
-                    WHERE id = %s
-                """, (new_title, new_topic, new_ai_cyber, new_quantum_cyber, new_ai_ethics, new_quantum_ethics, doc_id))
+                        title = :title,
+                        topic = :topic,
+                        ai_cybersecurity_score = :ai_cyber,
+                        quantum_cybersecurity_score = :quantum_cyber,
+                        ai_ethics_score = :ai_ethics,
+                        quantum_ethics_score = :quantum_ethics
+                    WHERE id = :doc_id
+                """
+                
+                params = {
+                    'title': new_title,
+                    'topic': new_topic,
+                    'ai_cyber': new_ai_cyber,
+                    'quantum_cyber': new_quantum_cyber,
+                    'ai_ethics': new_ai_ethics,
+                    'quantum_ethics': new_quantum_ethics,
+                    'doc_id': doc_id
+                }
+                
+                db.execute_query(update_query, params)
                 
                 print(f"  - Topic: {topic} → {new_topic}")
                 print(f"  - Quantum Cyber: {quantum_cyber} → {new_quantum_cyber}")
@@ -159,10 +174,6 @@ def fix_quantum_document_scoring():
                 print(f"  - Error processing document {doc_id}: {e}")
                 continue
         
-        conn.commit()
-        cursor.close()
-        conn.close()
-        
         print(f"\nFixed {fixed_count} quantum documents successfully!")
         return True
         
@@ -173,31 +184,29 @@ def fix_quantum_document_scoring():
 def validate_fixes():
     """Validate that the fixes were applied correctly"""
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        db = DatabaseManager()
         
         print("\nValidating fixes...")
         
         # Check quantum documents have proper scores
-        cursor.execute("""
+        query1 = """
             SELECT COUNT(*) FROM documents 
             WHERE (content ILIKE '%quantum%' OR topic = 'Quantum') 
               AND (quantum_cybersecurity_score IS NULL OR quantum_cybersecurity_score < 20)
-        """)
+        """
         
-        low_quantum_scores = cursor.fetchone()[0]
+        result1 = db.execute_query(query1)
+        low_quantum_scores = result1[0][0] if result1 else 0
         
         # Check for improved titles
-        cursor.execute("""
+        query2 = """
             SELECT COUNT(*) FROM documents 
             WHERE title NOT IN ('AI Cybersecurity Framework', 'Document from URL', 'Untitled Document')
               AND (content ILIKE '%quantum%' OR topic = 'Quantum')
-        """)
+        """
         
-        proper_titles = cursor.fetchone()[0]
-        
-        cursor.close()
-        conn.close()
+        result2 = db.execute_query(query2)
+        proper_titles = result2[0][0] if result2 else 0
         
         print(f"Documents with low quantum scores: {low_quantum_scores}")
         print(f"Documents with proper titles: {proper_titles}")
