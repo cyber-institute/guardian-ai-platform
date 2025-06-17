@@ -425,18 +425,18 @@ def analyze_with_contextual_understanding(text: str, title: str) -> Dict[str, in
         scores['quantum_cybersecurity'] = 2
     # Note: No score assigned for non-quantum documents (returns None)
     
-    # AI Ethics with document authority context
+    # AI Ethics with realistic document authority context
     if any(term in combined for term in ['guidance', 'framework', 'standards']):
         if any(term in combined for term in ['ai', 'artificial intelligence']):
-            scores['ai_ethics'] = 70
+            scores['ai_ethics'] = 55  # Realistic for guidance documents
         else:
-            scores['ai_ethics'] = 20
+            scores['ai_ethics'] = 35
     else:
-        scores['ai_ethics'] = 10
+        scores['ai_ethics'] = 35  # Baseline for AI content
     
     # Quantum Ethics - Only score if quantum content is present
     if 'quantum' in combined and any(term in combined for term in ['ethics', 'responsibility']):
-        scores['quantum_ethics'] = 30
+        scores['quantum_ethics'] = 45  # Realistic quantum ethics score
     # Note: No score assigned for non-quantum documents (returns None)
     
     return scores
@@ -485,17 +485,17 @@ def enhanced_scoring_with_llm_insights(text: str, title: str) -> Dict[str, Optio
         'secure ai', 'ai authentication', 'ai encryption', 'ai privacy'
     ]
     
-    ai_cyber_score = 0
+    ai_cyber_score = 30  # Baseline for AI cyber content
     for keyword in ai_cyber_keywords:
         if keyword in combined_content:
-            ai_cyber_score += 15
+            ai_cyber_score += 3
             
     # Additional context scoring
     if any(term in combined_content for term in ['cybersecurity', 'cyber security', 'information security']):
         if any(term in combined_content for term in ['ai', 'artificial intelligence', 'machine learning']):
-            ai_cyber_score += 25
+            ai_cyber_score += 10
     
-    scores['ai_cybersecurity'] = min(100, ai_cyber_score) if ai_cyber_score > 0 else None
+    scores['ai_cybersecurity'] = min(70, ai_cyber_score) if ai_cyber_score > 30 else None
     
     # Quantum Cybersecurity Maturity (1-5)
     quantum_cyber_keywords = [
@@ -507,13 +507,13 @@ def enhanced_scoring_with_llm_insights(text: str, title: str) -> Dict[str, Optio
     quantum_cyber_matches = sum(1 for keyword in quantum_cyber_keywords if keyword in combined_content)
     
     if quantum_cyber_matches >= 4:
-        quantum_cyber_score = 5
-    elif quantum_cyber_matches >= 3:
         quantum_cyber_score = 4
-    elif quantum_cyber_matches >= 2:
+    elif quantum_cyber_matches >= 3:
         quantum_cyber_score = 3
-    elif quantum_cyber_matches >= 1:
+    elif quantum_cyber_matches >= 2:
         quantum_cyber_score = 2
+    elif quantum_cyber_matches >= 1:
+        quantum_cyber_score = 1
     else:
         quantum_cyber_score = None
         
@@ -526,17 +526,17 @@ def enhanced_scoring_with_llm_insights(text: str, title: str) -> Dict[str, Optio
         'bias mitigation', 'algorithmic fairness', 'ai transparency', 'trustworthy ai'
     ]
     
-    ai_ethics_score = 0
+    ai_ethics_score = 35  # Baseline for AI ethics content
     for keyword in ai_ethics_keywords:
         if keyword in combined_content:
-            ai_ethics_score += 12
+            ai_ethics_score += 3
             
     # Boost for comprehensive ethical considerations
     if any(term in combined_content for term in ['ethics', 'ethical', 'bias', 'fairness']):
         if any(term in combined_content for term in ['ai', 'artificial intelligence', 'algorithm']):
-            ai_ethics_score += 20
+            ai_ethics_score += 8
     
-    scores['ai_ethics'] = min(100, ai_ethics_score) if ai_ethics_score > 0 else None
+    scores['ai_ethics'] = min(65, ai_ethics_score) if ai_ethics_score > 35 else None
     
     # Quantum Ethics Score (0-100)
     quantum_ethics_keywords = [
@@ -545,17 +545,17 @@ def enhanced_scoring_with_llm_insights(text: str, title: str) -> Dict[str, Optio
         'quantum computing ethics', 'quantum fairness'
     ]
     
-    quantum_ethics_score = 0
+    quantum_ethics_score = 30  # Baseline for quantum ethics content  
     for keyword in quantum_ethics_keywords:
         if keyword in combined_content:
-            quantum_ethics_score += 20
+            quantum_ethics_score += 5
             
     # General quantum considerations
     if any(term in combined_content for term in ['quantum', 'quantum computing']):
         if any(term in combined_content for term in ['ethics', 'ethical', 'responsibility', 'access']):
-            quantum_ethics_score += 30
+            quantum_ethics_score += 10
     
-    scores['quantum_ethics'] = min(100, quantum_ethics_score) if quantum_ethics_score > 0 else None
+    scores['quantum_ethics'] = min(60, quantum_ethics_score) if quantum_ethics_score > 30 else None
     
     return scores
 
@@ -571,22 +571,22 @@ def fallback_scoring(text: str, title: str) -> Dict[str, Optional[int]]:
     
     scores = {}
     
-    # AI Cybersecurity scoring (0-100)
+    # AI Cybersecurity scoring with realistic range (30-70)
     if applicability['ai_cybersecurity']:
-        score = 0
+        score = 30  # Baseline for AI cyber content
         # Basic keyword scoring
         ai_security_keywords = ['encryption', 'authentication', 'ai security', 'model protection', 'threat detection']
-        score += min(40, sum(10 for kw in ai_security_keywords if kw in text_lower))
+        score += min(15, sum(3 for kw in ai_security_keywords if kw in text_lower))
         
         # Advanced concepts
         advanced_keywords = ['federated learning', 'differential privacy', 'adversarial', 'secure computation']
-        score += min(30, sum(15 for kw in advanced_keywords if kw in text_lower))
+        score += min(15, sum(4 for kw in advanced_keywords if kw in text_lower))
         
         # Implementation indicators
         impl_keywords = ['implementation', 'deployed', 'operational', 'monitoring']
-        score += min(30, sum(10 for kw in impl_keywords if kw in text_lower))
+        score += min(10, sum(2 for kw in impl_keywords if kw in text_lower))
         
-        scores['ai_cybersecurity'] = min(100, score)
+        scores['ai_cybersecurity'] = min(70, score)
     else:
         scores['ai_cybersecurity'] = None
     
@@ -594,44 +594,44 @@ def fallback_scoring(text: str, title: str) -> Dict[str, Optional[int]]:
     if applicability['quantum_cybersecurity']:
         score = 1  # Base level
         
-        # Level indicators
+        # Level indicators with realistic caps
         if any(kw in text_lower for kw in ['post-quantum', 'pqc', 'quantum-safe']):
-            score = max(score, 3)
+            score = max(score, 2)
         if any(kw in text_lower for kw in ['implementation', 'deployment', 'migration']):
-            score = max(score, 4)
+            score = max(score, 3)
         if any(kw in text_lower for kw in ['integrated', 'enterprise-wide', 'systematic']):
-            score = max(score, 5)
+            score = max(score, 4)
             
         scores['quantum_cybersecurity'] = score
     else:
         scores['quantum_cybersecurity'] = None
     
-    # AI Ethics scoring (0-100)
+    # AI Ethics scoring with realistic range (35-65)
     if applicability['ai_ethics']:
-        score = 0
+        score = 35  # Baseline for AI ethics content
         ethics_keywords = ['fairness', 'bias', 'transparency', 'accountability', 'explainable']
-        score += min(50, sum(10 for kw in ethics_keywords if kw in text_lower))
+        score += min(15, sum(3 for kw in ethics_keywords if kw in text_lower))
         
         advanced_ethics = ['algorithmic auditing', 'ethical AI', 'responsible AI', 'human oversight']
-        score += min(30, sum(15 for kw in advanced_ethics if kw in text_lower))
+        score += min(10, sum(3 for kw in advanced_ethics if kw in text_lower))
         
         governance_keywords = ['governance', 'oversight', 'compliance', 'monitoring']
-        score += min(20, sum(10 for kw in governance_keywords if kw in text_lower))
+        score += min(5, sum(2 for kw in governance_keywords if kw in text_lower))
         
-        scores['ai_ethics'] = min(100, score)
+        scores['ai_ethics'] = min(65, score)
     else:
         scores['ai_ethics'] = None
     
-    # Quantum Ethics scoring (0-100)
+    # Quantum Ethics scoring with realistic range (30-60)
     if applicability['quantum_ethics']:
-        score = 0
+        score = 30  # Baseline for quantum ethics content
         quantum_ethics_keywords = ['quantum ethics', 'quantum access', 'quantum equity', 'quantum governance']
-        score += min(60, sum(20 for kw in quantum_ethics_keywords if kw in text_lower))
+        score += min(20, sum(5 for kw in quantum_ethics_keywords if kw in text_lower))
         
         general_ethics = ['ethical', 'responsible', 'equitable', 'fair access']
-        score += min(40, sum(10 for kw in general_ethics if kw in text_lower))
+        score += min(10, sum(2 for kw in general_ethics if kw in text_lower))
         
-        scores['quantum_ethics'] = min(100, score)
+        scores['quantum_ethics'] = min(60, score)
     else:
         scores['quantum_ethics'] = None
     
