@@ -4642,11 +4642,15 @@ def render_card_view(docs):
             clean_content = re.sub(r'[-_]{3,}', '', clean_content) # Remove dividers
             clean_content = re.sub(r'\s+', ' ', clean_content).strip()  # Normalize spaces
             
-            # Generate intelligent AI-powered preview summary
+            # Generate enhanced strategic preview summary
             try:
-                from utils.intelligent_preview import generate_intelligent_preview
-                intelligent_summary = generate_intelligent_preview(title, raw_content)
-                preview_content = intelligent_summary
+                from utils.content_preview import generate_enhanced_preview
+                preview_doc = {
+                    'content': raw_content,
+                    'title': title,
+                    'content_preview': content_preview
+                }
+                preview_content = generate_enhanced_preview(preview_doc)
             except Exception as e:
                 # Fallback to meaningful preview without asterisks
                 if len(clean_content) > 100:
