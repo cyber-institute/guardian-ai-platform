@@ -9,6 +9,7 @@ import re
 from typing import Dict, Optional
 from urllib.parse import urlparse, urljoin
 import time
+from .focused_bypass_extractor import focused_bypass
 
 class URLContentExtractor:
     """Extract and process content from web URLs"""
@@ -51,7 +52,22 @@ class URLContentExtractor:
             if not parsed_url.scheme or not parsed_url.netloc:
                 return self._error_result("Invalid URL format")
             
-            # Fetch the webpage with human-like behavior
+            # Use focused bypass system for protected sites like UNESCO
+            bypass_result = focused_bypass.extract_with_bypass(url)
+            
+            if bypass_result.get('success'):
+                # Successfully bypassed protection and extracted content
+                return {
+                    'success': True,
+                    'text_content': bypass_result['text_content'],
+                    'title': bypass_result['title'],
+                    'organization': bypass_result['organization'],
+                    'document_type': bypass_result['document_type'],
+                    'extraction_method': bypass_result.get('extraction_method', 'focused_bypass'),
+                    'url': bypass_result.get('original_url', url)
+                }
+            
+            # Fallback to standard method if bypass didn't work
             response = self._fetch_with_human_behavior(url)
             
             # Extract content using trafilatura with enhanced fallback methods
@@ -340,6 +356,62 @@ class URLContentExtractor:
                 return ' '.join(tiktok_content)
         
         return fallback_text
+    
+    def _extract_title_from_content(self, content: str, url: str) -> str:
+        """Extract title from content or generate from URL"""
+        
+        # Try to find title-like text at the beginning of content
+        lines = content.split('\n')
+        for line in lines[:10]:  # Check first 10 lines
+            line = line.strip()
+            if len(line) > 10 and len(line) < 200:
+                # Check if line looks like a title (no excessive punctuation)
+                if line.count('.') < 3 and line.count(',') < 3:
+                    return line
+        
+        # Fallback to URL-based title
+        return self._generate_title_from_url(url)
+    
+    def _generate_title_from_url(self, url: str) -> str:
+        """Generate title from URL path"""
+        
+        parsed_url = urlparse(url)
+        path_parts = [part for part in parsed_url.path.split('/') if part]
+        
+        if path_parts:
+            title = path_parts[-1]
+            title = re.sub(r'\.[a-zA-Z0-9]+$', '', title)  # Remove extension
+            title = re.sub(r'[-_]+', ' ', title)  # Replace hyphens/underscores
+            return title.title()
+        
+        return f"Document from {parsed_url.netloc}"
+    
+    def _detect_organization_from_url(self, url: str) -> str:
+        """Detect organization from URL domain"""
+        
+        parsed_url = urlparse(url)
+        domain = parsed_url.netloc.lower()
+        
+        org_mappings = {
+            'nist.gov': 'NIST',
+            'nasa.gov': 'NASA',
+            'dhs.gov': 'DHS',
+            'cisa.gov': 'CISA',
+            'whitehouse.gov': 'White House',
+            'unesco.org': 'UNESCO',
+            'unesdoc.unesco.org': 'UNESCO'
+        }
+        
+        for domain_pattern, org_name in org_mappings.items():
+            if domain_pattern in domain:
+                return org_name
+        
+        # Extract from domain
+        domain_parts = domain.split('.')
+        if len(domain_parts) >= 2:
+            return domain_parts[-2].replace('-', ' ').title()
+        
+        return 'Unknown'
     
     def _fetch_with_human_behavior(self, url: str):
         """Fetch URL with human-like behavior to bypass automation detection"""
