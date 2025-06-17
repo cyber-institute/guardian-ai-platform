@@ -2,6 +2,7 @@ import streamlit as st
 from all_docs_tab import render
 from datetime import datetime
 from components.chatbot_widget import render_chatbot_widget, inject_chatbot_css
+from components.ai_assistant_mascot import render_ai_assistant
 
 # Performance optimization: Cache database queries
 @st.cache_data(ttl=300)  # Cache for 5 minutes
@@ -569,8 +570,17 @@ def main():
                 progress_bar.empty()
                 status_text.empty()
     
+    # Render AI Assistant on all pages
+    assistant = render_ai_assistant()
+    
+    # Track current page for contextual guidance
+    st.session_state.current_page = st.session_state.nav_selection.lower().replace(" ", "_")
+    
     # Render content based on sidebar selection
     if st.session_state.nav_selection == "Policy Repository":
+        # Update assistant context for documents page
+        if assistant:
+            assistant.update_context('documents_view')
         # Single page Policy Repository
         render()
     
