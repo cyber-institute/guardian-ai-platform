@@ -1888,20 +1888,51 @@ def render():
                             st.text(preview)
                         
                         if content and len(content.strip()) > 100:
-                            # Extract proper title, author, and date using intelligent extraction
-                            st.info("🔍 Analyzing content for metadata extraction...")
+                            # Extract proper title, author, and date using enhanced OCR metadata extraction
+                            st.info("🔍 Analyzing content for enhanced metadata extraction...")
                             
-                            title = extract_title_from_url_content(content, metadata, url_input)
-                            st.success(f"📝 Title extracted: {title}")
-                            
-                            author = extract_author_from_url_content(content, metadata, url_input)
-                            st.success(f"👤 Author extracted: {author}")
-                            
-                            pub_date = extract_date_from_url_content(content, metadata)
-                            st.success(f"📅 Date extracted: {pub_date if pub_date else 'Not found'}")
-                            
-                            organization = extract_organization_from_url_content(content, metadata, url_input)
-                            st.success(f"🏢 Organization extracted: {organization}")
+                            # Use enhanced OCR metadata extraction for better UNESCO document recognition
+                            try:
+                                from utils.enhanced_ocr_metadata import extract_enhanced_metadata_from_content
+                                
+                                # Prepare existing metadata dict
+                                existing_metadata = {}
+                                if metadata:
+                                    if hasattr(metadata, 'title') and metadata.title:
+                                        existing_metadata['title'] = metadata.title
+                                    if hasattr(metadata, 'author') and metadata.author:
+                                        existing_metadata['author'] = metadata.author
+                                    if hasattr(metadata, 'date') and metadata.date:
+                                        existing_metadata['creation_date'] = metadata.date
+                                
+                                # Extract enhanced metadata
+                                enhanced_metadata = extract_enhanced_metadata_from_content(content, existing_metadata)
+                                
+                                title = enhanced_metadata.get('title', 'Document Title Not Extracted')
+                                organization = enhanced_metadata.get('author_organization', 'Unknown')
+                                doc_type = enhanced_metadata.get('document_type', 'Document')
+                                pub_date = enhanced_metadata.get('publish_date', None)
+                                
+                                # Set author based on organization for institutional documents
+                                if organization != 'Unknown':
+                                    author = organization
+                                else:
+                                    author = extract_author_from_url_content(content, metadata, url_input)
+                                
+                                st.success(f"📝 Title extracted: {title}")
+                                st.success(f"👤 Author extracted: {author}")
+                                st.success(f"📅 Date extracted: {pub_date if pub_date else 'Not found'}")
+                                st.success(f"🏢 Organization extracted: {organization}")
+                                st.success(f"📄 Document type: {doc_type}")
+                                
+                            except Exception as e:
+                                st.warning(f"Enhanced extraction failed, using fallback: {str(e)}")
+                                # Fallback to original extraction
+                                title = extract_title_from_url_content(content, metadata, url_input)
+                                author = extract_author_from_url_content(content, metadata, url_input)
+                                pub_date = extract_date_from_url_content(content, metadata)
+                                organization = extract_organization_from_url_content(content, metadata, url_input)
+                                doc_type = "Document"
                             
                             # Check if we're in auto mode or verification mode
                             auto_mode = st.session_state.get('auto_metadata_mode', False)
@@ -2392,6 +2423,25 @@ def render():
                                 except Exception as e:
                                     st.warning(f"ML training capture failed (non-critical): {str(e)}")
                             
+                            # Attempt URL discovery for documents that need source URLs
+                            final_url = url_input
+                            url_status = 'valid'
+                            
+                            # If this is not a direct PDF/document URL, try to discover the actual document URL
+                            if not url_input.lower().endswith('.pdf') and 'filetype:pdf' not in url_input.lower():
+                                st.info("🔍 Discovering document source URL...")
+                                try:
+                                    from utils.restore_url_discovery import discover_document_source_url
+                                    discovered_url = discover_document_source_url(clean_title, clean_organization, doc_type)
+                                    if discovered_url:
+                                        final_url = discovered_url
+                                        url_status = 'discovered'
+                                        st.success(f"✓ Document URL discovered: {discovered_url}")
+                                    else:
+                                        st.info("📋 Using provided URL as source")
+                                except Exception as e:
+                                    st.warning(f"URL discovery failed: {str(e)}")
+                            
                             # Save to database using db_manager with enhanced metadata
                             document_data = {
                                 'id': doc_id,
@@ -2399,8 +2449,12 @@ def render():
                                 'content': clean_content,
                                 'clean_content': clean_content,
                                 'text_content': clean_content,
-                                'source_url': url_input,  # Ensure URL is saved for clickability
-                                'url': url_input,  # Additional URL field for compatibility
+                                'source': final_url,  # Use discovered or provided URL
+                                'source_url': final_url,  
+                                'url': final_url,  
+                                'url_valid': True,
+                                'url_status': url_status,
+                                'url_checked': True,
                                 'document_type': doc_type_mapping.get(doc_type, "Document"),
                                 'author': clean_author,
                                 'author_organization': clean_organization,
