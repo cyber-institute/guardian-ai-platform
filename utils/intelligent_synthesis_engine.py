@@ -248,16 +248,29 @@ class IntelligentSynthesisEngine:
                 prior_mean = priors.get(metric, {}).get('mean', 70)
                 prior_variance = priors.get(metric, {}).get('variance', 15)
                 
-                # Weighted likelihood
-                weighted_mean = sum(o * w for o, w in zip(observations, weights)) / sum(weights)
+                # Weighted likelihood with division by zero protection
+                total_weights = sum(weights)
+                if total_weights == 0:
+                    total_weights = 1  # Prevent division by zero
+                    
+                weighted_mean = sum(o * w for o, w in zip(observations, weights)) / total_weights
                 observation_variance = np.var(observations) if len(observations) > 1 else 10
                 
-                # Posterior calculation
-                posterior_precision = (1 / prior_variance) + (sum(weights) / observation_variance)
+                # Prevent division by zero in variance calculations
+                if prior_variance == 0:
+                    prior_variance = 0.1
+                if observation_variance == 0:
+                    observation_variance = 0.1
+                
+                # Posterior calculation with safe division
+                posterior_precision = (1 / prior_variance) + (total_weights / observation_variance)
+                if posterior_precision == 0:
+                    posterior_precision = 0.1
+                    
                 posterior_variance = 1 / posterior_precision
                 posterior_mean = (
                     (prior_mean / prior_variance) + 
-                    (weighted_mean * sum(weights) / observation_variance)
+                    (weighted_mean * total_weights / observation_variance)
                 ) / posterior_precision
                 
                 # Apply proper scale limits based on metric type
