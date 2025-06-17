@@ -63,56 +63,40 @@ class DatabaseManager:
                 return []
     
     def fetch_documents(self):
-        """Fetch all documents from the database."""
+        """Fetch documents from database - optimized for listing view."""
         query = """
-        SELECT id, title, content, text_content as text, quantum_score as quantum_q,
+        SELECT id, title, document_type, source, author_organization, publish_date, content_preview,
                ai_cybersecurity_score, quantum_cybersecurity_score, ai_ethics_score, quantum_ethics_score,
-               document_type, source, author_organization, publish_date, content_preview,
-               detected_region, region_confidence, region_reasoning, topic,
-               url_valid, url_status, source_redirect, url_checked,
-               created_at, updated_at
+               detected_region, topic, url_valid, url_status, created_at, updated_at
         FROM documents 
         ORDER BY updated_at DESC, created_at DESC
+        LIMIT 200
         """
         
         results = self.execute_query(query)
         if results is None:
             return []
         
-        # Convert to format expected by the application
+        # Convert to lightweight format for fast loading
         documents = []
         if isinstance(results, list):
             for row in results:
-                # Apply comprehensive HTML cleaning at the database level
-                from utils.html_artifact_interceptor import clean_field
-                
                 doc = {
                     'id': row['id'],
-                    'title': clean_field(row['title'] or 'Untitled Document'),
-                    'content': row['content'],  # Keep raw content for scoring
-                    'clean_content': clean_field(row['content']),  # Add cleaned version
-                    'text': row['text'],
-                    'text_content': clean_field(row['text']),  # Add cleaned version
-                    'quantum_q': float(row['quantum_q']) if row['quantum_q'] else 0,
-                    # Add score fields for multi-LLM ensemble scoring
+                    'title': row['title'] or 'Untitled Document',
+                    'document_type': row['document_type'] or 'Report',
+                    'source': row['source'] or '',
+                    'author_organization': row.get('author_organization', 'Unknown'),
+                    'publish_date': str(row.get('publish_date')) if row.get('publish_date') else None,
+                    'content_preview': row.get('content_preview', 'No preview available'),
                     'ai_cybersecurity_score': int(row.get('ai_cybersecurity_score', 0)) if row.get('ai_cybersecurity_score') else 0,
                     'quantum_cybersecurity_score': int(row.get('quantum_cybersecurity_score', 0)) if row.get('quantum_cybersecurity_score') else 0,
                     'ai_ethics_score': int(row.get('ai_ethics_score', 0)) if row.get('ai_ethics_score') else 0,
                     'quantum_ethics_score': int(row.get('quantum_ethics_score', 0)) if row.get('quantum_ethics_score') else 0,
-                    'document_type': clean_field(row['document_type'] or 'Report'),
-                    'source': row['source'] or '',
-                    'author_organization': clean_field(row.get('author_organization', 'Unknown')),
-                    'publish_date': str(row.get('publish_date')) if row.get('publish_date') else None,
-                    'content_preview': clean_field(row.get('content_preview', 'No preview available')),
-                    'detected_region': clean_field(row.get('detected_region', 'Unknown')),
-                    'region_confidence': float(row.get('region_confidence', 0.0)) if row.get('region_confidence') else 0.0,
-                    'region_reasoning': clean_field(row.get('region_reasoning', '')),
-                    'topic': clean_field(row.get('topic', 'General')),
-                    # Add URL validation fields for clickable titles
+                    'detected_region': row.get('detected_region', 'Unknown'),
+                    'topic': row.get('topic', 'General'),
                     'url_valid': row.get('url_valid', False),
                     'url_status': row.get('url_status', 'unchecked'),
-                    'source_redirect': row.get('source_redirect', ''),
-                    'url_checked': row.get('url_checked', False),
                     'created_at': row['created_at'],
                     'updated_at': row['updated_at']
                 }

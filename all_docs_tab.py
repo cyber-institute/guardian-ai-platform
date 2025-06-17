@@ -1199,9 +1199,9 @@ def render():
     # Get display mode from session state (set in top controls)
     display_mode = st.session_state.get("display_mode", "cards")
 
-    # Enhanced pagination with performance controls
+    # Enhanced pagination with performance controls  
     per_page_options = [5, 10, 20, 50]
-    per_page = st.session_state.get("per_page", 10)
+    per_page = st.session_state.get("per_page", 5)  # Default to 5 for fastest loading
     
     # Performance control sidebar
     with st.sidebar:
@@ -3237,17 +3237,8 @@ def render_compact_cards(docs):
                     # Use database score as-is without artificial inflation
                     scores['ai_cybersecurity'] = raw_scores['ai_cybersecurity']
                 else:
-                    from utils.comprehensive_scoring import comprehensive_document_scoring
-                    try:
-                        computed_scores = comprehensive_document_scoring(raw_content, title)
-                        # Cap computed scores at realistic ranges (30-80)
-                        ai_cyber_computed = computed_scores.get('ai_cybersecurity', 45)
-                        if ai_cyber_computed is not None:
-                            scores['ai_cybersecurity'] = min(max(ai_cyber_computed, 25), 80)
-                        else:
-                            scores['ai_cybersecurity'] = 45
-                    except:
-                        scores['ai_cybersecurity'] = 45  # Realistic default
+                    # Use database scores only for fast loading
+                    scores['ai_cybersecurity'] = 'N/A'
             else:
                 scores['ai_cybersecurity'] = 'N/A'
                 
