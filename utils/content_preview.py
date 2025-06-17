@@ -142,6 +142,14 @@ def create_strategic_preview(content: str, title: str = "", max_length: int = 25
         return create_enhanced_short_content_preview(content, title, max_length)
     
     # Continue with full content analysis for longer documents
+    clean_text = re.sub(r'<[^>]+>', '', content)
+    clean_text = re.sub(r'&[a-zA-Z]+;', ' ', clean_text)
+    clean_text = re.sub(r'\*+', '', clean_text)
+    clean_text = re.sub(r'#+\s*', '', clean_text)
+    clean_text = re.sub(r'\s+', ' ', clean_text).strip()
+    
+    # Use the existing comprehensive analysis for longer documents
+    return clean_and_enhance_preview(clean_text, max_length)
     
 def create_enhanced_short_content_preview(content: str, title: str = "", max_length: int = 2500) -> str:
     """Create enhanced preview for documents with limited content"""
