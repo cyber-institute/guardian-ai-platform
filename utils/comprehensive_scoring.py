@@ -24,13 +24,17 @@ def analyze_document_applicability(text: str, title: str) -> Dict[str, bool]:
         'trustworthy ai', 'ai plan', 'ai framework', 'ai policy', 'ai governance'
     ]
     
-    # Quantum-related keywords (positive indicators only)
+    # Quantum-related keywords (expanded for better detection)
     quantum_keywords = [
-        'post-quantum', 'quantum computing', 'quantum cryptography',
+        'quantum', 'post-quantum', 'quantum computing', 'quantum cryptography',
         'quantum encryption', 'quantum key', 'quantum-safe', 'quantum-resistant',
         'qkd', 'quantum supremacy', 'quantum advantage', 'quantum security',
         'quantum technology', 'quantum systems', 'quantum protocols',
-        'lattice-based', 'quantum key distribution'
+        'lattice-based', 'quantum key distribution', 'quantum mechanics',
+        'quantum information', 'quantum communication', 'quantum ethics',
+        'quantum governance', 'quantum framework', 'quantum policy',
+        'quantum threat', 'quantum era', 'quantum revolution', 'qubit',
+        'quantum state', 'quantum entanglement', 'quantum algorithm'
     ]
     
     # Cybersecurity keywords (expanded for AI documents)
@@ -116,74 +120,54 @@ def score_ai_cybersecurity_maturity(text: str, title: str) -> Optional[int]:
 
 def score_quantum_cybersecurity_maturity(text: str, title: str) -> Optional[int]:
     """
-    Score Quantum Cybersecurity Maturity (1-5) based on QCMEA patent framework.
+    Score Quantum Cybersecurity Maturity (0-100) based on QCMEA patent framework.
     
-    Patent levels:
-    1. Initial: Basic awareness
-    2. Basic: Foundational measures
-    3. Intermediate: Scalable solutions
-    4. Advanced: Comprehensive integration
-    5. Dynamic: Continuous adaptability
+    Patent levels converted to 0-100 scale:
+    - 0-20: Initial awareness
+    - 21-40: Basic foundational measures
+    - 41-60: Intermediate scalable solutions
+    - 61-80: Advanced comprehensive integration
+    - 81-100: Dynamic continuous adaptability
     """
     if not analyze_document_applicability(text, title)['quantum_cybersecurity']:
         return None
     
     text_lower = text.lower()
+    score = 0
     
-    # Calculate weighted score based on content depth and sophistication
-    score_components = 0
-    
-    # Basic quantum awareness (1-3 points)
-    basic_terms = ['quantum', 'post-quantum', 'quantum-safe', 'quantum-resistant', 'pqc']
+    # Basic quantum awareness (20 points)
+    basic_terms = ['quantum', 'post-quantum', 'quantum-safe', 'quantum-resistant', 'pqc', 
+                   'quantum computing', 'quantum cryptography', 'quantum threat']
     basic_count = sum(1 for term in basic_terms if term in text_lower)
-    score_components += min(3, basic_count)
+    score += min(20, basic_count * 3)
     
-    # Technical depth indicators (1-4 points)
+    # Technical depth indicators (25 points)
     technical_terms = ['lattice-based', 'code-based', 'multivariate', 'hash-based', 'isogeny', 
-                      'quantum key distribution', 'quantum cryptography', 'cryptographic agility']
+                      'quantum key distribution', 'qkd', 'cryptographic agility', 'quantum algorithms',
+                      'quantum mechanics', 'quantum information', 'quantum systems']
     technical_count = sum(1 for term in technical_terms if term in text_lower)
-    score_components += min(4, technical_count)
+    score += min(25, technical_count * 3)
     
-    # Implementation readiness (1-3 points)
-    implementation_terms = ['implementation', 'deployment', 'migration', 'transition', 'roadmap']
+    # Implementation readiness (20 points)
+    implementation_terms = ['implementation', 'deployment', 'migration', 'transition', 'roadmap',
+                           'strategy', 'framework', 'guidelines', 'best practices', 'methodology']
     impl_count = sum(1 for term in implementation_terms if term in text_lower)
-    score_components += min(3, impl_count)
+    score += min(20, impl_count * 3)
     
-    # Standards and governance (1-3 points)
-    standards_terms = ['nist', 'standards', 'compliance', 'governance', 'framework', 'policy']
+    # Standards and governance (20 points)
+    standards_terms = ['nist', 'standards', 'compliance', 'governance', 'policy', 'regulation',
+                      'oversight', 'assessment', 'evaluation', 'audit', 'certification']
     standards_count = sum(1 for term in standards_terms if term in text_lower)
-    score_components += min(3, standards_count)
+    score += min(20, standards_count * 3)
     
-    # Advanced concepts (1-3 points)
-    advanced_terms = ['hybrid systems', 'quantum supremacy', 'quantum advantage', 'quantum evolution', 
-                     'quantum machine learning', 'adaptive quantum', 'continuous quantum monitoring']
+    # Advanced concepts and ethics (15 points)
+    advanced_terms = ['quantum ethics', 'quantum governance', 'quantum advantage', 'quantum supremacy',
+                     'quantum machine learning', 'adaptive quantum', 'quantum monitoring', 
+                     'quantum privacy', 'quantum security', 'ethical quantum']
     advanced_count = sum(1 for term in advanced_terms if term in text_lower)
-    score_components += min(3, advanced_count)
+    score += min(15, advanced_count * 3)
     
-    # Document length factor (affects sophistication)
-    text_length = len(text)
-    length_factor = 1.0
-    if text_length > 5000:
-        length_factor = 1.2
-    elif text_length > 2000:
-        length_factor = 1.1
-    elif text_length < 500:
-        length_factor = 0.8
-    
-    # Calculate final score with length adjustment
-    final_score = int(score_components * length_factor)
-    
-    # Map to 1-5 maturity levels with refined thresholds
-    if final_score >= 14:
-        return 5  # Dynamic maturity
-    elif final_score >= 11:
-        return 4  # Advanced maturity  
-    elif final_score >= 7:
-        return 3  # Intermediate maturity
-    elif final_score >= 4:
-        return 2  # Basic maturity
-    else:
-        return 1  # Initial awareness
+    return min(100, score)
 
 def score_ai_ethics(text: str, title: str) -> Optional[int]:
     """
@@ -272,7 +256,7 @@ def score_quantum_ethics(text: str, title: str) -> Optional[int]:
         'quantum security standards', 'quantum compliance', 'quantum regulation',
         'quantum policy', 'quantum guidelines', 'quantum framework'
     ]
-    security_score = min(25, sum(4 for indicator in security_indicators if indicator in security_indicators))
+    security_score = min(25, sum(4 for indicator in security_indicators if indicator in text_lower))
     score += security_score
     
     # Equitable quantum access (25 points)
