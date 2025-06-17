@@ -63,24 +63,27 @@ class IntelligentPreviewGenerator:
             content_excerpt = content[:2000] if len(content) > 2000 else content
             
             prompt = f"""
-            Create a concise, intelligent preview summary for this document. Focus on key insights, main topics, and practical implications. 
+            Create a comprehensive, intelligent preview summary for this document. Focus on key insights, main topics, practical implications, and strategic value.
             
             Title: {title}
             Content: {content_excerpt}
             
-            Generate a 2-3 sentence preview that:
-            1. Identifies the document's main purpose and scope
-            2. Highlights key topics or frameworks covered
-            3. Mentions practical applications or target audience
+            Generate a detailed 4-6 sentence preview that:
+            1. Identifies the document's main purpose, scope, and strategic importance
+            2. Highlights key topics, frameworks, standards, or methodologies covered
+            3. Describes practical applications, implementation guidance, or target audience
+            4. Mentions any specific recommendations, best practices, or critical insights
+            5. Notes the document's relevance to cybersecurity, AI governance, or quantum technologies if applicable
+            6. Provides context about the document's authority or organizational source
             
-            Keep the summary informative but concise (under 200 words).
+            Make the summary comprehensive and informative (200-300 words) while maintaining clarity and readability.
             """
             
             # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
             response = self.client.chat.completions.create(
                 model="gpt-4o",
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=150,
+                max_tokens=300,
                 temperature=0.3
             )
             
@@ -131,36 +134,61 @@ class IntelligentPreviewGenerator:
         if any(term in content_lower for term in ['implementation', 'deployment', 'migration', 'adoption']):
             themes.append("implementation strategies")
         
-        # Create intelligent summary
+        # Create comprehensive intelligent summary
         if themes:
-            theme_text = ", ".join(themes[:3])
-            # Extract first meaningful sentence
-            sentences = re.split(r'[.!?]+', content)
-            first_sentence = ""
-            for sentence in sentences[:3]:
-                sentence = sentence.strip()
-                if len(sentence) > 40 and not sentence.lower().startswith(('table', 'figure', 'page')):
-                    first_sentence = sentence + "."
-                    break
+            theme_text = ", ".join(themes[:4])
             
-            if first_sentence:
-                return f"Comprehensive document covering {theme_text}. {first_sentence} Provides detailed guidance for practitioners and stakeholders."
-            else:
-                return f"Comprehensive document addressing {theme_text} with practical implementation guidance and strategic recommendations."
-        else:
-            # Generic intelligent preview
+            # Extract multiple meaningful sentences for detailed preview
             sentences = re.split(r'[.!?]+', content)
             meaningful_sentences = []
-            for sentence in sentences[:3]:
+            for sentence in sentences[:8]:  # Look at more sentences
                 sentence = sentence.strip()
-                if len(sentence) > 30:
+                if (len(sentence) > 40 and 
+                    not sentence.lower().startswith(('table', 'figure', 'page', 'abstract', 'keywords')) and
+                    not re.match(r'^\d+\.', sentence.strip())):  # Skip numbered lists
                     meaningful_sentences.append(sentence)
+                    if len(meaningful_sentences) >= 4:  # Get up to 4 good sentences
+                        break
+            
+            # Build comprehensive preview
+            base_description = f"This comprehensive document addresses {theme_text}, providing strategic guidance and practical implementation frameworks."
             
             if meaningful_sentences:
-                preview_text = '. '.join(meaningful_sentences[:2]) + '.'
-                return preview_text[:250] + '...' if len(preview_text) > 250 else preview_text
+                # Add key insights from content
+                content_insights = '. '.join(meaningful_sentences[:3]) + '.'
+                if len(content_insights) > 300:
+                    content_insights = content_insights[:300] + '...'
+                
+                # Add practical applications context
+                practical_context = ""
+                if 'implementation' in content_lower:
+                    practical_context = " The document includes specific implementation strategies and deployment considerations."
+                elif 'guidance' in content_lower or 'recommendation' in content_lower:
+                    practical_context = " It offers detailed recommendations and best practice guidance for practitioners."
+                elif 'framework' in content_lower or 'standard' in content_lower:
+                    practical_context = " The framework provides structured approaches and standardized methodologies."
+                
+                return f"{base_description} {content_insights}{practical_context} This resource serves as a valuable reference for stakeholders, practitioners, and decision-makers in the field."
             else:
-                return f"Document providing comprehensive analysis and guidance on {title.lower()} with detailed recommendations and best practices."
+                return f"{base_description} The document provides detailed analysis, strategic recommendations, and implementation guidance. It serves as a comprehensive resource for understanding key concepts, methodologies, and best practices. This material is particularly valuable for practitioners, policymakers, and stakeholders seeking authoritative guidance and practical insights."
+        else:
+            # Enhanced generic intelligent preview
+            sentences = re.split(r'[.!?]+', content)
+            meaningful_sentences = []
+            for sentence in sentences[:6]:
+                sentence = sentence.strip()
+                if (len(sentence) > 30 and 
+                    not sentence.lower().startswith(('table', 'figure', 'page', 'abstract'))):
+                    meaningful_sentences.append(sentence)
+                    if len(meaningful_sentences) >= 3:
+                        break
+            
+            if meaningful_sentences:
+                preview_text = '. '.join(meaningful_sentences) + '.'
+                base_text = f"This document presents comprehensive analysis and guidance on {title.lower()}. {preview_text} It provides valuable insights, practical recommendations, and strategic frameworks for implementation."
+                return base_text[:400] + '...' if len(base_text) > 400 else base_text
+            else:
+                return f"This comprehensive document provides detailed analysis and guidance on {title.lower()}. It covers key concepts, methodologies, and implementation strategies with practical recommendations for stakeholders. The document serves as an authoritative resource offering strategic insights, best practices, and actionable guidance for practitioners and decision-makers in the field."
 
 # Global instance
 preview_generator = IntelligentPreviewGenerator()
