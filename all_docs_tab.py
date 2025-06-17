@@ -4600,13 +4600,13 @@ def render_card_view(docs):
             try:
                 from utils.intelligent_preview import generate_intelligent_preview
                 intelligent_summary = generate_intelligent_preview(title, raw_content)
-                preview_content = f"<b>{title}</b><br><br><i>Document Summary:</i><br>{intelligent_summary}"
+                preview_content = intelligent_summary
             except Exception as e:
                 # Fallback to meaningful preview without asterisks
                 if len(clean_content) > 100:
-                    preview_content = f"<b>{title}</b><br><br>{clean_content[:400]}..."
+                    preview_content = clean_content[:400] + "..."
                 else:
-                    preview_content = f"<b>{title}</b><br><br>Document content available. Click to view full analysis and details."
+                    preview_content = "Document content available. Click to view full analysis and details."
             
             # Ensure all analysis content is string and escape for JavaScript
             # Format bullet points properly for HTML display
