@@ -1226,9 +1226,28 @@ def render():
         st.metric("Cached Documents", cache_size)
         
         if st.button("🔄 Refresh All Scores", use_container_width=True):
-            if 'guardian_score_cache' in st.session_state:
-                st.session_state['guardian_score_cache'] = {}
-            st.success("Score cache cleared - scores will be recalculated")
+            # Clear all score-related caches
+            cache_keys_to_clear = [
+                'guardian_score_cache',
+                'comprehensive_scores_cache', 
+                'document_scores_cache',
+                'cached_documents',
+                'cached_analytics'
+            ]
+            
+            for key in cache_keys_to_clear:
+                if key in st.session_state:
+                    st.session_state[key] = {}
+            
+            # Force database to recalculate scores by updating a timestamp
+            try:
+                from utils.database import DatabaseManager
+                db = DatabaseManager()
+                db.execute_query("UPDATE documents SET updated_at = NOW() WHERE quantum_cybersecurity_score IS NOT NULL")
+                st.success("Score cache cleared and database updated - all scores will be recalculated")
+            except:
+                st.success("Score cache cleared - scores will be recalculated")
+            
             st.rerun()
     
     page = st.session_state.get("doc_page", 0)
@@ -3263,12 +3282,15 @@ def render_compact_cards(docs):
                 scores['ai_ethics'] = 'N/A'
             
             if is_quantum_related:
-                if raw_scores['quantum_cybersecurity'] and raw_scores['quantum_cybersecurity'] > 0:
-                    # Use existing DB score as-is
-                    quantum_score = raw_scores['quantum_cybersecurity']
-                else:
-                    # Use database value or N/A for fast loading
-                    quantum_score = 2  # Default tier
+                # Force fresh quantum scoring calculation bypassing all caches
+                try:
+                    from utils.comprehensive_scoring import score_quantum_cybersecurity_maturity
+                    quantum_score = score_quantum_cybersecurity_maturity(raw_content, title)
+                    if quantum_score is None:
+                        quantum_score = 1  # Minimal quantum content
+                except:
+                    # Fallback to database value only if fresh scoring fails
+                    quantum_score = raw_scores.get('quantum_cybersecurity', 1) or 1
                 
                 # Convert to tier system (1-5) with realistic thresholds
                 if quantum_score >= 70:
