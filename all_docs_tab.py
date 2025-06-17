@@ -3443,13 +3443,13 @@ def render_grid_view(docs):
                     except:
                         quantum_score = 65
                 
-                if quantum_score >= 85:
+                if quantum_score is not None and quantum_score >= 85:
                     scores['quantum_cybersecurity'] = 4
-                elif quantum_score >= 65:
+                elif quantum_score is not None and quantum_score >= 65:
                     scores['quantum_cybersecurity'] = 3
-                elif quantum_score >= 45:
+                elif quantum_score is not None and quantum_score >= 45:
                     scores['quantum_cybersecurity'] = 2
-                elif quantum_score >= 25:
+                elif quantum_score is not None and quantum_score >= 25:
                     scores['quantum_cybersecurity'] = 1
                 else:
                     scores['quantum_cybersecurity'] = 1
@@ -4387,42 +4387,42 @@ def render_card_view(docs):
             q_cyber = scores.get('quantum_cybersecurity', 'N/A')
             q_ethics = scores.get('quantum_ethics', 'N/A')
             
-            # AI Cybersecurity color
-            if ai_cyber != 'N/A' and ai_cyber >= 75:
+            # AI Cybersecurity color - Safe None comparison
+            if ai_cyber != 'N/A' and ai_cyber is not None and ai_cyber >= 75:
                 ai_cyber_color = '#28a745'  # Green
-            elif ai_cyber != 'N/A' and ai_cyber >= 50:
+            elif ai_cyber != 'N/A' and ai_cyber is not None and ai_cyber >= 50:
                 ai_cyber_color = '#fd7e14'  # Orange
-            elif ai_cyber != 'N/A':
+            elif ai_cyber != 'N/A' and ai_cyber is not None:
                 ai_cyber_color = '#dc3545'  # Red
             else:
                 ai_cyber_color = '#6c757d'  # Gray
                 
-            # AI Ethics color
-            if ai_ethics != 'N/A' and ai_ethics >= 75:
+            # AI Ethics color - Safe None comparison
+            if ai_ethics != 'N/A' and ai_ethics is not None and ai_ethics >= 75:
                 ai_ethics_color = '#28a745'
-            elif ai_ethics != 'N/A' and ai_ethics >= 50:
+            elif ai_ethics != 'N/A' and ai_ethics is not None and ai_ethics >= 50:
                 ai_ethics_color = '#fd7e14'
-            elif ai_ethics != 'N/A':
+            elif ai_ethics != 'N/A' and ai_ethics is not None:
                 ai_ethics_color = '#dc3545'
             else:
                 ai_ethics_color = '#6c757d'
                 
-            # Quantum Cybersecurity color (tier-based 1-5)
-            if q_cyber != 'N/A' and q_cyber >= 4:
+            # Quantum Cybersecurity color (tier-based 1-5) - Safe None comparison
+            if q_cyber != 'N/A' and q_cyber is not None and q_cyber >= 4:
                 q_cyber_color = '#28a745'  # Green
-            elif q_cyber != 'N/A' and q_cyber >= 3:
+            elif q_cyber != 'N/A' and q_cyber is not None and q_cyber >= 3:
                 q_cyber_color = '#fd7e14'  # Orange
-            elif q_cyber != 'N/A':
+            elif q_cyber != 'N/A' and q_cyber is not None:
                 q_cyber_color = '#dc3545'  # Red
             else:
                 q_cyber_color = '#6c757d'  # Gray
                 
-            # Quantum Ethics color
-            if q_ethics != 'N/A' and q_ethics >= 75:
+            # Quantum Ethics color - Safe None comparison
+            if q_ethics != 'N/A' and q_ethics is not None and q_ethics >= 75:
                 q_ethics_color = '#28a745'
-            elif q_ethics != 'N/A' and q_ethics >= 50:
+            elif q_ethics != 'N/A' and q_ethics is not None and q_ethics >= 50:
                 q_ethics_color = '#fd7e14'
-            elif q_ethics != 'N/A':
+            elif q_ethics != 'N/A' and q_ethics is not None:
                 q_ethics_color = '#dc3545'
             else:
                 q_ethics_color = '#6c757d'
