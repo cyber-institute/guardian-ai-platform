@@ -246,6 +246,12 @@ class URLDiscoverySystem:
 # Global instance
 url_discovery = URLDiscoverySystem()
 
+def discover_document_url(title: str, organization: str = "", doc_type: str = "") -> Optional[str]:
+    """
+    Discover document URL - wrapper function for upload system compatibility
+    """
+    return url_discovery.discover_document_url(title, organization, doc_type)
+
 def discover_document_source_url(title: str, organization: str = "", doc_type: str = "") -> Optional[str]:
     """
     Main function to discover document source URLs

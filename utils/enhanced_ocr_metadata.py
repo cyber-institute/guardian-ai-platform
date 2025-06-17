@@ -151,6 +151,67 @@ def _extract_organization_enhanced(content: str, existing_metadata: dict = None)
         if re.search(indicator, full_text, re.IGNORECASE):
             return "UNESCO"
     
+    # NIST and government organizations
+    nist_patterns = [
+        r'National Institute of Standards and Technology',
+        r'NIST',
+        r'U\.?S\.? Department of Commerce',
+        r'Department of Commerce'
+    ]
+    
+    for pattern in nist_patterns:
+        if re.search(pattern, full_text, re.IGNORECASE):
+            return "NIST"
+    
+    # NASA patterns
+    nasa_patterns = [
+        r'National Aeronautics and Space Administration',
+        r'NASA',
+        r'nasa\.gov'
+    ]
+    
+    for pattern in nasa_patterns:
+        if re.search(pattern, full_text, re.IGNORECASE):
+            return "NASA"
+    
+    # White House patterns
+    whitehouse_patterns = [
+        r'White House',
+        r'Executive Office of the President',
+        r'whitehouse\.gov',
+        r'National Security Council'
+    ]
+    
+    for pattern in whitehouse_patterns:
+        if re.search(pattern, full_text, re.IGNORECASE):
+            return "White House"
+    
+    # DHS/CISA patterns
+    dhs_patterns = [
+        r'Department of Homeland Security',
+        r'DHS',
+        r'Cybersecurity and Infrastructure Security Agency',
+        r'CISA'
+    ]
+    
+    for pattern in dhs_patterns:
+        if re.search(pattern, full_text, re.IGNORECASE):
+            return "DHS/CISA"
+    
+    # Look for organization in structured format
+    org_patterns = [
+        r'(?:Organization|Author|Publisher):\s*([A-Za-z\s&,.-]{5,50})',
+        r'([A-Z][A-Za-z\s&,.-]{10,50})\s+(?:Foundation|Institute|Organization|Agency|Department)',
+        r'Published by:?\s*([A-Za-z\s&,.-]{5,50})'
+    ]
+    
+    for pattern in org_patterns:
+        matches = re.findall(pattern, full_text, re.IGNORECASE)
+        if matches:
+            org = matches[0].strip()
+            if len(org) > 3:
+                return org
+    
     # Enhanced organization patterns
     org_patterns = [
         # Government agencies

@@ -1614,6 +1614,18 @@ def render():
                                         st.info(f"Type: {doc_type}")
                                         st.info(f"Author: {author}")
                                         
+                                        st.info("Discovering document URL...")
+                                        
+                                        # Discover URL for the document
+                                        from utils.restore_url_discovery import discover_document_url
+                                        discovered_url = discover_document_url(title, organization, content[:500])
+                                        
+                                        if discovered_url and discovered_url != "Not found":
+                                            st.success(f"Found document URL: {discovered_url}")
+                                        else:
+                                            st.info("URL discovery in progress - will update automatically")
+                                            discovered_url = None
+                                        
                                         st.info("Calculating comprehensive scores...")
                                         
                                         # Generate scores
@@ -1635,6 +1647,7 @@ def render():
                                             'publish_date': pub_date,
                                             'publication_date': pub_date,
                                             'filename': uploaded_file.name,
+                                            'url': discovered_url,
                                             'ai_cybersecurity_score': scores.get('ai_cybersecurity', 0),
                                             'quantum_cybersecurity_score': scores.get('quantum_cybersecurity', 0),
                                             'ai_ethics_score': scores.get('ai_ethics', 0),
