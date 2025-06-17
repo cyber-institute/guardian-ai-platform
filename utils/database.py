@@ -65,7 +65,8 @@ class DatabaseManager:
     def fetch_documents(self):
         """Fetch documents from database - optimized for listing view."""
         query = """
-        SELECT id, title, document_type, source, author_organization, publish_date, content_preview,
+        SELECT id, title, document_type, source, author_organization, publish_date, 
+               COALESCE(content_preview, LEFT(content, 500), LEFT(text_content, 500), 'No preview available') as content_preview,
                ai_cybersecurity_score, quantum_cybersecurity_score, ai_ethics_score, quantum_ethics_score,
                detected_region, topic, url_valid, url_status, created_at, updated_at
         FROM documents 
@@ -81,6 +82,22 @@ class DatabaseManager:
         documents = []
         if isinstance(results, list):
             for row in results:
+                # Clean content preview of asterisks and formatting
+                raw_preview = row.get('content_preview', 'No preview available')
+                if raw_preview and raw_preview != 'No preview available':
+                    # Remove asterisks, excessive whitespace, and clean up text
+                    import re
+                    clean_preview = re.sub(r'\*+', '', raw_preview)
+                    clean_preview = re.sub(r'#+\s*', '', clean_preview)
+                    clean_preview = re.sub(r'\s+', ' ', clean_preview).strip()
+                    # Ensure preview has meaningful length
+                    if len(clean_preview) > 50:
+                        content_preview = clean_preview[:400] + '...' if len(clean_preview) > 400 else clean_preview
+                    else:
+                        content_preview = 'Preview content available - click to view document details'
+                else:
+                    content_preview = 'No preview available'
+
                 doc = {
                     'id': row['id'],
                     'title': row['title'] or 'Untitled Document',
@@ -88,7 +105,7 @@ class DatabaseManager:
                     'source': row['source'] or '',
                     'author_organization': row.get('author_organization', 'Unknown'),
                     'publish_date': str(row.get('publish_date')) if row.get('publish_date') else None,
-                    'content_preview': row.get('content_preview', 'No preview available'),
+                    'content_preview': content_preview,
                     'ai_cybersecurity_score': int(row.get('ai_cybersecurity_score', 0)) if row.get('ai_cybersecurity_score') else 0,
                     'quantum_cybersecurity_score': int(row.get('quantum_cybersecurity_score', 0)) if row.get('quantum_cybersecurity_score') else 0,
                     'ai_ethics_score': int(row.get('ai_ethics_score', 0)) if row.get('ai_ethics_score') else 0,

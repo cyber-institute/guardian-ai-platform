@@ -65,8 +65,16 @@ class ScoreCache:
     
     def get_cache_stats(self) -> Dict:
         """Get cache performance statistics"""
+        # Ensure metadata is initialized
+        if self.metadata_key not in st.session_state:
+            st.session_state[self.metadata_key] = {
+                'last_refresh': None,
+                'cache_hits': 0,
+                'cache_misses': 0
+            }
+        
         metadata = st.session_state[self.metadata_key]
-        cache_size = len(st.session_state[self.cache_key])
+        cache_size = len(st.session_state.get(self.cache_key, {}))
         
         total_requests = metadata['cache_hits'] + metadata['cache_misses']
         hit_rate = (metadata['cache_hits'] / total_requests * 100) if total_requests > 0 else 0

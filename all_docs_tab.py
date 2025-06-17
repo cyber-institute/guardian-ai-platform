@@ -1221,15 +1221,13 @@ def render():
         st.markdown("---")
         st.subheader("Score Cache")
         
-        from utils.score_cache import score_cache
-        cache_stats = score_cache.get_cache_stats()
-        
-        st.metric("Cached Documents", cache_stats['cached_documents'])
-        if cache_stats['cache_hits'] + cache_stats['cache_misses'] > 0:
-            st.metric("Cache Hit Rate", f"{cache_stats['hit_rate']}%")
+        # Simple cache control without complex stats
+        cache_size = len(st.session_state.get('guardian_score_cache', {}))
+        st.metric("Cached Documents", cache_size)
         
         if st.button("🔄 Refresh All Scores", use_container_width=True):
-            score_cache.clear_cache()
+            if 'guardian_score_cache' in st.session_state:
+                st.session_state['guardian_score_cache'] = {}
             st.success("Score cache cleared - scores will be recalculated")
             st.rerun()
     
