@@ -63,27 +63,29 @@ class IntelligentPreviewGenerator:
             content_excerpt = content[:2000] if len(content) > 2000 else content
             
             prompt = f"""
-            Create a comprehensive, intelligent preview summary for this document. Focus on key insights, main topics, practical implications, and strategic value.
+            Create an extensive, detailed preview summary for this document. Provide comprehensive analysis covering all key aspects, insights, and strategic implications.
             
             Title: {title}
             Content: {content_excerpt}
             
-            Generate a detailed 4-6 sentence preview that:
-            1. Identifies the document's main purpose, scope, and strategic importance
-            2. Highlights key topics, frameworks, standards, or methodologies covered
-            3. Describes practical applications, implementation guidance, or target audience
-            4. Mentions any specific recommendations, best practices, or critical insights
-            5. Notes the document's relevance to cybersecurity, AI governance, or quantum technologies if applicable
-            6. Provides context about the document's authority or organizational source
+            Generate a thorough 6-8 sentence preview that includes:
+            1. Document's main purpose, scope, strategic importance, and organizational context
+            2. Detailed overview of key topics, frameworks, standards, methodologies, and technical approaches covered
+            3. Specific practical applications, implementation strategies, deployment considerations, and target audience
+            4. Critical recommendations, best practices, risk assessments, and compliance requirements
+            5. Relevance to cybersecurity, AI governance, quantum technologies, or related emerging technologies
+            6. Authority and credibility indicators (source organization, standards body, expert authorship)
+            7. Unique insights, innovative approaches, or distinguishing features of the document
+            8. Strategic value for different stakeholder groups (practitioners, policymakers, researchers, executives)
             
-            Make the summary comprehensive and informative (200-300 words) while maintaining clarity and readability.
+            Make the summary comprehensive and detailed (300-450 words) while maintaining excellent clarity, flow, and professional readability. Include specific technical details and actionable insights where relevant.
             """
             
             # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
             response = self.client.chat.completions.create(
                 model="gpt-4o",
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=300,
+                max_tokens=500,
                 temperature=0.3
             )
             
@@ -168,9 +170,9 @@ class IntelligentPreviewGenerator:
                 elif 'framework' in content_lower or 'standard' in content_lower:
                     practical_context = " The framework provides structured approaches and standardized methodologies."
                 
-                return f"{base_description} {content_insights}{practical_context} This resource serves as a valuable reference for stakeholders, practitioners, and decision-makers in the field."
+                return f"{base_description} {content_insights}{practical_context} This resource serves as a valuable reference for stakeholders, practitioners, and decision-makers seeking comprehensive understanding and actionable implementation strategies. The document offers strategic insights that support informed decision-making and effective governance approaches in complex technological environments."
             else:
-                return f"{base_description} The document provides detailed analysis, strategic recommendations, and implementation guidance. It serves as a comprehensive resource for understanding key concepts, methodologies, and best practices. This material is particularly valuable for practitioners, policymakers, and stakeholders seeking authoritative guidance and practical insights."
+                return f"{base_description} The document provides detailed analysis, strategic recommendations, and comprehensive implementation guidance across multiple domains. It serves as an authoritative resource for understanding key concepts, advanced methodologies, and industry best practices. This material delivers particular value for practitioners, policymakers, researchers, and stakeholders seeking authoritative guidance, practical insights, and strategic direction. The content supports evidence-based decision-making and facilitates effective governance frameworks for emerging technologies and complex organizational challenges."
         else:
             # Enhanced generic intelligent preview
             sentences = re.split(r'[.!?]+', content)
@@ -185,10 +187,10 @@ class IntelligentPreviewGenerator:
             
             if meaningful_sentences:
                 preview_text = '. '.join(meaningful_sentences) + '.'
-                base_text = f"This document presents comprehensive analysis and guidance on {title.lower()}. {preview_text} It provides valuable insights, practical recommendations, and strategic frameworks for implementation."
-                return base_text[:400] + '...' if len(base_text) > 400 else base_text
+                base_text = f"This comprehensive document presents detailed analysis and extensive guidance on {title.lower()}. {preview_text} The resource provides valuable insights, practical recommendations, strategic frameworks, and actionable implementation guidance. It addresses critical considerations for stakeholders across technical, operational, and governance domains, offering evidence-based approaches to complex challenges and emerging opportunities in the field."
+                return base_text[:500] + '...' if len(base_text) > 500 else base_text
             else:
-                return f"This comprehensive document provides detailed analysis and guidance on {title.lower()}. It covers key concepts, methodologies, and implementation strategies with practical recommendations for stakeholders. The document serves as an authoritative resource offering strategic insights, best practices, and actionable guidance for practitioners and decision-makers in the field."
+                return f"This comprehensive document provides extensive analysis and detailed guidance on {title.lower()}, addressing key concepts, advanced methodologies, and strategic implementation approaches. The resource covers practical recommendations for stakeholders, offering authoritative insights across technical, operational, and governance domains. It serves as a definitive reference for practitioners, policymakers, researchers, and decision-makers seeking evidence-based guidance and strategic direction. The document facilitates informed decision-making through comprehensive coverage of best practices, risk considerations, and emerging trends, supporting effective implementation of complex initiatives and organizational transformation efforts."
 
 # Global instance
 preview_generator = IntelligentPreviewGenerator()
