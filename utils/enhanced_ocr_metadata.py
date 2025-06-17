@@ -64,12 +64,15 @@ def _extract_title_enhanced(content: str, existing_metadata: dict = None) -> str
     
     # UNESCO specific patterns
     unesco_patterns = [
+        r'(Recommendation\s+on\s+the\s+Ethics\s+of\s+Artificial\s+Intelligence)',
         r'(Quantum Science for\s*Inclusion and\s*Sustainability)',
         r'(Quantum Science for Inclusion and Sustainability)',
         r'(AI and the Future of Learning)',
         r'(Artificial Intelligence and Education)',
         r'(Digital Transformation in Education)',
         r'([A-Z][A-Za-z\s&,-]{15,80})\s*(?:Policy brief|Policy Brief)',
+        r'(Ethics\s+of\s+Artificial\s+Intelligence)',
+        r'(Recommendation\s+[A-Za-z\s]{10,60}\s+Intelligence)',
     ]
     
     # Check for UNESCO patterns first
@@ -297,6 +300,8 @@ def _extract_document_type_enhanced(content: str, title: str) -> str:
             r'analysis',
         ],
         'Policy': [
+            r'recommendation\s+on\s+the\s+ethics',
+            r'recommendation',
             r'policy',
             r'regulation',
             r'directive',
@@ -343,12 +348,13 @@ def _extract_date_enhanced(content: str, existing_metadata: dict = None) -> Opti
     lines = content.split('\n')
     full_text = ' '.join(lines[:30])  # First 30 lines
     
-    # Date patterns
+    # Date patterns - prioritize UNESCO adoption format
     date_patterns = [
+        r'Adopted\s+on\s+(\d{1,2}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4})',  # UNESCO adoption format - priority
+        r'(\d{1,2}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4})',  # 23 November 2021
         r'(\d{4}-\d{2}-\d{2})',  # YYYY-MM-DD
         r'(\d{1,2}/\d{1,2}/\d{4})',  # MM/DD/YYYY or DD/MM/YYYY
         r'((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4})',
-        r'(\d{1,2}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4})',
         r'((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2},?\s+\d{4})',
         r'(\d{4})',  # Just year as fallback
     ]

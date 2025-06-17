@@ -439,22 +439,41 @@ def analyze_with_enhanced_patterns(text: str, title: str) -> Dict[str, int]:
     
     ethics_score = 0
     if any(term in combined for term in ['ethics', 'ethical', 'bias']) and any(term in combined for term in ['ai', 'algorithm']):
-        ethics_score = 35  # Base score for AI ethics content
+        # Matured scoring - more stringent criteria
+        ethics_score = 25  # Reduced base score for AI ethics content
         
-        # Core ethics indicators
-        ethics_score += sum(6 for indicator in ethics_indicators if indicator in combined)
+        # Core ethics indicators - require multiple indicators for higher scores
+        ethics_count = sum(1 for indicator in ethics_indicators if indicator in combined)
+        if ethics_count >= 3:
+            ethics_score += ethics_count * 5  # Reward comprehensive coverage
+        elif ethics_count >= 1:
+            ethics_score += ethics_count * 3  # Lower reward for limited coverage
         
-        # Advanced bias mitigation
-        ethics_score += sum(8 for indicator in bias_mitigation if indicator in combined)
+        # Advanced bias mitigation - stricter requirements
+        bias_count = sum(1 for indicator in bias_mitigation if indicator in combined)
+        if bias_count >= 2:
+            ethics_score += bias_count * 7  # High value for actual bias solutions
         
-        # Transparency and explainability
-        ethics_score += sum(7 for indicator in transparency_concepts if indicator in combined)
+        # Transparency and explainability - implementation focus
+        transparency_count = sum(1 for indicator in transparency_concepts if indicator in combined)
+        if transparency_count >= 2:
+            ethics_score += transparency_count * 6
         
-        # Governance frameworks
-        ethics_score += sum(9 for indicator in governance_frameworks if indicator in combined)
+        # Governance frameworks - require concrete frameworks
+        governance_count = sum(1 for indicator in governance_frameworks if indicator in combined)
+        if governance_count >= 1:
+            ethics_score += governance_count * 8
         
-        # Human oversight mechanisms
-        ethics_score += sum(8 for indicator in human_oversight if indicator in combined)
+        # Human oversight mechanisms - critical for high scores
+        oversight_count = sum(1 for indicator in human_oversight if indicator in combined)
+        if oversight_count >= 1:
+            ethics_score += oversight_count * 7
+        
+        # Maturity penalty for documents that only discuss ethics generally
+        # without specific technical implementations
+        if ('recommendation' in combined and 'implementation' not in combined and 
+            'technical' not in combined and 'system' not in combined):
+            ethics_score = max(0, ethics_score - 15)  # Reduce score for policy-only documents
     
     scores['ai_ethics'] = min(100, ethics_score) if ethics_score > 0 else 0
     
