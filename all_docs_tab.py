@@ -116,37 +116,55 @@ from utils.direct_db import get_db_connection
 def calculate_database_averages():
     """Calculate dynamic averages from database for NORM comparison"""
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        # Simplified version that uses the documents cache
+        from utils.db import fetch_documents
+        docs = fetch_documents()
         
-        # Get averages for each scoring type
-        cursor.execute("""
-            SELECT 
-                AVG(CAST(REGEXP_REPLACE(ai_cybersecurity_score, '[^0-9]', '', 'g') AS INTEGER)) as ai_cyber_avg,
-                AVG(CAST(REGEXP_REPLACE(quantum_cybersecurity_score, '[^0-9]', '', 'g') AS INTEGER)) as q_cyber_avg,
-                AVG(CAST(REGEXP_REPLACE(ai_ethics_score, '[^0-9]', '', 'g') AS INTEGER)) as ai_ethics_avg,
-                AVG(CAST(REGEXP_REPLACE(quantum_ethics_score, '[^0-9]', '', 'g') AS INTEGER)) as q_ethics_avg,
-                COUNT(*) as total_docs
-            FROM documents 
-            WHERE ai_cybersecurity_score IS NOT NULL 
-            AND quantum_cybersecurity_score IS NOT NULL
-            AND ai_ethics_score IS NOT NULL 
-            AND quantum_ethics_score IS NOT NULL
-        """)
-        
-        result = cursor.fetchone()
-        conn.close()
-        
-        if result and result[4] > 0:  # total_docs > 0
-            return {
-                'ai_cyber_avg': round(result[0] or 0, 1),
-                'q_cyber_avg': round(result[1] or 0, 1), 
-                'ai_ethics_avg': round(result[2] or 0, 1),
-                'q_ethics_avg': round(result[3] or 0, 1),
-                'total_docs': result[4]
-            }
-        else:
+        if not docs:
             return None
+            
+        ai_cyber_scores = []
+        q_cyber_scores = []
+        ai_ethics_scores = []
+        q_ethics_scores = []
+        
+        for doc in docs:
+            # Extract numeric values from scores
+            ai_cyber = doc.get('ai_cybersecurity_score', '')
+            if ai_cyber and ai_cyber != 'N/A':
+                try:
+                    ai_cyber_scores.append(int(str(ai_cyber).split('/')[0]))
+                except:
+                    pass
+                    
+            q_cyber = doc.get('quantum_cybersecurity_score', '')
+            if q_cyber and q_cyber != 'N/A':
+                try:
+                    q_cyber_scores.append(int(str(q_cyber).replace('Tier ', '')))
+                except:
+                    pass
+                    
+            ai_ethics = doc.get('ai_ethics_score', '')
+            if ai_ethics and ai_ethics != 'N/A':
+                try:
+                    ai_ethics_scores.append(int(str(ai_ethics).split('/')[0]))
+                except:
+                    pass
+                    
+            q_ethics = doc.get('quantum_ethics_score', '')
+            if q_ethics and q_ethics != 'N/A':
+                try:
+                    q_ethics_scores.append(int(str(q_ethics).split('/')[0]))
+                except:
+                    pass
+        
+        return {
+            'ai_cyber_avg': round(sum(ai_cyber_scores) / len(ai_cyber_scores), 1) if ai_cyber_scores else 0,
+            'q_cyber_avg': round(sum(q_cyber_scores) / len(q_cyber_scores), 1) if q_cyber_scores else 0,
+            'ai_ethics_avg': round(sum(ai_ethics_scores) / len(ai_ethics_scores), 1) if ai_ethics_scores else 0,
+            'q_ethics_avg': round(sum(q_ethics_scores) / len(q_ethics_scores), 1) if q_ethics_scores else 0,
+            'total_docs': len(docs)
+        }
             
     except Exception as e:
         print(f"Error calculating database averages: {e}")
@@ -4717,37 +4735,43 @@ def render_card_view(docs):
                         'title': 'AI Cybersecurity Analysis',
                         'score': '{ai_cyber_display}',
                         'analysis': '{ai_cyber_analysis_js}',
-                        'color': '{ai_cyber_color}'
+                        'color': '{ai_cyber_color}',
+                        'norm': '{ai_cyber_norm_js}'
                     }},
                     'q_cyber': {{
                         'title': 'Quantum Cybersecurity Analysis',
                         'score': '{q_cyber_display}',
                         'analysis': '{q_cyber_analysis_js}',
-                        'color': '{q_cyber_color}'
+                        'color': '{q_cyber_color}',
+                        'norm': '{q_cyber_norm_js}'
                     }},
                     'ai_ethics': {{
                         'title': 'AI Ethics Analysis',
                         'score': '{ai_ethics_display}',
                         'analysis': '{ai_ethics_analysis_js}',
-                        'color': '{ai_ethics_color}'
+                        'color': '{ai_ethics_color}',
+                        'norm': '{ai_ethics_norm_js}'
                     }},
                     'q_ethics': {{
                         'title': 'Quantum Ethics Analysis',
                         'score': '{q_ethics_display}',
                         'analysis': '{q_ethics_analysis_js}',
-                        'color': '{q_ethics_color}'
+                        'color': '{q_ethics_color}',
+                        'norm': '{q_ethics_norm_js}'
                     }},
                     'preview': {{
                         'title': 'Content Preview',
                         'score': 'N/A',
                         'analysis': '{preview_content_js}',
-                        'color': '#666'
+                        'color': '#666',
+                        'norm': ''
                     }},
                     'translate': {{
                         'title': 'Document Translation',
                         'score': 'N/A',
                         'analysis': 'Translation features coming soon.',
-                        'color': '#666'
+                        'color': '#666',
+                        'norm': ''
                     }}
                 }};
                 
