@@ -87,28 +87,33 @@ class DatabaseManager:
                 full_content = row.get('content', '') or row.get('text_content', '')
                 
                 if full_content and len(full_content) > 200:
-                    # Create preview from full content
-                    import re
-                    clean_preview = re.sub(r'<[^>]+>', '', full_content)  # Remove HTML
-                    clean_preview = re.sub(r'\*+', '', clean_preview)     # Remove asterisks
-                    clean_preview = re.sub(r'#+\s*', '', clean_preview)   # Remove headers
-                    clean_preview = re.sub(r'[-_]{3,}', '', clean_preview) # Remove dividers
-                    clean_preview = re.sub(r'\s+', ' ', clean_preview).strip()
-                    
-                    # Extract meaningful sentences
-                    sentences = re.split(r'[.!?]+', clean_preview)
-                    meaningful_text = []
-                    for sentence in sentences[:3]:  # First 3 sentences
-                        sentence = sentence.strip()
-                        if len(sentence) > 30:  # Skip very short fragments
-                            meaningful_text.append(sentence)
-                    
-                    if meaningful_text:
-                        content_preview = '. '.join(meaningful_text) + '.'
-                        if len(content_preview) > 350:
-                            content_preview = content_preview[:350] + '...'
-                    else:
-                        content_preview = clean_preview[:350] + '...' if len(clean_preview) > 350 else clean_preview
+                    # Generate intelligent AI-powered preview
+                    try:
+                        from utils.intelligent_preview import generate_intelligent_preview
+                        title = row.get('title', 'Untitled Document')
+                        content_preview = generate_intelligent_preview(title, full_content)
+                    except Exception as e:
+                        # Fallback to sentence extraction
+                        import re
+                        clean_preview = re.sub(r'<[^>]+>', '', full_content)
+                        clean_preview = re.sub(r'\*+', '', clean_preview)
+                        clean_preview = re.sub(r'#+\s*', '', clean_preview)
+                        clean_preview = re.sub(r'[-_]{3,}', '', clean_preview)
+                        clean_preview = re.sub(r'\s+', ' ', clean_preview).strip()
+                        
+                        sentences = re.split(r'[.!?]+', clean_preview)
+                        meaningful_text = []
+                        for sentence in sentences[:3]:
+                            sentence = sentence.strip()
+                            if len(sentence) > 30:
+                                meaningful_text.append(sentence)
+                        
+                        if meaningful_text:
+                            content_preview = '. '.join(meaningful_text) + '.'
+                            if len(content_preview) > 350:
+                                content_preview = content_preview[:350] + '...'
+                        else:
+                            content_preview = clean_preview[:350] + '...' if len(clean_preview) > 350 else clean_preview
                 elif raw_preview:
                     # Clean existing preview
                     import re
