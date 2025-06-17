@@ -3230,7 +3230,16 @@ def render_compact_cards(docs):
             pub_date = clean_date_safely(doc)
             
             doc_type = ultra_clean_metadata(doc.get('document_type', 'Unknown'))
-            content_preview = ultra_clean_metadata(doc.get('content_preview', 'No preview available') or 'No preview available')
+            
+            # Force regenerate enhanced content preview
+            if raw_content and len(raw_content) > 100:
+                try:
+                    from utils.intelligent_preview import generate_intelligent_preview
+                    content_preview = generate_intelligent_preview(title, raw_content)
+                except Exception:
+                    content_preview = ultra_clean_metadata(doc.get('content_preview', 'No preview available') or 'No preview available')
+            else:
+                content_preview = ultra_clean_metadata(doc.get('content_preview', 'No preview available') or 'No preview available')
             
             # Use smart caching system for maximum performance
             from utils.smart_scoring import get_smart_scores, apply_topic_filtering
@@ -4305,7 +4314,17 @@ def render_card_view(docs):
             pub_date = clean_date_safely(doc)
             
             doc_type = ultra_clean_metadata(doc.get('document_type', 'Unknown'))
-            content_preview = ultra_clean_metadata(doc.get('content_preview', 'No preview available') or 'No preview available')
+            
+            # Force regenerate enhanced content preview for card view
+            raw_content = doc.get('clean_content', '') or doc.get('content', '') or doc.get('text_content', '')
+            if raw_content and len(raw_content) > 100:
+                try:
+                    from utils.intelligent_preview import generate_intelligent_preview
+                    content_preview = generate_intelligent_preview(title, raw_content)
+                except Exception:
+                    content_preview = ultra_clean_metadata(doc.get('content_preview', 'No preview available') or 'No preview available')
+            else:
+                content_preview = ultra_clean_metadata(doc.get('content_preview', 'No preview available') or 'No preview available')
             
             # Display metadata card without thumbnail (Card View)
             import html

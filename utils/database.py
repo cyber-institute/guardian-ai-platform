@@ -92,9 +92,7 @@ class DatabaseManager:
                         from utils.intelligent_preview import generate_intelligent_preview
                         title = row.get('title', 'Untitled Document')
                         content_preview = generate_intelligent_preview(title, full_content)
-                        print(f"Generated preview length: {len(content_preview)} for document: {title[:50]}")
                     except Exception as e:
-                        print(f"Preview generation error: {e}")
                         # Fallback to sentence extraction
                         import re
                         clean_preview = re.sub(r'<[^>]+>', '', full_content)
