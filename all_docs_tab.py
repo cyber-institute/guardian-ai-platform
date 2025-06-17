@@ -21,9 +21,9 @@ def fetch_documents_cached():
 def comprehensive_document_scoring_cached(content, title):
     """Cached version of comprehensive scoring to improve performance"""
     try:
-        from utils.fast_scoring import fast_comprehensive_scoring
-        # Use fast scoring system for better performance
-        return fast_comprehensive_scoring(content, title)
+        from utils.comprehensive_scoring import multi_llm_intelligent_scoring
+        # Use the patented multi-LLM Convergence AI synthesis engine
+        return multi_llm_intelligent_scoring(content, title)
     except Exception:
         # Fallback to basic scoring if needed
         return {
