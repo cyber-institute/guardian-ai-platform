@@ -11,7 +11,7 @@ help_tooltips = HelpTooltips()
 enhanced_scoring = EnhancedScoringDisplay()
 
 # Performance optimization: Enhanced caching with memory optimization
-@st.cache_data(ttl=900, max_entries=100)  # 15 minutes, limit entries
+@st.cache_data(ttl=60, max_entries=50)  # 1 minute cache for immediate updates
 def fetch_documents_cached():
     """Cached version of document fetching with memory optimization"""
     return fetch_documents()
@@ -1032,11 +1032,19 @@ def render():
         st.markdown('</div>', unsafe_allow_html=True)
     
     with view_col:
-        # Create container that aligns perfectly with Topic Filter baseline
-        st.markdown("""
-        <div style="display: flex; justify-content: flex-end; align-items: baseline; margin-top: -2.75rem; margin-bottom: 1.25rem;">
-        """, unsafe_allow_html=True)
-        display_mode = st.session_state.get("display_mode", "cards")
+        # Add refresh button to clear cache and show newly uploaded documents
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            if st.button("🔄 Refresh", help="Refresh to show newly uploaded documents"):
+                st.cache_data.clear()
+                st.rerun()
+        
+        with col2:
+            # Create container that aligns perfectly with Topic Filter baseline
+            st.markdown("""
+            <div style="display: flex; justify-content: flex-end; align-items: baseline; margin-top: -2.75rem; margin-bottom: 1.25rem;">
+            """, unsafe_allow_html=True)
+            display_mode = st.session_state.get("display_mode", "cards")
         display_mode = st.radio(
             "**View Mode:**",
             ["cards", "compact", "table", "grid", "minimal"],
@@ -1596,7 +1604,9 @@ def render():
                                     
                                     if save_result:
                                         st.success("Document processed successfully!")
-                                        st.info("Document added to collection. Refresh to see it in the list.")
+                                        st.info("Document added to collection.")
+                                        # Clear cache to show new document immediately
+                                        st.cache_data.clear()
                                         st.balloons()
                                     else:
                                         st.error("Failed to save document to database")
