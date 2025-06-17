@@ -1194,7 +1194,7 @@ def render():
     def show_global_scoring_modal():
         # Get current analysis info from session state
         for key in st.session_state.keys():
-            if key.startswith("show_analysis_doc_") and st.session_state[key]:
+            if isinstance(key, str) and key.startswith("show_analysis_doc_") and st.session_state[key]:
                 unique_id = key.replace("show_analysis_", "")
                 current_analysis = st.session_state[key]
                 
@@ -1359,14 +1359,14 @@ def render():
                 # Close button
                 if st.button("Close Analysis", key="close_modal", use_container_width=True):
                     for key in list(st.session_state.keys()):
-                        if key.startswith("show_analysis_") or key.startswith("modal_doc_data_"):
+                        if isinstance(key, str) and (key.startswith("show_analysis_") or key.startswith("modal_doc_data_")):
                             del st.session_state[key]
                     st.rerun()
                 
                 return  # Only show one modal at a time
     
     # Check if any modal should be shown (handle all view types)
-    should_show_modal = any(key.startswith("show_analysis_") and st.session_state.get(key) for key in st.session_state.keys())
+    should_show_modal = any(isinstance(key, str) and key.startswith("show_analysis_") and st.session_state.get(key) for key in st.session_state.keys())
     if should_show_modal:
         show_global_scoring_modal()
 
@@ -3175,7 +3175,10 @@ def render_compact_cards(docs):
                         computed_scores = comprehensive_document_scoring(raw_content, title)
                         # Cap computed scores at realistic ranges (30-80)
                         ai_cyber_computed = computed_scores.get('ai_cybersecurity', 45)
-                        scores['ai_cybersecurity'] = min(max(ai_cyber_computed, 25), 80)
+                        if ai_cyber_computed is not None:
+                            scores['ai_cybersecurity'] = min(max(ai_cyber_computed, 25), 80)
+                        else:
+                            scores['ai_cybersecurity'] = 45
                     except:
                         scores['ai_cybersecurity'] = 45  # Realistic default
             else:

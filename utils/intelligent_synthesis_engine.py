@@ -186,7 +186,7 @@ class IntelligentSynthesisEngine:
                 total_diversity += normalized_variance
                 comparisons += 1
         
-        return total_diversity / comparisons if comparisons > 0 else 0.0
+        return total_diversity / max(comparisons, 1) if comparisons > 0 else 0.0
     
     def _advanced_bayesian_synthesis(
         self, 
@@ -307,7 +307,7 @@ class IntelligentSynthesisEngine:
         # Weight clusters by size and confidence
         cluster_weights = {}
         for cluster_id, cluster_responses in response_clusters.items():
-            avg_confidence = sum(r['confidence'] for r in cluster_responses) / len(cluster_responses)
+            avg_confidence = sum(r['confidence'] for r in cluster_responses) / max(len(cluster_responses), 1)
             cluster_size_weight = len(cluster_responses) / len(responses)
             cluster_weights[cluster_id] = avg_confidence * cluster_size_weight
         
