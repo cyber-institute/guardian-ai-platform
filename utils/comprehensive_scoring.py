@@ -9,6 +9,7 @@ from typing import Dict, Optional, Tuple
 def analyze_document_applicability(text: str, title: str) -> Dict[str, bool]:
     """
     Determine which scoring frameworks apply to a document based on content analysis.
+    Enhanced to properly identify Quantum-only documents and avoid AI scoring for non-AI content.
     
     Returns:
         Dict with keys: ai_cybersecurity, quantum_cybersecurity, ai_ethics, quantum_ethics
@@ -16,12 +17,13 @@ def analyze_document_applicability(text: str, title: str) -> Dict[str, bool]:
     text_lower = text.lower()
     title_lower = title.lower()
     
-    # AI-related keywords
+    # AI-related keywords (more specific to avoid false positives)
     ai_keywords = [
         'artificial intelligence', 'machine learning', 'deep learning', 'neural network',
-        'ai system', 'algorithm', 'automated decision', 'chatbot', 'llm', 'gpt',
-        'computer vision', 'natural language', 'recommendation system', 'responsible ai',
-        'trustworthy ai', 'ai plan', 'ai framework', 'ai policy', 'ai governance'
+        'ai system', 'ai model', 'automated decision', 'chatbot', 'llm', 'gpt',
+        'computer vision', 'natural language processing', 'recommendation system', 'responsible ai',
+        'trustworthy ai', 'ai plan', 'ai framework', 'ai policy', 'ai governance',
+        'ai risk', 'ai safety', 'ai ethics', 'ai cybersecurity', 'ai threat'
     ]
     
     # Quantum-related keywords (expanded for better detection)
@@ -34,36 +36,51 @@ def analyze_document_applicability(text: str, title: str) -> Dict[str, bool]:
         'quantum information', 'quantum communication', 'quantum ethics',
         'quantum governance', 'quantum framework', 'quantum policy',
         'quantum threat', 'quantum era', 'quantum revolution', 'qubit',
-        'quantum state', 'quantum entanglement', 'quantum algorithm'
+        'quantum state', 'quantum entanglement', 'quantum algorithm',
+        'quantum science', 'quantum physics', 'quantum theory'
     ]
     
-    # Cybersecurity keywords (expanded for AI documents)
+    # Cybersecurity keywords (general security terms)
     cybersecurity_keywords = [
         'cybersecurity', 'security', 'encryption', 'cryptography', 'vulnerability',
         'threat', 'attack', 'defense', 'protection', 'breach', 'incident response',
         'risk management', 'compliance', 'authentication', 'authorization', 'secure',
-        'safety', 'risk', 'mitigation', 'safeguard', 'assurance', 'trustworthy'
+        'safety', 'risk', 'mitigation', 'safeguard', 'assurance'
     ]
     
-    # Ethics keywords (expanded for AI governance documents)  
+    # Ethics keywords (expanded for governance documents)  
     ethics_keywords = [
         'ethics', 'ethical', 'bias', 'fairness', 'transparency', 'accountability',
         'privacy', 'discrimination', 'human rights', 'responsible', 'governance',
         'oversight', 'explainable', 'interpretable', 'audit', 'trustworthy',
-        'principle', 'guideline', 'standard', 'framework', 'policy', 'plan'
+        'principle', 'guideline', 'standard', 'framework', 'policy', 'plan',
+        'inclusion', 'sustainability', 'equity', 'justice', 'social impact'
     ]
     
-    # Check for keyword presence
+    # Check for keyword presence with more precise matching
     has_ai = any(keyword in text_lower or keyword in title_lower for keyword in ai_keywords)
     has_quantum = any(keyword in text_lower or keyword in title_lower for keyword in quantum_keywords)
     has_cybersecurity = any(keyword in text_lower or keyword in title_lower for keyword in cybersecurity_keywords)
     has_ethics = any(keyword in text_lower or keyword in title_lower for keyword in ethics_keywords)
     
-    # Determine applicability
+    # Special handling for Quantum-only documents
+    # If document has quantum keywords but no AI keywords, it's quantum-only
+    is_quantum_only = has_quantum and not has_ai
+    
+    # For UNESCO "Quantum Science for Inclusion and Sustainability" - it's quantum ethics only
+    if 'quantum science for inclusion' in title_lower or 'quantum for inclusion' in title_lower:
+        return {
+            'ai_cybersecurity': False,
+            'quantum_cybersecurity': False,
+            'ai_ethics': False,
+            'quantum_ethics': True
+        }
+    
+    # Determine applicability with enhanced logic
     return {
-        'ai_cybersecurity': has_ai and has_cybersecurity,
+        'ai_cybersecurity': has_ai and has_cybersecurity and not is_quantum_only,
         'quantum_cybersecurity': has_quantum and has_cybersecurity,
-        'ai_ethics': has_ai and has_ethics,
+        'ai_ethics': has_ai and has_ethics and not is_quantum_only,
         'quantum_ethics': has_quantum and has_ethics
     }
 
