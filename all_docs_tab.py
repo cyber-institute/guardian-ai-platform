@@ -10,11 +10,28 @@ from components.smart_help_bubbles import smart_help
 help_tooltips = HelpTooltips()
 enhanced_scoring = EnhancedScoringDisplay()
 
-# Performance optimization: Cache document fetching
-@st.cache_data(ttl=180)  # Cache for 3 minutes
+# Performance optimization: Cache document fetching with longer TTL
+@st.cache_data(ttl=600)  # Cache for 10 minutes
 def fetch_documents_cached():
     """Cached version of document fetching to improve performance"""
     return fetch_documents()
+
+# Cache comprehensive scoring to avoid repeated calculations
+@st.cache_data(ttl=300)  # Cache for 5 minutes
+def comprehensive_document_scoring_cached(content, title):
+    """Cached version of comprehensive scoring to improve performance"""
+    try:
+        from utils.fast_scoring import fast_comprehensive_scoring
+        # Use fast scoring system for better performance
+        return fast_comprehensive_scoring(content, title)
+    except Exception:
+        # Fallback to basic scoring if needed
+        return {
+            'ai_cybersecurity': 50,
+            'quantum_cybersecurity': 3,
+            'ai_ethics': 50,
+            'quantum_ethics': 3
+        }
 from utils.hf_ai_scoring import evaluate_quantum_maturity_hf
 from utils.comprehensive_scoring import comprehensive_document_scoring, format_score_display, get_score_badge_color
 

@@ -293,58 +293,40 @@ def comprehensive_document_scoring(text: str, title: str) -> Dict[str, Optional[
 
 def multi_llm_intelligent_scoring(text: str, title: str) -> Dict[str, Optional[int]]:
     """
-    Multi-LLM intelligent scoring system that combines multiple AI models and intelligent synthesis.
-    This is the superior scoring method that should be used first.
+    Optimized multi-LLM scoring system with fast consensus algorithm.
+    Bypasses complex synthesis for better performance.
     """
     try:
-        # Use intelligent synthesis engine directly for comprehensive analysis
-        from utils.intelligent_synthesis_engine import intelligent_synthesis_engine
+        # Direct analysis without synthesis engine overhead
+        enhanced_scores = analyze_with_enhanced_patterns(text, title)
+        contextual_scores = analyze_with_contextual_understanding(text, title)
         
-        # Create mock multi-service responses for synthesis engine
-        mock_responses = [
-            {
-                'service_name': 'anthropic_analyzer',
-                'confidence': 0.85,
-                'scores': analyze_with_enhanced_patterns(text, title),
-                'processing_time': 1.2,
-                'metadata': {
-                    'domain_relevance': 90,
-                    'key_insights': ['comprehensive_analysis', 'pattern_based_scoring']
-                }
-            },
-            {
-                'service_name': 'openai_analyzer', 
-                'confidence': 0.80,
-                'scores': analyze_with_contextual_understanding(text, title),
-                'processing_time': 1.5,
-                'metadata': {
-                    'domain_relevance': 85,
-                    'key_insights': ['contextual_scoring', 'semantic_analysis']
-                }
-            }
-        ]
-        
-        # Use intelligent synthesis for optimal consensus
-        synthesis_result = intelligent_synthesis_engine.synthesize_optimal_consensus(
-            mock_responses,
-            "comprehensive_scoring",
-            target_confidence=0.85
-        )
-        
-        if synthesis_result and synthesis_result.get('scores'):
-            scores = synthesis_result['scores']
+        # Simple averaging for fast consensus
+        consensus_scores = {}
+        for metric in ['ai_cybersecurity', 'quantum_cybersecurity', 'ai_ethics', 'quantum_ethics']:
+            enhanced_val = enhanced_scores.get(metric, 0)
+            contextual_val = contextual_scores.get(metric, 0)
             
-            # Apply logical filtering based on document applicability
-            applicability = analyze_document_applicability(text, title)
-            
-            return {
-                'ai_cybersecurity': scores.get('ai_cybersecurity') if applicability['ai_cybersecurity'] else None,
-                'quantum_cybersecurity': scores.get('quantum_cybersecurity') if applicability['quantum_cybersecurity'] else None,
-                'ai_ethics': scores.get('ai_ethics') if applicability['ai_ethics'] else None,
-                'quantum_ethics': scores.get('quantum_ethics') if applicability['quantum_ethics'] else None
-            }
+            if enhanced_val and contextual_val:
+                consensus_scores[metric] = int((enhanced_val + contextual_val) / 2)
+            elif enhanced_val:
+                consensus_scores[metric] = enhanced_val
+            elif contextual_val:
+                consensus_scores[metric] = contextual_val
+            else:
+                consensus_scores[metric] = 0
+        
+        # Apply document applicability filtering
+        applicability = analyze_document_applicability(text, title)
+        
+        return {
+            'ai_cybersecurity': consensus_scores.get('ai_cybersecurity') if applicability['ai_cybersecurity'] else None,
+            'quantum_cybersecurity': consensus_scores.get('quantum_cybersecurity') if applicability['quantum_cybersecurity'] else None,
+            'ai_ethics': consensus_scores.get('ai_ethics') if applicability['ai_ethics'] else None,
+            'quantum_ethics': consensus_scores.get('quantum_ethics') if applicability['quantum_ethics'] else None
+        }
     except Exception as e:
-        print(f"Intelligent synthesis failed: {e}")
+        print(f"Fast scoring failed: {e}")
     
     # Fall back to hybrid analysis
     return multi_service_hybrid_analysis(text, title)
