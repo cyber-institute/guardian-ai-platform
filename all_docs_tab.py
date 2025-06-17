@@ -3247,16 +3247,7 @@ def render_compact_cards(docs):
                     # Use database score as-is without artificial inflation
                     scores['ai_ethics'] = raw_scores['ai_ethics']
                 else:
-                    try:
-                        computed_scores = comprehensive_document_scoring(raw_content, title)
-                        # Cap computed scores at realistic ranges (30-80)
-                        ai_ethics_computed = computed_scores.get('ai_ethics', 50)
-                        if ai_ethics_computed is not None:
-                            scores['ai_ethics'] = min(max(ai_ethics_computed, 30), 80)
-                        else:
-                            scores['ai_ethics'] = 50
-                    except:
-                        scores['ai_ethics'] = 50  # Realistic default
+                    scores['ai_ethics'] = 'N/A'
             else:
                 scores['ai_ethics'] = 'N/A'
             
@@ -3265,17 +3256,8 @@ def render_compact_cards(docs):
                     # Use existing DB score as-is
                     quantum_score = raw_scores['quantum_cybersecurity']
                 else:
-                    # Generate realistic score for quantum documents
-                    try:
-                        computed_scores = comprehensive_document_scoring(raw_content, title)
-                        # Cap at realistic ranges (30-75 for quantum docs)
-                        quantum_computed = computed_scores.get('quantum_cybersecurity', 45)
-                        if quantum_computed is not None:
-                            quantum_score = min(max(quantum_computed, 30), 75)
-                        else:
-                            quantum_score = 45
-                    except:
-                        quantum_score = 45  # Realistic default
+                    # Use database value or N/A for fast loading
+                    quantum_score = 2  # Default tier
                 
                 # Convert to tier system (1-5) with realistic thresholds
                 if quantum_score >= 70:
@@ -3514,11 +3496,7 @@ def render_grid_view(docs):
                     ai_ethics_score = min(raw_scores['ai_ethics'] + 12, 100)
                     scores['ai_ethics'] = max(ai_ethics_score, 85) if ai_ethics_score > 65 else ai_ethics_score
                 else:
-                    try:
-                        computed_scores = comprehensive_document_scoring(content, title)
-                        scores['ai_ethics'] = computed_scores.get('ai_ethics', 70)
-                    except:
-                        scores['ai_ethics'] = 70
+                    scores['ai_ethics'] = 'N/A'
             else:
                 scores['ai_ethics'] = 'N/A'
             
@@ -3526,11 +3504,7 @@ def render_grid_view(docs):
                 if raw_scores['quantum_cybersecurity'] and raw_scores['quantum_cybersecurity'] > 0:
                     quantum_score = raw_scores['quantum_cybersecurity']
                 else:
-                    try:
-                        computed_scores = comprehensive_document_scoring(content, title)
-                        quantum_score = computed_scores.get('quantum_cybersecurity', 65)
-                    except:
-                        quantum_score = 65
+                    quantum_score = 2  # Default tier
                 
                 if quantum_score is not None and quantum_score >= 85:
                     scores['quantum_cybersecurity'] = 4
@@ -3550,11 +3524,7 @@ def render_grid_view(docs):
                     quantum_ethics_score = min(raw_scores['quantum_ethics'] + 10, 100)
                     scores['quantum_ethics'] = max(quantum_ethics_score, 85) if quantum_ethics_score > 70 else quantum_ethics_score
                 else:
-                    try:
-                        computed_scores = comprehensive_document_scoring(content, title)
-                        scores['quantum_ethics'] = computed_scores.get('quantum_ethics', 68)
-                    except:
-                        scores['quantum_ethics'] = 68
+                    scores['quantum_ethics'] = 'N/A'
             else:
                 scores['quantum_ethics'] = 'N/A'
             
