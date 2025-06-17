@@ -1566,74 +1566,94 @@ def render():
                                 basic_metadata = result.get('metadata', {})
                                 
                                 if len(content.strip()) > 50:
-                                    st.info("Applying enhanced metadata extraction...")
+                                    st.info("Checking for duplicate documents...")
                                     
-                                    # Use enhanced OCR metadata extraction
+                                    # Import required modules
                                     from utils.enhanced_ocr_metadata import extract_enhanced_metadata_from_content
                                     from utils.comprehensive_scoring import comprehensive_document_scoring
                                     from utils.database import db_manager
                                     import uuid
+                                    import hashlib
                                     
-                                    # Apply enhanced metadata extraction
-                                    enhanced_metadata = extract_enhanced_metadata_from_content(content, basic_metadata)
+                                    # Check for duplicates by content hash
+                                    content_hash = hashlib.md5(content.encode()).hexdigest()
+                                    existing_docs = db_manager.fetch_documents()
                                     
-                                    title = enhanced_metadata.get('title', uploaded_file.name)
-                                    organization = enhanced_metadata.get('author_organization', 'Unknown')
-                                    doc_type = enhanced_metadata.get('document_type', result.get('file_type', 'Document'))
-                                    pub_date = enhanced_metadata.get('publish_date', None)
+                                    is_duplicate = False
+                                    for doc in existing_docs:
+                                        if doc.get('content'):
+                                            existing_hash = hashlib.md5(doc['content'].encode()).hexdigest()
+                                            if existing_hash == content_hash:
+                                                is_duplicate = True
+                                                st.warning(f"Duplicate document detected! This document already exists as: {doc.get('title', 'Unknown')}")
+                                                break
                                     
-                                    # Set author based on organization for institutional documents
-                                    if organization != 'Unknown':
-                                        author = organization
+                                    if is_duplicate:
+                                        st.error("Upload cancelled - document already exists in repository")
                                     else:
-                                        author = basic_metadata.get('author', 'Unknown')
-                                    
-                                    st.success(f"Enhanced metadata extracted:")
-                                    st.info(f"Title: {title}")
-                                    st.info(f"Organization: {organization}")
-                                    st.info(f"Type: {doc_type}")
-                                    st.info(f"Author: {author}")
-                                    
-                                    st.info("Calculating comprehensive scores...")
-                                    
-                                    # Generate scores
-                                    scores = comprehensive_document_scoring(content, title)
-                                    st.info(f"Scoring complete: AI={scores.get('ai_cybersecurity', 0)}, Quantum={scores.get('quantum_cybersecurity', 0)}")
-                                    
-                                    # Prepare document data
-                                    doc_id = str(uuid.uuid4())
-                                    document_data = {
-                                        'id': doc_id,
-                                        'title': title,
-                                        'content': content,
-                                        'clean_content': content,
-                                        'text_content': content,
-                                        'document_type': doc_type,
-                                        'author': author,
-                                        'author_organization': organization,
-                                        'organization': organization,
-                                        'publish_date': pub_date,
-                                        'publication_date': pub_date,
-                                        'filename': uploaded_file.name,
-                                        'ai_cybersecurity_score': scores.get('ai_cybersecurity', 0),
-                                        'quantum_cybersecurity_score': scores.get('quantum_cybersecurity', 0),
-                                        'ai_ethics_score': scores.get('ai_ethics', 0),
-                                        'quantum_ethics_score': scores.get('quantum_ethics', 0),
-                                        'extraction_method': 'FILE_ENHANCED_OCR'
-                                    }
-                                    
-                                    st.info("Saving document to database...")
-                                    save_result = db_manager.save_document(document_data)
-                                    
-                                    if save_result:
-                                        st.success("Document processed successfully!")
-                                        st.info("Document added to collection with enhanced metadata.")
-                                        # Clear cache to show new document immediately
-                                        if hasattr(st, 'cache_data'):
-                                            st.cache_data.clear()
-                                        st.rerun()
-                                    else:
-                                        st.error("Failed to save document to database")
+                                        st.success("Document is unique - proceeding with processing")
+                                        st.info("Applying enhanced metadata extraction...")
+                                        
+                                        # Apply enhanced metadata extraction
+                                        enhanced_metadata = extract_enhanced_metadata_from_content(content, basic_metadata)
+                                        
+                                        title = enhanced_metadata.get('title', uploaded_file.name)
+                                        organization = enhanced_metadata.get('author_organization', 'Unknown')
+                                        doc_type = enhanced_metadata.get('document_type', result.get('file_type', 'Document'))
+                                        pub_date = enhanced_metadata.get('publish_date', None)
+                                        
+                                        # Set author based on organization for institutional documents
+                                        if organization != 'Unknown':
+                                            author = organization
+                                        else:
+                                            author = basic_metadata.get('author', 'Unknown')
+                                        
+                                        st.success(f"Enhanced metadata extracted:")
+                                        st.info(f"Title: {title}")
+                                        st.info(f"Organization: {organization}")
+                                        st.info(f"Type: {doc_type}")
+                                        st.info(f"Author: {author}")
+                                        
+                                        st.info("Calculating comprehensive scores...")
+                                        
+                                        # Generate scores
+                                        scores = comprehensive_document_scoring(content, title)
+                                        st.info(f"Scoring complete: AI={scores.get('ai_cybersecurity', 0)}, Quantum={scores.get('quantum_cybersecurity', 0)}")
+                                        
+                                        # Prepare document data
+                                        doc_id = str(uuid.uuid4())
+                                        document_data = {
+                                            'id': doc_id,
+                                            'title': title,
+                                            'content': content,
+                                            'clean_content': content,
+                                            'text_content': content,
+                                            'document_type': doc_type,
+                                            'author': author,
+                                            'author_organization': organization,
+                                            'organization': organization,
+                                            'publish_date': pub_date,
+                                            'publication_date': pub_date,
+                                            'filename': uploaded_file.name,
+                                            'ai_cybersecurity_score': scores.get('ai_cybersecurity', 0),
+                                            'quantum_cybersecurity_score': scores.get('quantum_cybersecurity', 0),
+                                            'ai_ethics_score': scores.get('ai_ethics', 0),
+                                            'quantum_ethics_score': scores.get('quantum_ethics', 0),
+                                            'extraction_method': 'FILE_ENHANCED_OCR'
+                                        }
+                                        
+                                        st.info("Saving document to database...")
+                                        save_result = db_manager.save_document(document_data)
+                                        
+                                        if save_result:
+                                            st.success("Document processed successfully!")
+                                            st.info("Document added to collection with enhanced metadata.")
+                                            # Clear cache to show new document immediately
+                                            if hasattr(st, 'cache_data'):
+                                                st.cache_data.clear()
+                                            st.rerun()
+                                        else:
+                                            st.error("Failed to save document to database")
                                 else:
                                     st.error("Could not extract sufficient content from file")
                             else:
