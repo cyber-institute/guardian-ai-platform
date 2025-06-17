@@ -15,9 +15,32 @@ class URLContentExtractor:
     
     def __init__(self):
         self.session = requests.Session()
+        # Advanced human-like headers to bypass automation detection
         self.session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'DNT': '1',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1',
+            'Cache-Control': 'max-age=0'
         })
+        
+        # Additional session configuration for better compatibility
+        self.session.max_redirects = 10
+        
+        # User agents pool for rotation
+        self.user_agents = [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15'
+        ]
     
     def extract_from_url(self, url: str) -> Dict[str, any]:
         """Extract content, metadata, and generate document info from URL"""
@@ -28,9 +51,8 @@ class URLContentExtractor:
             if not parsed_url.scheme or not parsed_url.netloc:
                 return self._error_result("Invalid URL format")
             
-            # Fetch the webpage
-            response = self.session.get(url, timeout=30)
-            response.raise_for_status()
+            # Fetch the webpage with human-like behavior
+            response = self._fetch_with_human_behavior(url)
             
             # Extract content using trafilatura with enhanced fallback methods
             text_content = trafilatura.extract(response.text, include_comments=False, include_tables=True)
@@ -318,6 +340,199 @@ class URLContentExtractor:
                 return ' '.join(tiktok_content)
         
         return fallback_text
+    
+    def _fetch_with_human_behavior(self, url: str):
+        """Fetch URL with human-like behavior to bypass automation detection"""
+        import random
+        
+        # Rotate user agent
+        user_agent = random.choice(self.user_agents)
+        self.session.headers.update({'User-Agent': user_agent})
+        
+        # Add random delay to mimic human browsing
+        time.sleep(random.uniform(1, 3))
+        
+        # Site-specific handling for known problematic sites
+        parsed_url = urlparse(url)
+        domain = parsed_url.netloc.lower()
+        
+        # UNESCO specific handling
+        if 'unesco.org' in domain:
+            return self._fetch_unesco_document(url)
+        
+        # Add referer header for more realistic requests
+        if 'gov' in domain:
+            self.session.headers.update({
+                'Referer': f"https://{domain}/",
+                'Origin': f"https://{domain}"
+            })
+        
+        # Try multiple approaches for difficult sites
+        for attempt in range(3):
+            try:
+                # Method 1: Standard request
+                response = self.session.get(url, timeout=30, allow_redirects=True)
+                
+                # Check for access denied or automation detection
+                if response.status_code == 403 or 'access denied' in response.text.lower() or 'automated' in response.text.lower():
+                    if attempt < 2:  # Try alternative methods
+                        time.sleep(random.uniform(2, 5))
+                        continue
+                    else:
+                        # Method 2: Try with different headers
+                        self.session.headers.update({
+                            'Sec-Fetch-Site': 'same-origin',
+                            'Sec-Fetch-Mode': 'cors',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        })
+                        response = self.session.get(url, timeout=30)
+                
+                response.raise_for_status()
+                return response
+                
+            except requests.exceptions.RequestException as e:
+                if attempt == 2:  # Last attempt
+                    raise e
+                time.sleep(random.uniform(2, 4))
+        
+        raise requests.exceptions.RequestException("All fetch attempts failed")
+    
+    def _fetch_unesco_document(self, url: str):
+        """Advanced handling for UNESCO documents with multiple bypass strategies"""
+        
+        # Strategy 1: Try with cloudscraper (bypass Cloudflare)
+        try:
+            import cloudscraper
+            scraper = cloudscraper.create_scraper(
+                browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True}
+            )
+            response = scraper.get(url, timeout=30)
+            response.raise_for_status()
+            return response
+        except ImportError:
+            pass  # cloudscraper not available
+        except Exception:
+            pass  # Try next strategy
+        
+        # Strategy 2: Multi-step session with realistic browsing pattern
+        unesco_session = requests.Session()
+        
+        # Set comprehensive browser headers
+        unesco_session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate', 
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1',
+            'sec-ch-ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"'
+        })
+        
+        try:
+            # Step 1: Visit main UNESCO site first
+            unesco_session.get('https://unesdoc.unesco.org/', timeout=15)
+            time.sleep(2)
+            
+            # Step 2: Visit a search page to appear more human-like
+            search_url = 'https://unesdoc.unesco.org/search'
+            unesco_session.get(search_url, timeout=15)
+            time.sleep(1)
+            
+            # Step 3: Add referer header and try document
+            unesco_session.headers['Referer'] = 'https://unesdoc.unesco.org/search'
+            response = unesco_session.get(url, timeout=30, allow_redirects=True)
+            
+            if response.status_code == 200:
+                return response
+            
+        except Exception:
+            pass
+        
+        # Strategy 3: Alternative UNESCO URL patterns
+        if '/ark:/' in url:
+            # Try alternative URL formats
+            alternatives = [
+                url.replace('/ark:/', '/ark:/48223/'),
+                url + '.pdf',
+                url + '/PDF/' + url.split('/')[-1] + 'eng.pdf.multi'
+            ]
+            
+            for alt_url in alternatives:
+                try:
+                    response = unesco_session.get(alt_url, timeout=20)
+                    if response.status_code == 200 and len(response.content) > 1000:
+                        return response
+                except:
+                    continue
+        
+        # Strategy 4: Use requests-html for JavaScript rendering
+        try:
+            from requests_html import HTMLSession
+            session = HTMLSession()
+            r = session.get(url)
+            r.html.render(timeout=20)  # This will execute JavaScript
+            
+            # Create mock response
+            class MockResponse:
+                def __init__(self, content):
+                    self.text = content
+                    self.status_code = 200
+                def raise_for_status(self):
+                    pass
+            
+            return MockResponse(r.html.html)
+            
+        except ImportError:
+            pass
+        except Exception:
+            pass
+        
+        # Strategy 5: Direct PDF fetch attempt
+        if not url.endswith('.pdf'):
+            pdf_variants = [
+                url + '.pdf',
+                url.replace('/ark:/', '/ark:/48223/pf0000') + '.pdf',
+                url + '/PDF/' + url.split('/')[-1] + 'eng.pdf'
+            ]
+            
+            for pdf_url in pdf_variants:
+                try:
+                    response = requests.get(pdf_url, headers={
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    }, timeout=20)
+                    
+                    if response.status_code == 200 and response.headers.get('content-type', '').startswith('application/pdf'):
+                        # For PDF files, extract text using PyPDF2
+                        try:
+                            import PyPDF2
+                            from io import BytesIO
+                            
+                            pdf_reader = PyPDF2.PdfReader(BytesIO(response.content))
+                            text_content = ""
+                            for page in pdf_reader.pages:
+                                text_content += page.extract_text() + "\n"
+                            
+                            class MockResponse:
+                                def __init__(self, content):
+                                    self.text = content
+                                    self.status_code = 200
+                                def raise_for_status(self):
+                                    pass
+                            
+                            return MockResponse(text_content)
+                        except:
+                            pass
+                except:
+                    continue
+        
+        # Final fallback with error
+        raise requests.exceptions.RequestException(f"Unable to access UNESCO document at {url}. The site may be blocking automated access.")
     
     def _error_result(self, error_message: str) -> Dict[str, any]:
         """Return error result structure"""
