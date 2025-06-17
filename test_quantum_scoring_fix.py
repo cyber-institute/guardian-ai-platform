@@ -1,117 +1,77 @@
 #!/usr/bin/env python3
 """
-Test quantum cybersecurity scoring fix
+Test the fixed quantum cybersecurity scoring system
 """
 
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from utils.comprehensive_scoring import (
-    multi_llm_intelligent_scoring,
-    analyze_with_enhanced_patterns, 
-    analyze_with_contextual_understanding,
-    score_quantum_cybersecurity_maturity
-)
+from utils.comprehensive_scoring import score_quantum_cybersecurity_maturity, analyze_document_applicability
 
-def test_quantum_scoring():
-    """Test quantum cybersecurity scoring for non-quantum documents"""
+def test_quantum_scoring_variation():
+    """Test that quantum documents get varied scores based on content"""
     
-    # Test document with no quantum content
-    non_quantum_text = """
-    This document discusses artificial intelligence security frameworks and 
-    cybersecurity best practices for AI systems. It covers machine learning 
-    model protection, authentication mechanisms, and threat detection for 
-    traditional AI applications.
-    """
-    non_quantum_title = "AI Cybersecurity Framework for Traditional Systems"
+    test_documents = [
+        {
+            'title': 'Basic Quantum Awareness Document',
+            'content': 'This document mentions quantum computing threats and the need for quantum-safe cryptography. Basic awareness of post-quantum security.',
+            'expected_range': (1, 2)
+        },
+        {
+            'title': 'Intermediate Quantum Implementation Guide', 
+            'content': 'Comprehensive guide covering lattice-based cryptography, quantum key distribution, and pqc implementation strategies. Includes migration roadmap and deployment considerations for quantum-resistant systems.',
+            'expected_range': (2, 4)
+        },
+        {
+            'title': 'Advanced NIST Post-Quantum Standards',
+            'content': 'Detailed analysis of NIST post-quantum cryptography standards including lattice-based, code-based, multivariate, and hash-based approaches. Covers implementation guidelines, governance frameworks, compliance requirements, and hybrid systems integration for enterprise deployment.',
+            'expected_range': (4, 5)
+        },
+        {
+            'title': 'Dynamic Quantum Security Framework',
+            'content': 'Cutting-edge framework for adaptive quantum security featuring quantum machine learning, continuous quantum monitoring, quantum evolution protocols, and dynamic quantum response systems. Includes comprehensive governance, NIST compliance, hybrid systems, quantum supremacy considerations, and enterprise-wide implementation strategies with cryptographic agility.',
+            'expected_range': (5, 5)
+        }
+    ]
     
-    print("Testing Non-Quantum Document:")
-    print(f"Title: {non_quantum_title}")
-    print(f"Content preview: {non_quantum_text[:100]}...")
-    print()
+    print("Testing Fixed Quantum Scoring System")
+    print("=" * 50)
     
-    # Test direct quantum cybersecurity scoring function
-    print("1. Direct quantum cybersecurity function:")
-    direct_score = score_quantum_cybersecurity_maturity(non_quantum_text, non_quantum_title)
-    print(f"   Result: {direct_score} (should be None for non-quantum content)")
-    print()
+    scores = []
+    for i, doc in enumerate(test_documents, 1):
+        # Check applicability
+        applicability = analyze_document_applicability(doc['content'], doc['title'])
+        print(f"\nTest {i}: {doc['title']}")
+        print(f"Quantum applicable: {applicability['quantum_cybersecurity']}")
+        
+        if applicability['quantum_cybersecurity']:
+            score = score_quantum_cybersecurity_maturity(doc['content'], doc['title'])
+            scores.append(score)
+            expected_min, expected_max = doc['expected_range']
+            
+            print(f"Score: {score}")
+            print(f"Expected range: {expected_min}-{expected_max}")
+            
+            if expected_min <= score <= expected_max:
+                print("✅ Score within expected range")
+            else:
+                print("❌ Score outside expected range")
+        else:
+            print("Document not applicable for quantum scoring")
     
-    # Test enhanced patterns function
-    print("2. Enhanced patterns analysis:")
-    enhanced_scores = analyze_with_enhanced_patterns(non_quantum_text, non_quantum_title)
-    quantum_cyber_enhanced = enhanced_scores.get('quantum_cybersecurity')
-    print(f"   Quantum cybersecurity: {quantum_cyber_enhanced} (should be None/missing for non-quantum)")
-    print()
+    print(f"\n" + "=" * 50)
+    print("Scoring Variation Analysis:")
+    print(f"All scores: {scores}")
     
-    # Test contextual understanding function
-    print("3. Contextual understanding analysis:")
-    contextual_scores = analyze_with_contextual_understanding(non_quantum_text, non_quantum_title)
-    quantum_cyber_contextual = contextual_scores.get('quantum_cybersecurity')
-    print(f"   Quantum cybersecurity: {quantum_cyber_contextual} (should be None/missing for non-quantum)")
-    print()
-    
-    # Test Multi-LLM intelligent scoring
-    print("4. Multi-LLM intelligent scoring:")
-    multi_llm_scores = multi_llm_intelligent_scoring(non_quantum_text, non_quantum_title)
-    quantum_cyber_multi = multi_llm_scores.get('quantum_cybersecurity')
-    print(f"   Quantum cybersecurity: {quantum_cyber_multi} (should be None for non-quantum)")
-    print(f"   AI cybersecurity: {multi_llm_scores.get('ai_cybersecurity')} (should have a score)")
-    print()
-    
-    # Test with actual quantum content for comparison
-    quantum_text = """
-    This document outlines post-quantum cryptography standards and quantum-safe 
-    encryption protocols. It discusses lattice-based cryptography, quantum key 
-    distribution systems, and quantum-resistant authentication mechanisms for 
-    preparing systems against quantum computing threats.
-    """
-    quantum_title = "Post-Quantum Cryptography Implementation Guide"
-    
-    print("Testing Quantum Document (for comparison):")
-    print(f"Title: {quantum_title}")
-    print()
-    
-    # Test quantum document scoring
-    quantum_direct = score_quantum_cybersecurity_maturity(quantum_text, quantum_title)
-    quantum_multi = multi_llm_intelligent_scoring(quantum_text, quantum_title)
-    
-    print("5. Quantum document scoring:")
-    print(f"   Direct function: {quantum_direct} (should have a score 1-5)")
-    print(f"   Multi-LLM: {quantum_multi.get('quantum_cybersecurity')} (should have a score)")
-    print()
-    
-    # Summary
-    print("=== SCORING FIX VERIFICATION ===")
-    print(f"Non-quantum document quantum cybersecurity scores:")
-    print(f"  - Direct function: {direct_score}")
-    print(f"  - Enhanced patterns: {quantum_cyber_enhanced}")
-    print(f"  - Contextual understanding: {quantum_cyber_contextual}")
-    print(f"  - Multi-LLM synthesis: {quantum_cyber_multi}")
-    print()
-    print(f"Quantum document quantum cybersecurity scores:")
-    print(f"  - Direct function: {quantum_direct}")
-    print(f"  - Multi-LLM synthesis: {quantum_multi.get('quantum_cybersecurity')}")
-    print()
-    
-    # Check if fix is working
-    non_quantum_scores = [direct_score, quantum_cyber_enhanced, quantum_cyber_contextual, quantum_cyber_multi]
-    quantum_scores = [quantum_direct, quantum_multi.get('quantum_cybersecurity')]
-    
-    print("Fix Status:")
-    if all(score is None for score in non_quantum_scores):
-        print("✅ SUCCESS: All non-quantum scoring methods correctly return None")
+    if len(set(scores)) == len(scores):
+        print("✅ SUCCESS: All documents received different scores")
+    elif len(set(scores)) > 1:
+        print(f"⚠️  PARTIAL: {len(set(scores))} unique scores from {len(scores)} documents")
     else:
-        print("❌ ISSUE: Some methods still return scores for non-quantum content:")
-        for i, score in enumerate(non_quantum_scores):
-            methods = ["Direct", "Enhanced", "Contextual", "Multi-LLM"]
-            if score is not None:
-                print(f"    - {methods[i]}: {score}")
+        print("❌ FAILURE: All documents received identical scores")
     
-    if any(score is not None for score in quantum_scores):
-        print("✅ SUCCESS: Quantum documents correctly receive scores")
-    else:
-        print("❌ ISSUE: Quantum documents not receiving scores")
+    return scores
 
 if __name__ == "__main__":
-    test_quantum_scoring()
+    test_quantum_scoring_variation()

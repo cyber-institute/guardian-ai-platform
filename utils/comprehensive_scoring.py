@@ -129,41 +129,61 @@ def score_quantum_cybersecurity_maturity(text: str, title: str) -> Optional[int]
         return None
     
     text_lower = text.lower()
-    maturity_score = 1  # Start at Initial level
     
-    # Level 2: Basic Maturity - Foundational quantum-resistant measures
-    basic_indicators = [
-        'post-quantum cryptography', 'quantum-safe', 'quantum-resistant',
-        'hybrid cryptographic', 'quantum awareness', 'quantum risk'
-    ]
-    if any(indicator in text_lower for indicator in basic_indicators):
-        maturity_score = 2
+    # Calculate weighted score based on content depth and sophistication
+    score_components = 0
     
-    # Level 3: Intermediate Maturity - Scalable quantum-safe solutions
-    intermediate_indicators = [
-        'lattice-based', 'quantum key distribution', 'pqc implementation',
-        'quantum migration', 'crypto agility', 'quantum readiness assessment'
-    ]
-    if any(indicator in text_lower for indicator in intermediate_indicators):
-        maturity_score = 3
+    # Basic quantum awareness (1-3 points)
+    basic_terms = ['quantum', 'post-quantum', 'quantum-safe', 'quantum-resistant', 'pqc']
+    basic_count = sum(1 for term in basic_terms if term in text_lower)
+    score_components += min(3, basic_count)
     
-    # Level 4: Advanced Maturity - Comprehensive integration with NIST standards
-    advanced_indicators = [
-        'nist post-quantum', 'comprehensive quantum', 'quantum integration',
-        'quantum governance', 'quantum compliance', 'quantum standards'
-    ]
-    if any(indicator in text_lower for indicator in advanced_indicators):
-        maturity_score = 4
+    # Technical depth indicators (1-4 points)
+    technical_terms = ['lattice-based', 'code-based', 'multivariate', 'hash-based', 'isogeny', 
+                      'quantum key distribution', 'quantum cryptography', 'cryptographic agility']
+    technical_count = sum(1 for term in technical_terms if term in text_lower)
+    score_components += min(4, technical_count)
     
-    # Level 5: Dynamic Maturity - Continuous adaptability with ML
-    dynamic_indicators = [
-        'adaptive quantum', 'quantum machine learning', 'continuous quantum',
-        'quantum optimization', 'quantum evolution', 'dynamic quantum response'
-    ]
-    if any(indicator in text_lower for indicator in dynamic_indicators):
-        maturity_score = 5
+    # Implementation readiness (1-3 points)
+    implementation_terms = ['implementation', 'deployment', 'migration', 'transition', 'roadmap']
+    impl_count = sum(1 for term in implementation_terms if term in text_lower)
+    score_components += min(3, impl_count)
     
-    return maturity_score
+    # Standards and governance (1-3 points)
+    standards_terms = ['nist', 'standards', 'compliance', 'governance', 'framework', 'policy']
+    standards_count = sum(1 for term in standards_terms if term in text_lower)
+    score_components += min(3, standards_count)
+    
+    # Advanced concepts (1-3 points)
+    advanced_terms = ['hybrid systems', 'quantum supremacy', 'quantum advantage', 'quantum evolution', 
+                     'quantum machine learning', 'adaptive quantum', 'continuous quantum monitoring']
+    advanced_count = sum(1 for term in advanced_terms if term in text_lower)
+    score_components += min(3, advanced_count)
+    
+    # Document length factor (affects sophistication)
+    text_length = len(text)
+    length_factor = 1.0
+    if text_length > 5000:
+        length_factor = 1.2
+    elif text_length > 2000:
+        length_factor = 1.1
+    elif text_length < 500:
+        length_factor = 0.8
+    
+    # Calculate final score with length adjustment
+    final_score = int(score_components * length_factor)
+    
+    # Map to 1-5 maturity levels with refined thresholds
+    if final_score >= 14:
+        return 5  # Dynamic maturity
+    elif final_score >= 11:
+        return 4  # Advanced maturity  
+    elif final_score >= 7:
+        return 3  # Intermediate maturity
+    elif final_score >= 4:
+        return 2  # Basic maturity
+    else:
+        return 1  # Initial awareness
 
 def score_ai_ethics(text: str, title: str) -> Optional[int]:
     """
