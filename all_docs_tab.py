@@ -150,7 +150,7 @@ This document demonstrates Quantum Ethics considerations scoring {score}/100.
 """
 
 # Performance optimization: Cache scoring calculations
-@st.cache_data(ttl=600)  # Cache for 10 minutes
+@st.cache_data(ttl=60)  # Reduced cache time to 1 minute for testing
 def comprehensive_document_scoring_cached(content, title):
     """Cached version of comprehensive scoring to improve performance"""
     return comprehensive_document_scoring(content, title)
