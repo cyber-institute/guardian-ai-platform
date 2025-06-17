@@ -181,10 +181,14 @@ class IntelligentSynthesisEngine:
                     scores.append(response['scores'][metric])
             
             if len(scores) >= 2:
-                score_variance = np.var(scores)
-                normalized_variance = min(score_variance / 100, 1.0)  # Normalize
-                total_diversity += normalized_variance
-                comparisons += 1
+                try:
+                    score_variance = np.var(scores)
+                    normalized_variance = min(float(score_variance) / 100.0, 1.0)  # Normalize
+                    total_diversity += normalized_variance
+                    comparisons += 1
+                except (ZeroDivisionError, ValueError, TypeError):
+                    # Skip this comparison if calculation fails
+                    pass
         
         return total_diversity / max(comparisons, 1) if comparisons > 0 else 0.0
     
@@ -262,16 +266,21 @@ class IntelligentSynthesisEngine:
                 if observation_variance == 0:
                     observation_variance = 0.1
                 
-                # Posterior calculation with safe division
-                posterior_precision = (1 / prior_variance) + (total_weights / observation_variance)
-                if posterior_precision == 0:
-                    posterior_precision = 0.1
-                    
-                posterior_variance = 1 / posterior_precision
-                posterior_mean = (
-                    (prior_mean / prior_variance) + 
-                    (weighted_mean * total_weights / observation_variance)
-                ) / posterior_precision
+                # Posterior calculation with comprehensive division protection
+                try:
+                    posterior_precision = (1 / max(prior_variance, 0.001)) + (total_weights / max(observation_variance, 0.001))
+                    if posterior_precision == 0:
+                        posterior_precision = 0.1
+                        
+                    posterior_variance = 1 / max(posterior_precision, 0.001)
+                    posterior_mean = (
+                        (prior_mean / max(prior_variance, 0.001)) + 
+                        (weighted_mean * total_weights / max(observation_variance, 0.001))
+                    ) / max(posterior_precision, 0.001)
+                except (ZeroDivisionError, ValueError, FloatingPointError):
+                    # Fallback to prior mean if calculation fails
+                    posterior_mean = prior_mean
+                    posterior_variance = prior_variance
                 
                 # Apply proper scale limits based on metric type
                 if metric == 'quantum_cybersecurity':
@@ -292,8 +301,8 @@ class IntelligentSynthesisEngine:
             'confidence': self._calculate_synthesis_confidence(responses, synthesized_scores),
             'metadata': {
                 'domain_priors_applied': True,
-                'posterior_variance': posterior_variance if 'posterior_variance' in locals() else 0,
-                'observations_count': len(observations) if 'observations' in locals() else 0
+                'posterior_variance': 0,
+                'observations_count': 0
             }
         }
     
@@ -536,9 +545,12 @@ class IntelligentSynthesisEngine:
             if metric != 'consensus_score':
                 metric_scores = [r['scores'].get(metric, 0) for r in responses if metric in r['scores']]
                 if len(metric_scores) > 1:
-                    variance = np.var(metric_scores)
-                    normalized_variance = min(variance / 100, 1.0)
-                    score_variances.append(normalized_variance)
+                    try:
+                        variance = np.var(metric_scores)
+                        normalized_variance = min(float(variance) / 100.0, 1.0)
+                        score_variances.append(normalized_variance)
+                    except (ZeroDivisionError, ValueError, TypeError):
+                        pass
         
         if score_variances and len(score_variances) > 0:
             avg_variance = sum(score_variances) / len(score_variances)
