@@ -4589,10 +4589,18 @@ def render_card_view(docs):
             ai_ethics_norm = generate_norm_analysis('ai_ethics', ai_ethics_display, db_averages) if ai_ethics != 'N/A' else ""
             q_ethics_norm = generate_norm_analysis('q_ethics', q_ethics_display, db_averages) if q_ethics != 'N/A' else ""
             
-            # Clean content for preview
-            clean_content = re.sub(r'<[^>]+>', '', raw_content)
-            clean_content = re.sub(r'\s+', ' ', clean_content).strip()
-            preview_content = f"**Title:** {title}<br><br>**Content:** {clean_content[:500]}..."
+            # Clean content for preview - remove all formatting artifacts
+            clean_content = re.sub(r'<[^>]+>', '', raw_content)  # Remove HTML tags
+            clean_content = re.sub(r'\*+', '', clean_content)     # Remove asterisks
+            clean_content = re.sub(r'#+\s*', '', clean_content)   # Remove markdown headers
+            clean_content = re.sub(r'[-_]{3,}', '', clean_content) # Remove dividers
+            clean_content = re.sub(r'\s+', ' ', clean_content).strip()  # Normalize spaces
+            
+            # Generate meaningful preview without asterisks
+            if len(clean_content) > 100:
+                preview_content = f"<b>{title}</b><br><br>{clean_content[:400]}..."
+            else:
+                preview_content = f"<b>{title}</b><br><br>Document content available. Click to view full analysis and details."
             
             # Ensure all analysis content is string and escape for JavaScript
             # Format bullet points properly for HTML display

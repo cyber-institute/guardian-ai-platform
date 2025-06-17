@@ -82,21 +82,42 @@ class DatabaseManager:
         documents = []
         if isinstance(results, list):
             for row in results:
-                # Clean content preview of asterisks and formatting
-                raw_preview = row.get('content_preview', 'No preview available')
-                if raw_preview and raw_preview != 'No preview available':
-                    # Remove asterisks, excessive whitespace, and clean up text
+                # Generate enhanced content preview from full content
+                raw_preview = row.get('content_preview', '')
+                full_content = row.get('content', '') or row.get('text_content', '')
+                
+                if full_content and len(full_content) > 200:
+                    # Create preview from full content
+                    import re
+                    clean_preview = re.sub(r'<[^>]+>', '', full_content)  # Remove HTML
+                    clean_preview = re.sub(r'\*+', '', clean_preview)     # Remove asterisks
+                    clean_preview = re.sub(r'#+\s*', '', clean_preview)   # Remove headers
+                    clean_preview = re.sub(r'[-_]{3,}', '', clean_preview) # Remove dividers
+                    clean_preview = re.sub(r'\s+', ' ', clean_preview).strip()
+                    
+                    # Extract meaningful sentences
+                    sentences = re.split(r'[.!?]+', clean_preview)
+                    meaningful_text = []
+                    for sentence in sentences[:3]:  # First 3 sentences
+                        sentence = sentence.strip()
+                        if len(sentence) > 30:  # Skip very short fragments
+                            meaningful_text.append(sentence)
+                    
+                    if meaningful_text:
+                        content_preview = '. '.join(meaningful_text) + '.'
+                        if len(content_preview) > 350:
+                            content_preview = content_preview[:350] + '...'
+                    else:
+                        content_preview = clean_preview[:350] + '...' if len(clean_preview) > 350 else clean_preview
+                elif raw_preview:
+                    # Clean existing preview
                     import re
                     clean_preview = re.sub(r'\*+', '', raw_preview)
                     clean_preview = re.sub(r'#+\s*', '', clean_preview)
                     clean_preview = re.sub(r'\s+', ' ', clean_preview).strip()
-                    # Ensure preview has meaningful length
-                    if len(clean_preview) > 50:
-                        content_preview = clean_preview[:400] + '...' if len(clean_preview) > 400 else clean_preview
-                    else:
-                        content_preview = 'Preview content available - click to view document details'
+                    content_preview = clean_preview[:350] + '...' if len(clean_preview) > 350 else clean_preview
                 else:
-                    content_preview = 'No preview available'
+                    content_preview = 'Document content available - click to view details'
 
                 doc = {
                     'id': row['id'],
