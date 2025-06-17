@@ -1032,12 +1032,8 @@ def render():
         st.markdown('</div>', unsafe_allow_html=True)
     
     with view_col:
-        # Add refresh button to clear cache and show newly uploaded documents
+        # View mode selection
         col1, col2 = st.columns([1, 3])
-        with col1:
-            if st.button("🔄 Refresh", help="Refresh to show newly uploaded documents"):
-                st.cache_data.clear()
-                st.rerun()
         
         with col2:
             # Create container that aligns perfectly with Topic Filter baseline
