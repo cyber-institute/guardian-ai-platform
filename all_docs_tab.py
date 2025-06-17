@@ -111,6 +111,92 @@ def comprehensive_document_scoring_cached(content, title):
 from utils.document_metadata_extractor import extract_document_metadata
 from utils.multi_llm_metadata_extractor import extract_clean_metadata
 from components.help_tooltips import help_tooltips
+from utils.direct_db import get_db_connection
+
+def calculate_database_averages():
+    """Calculate dynamic averages from database for NORM comparison"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Get averages for each scoring type
+        cursor.execute("""
+            SELECT 
+                AVG(CAST(REGEXP_REPLACE(ai_cybersecurity_score, '[^0-9]', '', 'g') AS INTEGER)) as ai_cyber_avg,
+                AVG(CAST(REGEXP_REPLACE(quantum_cybersecurity_score, '[^0-9]', '', 'g') AS INTEGER)) as q_cyber_avg,
+                AVG(CAST(REGEXP_REPLACE(ai_ethics_score, '[^0-9]', '', 'g') AS INTEGER)) as ai_ethics_avg,
+                AVG(CAST(REGEXP_REPLACE(quantum_ethics_score, '[^0-9]', '', 'g') AS INTEGER)) as q_ethics_avg,
+                COUNT(*) as total_docs
+            FROM documents 
+            WHERE ai_cybersecurity_score IS NOT NULL 
+            AND quantum_cybersecurity_score IS NOT NULL
+            AND ai_ethics_score IS NOT NULL 
+            AND quantum_ethics_score IS NOT NULL
+        """)
+        
+        result = cursor.fetchone()
+        conn.close()
+        
+        if result and result[4] > 0:  # total_docs > 0
+            return {
+                'ai_cyber_avg': round(result[0] or 0, 1),
+                'q_cyber_avg': round(result[1] or 0, 1), 
+                'ai_ethics_avg': round(result[2] or 0, 1),
+                'q_ethics_avg': round(result[3] or 0, 1),
+                'total_docs': result[4]
+            }
+        else:
+            return None
+            
+    except Exception as e:
+        print(f"Error calculating database averages: {e}")
+        return None
+
+def generate_norm_analysis(score_type, current_score, averages):
+    """Generate dynamic NORM analysis comparing to database averages"""
+    if not averages:
+        return "Database averages not available for comparison."
+    
+    # Extract numeric value from score
+    if score_type == 'q_cyber':
+        # For Quantum Cybersecurity (Tier system)
+        current_numeric = int(current_score.replace('Tier ', '')) if 'Tier' in current_score else 0
+        avg_numeric = averages['q_cyber_avg']
+        score_format = "Tier"
+    else:
+        # For other scores (/100 system)
+        current_numeric = int(current_score.split('/')[0]) if '/' in current_score else 0
+        if score_type == 'ai_cyber':
+            avg_numeric = averages['ai_cyber_avg']
+        elif score_type == 'ai_ethics':
+            avg_numeric = averages['ai_ethics_avg']
+        else:  # q_ethics
+            avg_numeric = averages['q_ethics_avg']
+        score_format = "/100"
+    
+    # Generate comparison analysis
+    diff = current_numeric - avg_numeric
+    total_docs = averages['total_docs']
+    
+    if diff > 15:
+        performance = "significantly above"
+        color = "#28a745"
+    elif diff > 5:
+        performance = "above"
+        color = "#28a745"
+    elif diff >= -5:
+        performance = "near"
+        color = "#ffc107"
+    elif diff >= -15:
+        performance = "below"
+        color = "#fd7e14"
+    else:
+        performance = "significantly below"
+        color = "#dc3545"
+    
+    avg_display = f"Tier {avg_numeric}" if score_format == "Tier" else f"{avg_numeric}/100"
+    
+    return f'This document scores <span style="color: {color}; font-weight: bold;">{performance}</span> the repository average of <b>{avg_display}</b> (based on {total_docs} documents). The difference is <b>{abs(diff):.1f} points</b> {"higher" if diff > 0 else "lower" if diff < 0 else "equal"}.'
 
 def show_score_explanation(framework_type, score, content="", title=""):
     """Show detailed scoring explanation in a modal dialog"""
@@ -4412,11 +4498,20 @@ def render_card_view(docs):
 • Address quantum computing's societal implications<br>
 • Develop quantum governance frameworks"""
 
+            # Calculate database averages for NORM comparison
+            db_averages = calculate_database_averages()
+            
             # Generate analysis content using local functions
             ai_cyber_analysis = get_ai_cyber_analysis(raw_content, ai_cyber) if ai_cyber != 'N/A' else "No AI cybersecurity assessment available for this document."
             q_cyber_analysis = get_q_cyber_analysis(raw_content, q_cyber) if q_cyber != 'N/A' else "No quantum cybersecurity assessment available for this document."
             ai_ethics_analysis = get_ai_ethics_analysis(raw_content, ai_ethics) if ai_ethics != 'N/A' else "No AI ethics assessment available for this document."
             q_ethics_analysis = get_q_ethics_analysis(raw_content, q_ethics) if q_ethics != 'N/A' else "No quantum ethics assessment available for this document."
+            
+            # Generate NORM analyses
+            ai_cyber_norm = generate_norm_analysis('ai_cyber', ai_cyber_display, db_averages) if ai_cyber != 'N/A' else ""
+            q_cyber_norm = generate_norm_analysis('q_cyber', q_cyber_display, db_averages) if q_cyber != 'N/A' else ""
+            ai_ethics_norm = generate_norm_analysis('ai_ethics', ai_ethics_display, db_averages) if ai_ethics != 'N/A' else ""
+            q_ethics_norm = generate_norm_analysis('q_ethics', q_ethics_display, db_averages) if q_ethics != 'N/A' else ""
             
             # Clean content for preview
             clean_content = re.sub(r'<[^>]+>', '', raw_content)
@@ -4429,6 +4524,12 @@ def render_card_view(docs):
             ai_ethics_analysis_js = str(ai_ethics_analysis).replace("'", "\\'").replace('"', '\\"').replace('\n', '<br>')
             q_ethics_analysis_js = str(q_ethics_analysis).replace("'", "\\'").replace('"', '\\"').replace('\n', '<br>')
             preview_content_js = str(preview_content).replace("'", "\\'").replace('"', '\\"')
+            
+            # Escape NORM content for JavaScript
+            ai_cyber_norm_js = str(ai_cyber_norm).replace("'", "\\'").replace('"', '\\"') if ai_cyber_norm else ""
+            q_cyber_norm_js = str(q_cyber_norm).replace("'", "\\'").replace('"', '\\"') if q_cyber_norm else ""
+            ai_ethics_norm_js = str(ai_ethics_norm).replace("'", "\\'").replace('"', '\\"') if ai_ethics_norm else ""
+            q_ethics_norm_js = str(q_ethics_norm).replace("'", "\\'").replace('"', '\\"') if q_ethics_norm else ""
             
             # Buttons that create modals dynamically on document body
             button_html = f"""
@@ -4674,17 +4775,32 @@ def render_card_view(docs):
                     var offsetY = Math.floor(Math.random() * 50) + 30;
                     
                     modal.innerHTML = `
-                        <div id="modalWindow_${{modalId}}" style="position: absolute; top: ${{offsetY}}px; left: ${{offsetX}}px; background-color: white; border: 2px solid #333; border-radius: 8px; width: 450px; max-height: 400px; overflow-y: auto; box-shadow: 0 8px 16px rgba(0,0,0,0.3); font-family: Arial, sans-serif;">
-                            <div id="modalHeader_${{modalId}}" style="background-color: #f8f9fa; padding: 12px 16px; border-bottom: 2px solid #ddd; cursor: move; font-weight: bold; border-radius: 6px 6px 0 0; position: relative;">
-                                <span style="font-size: 16px;">${{data.title}}</span>
-                                <span onclick="parent.document.getElementById('${{modalId}}').remove(); window.currentGlobalModal = null;" style="position: absolute; right: 12px; top: 8px; color: #666; font-size: 24px; font-weight: bold; cursor: pointer; line-height: 1;">&times;</span>
+                        <div id="modalWindow_${{modalId}}" style="position: absolute; top: ${{offsetY}}px; left: ${{offsetX}}px; background-color: white; border: 2px solid #333; border-radius: 8px; width: 450px; max-height: 500px; overflow-y: auto; box-shadow: 0 8px 16px rgba(0,0,0,0.3); font-family: Arial, sans-serif;">
+                            <div id="modalHeader_${{modalId}}" style="background-color: #f8f9fa; padding: 8px 12px; border-bottom: 2px solid #ddd; cursor: move; font-weight: bold; border-radius: 6px 6px 0 0; position: relative;">
+                                <span style="font-size: 14px;">${{data.title}}</span>
+                                <span onclick="closeModalSafely('${{modalId}}')" style="position: absolute; right: 10px; top: 4px; color: #666; font-size: 20px; font-weight: bold; cursor: pointer; line-height: 1;">&times;</span>
                             </div>
-                            <div style="padding: 16px; font-size: 14px; line-height: 1.5;">
-                                ${{data.score !== 'N/A' ? '<div style="margin-bottom: 15px;"><b>Score: <span style="color: ' + data.color + '; font-weight: bold;">' + data.score + '</span></b></div>' : ''}}
+                            <div style="padding: 12px; font-size: 13px; line-height: 1.4;">
+                                ${{data.score !== 'N/A' ? '<div style="margin-bottom: 8px;"><b>SCORE: <span style="color: ' + data.color + '; font-weight: bold;">' + data.score + '</span></b></div>' : ''}}
+                                ${{data.norm ? '<div style="margin-bottom: 8px; padding: 6px; background-color: #f8f9fa; border-left: 3px solid #007bff; font-size: 12px;"><b>NORM:</b> ' + data.norm + '</div>' : ''}}
+                                <div style="margin-bottom: 4px;"><b>KEY ANALYSIS:</b></div>
                                 <div>${{data.analysis}}</div>
                             </div>
                         </div>
                     `;
+                    
+                    // Add safe close function to parent window
+                    if (!parent.window.closeModalSafely) {{
+                        parent.window.closeModalSafely = function(modalId) {{
+                            var modal = parent.document.getElementById(modalId);
+                            if (modal) {{
+                                modal.remove();
+                                if (window.currentGlobalModal && window.currentGlobalModal.id === modalId) {{
+                                    window.currentGlobalModal = null;
+                                }}
+                            }}
+                        }};
+                    }}
                     
                     parent.document.body.appendChild(modal);
                     window.currentGlobalModal = modal;
