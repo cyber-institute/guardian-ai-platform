@@ -10,28 +10,62 @@ from components.smart_help_bubbles import smart_help
 help_tooltips = HelpTooltips()
 enhanced_scoring = EnhancedScoringDisplay()
 
-# Performance optimization: Cache document fetching with longer TTL
-@st.cache_data(ttl=600)  # Cache for 10 minutes
+# Performance optimization: Enhanced caching with memory optimization
+@st.cache_data(ttl=900, max_entries=100)  # 15 minutes, limit entries
 def fetch_documents_cached():
-    """Cached version of document fetching to improve performance"""
+    """Cached version of document fetching with memory optimization"""
     return fetch_documents()
 
-# Cache comprehensive scoring to avoid repeated calculations
-@st.cache_data(ttl=300)  # Cache for 5 minutes
+# Separate cache for document content to avoid redundant processing
+@st.cache_data(ttl=1800, max_entries=200)  # 30 minutes for content
+def get_document_content_cached(doc_id, url):
+    """Cache document content separately for better memory management"""
+    try:
+        from utils.database import get_db_connection
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT content FROM documents WHERE id = %s", (doc_id,))
+        result = cursor.fetchone()
+        return result[0] if result else ""
+    except Exception:
+        return ""
+
+# Cache comprehensive scoring with content hashing for better cache hits
+@st.cache_data(ttl=1200, max_entries=300)  # 20 minutes, 300 entries
 def comprehensive_document_scoring_cached(content, title):
-    """Cached version of comprehensive scoring to improve performance"""
+    """Cached version of comprehensive scoring with content hashing"""
     try:
         from utils.comprehensive_scoring import multi_llm_intelligent_scoring
         # Use the patented multi-LLM Convergence AI synthesis engine
         return multi_llm_intelligent_scoring(content, title)
     except Exception:
-        # Fallback to basic scoring if needed
-        return {
-            'ai_cybersecurity': 50,
-            'quantum_cybersecurity': 3,
-            'ai_ethics': 50,
-            'quantum_ethics': 3
-        }
+        # Return None to indicate scoring unavailable - no synthetic data
+        return None
+
+# Lazy loading for non-critical document metadata
+@st.cache_data(ttl=3600, max_entries=500)  # 1 hour for metadata
+def get_document_metadata_cached(doc_id):
+    """Cache document metadata separately for faster loading"""
+    try:
+        from utils.database import get_db_connection
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT title, author, organization, date_published, url 
+            FROM documents WHERE id = %s
+        """, (doc_id,))
+        result = cursor.fetchone()
+        if result:
+            return {
+                'title': result[0],
+                'author': result[1], 
+                'organization': result[2],
+                'date_published': result[3],
+                'url': result[4]
+            }
+        return None
+    except Exception:
+        return None
 from utils.hf_ai_scoring import evaluate_quantum_maturity_hf
 from utils.comprehensive_scoring import comprehensive_document_scoring, format_score_display, get_score_badge_color
 
@@ -1165,8 +1199,24 @@ def render():
     # Get display mode from session state (set in top controls)
     display_mode = st.session_state.get("display_mode", "cards")
 
-    # Pagination
-    per_page = 10
+    # Enhanced pagination with performance controls
+    per_page_options = [5, 10, 20, 50]
+    per_page = st.session_state.get("per_page", 10)
+    
+    # Performance control sidebar
+    with st.sidebar:
+        st.subheader("Performance Settings")
+        new_per_page = st.selectbox(
+            "Documents per page",
+            per_page_options,
+            index=per_page_options.index(per_page),
+            help="Fewer documents = faster loading"
+        )
+        if new_per_page != per_page:
+            st.session_state["per_page"] = new_per_page
+            st.session_state["doc_page"] = 0  # Reset to first page
+            st.rerun()
+    
     page = st.session_state.get("doc_page", 0)
     total_pages = max(1, len(docs) // per_page + (1 if len(docs) % per_page else 0))
 
