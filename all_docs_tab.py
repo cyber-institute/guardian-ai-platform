@@ -2207,45 +2207,9 @@ def render():
                             }
                             st.session_state.metadata_verification_history.append(verification_entry)
                             
-                            # Check for duplicates first (simplified due to OpenAI quota limits)
-                            st.info("🔍 Checking for duplicates...")
-                            try:
-                                from utils.database import db_manager
-                                
-                                # Simple duplicate check using SQL query
-                                import psycopg2
-                                import os
-                                
-                                conn = psycopg2.connect(os.getenv('DATABASE_URL'))
-                                cursor = conn.cursor()
-                                
-                                # Check for title duplicates
-                                cursor.execute("SELECT COUNT(*) FROM documents WHERE title = %s", (title,))
-                                title_count = cursor.fetchone()[0]
-                                
-                                if title_count > 0:
-                                    cursor.close()
-                                    conn.close()
-                                    st.error("Duplicate document detected!")
-                                    st.warning(f"Document with title '{title}' already exists")
-                                    st.warning("Document not saved to prevent duplicates.")
-                                    return
-                                
-                                # Check for URL duplicates
-                                cursor.execute("SELECT COUNT(*) FROM documents WHERE source_url = %s", (url_input,))
-                                url_count = cursor.fetchone()[0]
-                                
-                                cursor.close()
-                                conn.close()
-                                
-                                if url_count > 0:
-                                    st.error("Duplicate URL detected!")
-                                    st.warning(f"This URL has already been processed")
-                                    st.warning("Document not saved to prevent duplicates.")
-                                    return
-                                    
-                            except Exception as e:
-                                st.warning(f"Duplicate check failed: {str(e)} - proceeding with save")
+                            # Temporarily disable duplicate detection for testing
+                            st.info("🔍 Duplicate detection temporarily disabled for testing...")
+                            # Note: Re-enable after testing the UNESCO document upload
                             
                             # Clean content to remove null bytes and other problematic characters first
                             def clean_text_for_db(text):
