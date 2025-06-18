@@ -301,11 +301,15 @@ def _extract_document_type_enhanced(content: str, title: str) -> str:
         ],
         'Policy': [
             r'recommendation\s+on\s+the\s+ethics',
+            r'unesco.*recommendation',
+            r'recommendation.*unesco',
             r'recommendation',
             r'policy',
             r'regulation',
             r'directive',
             r'memorandum',
+            r'guidelines',
+            r'guidance',
         ],
         'Research': [
             r'research',

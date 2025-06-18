@@ -7,7 +7,7 @@ from typing import Dict, Tuple
 
 # Standard document types available in the system
 DOCUMENT_TYPES = {
-    'policy': ['policy', 'policies', 'directive', 'guidelines', 'guidance'],
+    'policy': ['policy', 'policies', 'directive', 'guidelines', 'guidance', 'recommendation', 'unesco recommendation', 'memorandum'],
     'standard': ['standard', 'standards', 'specification', 'spec', 'nist', 'iso', 'fips'],
     'strategy': ['strategy', 'strategic', 'roadmap', 'plan', 'planning'],
     'regulation': ['regulation', 'regulatory', 'compliance', 'law', 'legal', 'rule'],
