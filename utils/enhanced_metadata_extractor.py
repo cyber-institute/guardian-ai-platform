@@ -228,7 +228,6 @@ class EnhancedMetadataExtractor:
         for pattern, org in org_patterns:
             if re.search(pattern, first_page, re.IGNORECASE):
                 return org
-                return convert_org_to_acronym(org)
         
         # Strategy 3: Look for author affiliations
         affiliation_match = re.search(r'(?:affiliation|organization|institution)[:]\s*([^.\n]+)', content_lower)
