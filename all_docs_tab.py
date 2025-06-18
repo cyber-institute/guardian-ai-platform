@@ -21,8 +21,9 @@ def fetch_documents_cached():
 def get_document_content_cached(doc_id, url):
     """Cache document content separately for better memory management"""
     try:
-        from utils.database import get_db_connection
-        conn = get_db_connection()
+        import psycopg2
+        import os
+        conn = psycopg2.connect(os.getenv('DATABASE_URL'))
         cursor = conn.cursor()
         cursor.execute("SELECT content FROM documents WHERE id = %s", (doc_id,))
         result = cursor.fetchone()
@@ -47,11 +48,12 @@ def comprehensive_document_scoring_cached(content, title):
 def get_document_metadata_cached(doc_id):
     """Cache document metadata separately for faster loading"""
     try:
-        from utils.database import get_db_connection
-        conn = get_db_connection()
+        import psycopg2
+        import os
+        conn = psycopg2.connect(os.getenv('DATABASE_URL'))
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT title, author, organization, date_published, url 
+            SELECT title, author_organization, organization, publication_date, source 
             FROM documents WHERE id = %s
         """, (doc_id,))
         result = cursor.fetchone()
