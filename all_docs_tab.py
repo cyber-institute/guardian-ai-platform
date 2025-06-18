@@ -1573,17 +1573,74 @@ def render():
                         try:
                             st.info(f"Processing file: {uploaded_file.name}")
                             
-                            # Reset file position and process
+                            # Reset file position and use enhanced extraction pipeline
                             uploaded_file.seek(0)
-                            result = process_uploaded_file(uploaded_file)
+                            
+                            # Use the same enhanced extraction pipeline as URL uploads
+                            from utils.enhanced_ocr_metadata import extract_enhanced_metadata_from_content
+                            from utils.url_content_extractor import URLContentExtractor
+                            
+                            # Extract content using robust methods
+                            if uploaded_file.type == "application/pdf":
+                                try:
+                                    import PyPDF2
+                                    import io
+                                    pdf_file = io.BytesIO(uploaded_file.read())
+                                    pdf_reader = PyPDF2.PdfReader(pdf_file)
+                                    content = ""
+                                    for page in pdf_reader.pages:
+                                        content += page.extract_text() + "\n"
+                                    
+                                    # If PyPDF2 fails, try alternative extraction
+                                    if len(content.strip()) < 100:
+                                        uploaded_file.seek(0)
+                                        from pdf2image import convert_from_bytes
+                                        import pytesseract
+                                        pages = convert_from_bytes(uploaded_file.read())
+                                        content = ""
+                                        for page in pages:
+                                            content += pytesseract.image_to_string(page) + "\n"
+                                except Exception as pdf_error:
+                                    st.warning(f"PDF extraction failed: {str(pdf_error)}")
+                                    content = ""
+                            else:
+                                # Handle text files
+                                uploaded_file.seek(0)
+                                content = str(uploaded_file.read(), 'utf-8')
+                            
                             st.info("File processing completed")
                             
-                            if result and result.get('success'):
+                            if content and len(content.strip()) > 50:
                                 st.info("Content extracted successfully")
                                 
-                                # Extract content and basic metadata
-                                content = result.get('content', '')
-                                basic_metadata = result.get('metadata', {})
+                                # Use enhanced metadata extraction (same as URL uploads)
+                                basic_metadata = extract_enhanced_metadata_from_content(content, uploaded_file.name)
+                                
+                                # For file uploads, trigger URL discovery after content extraction
+                                st.info("🔍 Discovering source URL...")
+                                try:
+                                    from utils.restore_url_discovery import discover_document_source_url
+                                    
+                                    # Extract enhanced metadata first
+                                    title = basic_metadata.get('title', uploaded_file.name.replace('.pdf', '').replace('_', ' '))
+                                    organization = basic_metadata.get('organization', 'Unknown')
+                                    doc_type = basic_metadata.get('document_type', 'Document')
+                                    
+                                    # Try to discover the original source URL
+                                    discovered_url = discover_document_source_url(title, organization, doc_type)
+                                    if discovered_url:
+                                        st.success(f"✓ Source URL discovered: {discovered_url}")
+                                        # Update metadata with discovered URL
+                                        basic_metadata['source_url'] = discovered_url
+                                        basic_metadata['url_status'] = 'discovered'
+                                    else:
+                                        st.info("📋 Source URL not found - proceeding with file processing")
+                                        basic_metadata['source_url'] = None
+                                        basic_metadata['url_status'] = 'not_found'
+                                except Exception as e:
+                                    st.warning(f"URL discovery failed: {str(e)}")
+                                    basic_metadata['source_url'] = None
+                                    basic_metadata['url_status'] = 'failed'
                                 
                                 if len(content.strip()) > 50:
                                     st.info("Checking for duplicate documents...")
@@ -2471,24 +2528,10 @@ def render():
                                 except Exception as e:
                                     st.warning(f"ML training capture failed (non-critical): {str(e)}")
                             
-                            # Attempt URL discovery for documents that need source URLs
+                            # For URL uploads, use the provided URL directly
                             final_url = url_input
                             url_status = 'valid'
-                            
-                            # If this is not a direct PDF/document URL, try to discover the actual document URL
-                            if not url_input.lower().endswith('.pdf') and 'filetype:pdf' not in url_input.lower():
-                                st.info("🔍 Discovering document source URL...")
-                                try:
-                                    from utils.restore_url_discovery import discover_document_source_url
-                                    discovered_url = discover_document_source_url(clean_title, clean_organization, doc_type)
-                                    if discovered_url:
-                                        final_url = discovered_url
-                                        url_status = 'discovered'
-                                        st.success(f"✓ Document URL discovered: {discovered_url}")
-                                    else:
-                                        st.info("📋 Using provided URL as source")
-                                except Exception as e:
-                                    st.warning(f"URL discovery failed: {str(e)}")
+                            st.success(f"✓ Using provided URL as source: {url_input}")
                             
                             # Save to database using db_manager with enhanced metadata
                             document_data = {
