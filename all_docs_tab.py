@@ -2264,9 +2264,53 @@ def render():
                             }
                             st.session_state.metadata_verification_history.append(verification_entry)
                             
-                            # Temporarily disable duplicate detection for testing
-                            st.info("🔍 Duplicate detection temporarily disabled for testing...")
-                            # Note: Re-enable after testing the UNESCO document upload
+                            # Enhanced duplicate detection with similarity checking
+                            st.info("🔍 Checking for duplicates...")
+                            try:
+                                import psycopg2
+                                import os
+                                
+                                conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+                                cursor = conn.cursor()
+                                
+                                # Check for similar titles (not exact matches to avoid false positives)
+                                cursor.execute("""
+                                    SELECT id, title FROM documents 
+                                    WHERE LOWER(title) = LOWER(%s) 
+                                    OR similarity(title, %s) > 0.8
+                                """, (title, title))
+                                
+                                similar_docs = cursor.fetchall()
+                                
+                                if similar_docs:
+                                    st.warning(f"Found {len(similar_docs)} similar document(s):")
+                                    for doc_id, doc_title in similar_docs:
+                                        st.write(f"- ID {doc_id}: {doc_title[:60]}...")
+                                    
+                                    proceed = st.checkbox("Proceed anyway (document may be an updated version)")
+                                    if not proceed:
+                                        cursor.close()
+                                        conn.close()
+                                        st.warning("Document not saved to prevent duplicates.")
+                                        return
+                                
+                                # Check for URL duplicates only if URL provided
+                                if url_input:
+                                    cursor.execute("SELECT COUNT(*) FROM documents WHERE source = %s", (url_input,))
+                                    url_count = cursor.fetchone()[0]
+                                    
+                                    if url_count > 0:
+                                        st.error("Duplicate URL detected!")
+                                        st.warning(f"This URL has already been processed")
+                                        cursor.close()
+                                        conn.close()
+                                        return
+                                
+                                cursor.close()
+                                conn.close()
+                                    
+                            except Exception as e:
+                                st.warning(f"Duplicate check failed: {str(e)} - proceeding with save")
                             
                             # Clean content to remove null bytes and other problematic characters first
                             def clean_text_for_db(text):
