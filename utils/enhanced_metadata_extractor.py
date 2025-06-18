@@ -62,12 +62,32 @@ class EnhancedMetadataExtractor:
         content = re.sub(r'This publication is available free of charge from.*?(?=\n|\s{10})', '', content)
         return content
     
-    def _extract_title(self, content: str, existing_title: str = "") -> str:
-        """Extract proper document title using multiple strategies"""
+    def _extract_title(self, content: str, existing_title: str = "", url: str = "") -> str:
+        """Extract proper document title using universal enhanced strategies"""
         
+        if not content:
+            return existing_title if existing_title else "Untitled Document"
+            
+        # Clean content for analysis
+        content_lines = content.split('\n')
+        first_page = '\n'.join(content_lines[:50])  # Focus on first page
         content_lower = content.lower()
         
-        # Strategy 1: Look for NIST publication patterns
+        # Strategy 1: Look for UNESCO document patterns
+        unesco_patterns = [
+            r'Recommendation on the Ethics of Artificial Intelligence',
+            r'Quantum Science for\s*Inclusion and\s*Sustainability',
+            r'AI and Education:\s*Guidance for Policy-makers',
+            r'Artificial Intelligence and Education:\s*Guidance for Policy-makers',
+            r'Beijing Consensus on Artificial Intelligence and Education'
+        ]
+        
+        for pattern in unesco_patterns:
+            match = re.search(pattern, first_page, re.IGNORECASE | re.MULTILINE)
+            if match:
+                return match.group().strip()
+        
+        # Strategy 2: Look for NIST publication patterns
         nist_patterns = [
             r'nist\s+special\s+publication\s+(\d+[-\w]*)\s+(.+?)(?=\n|author|this publication)',
             r'nist\s+sp\s+(\d+[-\w]*)\s+(.+?)(?=\n|author|this publication)',
@@ -83,7 +103,25 @@ class EnhancedMetadataExtractor:
                 else:
                     return match.group(1).strip().title()
         
-        # Strategy 2: Look for document headers
+        # Strategy 3: Look for enhanced title patterns in first few lines
+        title_patterns = [
+            r'^([A-Z][^.\n]*(?:AI|Artificial Intelligence|Quantum|Education|Ethics|Policy|Framework)[^.\n]*)',
+            r'((?:AI|Artificial Intelligence|Quantum)[\s\w]*(?:Framework|Policy|Guidance|Recommendation))',
+            r'^([A-Z][\w\s]{10,80})\s*$'  # Capitalized line, reasonable length
+        ]
+        
+        for line in content_lines[:10]:
+            line = line.strip()
+            if len(line) > 10 and len(line) < 120:
+                for pattern in title_patterns:
+                    match = re.search(pattern, line, re.IGNORECASE)
+                    if match:
+                        candidate = match.group(1).strip()
+                        # Filter out common non-title patterns
+                        if not re.match(r'^(page|chapter|\d+|contents?|abstract|summary)', candidate, re.IGNORECASE):
+                            return candidate
+        
+        # Strategy 4: Look for document headers
         header_patterns = [
             r'^(.+?)(?=\n.*?author|\n.*?published|\n.*?date)',
             r'(?:^|\n)([A-Z][^.\n]{10,100})(?=\n|\s+version|\s+draft)',
@@ -96,16 +134,13 @@ class EnhancedMetadataExtractor:
                 if len(potential_title) > 10 and not any(word in potential_title.lower() for word in ['page', 'section', 'chapter']):
                     return potential_title.title()
         
-        # Strategy 3: Use existing title if available
+        # Strategy 5: Use existing title if available
         if existing_title and len(existing_title) > 5:
             return existing_title
         
-        # Strategy 4: Extract from first meaningful line
-        lines = content.split('\n')[:10]
-        for line in lines:
-            line = line.strip()
-            if len(line) > 15 and not line.lower().startswith(('page', 'section', 'chapter')):
-                return line.title()
+        # Strategy 6: Extract from URL if it contains document hints
+        if url and 'unesdoc.unesco.org' in url:
+            return "UNESCO Document"  # Fallback for UNESCO URLs
         
         return "Untitled Document"
     
@@ -156,33 +191,43 @@ class EnhancedMetadataExtractor:
         return best_type[0] if best_type[1] > 0 else "General"
     
     def _extract_organization(self, content: str, url: str = "") -> str:
-        """Extract organization with enhanced patterns"""
+        """Extract organization with universal enhanced patterns"""
         
-        # Strategy 1: URL-based detection
+        if not content:
+            return ""
+        
+        # Strategy 1: URL-based organization detection
         if url:
-            if 'nist.gov' in url or 'doi.org/10.6028/NIST' in url:
+            if 'unesco.org' in url or 'unesdoc.unesco.org' in url:
+                return "UNESCO"
+            elif 'nist.gov' in url or 'doi.org/10.6028/NIST' in url:
                 return "NIST"
-            elif 'nasa.gov' in url:
-                return "NASA"
             elif 'whitehouse.gov' in url:
                 return "White House"
             elif 'cisa.gov' in url:
                 return "CISA"
+            elif 'nasa.gov' in url:
+                return "NASA"
         
-        # Strategy 2: Content-based patterns
+        # Strategy 2: Content-based organization detection
         content_lower = content.lower()
+        first_page = content[:2000]  # First 2000 characters
         
-        org_patterns = {
-            'NIST': [r'nist\s+special\s+publication', r'national\s+institute\s+of\s+standards', r'nist\.gov'],
-            'NASA': [r'nasa', r'national\s+aeronautics'],
-            'White House': [r'white\s+house', r'executive\s+office', r'president'],
-            'CISA': [r'cisa', r'cybersecurity\s+and\s+infrastructure'],
-            'DOD': [r'department\s+of\s+defense', r'dod'],
-            'NSF': [r'national\s+science\s+foundation', r'nsf']
-        }
+        org_patterns = [
+            (r'unesco|united nations educational', 'UNESCO'),
+            (r'national institute of standards|nist', 'NIST'),
+            (r'white house|executive office', 'White House'),
+            (r'cybersecurity.*infrastructure.*security|cisa', 'CISA'),
+            (r'european commission|ec\s', 'European Commission'),
+            (r'oecd|organisation for economic', 'OECD'),
+            (r'nasa|national aeronautics', 'NASA'),
+            (r'department of defense|dod', 'DOD'),
+            (r'national science foundation|nsf', 'NSF')
+        ]
         
-        for org, patterns in org_patterns.items():
-            if any(re.search(pattern, content_lower) for pattern in patterns):
+        for pattern, org in org_patterns:
+            if re.search(pattern, first_page, re.IGNORECASE):
+                return org
                 return convert_org_to_acronym(org)
         
         # Strategy 3: Look for author affiliations
