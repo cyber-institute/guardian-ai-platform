@@ -1,73 +1,52 @@
 """
 Comprehensive scoring engine for AI and Quantum maturity assessments
-Implements patent-based scoring criteria with LLM intelligence
+Implements patent-based scoring criteria with enhanced content analysis
 """
 
 import re
 from typing import Dict, Optional, Tuple
+from .enhanced_content_analyzer import analyze_document_content_depth
 
 def analyze_document_applicability(text: str, title: str) -> Dict[str, bool]:
     """
-    Determine which scoring frameworks apply to a document based on content analysis.
-    Enhanced to properly identify Quantum-only documents and avoid AI scoring for non-AI content.
+    Determine which scoring frameworks apply to a document based on sophisticated content analysis.
+    Uses enhanced content depth analysis rather than simple keyword matching.
     
     Returns:
         Dict with keys: ai_cybersecurity, quantum_cybersecurity, ai_ethics, quantum_ethics
     """
+    # Use enhanced content analysis instead of keyword matching
+    content_analysis = analyze_document_content_depth(text, title)
+    
+    ai_analysis = content_analysis['ai_analysis']
+    quantum_analysis = content_analysis['quantum_analysis']
+    
+    # Determine applicability based on content depth analysis
+    ai_should_score = ai_analysis['recommendation']['should_score']
+    quantum_should_score = quantum_analysis['recommendation']['should_score']
+    
+    # Check for cybersecurity and ethics contexts
     text_lower = text.lower()
     title_lower = title.lower()
     
-    # AI-related keywords (more specific to avoid false positives)
-    ai_keywords = [
-        'artificial intelligence', 'machine learning', 'deep learning', 'neural network',
-        'ai system', 'ai model', 'automated decision', 'chatbot', 'llm', 'gpt',
-        'computer vision', 'natural language processing', 'recommendation system', 'responsible ai',
-        'trustworthy ai', 'ai plan', 'ai framework', 'ai policy', 'ai governance',
-        'ai risk', 'ai safety', 'ai ethics', 'ai cybersecurity', 'ai threat'
+    # Cybersecurity indicators - require substantial security discussion
+    cybersecurity_indicators = [
+        'cybersecurity framework', 'security policy', 'threat assessment', 'risk management',
+        'security governance', 'cyber defense', 'security standards', 'vulnerability management',
+        'incident response', 'security architecture', 'encryption standards', 'access control'
     ]
     
-    # Quantum-related keywords (expanded for better detection)
-    quantum_keywords = [
-        'quantum', 'post-quantum', 'quantum computing', 'quantum cryptography',
-        'quantum encryption', 'quantum key', 'quantum-safe', 'quantum-resistant',
-        'qkd', 'quantum supremacy', 'quantum advantage', 'quantum security',
-        'quantum technology', 'quantum systems', 'quantum protocols',
-        'lattice-based', 'quantum key distribution', 'quantum mechanics',
-        'quantum information', 'quantum communication', 'quantum ethics',
-        'quantum governance', 'quantum framework', 'quantum policy',
-        'quantum threat', 'quantum era', 'quantum revolution', 'qubit',
-        'quantum state', 'quantum entanglement', 'quantum algorithm',
-        'quantum science', 'quantum physics', 'quantum theory'
+    # Ethics indicators - require substantial ethics/governance discussion  
+    ethics_indicators = [
+        'ethics framework', 'ethical guidelines', 'governance model', 'policy framework',
+        'responsible development', 'ethical principles', 'oversight mechanisms', 'transparency requirements',
+        'accountability measures', 'bias mitigation', 'fairness assessment', 'social impact'
     ]
     
-    # Cybersecurity keywords (general security terms)
-    cybersecurity_keywords = [
-        'cybersecurity', 'security', 'encryption', 'cryptography', 'vulnerability',
-        'threat', 'attack', 'defense', 'protection', 'breach', 'incident response',
-        'risk management', 'compliance', 'authentication', 'authorization', 'secure',
-        'safety', 'risk', 'mitigation', 'safeguard', 'assurance'
-    ]
+    has_cybersecurity_depth = any(indicator in text_lower for indicator in cybersecurity_indicators)
+    has_ethics_depth = any(indicator in text_lower for indicator in ethics_indicators)
     
-    # Ethics keywords (expanded for governance documents)  
-    ethics_keywords = [
-        'ethics', 'ethical', 'bias', 'fairness', 'transparency', 'accountability',
-        'privacy', 'discrimination', 'human rights', 'responsible', 'governance',
-        'oversight', 'explainable', 'interpretable', 'audit', 'trustworthy',
-        'principle', 'guideline', 'standard', 'framework', 'policy', 'plan',
-        'inclusion', 'sustainability', 'equity', 'justice', 'social impact'
-    ]
-    
-    # Check for keyword presence with more precise matching
-    has_ai = any(keyword in text_lower or keyword in title_lower for keyword in ai_keywords)
-    has_quantum = any(keyword in text_lower or keyword in title_lower for keyword in quantum_keywords)
-    has_cybersecurity = any(keyword in text_lower or keyword in title_lower for keyword in cybersecurity_keywords)
-    has_ethics = any(keyword in text_lower or keyword in title_lower for keyword in ethics_keywords)
-    
-    # Special handling for Quantum-only documents
-    # If document has quantum keywords but no AI keywords, it's quantum-only
-    is_quantum_only = has_quantum and not has_ai
-    
-    # For UNESCO "Quantum Science for Inclusion and Sustainability" - it's quantum ethics only
+    # Special handling for UNESCO "Quantum Science for Inclusion and Sustainability" - it's quantum ethics only
     if 'quantum science for inclusion' in title_lower or 'quantum for inclusion' in title_lower:
         return {
             'ai_cybersecurity': False,
@@ -76,17 +55,17 @@ def analyze_document_applicability(text: str, title: str) -> Dict[str, bool]:
             'quantum_ethics': True
         }
     
-    # Determine applicability with enhanced logic
+    # Determine applicability based on content depth analysis and context
     return {
-        'ai_cybersecurity': has_ai and has_cybersecurity and not is_quantum_only,
-        'quantum_cybersecurity': has_quantum and has_cybersecurity,
-        'ai_ethics': has_ai and has_ethics and not is_quantum_only,
-        'quantum_ethics': has_quantum and has_ethics
+        'ai_cybersecurity': ai_should_score and has_cybersecurity_depth,
+        'quantum_cybersecurity': quantum_should_score and has_cybersecurity_depth,
+        'ai_ethics': ai_should_score and has_ethics_depth,
+        'quantum_ethics': quantum_should_score and has_ethics_depth
     }
 
 def score_ai_cybersecurity_maturity(text: str, title: str) -> Optional[int]:
     """
-    Score AI Cybersecurity Maturity (0-100) based on patent criteria.
+    Score AI Cybersecurity Maturity (0-100) based on patent criteria with content depth analysis.
     
     Patent criteria from AI Policy patent:
     - Encryption standards for AI systems
@@ -97,9 +76,26 @@ def score_ai_cybersecurity_maturity(text: str, title: str) -> Optional[int]:
     if not analyze_document_applicability(text, title)['ai_cybersecurity']:
         return None
     
+    # Get content depth analysis
+    content_analysis = analyze_document_content_depth(text, title)
+    ai_analysis = content_analysis['ai_analysis']
+    
+    # If content analysis says don't score, return None
+    if not ai_analysis['recommendation']['should_score']:
+        return None
+    
     text_lower = text.lower()
-    score = 0
+    base_score = 0
     max_score = 100
+    
+    # Apply content depth multiplier based on analysis
+    content_multiplier = 1.0
+    if ai_analysis['recommendation']['recommended_score'] == 'low':
+        content_multiplier = 0.15  # Max score around 15
+    elif ai_analysis['recommendation']['recommended_score'] == 'medium':
+        content_multiplier = 0.5   # Max score around 50
+    elif ai_analysis['recommendation']['recommended_score'] == 'high':
+        content_multiplier = 1.0   # Full scoring range
     
     # Encryption standards (25 points)
     encryption_indicators = [
@@ -107,7 +103,7 @@ def score_ai_cybersecurity_maturity(text: str, title: str) -> Optional[int]:
         'secure computation', 'homomorphic encryption', 'federated learning security'
     ]
     encryption_score = min(25, sum(5 for indicator in encryption_indicators if indicator in text_lower))
-    score += encryption_score
+    base_score += encryption_score
     
     # Authentication mechanisms (25 points)
     auth_indicators = [
@@ -115,7 +111,7 @@ def score_ai_cybersecurity_maturity(text: str, title: str) -> Optional[int]:
         'identity verification', 'multi-factor', 'zero trust', 'credential management'
     ]
     auth_score = min(25, sum(3 for indicator in auth_indicators if indicator in text_lower))
-    score += auth_score
+    base_score += auth_score
     
     # Threat monitoring (25 points)
     monitoring_indicators = [
@@ -123,7 +119,7 @@ def score_ai_cybersecurity_maturity(text: str, title: str) -> Optional[int]:
         'anomaly detection', 'security monitoring', 'ai security testing', 'vulnerability assessment'
     ]
     monitoring_score = min(25, sum(3 for indicator in monitoring_indicators if indicator in text_lower))
-    score += monitoring_score
+    base_score += monitoring_score
     
     # Incident response (25 points)
     incident_indicators = [
@@ -131,9 +127,12 @@ def score_ai_cybersecurity_maturity(text: str, title: str) -> Optional[int]:
         'forensics', 'containment', 'ai incident', 'security playbook'
     ]
     incident_score = min(25, sum(3 for indicator in incident_indicators if indicator in text_lower))
-    score += incident_score
+    base_score += incident_score
     
-    return min(100, score)
+    # Apply content depth multiplier
+    final_score = int(base_score * content_multiplier)
+    
+    return min(100, final_score)
 
 def score_quantum_cybersecurity_maturity(text: str, title: str) -> Optional[int]:
     """
