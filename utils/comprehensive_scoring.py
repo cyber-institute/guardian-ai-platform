@@ -187,7 +187,7 @@ def score_quantum_cybersecurity_maturity(text: str, title: str) -> Optional[int]
 
 def score_ai_ethics(text: str, title: str) -> Optional[int]:
     """
-    Score AI Ethics (0-100) based on patent ethical compliance criteria.
+    Score AI Ethics (0-100) based on patent ethical compliance criteria with content depth analysis.
     
     Patent criteria:
     - Fairness and bias mitigation
@@ -198,8 +198,25 @@ def score_ai_ethics(text: str, title: str) -> Optional[int]:
     if not analyze_document_applicability(text, title)['ai_ethics']:
         return None
     
+    # Get content depth analysis
+    content_analysis = analyze_document_content_depth(text, title)
+    ai_analysis = content_analysis['ai_analysis']
+    
+    # If content analysis says don't score, return None
+    if not ai_analysis['recommendation']['should_score']:
+        return None
+    
     text_lower = text.lower()
-    score = 0
+    base_score = 0
+    
+    # Apply content depth multiplier based on analysis
+    content_multiplier = 1.0
+    if ai_analysis['recommendation']['recommended_score'] == 'low':
+        content_multiplier = 0.15  # Max score around 15
+    elif ai_analysis['recommendation']['recommended_score'] == 'medium':
+        content_multiplier = 0.5   # Max score around 50
+    elif ai_analysis['recommendation']['recommended_score'] == 'high':
+        content_multiplier = 1.0   # Full scoring range
     
     # Fairness and bias mitigation (25 points)
     fairness_indicators = [
