@@ -37,12 +37,14 @@ class DocumentScoringSystem:
             conn = self.get_db_connection()
             cursor = conn.cursor()
             
-            # Get all documents that need scoring
+            # Get all documents that need scoring, excluding protected ones
             cursor.execute("""
                 SELECT id, title, text_content, content
                 FROM documents 
                 WHERE text_content IS NOT NULL 
                 AND text_content != ''
+                AND id NOT IN (10, 26, 27, 28, 29, 30, 43, 63)
+                AND NOT (title ILIKE '%UNESCO%' OR title ILIKE '%RECOMMENDATION ON THE ETHICS%')
                 ORDER BY id
             """)
             
