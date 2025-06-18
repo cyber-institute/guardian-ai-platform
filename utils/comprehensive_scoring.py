@@ -15,34 +15,39 @@ def analyze_document_applicability(text: str, title: str) -> Dict[str, bool]:
     Returns:
         Dict with keys: ai_cybersecurity, quantum_cybersecurity, ai_ethics, quantum_ethics
     """
-    # Use enhanced content analysis instead of keyword matching
-    content_analysis = analyze_document_content_depth(text, title)
-    
-    ai_analysis = content_analysis['ai_analysis']
-    quantum_analysis = content_analysis['quantum_analysis']
-    
-    # Determine applicability based on content depth analysis
-    ai_should_score = ai_analysis['recommendation']['should_score']
-    quantum_should_score = quantum_analysis['recommendation']['should_score']
-    
-    # Check for cybersecurity and ethics contexts
     text_lower = text.lower()
     title_lower = title.lower()
     
+    # AI indicators - substantial AI discussion required
+    ai_indicators = [
+        'artificial intelligence', 'machine learning', 'ai system', 'ai model', 'neural network',
+        'deep learning', 'ai algorithm', 'automated decision', 'ai governance', 'ai policy'
+    ]
+    
+    # Quantum indicators - substantial quantum discussion required
+    quantum_indicators = [
+        'quantum computing', 'quantum cryptography', 'post-quantum', 'quantum-safe', 'quantum algorithm',
+        'quantum system', 'quantum security', 'quantum key distribution', 'quantum threat', 'pqc'
+    ]
+    
     # Cybersecurity indicators - require substantial security discussion
     cybersecurity_indicators = [
-        'cybersecurity framework', 'security policy', 'threat assessment', 'risk management',
-        'security governance', 'cyber defense', 'security standards', 'vulnerability management',
-        'incident response', 'security architecture', 'encryption standards', 'access control'
+        'cybersecurity', 'security policy', 'threat assessment', 'risk management',
+        'security governance', 'cyber defense', 'security standards', 'vulnerability',
+        'incident response', 'security architecture', 'encryption', 'access control',
+        'cryptographic', 'security framework', 'threat model'
     ]
     
     # Ethics indicators - require substantial ethics/governance discussion  
     ethics_indicators = [
-        'ethics framework', 'ethical guidelines', 'governance model', 'policy framework',
-        'responsible development', 'ethical principles', 'oversight mechanisms', 'transparency requirements',
-        'accountability measures', 'bias mitigation', 'fairness assessment', 'social impact'
+        'ethics', 'ethical guidelines', 'governance', 'policy framework',
+        'responsible development', 'ethical principles', 'oversight', 'transparency',
+        'accountability', 'bias mitigation', 'fairness', 'social impact', 'inclusion'
     ]
     
+    # Check for substantial content (not just passing mentions)
+    ai_depth = sum(1 for indicator in ai_indicators if indicator in text_lower) >= 2
+    quantum_depth = sum(1 for indicator in quantum_indicators if indicator in text_lower) >= 2
     has_cybersecurity_depth = any(indicator in text_lower for indicator in cybersecurity_indicators)
     has_ethics_depth = any(indicator in text_lower for indicator in ethics_indicators)
     
@@ -57,10 +62,10 @@ def analyze_document_applicability(text: str, title: str) -> Dict[str, bool]:
     
     # Determine applicability based on content depth analysis and context
     return {
-        'ai_cybersecurity': ai_should_score and has_cybersecurity_depth,
-        'quantum_cybersecurity': quantum_should_score and has_cybersecurity_depth,
-        'ai_ethics': ai_should_score and has_ethics_depth,
-        'quantum_ethics': quantum_should_score and has_ethics_depth
+        'ai_cybersecurity': ai_depth and has_cybersecurity_depth,
+        'quantum_cybersecurity': quantum_depth and has_cybersecurity_depth,
+        'ai_ethics': ai_depth and has_ethics_depth,
+        'quantum_ethics': quantum_depth and has_ethics_depth
     }
 
 def score_ai_cybersecurity_maturity(text: str, title: str) -> Optional[int]:
@@ -307,7 +312,7 @@ def score_quantum_ethics(text: str, title: str) -> Optional[int]:
 
 def comprehensive_document_scoring(text: str, title: str) -> Dict[str, Optional[int]]:
     """
-    Perform comprehensive scoring across all four frameworks using Multi-LLM analysis.
+    Perform comprehensive scoring across all four frameworks using enhanced content analysis.
     
     Returns:
         Dict with scores for each framework or None if not applicable
@@ -318,16 +323,25 @@ def comprehensive_document_scoring(text: str, title: str) -> Dict[str, Optional[
         clean_text = clean_field(str(text)) if text else ""
         clean_title = clean_field(str(title)) if title else ""
         
-        # Use intelligent Multi-LLM ensemble analysis as primary method
-        scores = multi_llm_intelligent_scoring(clean_text, clean_title)
-        if any(score is not None for score in scores.values()):
-            return scores
+        # Use enhanced scoring functions with content analysis
+        scores = {}
         
-        # Secondary fallback to enhanced pattern analysis
-        return enhanced_scoring_with_llm_insights(clean_text, clean_title)
+        # AI Cybersecurity scoring with content analysis
+        scores['ai_cybersecurity'] = score_ai_cybersecurity_maturity(clean_text, clean_title)
+        
+        # AI Ethics scoring with content analysis  
+        scores['ai_ethics'] = score_ai_ethics(clean_text, clean_title)
+        
+        # Quantum Cybersecurity scoring with enhanced algorithm
+        scores['quantum_cybersecurity'] = score_quantum_cybersecurity_maturity(clean_text, clean_title)
+        
+        # Quantum Ethics scoring
+        scores['quantum_ethics'] = score_quantum_ethics(clean_text, clean_title)
+        
+        return scores
             
     except Exception as e:
-        print(f"Multi-LLM scoring failed, using fallback: {e}")
+        print(f"Enhanced scoring failed, using fallback: {e}")
         # Fallback to pattern-based scoring when API fails
         return fallback_scoring(clean_text if 'clean_text' in locals() else text, clean_title if 'clean_title' in locals() else title)
 
