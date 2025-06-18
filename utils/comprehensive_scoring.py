@@ -224,7 +224,7 @@ def score_ai_ethics(text: str, title: str) -> Optional[int]:
         'discrimination prevention', 'equitable', 'bias audit', 'fairness metrics'
     ]
     fairness_score = min(25, sum(3 for indicator in fairness_indicators if indicator in text_lower))
-    score += fairness_score
+    base_score += fairness_score
     
     # Transparency and explainability (25 points)
     transparency_indicators = [
@@ -232,7 +232,7 @@ def score_ai_ethics(text: str, title: str) -> Optional[int]:
         'ai explanation', 'model interpretation', 'decision transparency', 'algorithmic transparency'
     ]
     transparency_score = min(25, sum(3 for indicator in transparency_indicators if indicator in text_lower))
-    score += transparency_score
+    base_score += transparency_score
     
     # Accountability mechanisms (25 points)
     accountability_indicators = [
@@ -240,7 +240,7 @@ def score_ai_ethics(text: str, title: str) -> Optional[int]:
         'human oversight', 'ai responsibility', 'ethical review', 'ai audit'
     ]
     accountability_score = min(25, sum(3 for indicator in accountability_indicators if indicator in text_lower))
-    score += accountability_score
+    base_score += accountability_score
     
     # Privacy protection (25 points)
     privacy_indicators = [
@@ -248,9 +248,12 @@ def score_ai_ethics(text: str, title: str) -> Optional[int]:
         'privacy by design', 'data protection', 'personal data', 'privacy rights'
     ]
     privacy_score = min(25, sum(3 for indicator in privacy_indicators if indicator in text_lower))
-    score += privacy_score
+    base_score += privacy_score
     
-    return min(100, score)
+    # Apply content depth multiplier
+    final_score = int(base_score * content_multiplier)
+    
+    return min(100, final_score)
 
 def score_quantum_ethics(text: str, title: str) -> Optional[int]:
     """

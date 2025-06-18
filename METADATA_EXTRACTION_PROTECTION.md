@@ -12,10 +12,17 @@ These files contain WORKING metadata extraction logic that correctly identifies:
 2. `universal_metadata_extraction_fix.py` - Retroactive metadata correction system
 3. Database field mappings for `publication_date` and `publish_date` synchronization
 
+### Enhanced Scoring System (PROTECTED):
+4. `utils/enhanced_content_analyzer.py` - Content depth analysis engine
+5. `utils/comprehensive_scoring.py` - Enhanced scoring with content analysis
+6. `utils/metadata_integrity_validator.py` - Automated integrity validation
+
 ### Protected Functions:
 - `_extract_title()` - Contains UNESCO and NIST document patterns
 - `_extract_organization()` - URL and content-based organization detection
 - Date field synchronization logic
+- `analyze_document_content_depth()` - Content depth analysis
+- Enhanced scoring functions with content multipliers
 
 ## Working Test Cases (DO NOT BREAK):
 - Document ID 58: "Quantum Science for Inclusion and Sustainability" | UNESCO
