@@ -606,19 +606,39 @@ def get_document_topic(doc):
         doc.get('organization', '')
     ]
     
-    full_content = ' '.join(str(source) for source in content_sources if source)
+    full_content = ' '.join(str(source) for source in content_sources if source).lower()
     
-    is_ai = is_probably_ai(full_content)
-    is_quantum = is_probably_quantum(full_content)
+    # Enhanced AI detection - including UNESCO AI Ethics patterns
+    ai_indicators = [
+        'artificial intelligence', 'machine learning', 'ai policy', 'ai framework',
+        'ai strategy', 'ai governance', 'neural network', 'deep learning',
+        'ai ethics', 'ai safety', 'ai risk', 'generative ai', 'ai system',
+        'ethics of artificial intelligence', 'recommendation on the ethics',
+        'ai technologies', 'ethical ai', 'responsible ai', 'ai development',
+        'ai deployment', 'algorithmic', 'automated decision', 'intelligent system'
+    ]
     
-    if is_ai and is_quantum:
-        return "Both"
-    elif is_quantum:
+    # Enhanced quantum detection
+    quantum_indicators = [
+        'quantum policy', 'quantum approach', 'quantum technology', 'quantum computing', 
+        'quantum cryptography', 'quantum security', 'post-quantum', 'quantum-safe',
+        'quantum initiative', 'quantum strategy', 'quantum framework', 'qkd',
+        'quantum key distribution', 'quantum resistant', 'quantum threat', 'quantum',
+        'qubit', 'quantum state', 'quantum mechanics', 'quantum information'
+    ]
+    
+    ai_count = sum(1 for indicator in ai_indicators if indicator in full_content)
+    quantum_count = sum(1 for indicator in quantum_indicators if indicator in full_content)
+    
+    # Determine primary topic based on content analysis with improved sensitivity
+    if quantum_count >= 2 and quantum_count > ai_count:
         return "Quantum"
-    elif is_ai:
+    elif ai_count >= 1 and ai_count >= quantum_count:  # Lower threshold for AI detection
         return "AI"
+    elif quantum_count >= 1 and ai_count >= 1:
+        return "Both"
     else:
-        return "Both"  # Show documents that don't clearly fit either category
+        return "AI"  # Default to AI instead of Both for policy documents
 
 def render():
     """Render the All Documents tab with comprehensive document repository and contextual help tooltips."""
@@ -2420,25 +2440,28 @@ def render():
                                     'qubit', 'quantum state', 'quantum mechanics', 'quantum information'
                                 ]
                                 
-                                # Enhanced AI detection
+                                # Enhanced AI detection - including UNESCO AI Ethics patterns
                                 ai_indicators = [
                                     'artificial intelligence', 'machine learning', 'ai policy', 'ai framework',
                                     'ai strategy', 'ai governance', 'neural network', 'deep learning',
-                                    'ai ethics', 'ai safety', 'ai risk', 'generative ai', 'ai system'
+                                    'ai ethics', 'ai safety', 'ai risk', 'generative ai', 'ai system',
+                                    'ethics of artificial intelligence', 'recommendation on the ethics',
+                                    'ai technologies', 'ethical ai', 'responsible ai', 'ai development',
+                                    'ai deployment', 'algorithmic', 'automated decision', 'intelligent system'
                                 ]
                                 
                                 quantum_count = sum(1 for indicator in quantum_indicators if indicator in combined_text)
                                 ai_count = sum(1 for indicator in ai_indicators if indicator in combined_text)
                                 
-                                # Determine primary topic based on content analysis
-                                if quantum_count > ai_count and quantum_count > 0:
+                                # Determine primary topic based on content analysis with improved sensitivity
+                                if quantum_count >= 2 and quantum_count > ai_count:
                                     return "Quantum"
-                                elif ai_count > quantum_count and ai_count > 0:
+                                elif ai_count >= 1 and ai_count >= quantum_count:  # Lower threshold for AI detection
                                     return "AI"
-                                elif quantum_count > 0 and ai_count > 0:
+                                elif quantum_count >= 1 and ai_count >= 1:
                                     return "Both"
                                 else:
-                                    return "General"
+                                    return "AI"  # Default to AI instead of General for policy documents
                             
                             # Determine the document topic
                             document_topic = determine_document_topic(clean_content, clean_title)
@@ -2456,7 +2479,7 @@ def render():
                                         'title': extract_title_from_url_content(content, metadata, url_input),
                                         'author': extract_author_from_url_content(content, metadata, url_input),
                                         'organization': extract_organization_from_url_content(content, metadata, url_input),
-                                        'topic': 'General',  # Default before verification
+                                        'topic': document_topic,  # Use the determined topic
                                         'date': extract_date_from_url_content(content, metadata)
                                     }
                                     
