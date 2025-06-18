@@ -595,11 +595,12 @@ def main():
     
     elif st.session_state.nav_selection == "About GUARDIAN":
         # About tab with Patent Technology and Prototype Phased Plan as subtabs
-        about_subtab1, about_subtab2, about_subtab3, about_subtab4 = st.tabs([
+        about_subtab1, about_subtab2, about_subtab3, about_subtab4, about_subtab5 = st.tabs([
             "GUARDIAN Emerging Tech Tool", 
             "Patent Pending Technologies",
             "Convergence AI System",
-            "Prototype Phased Plan"
+            "Prototype Phased Plan",
+            "Scoring Pipeline Documentation"
         ])
         
         with about_subtab1:
@@ -614,6 +615,9 @@ def main():
         
         with about_subtab4:
             render_prototype_phased_plan_section()
+        
+        with about_subtab5:
+            render_scoring_pipeline_documentation()
     
     # Credit at bottom of page - appears on all pages
     st.markdown("<br><br>", unsafe_allow_html=True)
@@ -4469,6 +4473,486 @@ P_advanced = weighted_combination(
         - Consensus quality metrics
         - Quantum enhancement statistics
         """)
+
+def render_scoring_pipeline_documentation():
+    """Render detailed documentation of the GUARDIAN scoring pipeline."""
+    
+    # Enhanced header matching Patent Technologies style
+    st.markdown(
+        """<div style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%); padding: 2.5rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
+            <h1 style="color: white; margin-bottom: 1.2rem; font-size: 2.2rem; font-weight: 700; text-align: center;">
+                GUARDIAN Scoring Pipeline Architecture
+            </h1>
+            <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0; border: 1px solid rgba(255,255,255,0.2);">
+                <h3 style="color: #60a5fa; margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600; text-align: center;">
+                    Complete Document Analysis & Scoring System
+                </h3>
+                <p style="color: #e5e7eb; text-align: center; font-size: 1.1rem; line-height: 1.6; margin: 0;">
+                    From document ingestion through content analysis to final scoring with intelligent topic detection and sophisticated content depth evaluation.
+                </p>
+            </div>
+        </div>""", 
+        unsafe_allow_html=True
+    )
+    
+    # Pipeline overview
+    st.markdown("### 🔄 Pipeline Overview")
+    st.markdown("""
+    The GUARDIAN scoring system processes documents through a sophisticated 6-stage pipeline that ensures accurate, content-aware analysis:
+    
+    **Document Ingestion → Content Analysis → Topic Identification → Algorithm Selection → Scoring Process → Result Validation**
+    """)
+    
+    # Stage 1: Document Ingestion
+    with st.expander("🔍 Stage 1: Document Ingestion & Preprocessing", expanded=True):
+        st.markdown("""
+        #### Document Ingestion Process
+        
+        **Input Sources:**
+        - Direct PDF uploads with OCR processing
+        - URL-based document discovery and extraction
+        - Batch document processing capabilities
+        - API-based document ingestion
+        
+        **Content Extraction Pipeline:**
+        ```python
+        # Document processing workflow
+        1. Document Detection → PDF/URL/Text identification
+        2. Content Extraction → OCR, text parsing, metadata extraction
+        3. Text Normalization → Encoding standardization, character cleanup
+        4. Preprocessing → Tokenization, sentence segmentation
+        5. Metadata Enrichment → Title, author, organization, date extraction
+        ```
+        
+        **Extraction Technologies:**
+        - **PDF Processing:** PyPDF2, pdf2image, OCR with Tesseract
+        - **Web Scraping:** Trafilatura for clean text extraction
+        - **Metadata Extraction:** Enhanced pattern matching for organizations
+        - **Content Validation:** Integrity checks and quality assessment
+        
+        **Quality Assurance:**
+        - Minimum content length validation (500+ characters)
+        - Language detection and encoding verification
+        - Duplicate content detection using content hashing
+        - Metadata completeness scoring
+        """)
+    
+    # Stage 2: Content Analysis
+    with st.expander("🧠 Stage 2: Content Depth Analysis", expanded=True):
+        st.markdown("""
+        #### Intelligent Content Analysis Engine
+        
+        **Content Depth Evaluation:**
+        The system analyzes content depth rather than just keyword frequency to determine if a document substantively discusses AI/Quantum topics.
+        
+        **Analysis Dimensions:**
+        ```python
+        # Content depth analysis algorithm
+        def analyze_document_content_depth(text, title):
+            analysis = {
+                'ai_analysis': {
+                    'keyword_density': calculate_keyword_density(text, AI_KEYWORDS),
+                    'discussion_depth': evaluate_discussion_depth(text, AI_CONCEPTS),
+                    'complexity_score': assess_technical_complexity(text),
+                    'recommendation': determine_scoring_recommendation()
+                },
+                'quantum_analysis': {
+                    'keyword_density': calculate_keyword_density(text, QUANTUM_KEYWORDS),
+                    'discussion_depth': evaluate_discussion_depth(text, QUANTUM_CONCEPTS),
+                    'complexity_score': assess_technical_complexity(text),
+                    'recommendation': determine_scoring_recommendation()
+                }
+            }
+        ```
+        
+        **Depth Evaluation Criteria:**
+        
+        **1. Keyword Density Analysis:**
+        - Counts occurrences of domain-specific terms
+        - Weights terms by importance and specificity
+        - Calculates normalized density scores
+        
+        **2. Discussion Depth Assessment:**
+        - Identifies substantive discussions vs. passing mentions
+        - Analyzes sentence context and paragraph structure
+        - Evaluates technical depth and complexity
+        
+        **3. Content Complexity Scoring:**
+        - Technical terminology usage patterns
+        - Concept relationship analysis
+        - Implementation detail presence
+        
+        **4. Recommendation Engine:**
+        - **High Relevance:** Substantive discussion, high complexity
+        - **Medium Relevance:** Moderate discussion, some technical depth
+        - **Low Relevance:** Passing mentions, minimal technical content
+        - **Not Applicable:** Mentions only in comparisons or examples
+        """)
+    
+    # Stage 3: Topic Identification
+    with st.expander("🎯 Stage 3: Topic Identification & Applicability", expanded=True):
+        st.markdown("""
+        #### Document Topic Classification
+        
+        **Topic Detection Algorithm:**
+        ```python
+        def analyze_document_applicability(text, title):
+            return {
+                'ai_cybersecurity': is_ai_cybersecurity_applicable(text, title),
+                'ai_ethics': is_ai_ethics_applicable(text, title),
+                'quantum_cybersecurity': is_quantum_cybersecurity_applicable(text, title),
+                'quantum_ethics': is_quantum_ethics_applicable(text, title)
+            }
+        ```
+        
+        **AI Cybersecurity Detection:**
+        - Security framework discussions
+        - Threat detection and mitigation
+        - AI system vulnerabilities
+        - Cybersecurity policy implementation
+        
+        **AI Ethics Detection:**
+        - Fairness and bias considerations
+        - Transparency and explainability
+        - Accountability mechanisms
+        - Privacy protection measures
+        
+        **Quantum Cybersecurity Detection:**
+        - Post-quantum cryptography
+        - Quantum-safe security measures
+        - Quantum key distribution
+        - Quantum threat assessments
+        
+        **Quantum Ethics Detection:**
+        - Quantum advantage ethics
+        - Quantum privacy implications
+        - Equitable quantum access
+        - Quantum governance frameworks
+        
+        **Applicability Thresholds:**
+        - **Primary Topic:** >60% content relevance
+        - **Secondary Topic:** 30-60% content relevance
+        - **Mentioned:** 10-30% content relevance
+        - **Not Applicable:** <10% content relevance
+        """)
+    
+    # Stage 4: Algorithm Selection
+    with st.expander("⚙️ Stage 4: Scoring Algorithm Selection", expanded=True):
+        st.markdown("""
+        #### Dynamic Algorithm Selection
+        
+        **Selection Process:**
+        Based on topic identification and content depth analysis, the system selects appropriate scoring algorithms:
+        
+        **Algorithm Routing:**
+        ```python
+        def comprehensive_document_scoring(content, title):
+            # Get content depth analysis
+            content_analysis = analyze_document_content_depth(content, title)
+            applicability = analyze_document_applicability(content, title)
+            
+            scores = {}
+            
+            # Route to appropriate scoring algorithms
+            if applicability['ai_cybersecurity']:
+                scores['ai_cybersecurity'] = score_ai_cybersecurity(content, title)
+            
+            if applicability['ai_ethics']:
+                scores['ai_ethics'] = score_ai_ethics(content, title)
+            
+            if applicability['quantum_cybersecurity']:
+                scores['quantum_cybersecurity'] = score_quantum_cybersecurity(content, title)
+            
+            if applicability['quantum_ethics']:
+                scores['quantum_ethics'] = score_quantum_ethics(content, title)
+            
+            return scores
+        ```
+        
+        **Scoring Algorithms Available:**
+        
+        **1. AI Cybersecurity Scoring:**
+        - Threat detection capabilities (25 points)
+        - Security implementation (25 points)
+        - Risk assessment frameworks (25 points)
+        - Compliance and governance (25 points)
+        
+        **2. AI Ethics Scoring:**
+        - Fairness and bias mitigation (25 points)
+        - Transparency and explainability (25 points)
+        - Accountability mechanisms (25 points)
+        - Privacy protection (25 points)
+        
+        **3. Quantum Cybersecurity Scoring:**
+        - Post-quantum cryptography (30 points)
+        - Quantum-safe protocols (25 points)
+        - Implementation readiness (25 points)
+        - Advanced quantum security (20 points)
+        
+        **4. Quantum Ethics Scoring:**
+        - Quantum advantage ethics (25 points)
+        - Quantum privacy implications (25 points)
+        - Quantum security standards (25 points)
+        - Equitable quantum access (25 points)
+        """)
+    
+    # Stage 5: Scoring Process
+    with st.expander("📊 Stage 5: Scoring Process & Content Multipliers", expanded=True):
+        st.markdown("""
+        #### Detailed Scoring Process
+        
+        **Enhanced Scoring with Content Multipliers:**
+        ```python
+        def score_with_content_analysis(text, title, scoring_function):
+            # Get content depth analysis
+            content_analysis = analyze_document_content_depth(text, title)
+            topic_analysis = content_analysis['ai_analysis'] or content_analysis['quantum_analysis']
+            
+            # Check if scoring should proceed
+            if not topic_analysis['recommendation']['should_score']:
+                return None
+            
+            # Calculate base score using traditional indicators
+            base_score = calculate_base_score(text, scoring_function)
+            
+            # Apply content depth multiplier
+            multiplier = determine_content_multiplier(topic_analysis['recommendation'])
+            final_score = int(base_score * multiplier)
+            
+            return min(100, final_score)
+        ```
+        
+        **Content Multiplier System:**
+        - **High Relevance (1.0x):** Full scoring range (0-100)
+        - **Medium Relevance (0.5x):** Moderate scoring range (0-50)
+        - **Low Relevance (0.15x):** Minimal scoring range (0-15)
+        - **Not Applicable (N/A):** No score assigned
+        
+        **Scoring Methodology Example - AI Ethics:**
+        
+        **Base Score Calculation:**
+        ```python
+        base_score = 0
+        
+        # Fairness indicators (25 points max)
+        fairness_terms = ['bias mitigation', 'algorithmic fairness', 'bias testing']
+        fairness_score = min(25, sum(3 for term in fairness_terms if term in text))
+        base_score += fairness_score
+        
+        # Transparency indicators (25 points max)
+        transparency_terms = ['explainable ai', 'interpretable', 'transparency']
+        transparency_score = min(25, sum(3 for term in transparency_terms if term in text))
+        base_score += transparency_score
+        
+        # Similar for accountability and privacy (50 points max total)
+        ```
+        
+        **Final Score Application:**
+        ```python
+        # Apply content multiplier based on depth analysis
+        if recommendation == 'high':
+            final_score = base_score * 1.0    # Full range
+        elif recommendation == 'medium':
+            final_score = base_score * 0.5    # Moderate range
+        elif recommendation == 'low':
+            final_score = base_score * 0.15   # Minimal range
+        else:
+            return None  # N/A
+        ```
+        """)
+    
+    # Stage 6: Result Validation
+    with st.expander("✅ Stage 6: Result Validation & Quality Assurance", expanded=True):
+        st.markdown("""
+        #### Scoring Validation & Quality Control
+        
+        **Validation Pipeline:**
+        ```python
+        def validate_scoring_results(scores, content, title):
+            validation_report = {
+                'scores_valid': True,
+                'content_analysis_valid': True,
+                'metadata_integrity': True,
+                'scoring_logic_valid': True
+            }
+            
+            # Validate score ranges
+            for framework, score in scores.items():
+                if score is not None and (score < 0 or score > 100):
+                    validation_report['scores_valid'] = False
+            
+            # Validate content analysis consistency
+            if not validate_content_consistency(content, scores):
+                validation_report['content_analysis_valid'] = False
+            
+            return validation_report
+        ```
+        
+        **Quality Assurance Checks:**
+        
+        **1. Score Range Validation:**
+        - All scores must be between 0-100 or None
+        - Content multipliers properly applied
+        - No negative or impossible scores
+        
+        **2. Content Consistency Validation:**
+        - Scores align with content depth analysis
+        - Topic applicability matches scoring decisions
+        - No contradictory scoring patterns
+        
+        **3. Metadata Integrity Validation:**
+        - Title and organization extraction accuracy
+        - Date field synchronization
+        - URL and source validation
+        
+        **4. Scoring Logic Validation:**
+        - Algorithm selection logic correct
+        - Content multipliers applied consistently
+        - N/A assignments for minimal relevance
+        
+        **Automated Integrity Monitoring:**
+        ```python
+        # Example validation from utils/metadata_integrity_validator.py
+        def validate_document_integrity(doc_id):
+            # Test scoring consistency
+            # Test metadata extraction
+            # Test content analysis
+            # Generate validation report
+        ```
+        
+        **Protection Against Scoring Drift:**
+        - Regular validation against test cases
+        - Emergency restore points for scoring logic
+        - Automated detection of scoring inconsistencies
+        - Protection documentation prevents unauthorized changes
+        """)
+    
+    # Example walkthrough
+    st.markdown("### 📋 Complete Pipeline Example")
+    
+    with st.expander("📄 Example: Quantum Science Document Processing", expanded=True):
+        st.markdown("""
+        #### Real Document Processing Example
+        
+        **Document:** "Quantum Science for Inclusion and Sustainability"
+        
+        **Stage 1 - Ingestion:**
+        - Document uploaded as PDF
+        - OCR processing extracts text content
+        - Metadata extraction identifies UNESCO as organization
+        - Content validation passes (sufficient length and quality)
+        
+        **Stage 2 - Content Analysis:**
+        ```python
+        content_analysis = {
+            'ai_analysis': {
+                'keyword_density': 0.02,  # AI mentioned 2% of content
+                'discussion_depth': 'minimal',  # Only in comparisons
+                'complexity_score': 0.1,  # No technical AI discussion
+                'recommendation': {'should_score': False, 'reason': 'mentioned_in_passing'}
+            },
+            'quantum_analysis': {
+                'keyword_density': 0.15,  # Quantum discussed 15% of content
+                'discussion_depth': 'moderate',  # Substantive discussion
+                'complexity_score': 0.6,  # Technical quantum concepts
+                'recommendation': {'should_score': True, 'recommended_score': 'medium'}
+            }
+        }
+        ```
+        
+        **Stage 3 - Topic Identification:**
+        ```python
+        applicability = {
+            'ai_cybersecurity': False,  # AI not substantially discussed
+            'ai_ethics': False,         # AI not substantially discussed
+            'quantum_cybersecurity': False,  # No security focus
+            'quantum_ethics': True      # Quantum ethics and governance discussed
+        }
+        ```
+        
+        **Stage 4 - Algorithm Selection:**
+        - Routes to quantum_ethics scoring algorithm only
+        - AI algorithms bypassed due to minimal relevance
+        
+        **Stage 5 - Scoring Process:**
+        ```python
+        # Quantum Ethics Scoring
+        base_score = 0
+        base_score += 15  # Quantum governance frameworks
+        base_score += 12  # Quantum inclusion policies
+        base_score += 10  # Quantum access considerations
+        # Total base_score = 37
+        
+        # Apply content multiplier (medium relevance = 1.0x for quantum ethics)
+        final_score = 37 * 1.0 = 37
+        ```
+        
+        **Stage 6 - Validation:**
+        - Score within valid range (0-100) ✓
+        - Content analysis consistency ✓
+        - Metadata integrity preserved ✓
+        - Scoring logic applied correctly ✓
+        
+        **Final Results:**
+        - AI Cybersecurity: N/A (correctly identifies minimal relevance)
+        - AI Ethics: N/A (correctly identifies minimal relevance)
+        - Quantum Cybersecurity: N/A (no security focus)
+        - Quantum Ethics: 37/100 (appropriate for content depth)
+        """)
+    
+    # Technical implementation details
+    st.markdown("### 🔧 Technical Implementation")
+    
+    implementation_cols = st.columns(2)
+    
+    with implementation_cols[0]:
+        st.markdown("""
+        #### Core Technologies
+        
+        **Content Analysis Engine:**
+        - `utils/enhanced_content_analyzer.py`
+        - Natural language processing
+        - Statistical analysis algorithms
+        - Pattern recognition systems
+        
+        **Scoring Algorithms:**
+        - `utils/comprehensive_scoring.py`
+        - Framework-specific scoring logic
+        - Content-aware multiplier system
+        - Validation and quality control
+        
+        **Metadata Extraction:**
+        - `utils/enhanced_metadata_extractor.py`
+        - Universal pattern matching
+        - Organization detection
+        - Date synchronization
+        """)
+    
+    with implementation_cols[1]:
+        st.markdown("""
+        #### Protection Systems
+        
+        **Integrity Validation:**
+        - `utils/metadata_integrity_validator.py`
+        - Automated testing framework
+        - Emergency restore capabilities
+        - Drift detection systems
+        
+        **Protection Documentation:**
+        - `METADATA_EXTRACTION_PROTECTION.md`
+        - Comprehensive protection rules
+        - Working test case preservation
+        - Change prevention policies
+        
+        **Quality Assurance:**
+        - Continuous monitoring
+        - Automated validation
+        - Performance benchmarking
+        - Error detection and correction
+        """)
+    
+    st.markdown("---")
+    st.markdown("*This pipeline ensures accurate, content-aware scoring that distinguishes between substantive discussions and passing mentions of AI/Quantum topics.*")
 
 def render_footer_section():
     """Render footer with logo and credit at bottom of page."""

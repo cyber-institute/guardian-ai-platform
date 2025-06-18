@@ -1,5 +1,6 @@
-# METADATA EXTRACTION PROTECTION SYSTEM
+# METADATA EXTRACTION & SCORING ENGINE PROTECTION SYSTEM
 ## CRITICAL: DO NOT MODIFY THESE COMPONENTS WITHOUT EXPLICIT PERMISSION
+## BOTH METADATA EXTRACTION AND SCORING ENGINE ARE NOW PROTECTED
 
 ## Protected Components (HANDS OFF)
 These files contain WORKING metadata extraction logic that correctly identifies:
@@ -23,6 +24,18 @@ These files contain WORKING metadata extraction logic that correctly identifies:
 - Date field synchronization logic
 - `analyze_document_content_depth()` - Content depth analysis
 - Enhanced scoring functions with content multipliers
+- `score_ai_cybersecurity()` - AI cybersecurity scoring with content analysis
+- `score_ai_ethics()` - AI ethics scoring with content analysis
+- `score_quantum_cybersecurity()` - Quantum cybersecurity scoring
+- `score_quantum_ethics()` - Quantum ethics scoring
+- `analyze_document_applicability()` - Document topic applicability analysis
+
+### Scoring Engine Protection Rules:
+1. NEVER revert to keyword-only scoring
+2. NEVER remove content depth analysis
+3. NEVER modify content multipliers without testing
+4. ALWAYS preserve N/A scoring for documents with minimal topic coverage
+5. ALWAYS maintain protection against AI drift in scoring logic
 
 ## Working Test Cases (DO NOT BREAK):
 - Document ID 58: "Quantum Science for Inclusion and Sustainability" | UNESCO
