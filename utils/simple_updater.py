@@ -39,12 +39,12 @@ def update_document_metadata():
             protected_patterns = [
                 'NASA', 'NIST', 'RESPONSIBLE AI PLAN', 
                 'National Institute of Standards', 'ARTIFICIAL INTELLIGENCE RISK',
-                'DIGITAL IDENTITY GUIDELINES'
+                'DIGITAL IDENTITY GUIDELINES', 'UNESCO', 'RECOMMENDATION ON THE ETHICS'
             ]
             
             if (any(pattern in current_title.upper() for pattern in protected_patterns) or
                 any(pattern in current_org.upper() for pattern in protected_patterns) or
-                doc_id in [10, 26, 27, 28, 29]):  # Specific document IDs to protect
+                doc_id in [10, 26, 27, 28, 29, 30, 43, 63]):  # Specific document IDs to protect - including UNESCO doc 63
                 logger.info(f"Skipping document {doc_id} - manually corrected metadata")
                 continue
             
