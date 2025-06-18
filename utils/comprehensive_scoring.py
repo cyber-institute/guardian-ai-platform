@@ -5,7 +5,6 @@ Implements patent-based scoring criteria with enhanced content analysis
 
 import re
 from typing import Dict, Optional, Tuple
-from .enhanced_content_analyzer import analyze_document_content_depth
 
 def analyze_document_applicability(text: str, title: str) -> Dict[str, bool]:
     """
@@ -81,26 +80,8 @@ def score_ai_cybersecurity_maturity(text: str, title: str) -> Optional[int]:
     if not analyze_document_applicability(text, title)['ai_cybersecurity']:
         return None
     
-    # Get content depth analysis
-    content_analysis = analyze_document_content_depth(text, title)
-    ai_analysis = content_analysis['ai_analysis']
-    
-    # If content analysis says don't score, return None
-    if not ai_analysis['recommendation']['should_score']:
-        return None
-    
     text_lower = text.lower()
     base_score = 0
-    max_score = 100
-    
-    # Apply content depth multiplier based on analysis
-    content_multiplier = 1.0
-    if ai_analysis['recommendation']['recommended_score'] == 'low':
-        content_multiplier = 0.15  # Max score around 15
-    elif ai_analysis['recommendation']['recommended_score'] == 'medium':
-        content_multiplier = 0.5   # Max score around 50
-    elif ai_analysis['recommendation']['recommended_score'] == 'high':
-        content_multiplier = 1.0   # Full scoring range
     
     # Encryption standards (25 points)
     encryption_indicators = [
@@ -134,10 +115,7 @@ def score_ai_cybersecurity_maturity(text: str, title: str) -> Optional[int]:
     incident_score = min(25, sum(3 for indicator in incident_indicators if indicator in text_lower))
     base_score += incident_score
     
-    # Apply content depth multiplier
-    final_score = int(base_score * content_multiplier)
-    
-    return min(100, final_score)
+    return min(100, base_score)
 
 def score_quantum_cybersecurity_maturity(text: str, title: str) -> Optional[int]:
     """
@@ -203,25 +181,8 @@ def score_ai_ethics(text: str, title: str) -> Optional[int]:
     if not analyze_document_applicability(text, title)['ai_ethics']:
         return None
     
-    # Get content depth analysis
-    content_analysis = analyze_document_content_depth(text, title)
-    ai_analysis = content_analysis['ai_analysis']
-    
-    # If content analysis says don't score, return None
-    if not ai_analysis['recommendation']['should_score']:
-        return None
-    
     text_lower = text.lower()
     base_score = 0
-    
-    # Apply content depth multiplier based on analysis
-    content_multiplier = 1.0
-    if ai_analysis['recommendation']['recommended_score'] == 'low':
-        content_multiplier = 0.15  # Max score around 15
-    elif ai_analysis['recommendation']['recommended_score'] == 'medium':
-        content_multiplier = 0.5   # Max score around 50
-    elif ai_analysis['recommendation']['recommended_score'] == 'high':
-        content_multiplier = 1.0   # Full scoring range
     
     # Fairness and bias mitigation (25 points)
     fairness_indicators = [
@@ -255,10 +216,7 @@ def score_ai_ethics(text: str, title: str) -> Optional[int]:
     privacy_score = min(25, sum(3 for indicator in privacy_indicators if indicator in text_lower))
     base_score += privacy_score
     
-    # Apply content depth multiplier
-    final_score = int(base_score * content_multiplier)
-    
-    return min(100, final_score)
+    return min(100, base_score)
 
 def score_quantum_ethics(text: str, title: str) -> Optional[int]:
     """
