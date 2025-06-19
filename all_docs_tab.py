@@ -5415,8 +5415,59 @@ def render_card_view(docs):
             </script>
             """
             
-            import streamlit.components.v1 as components
-            components.html(button_html, height=180)
+            # Native Streamlit buttons for scoring analysis
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                if st.button(f"AI Cyber: {ai_cyber_display}", key=f"ai_cyber_{unique_id}", help="Click for AI Cybersecurity analysis"):
+                    st.session_state[f'modal_ai_cyber_{unique_id}'] = True
+                    st.rerun()
+                    
+                if st.button(f"AI Ethics: {ai_ethics_display}", key=f"ai_ethics_{unique_id}", help="Click for AI Ethics analysis"):
+                    st.session_state[f'modal_ai_ethics_{unique_id}'] = True
+                    st.rerun()
+            
+            with col2:
+                if st.button(f"Q Cyber: {q_cyber_display}", key=f"q_cyber_{unique_id}", help="Click for Quantum Cybersecurity analysis"):
+                    st.session_state[f'modal_q_cyber_{unique_id}'] = True
+                    st.rerun()
+                    
+                if st.button(f"Q Ethics: {q_ethics_display}", key=f"q_ethics_{unique_id}", help="Click for Quantum Ethics analysis"):
+                    st.session_state[f'modal_q_ethics_{unique_id}'] = True
+                    st.rerun()
+            
+            # Show modals if triggered
+            if st.session_state.get(f'modal_ai_cyber_{unique_id}', False):
+                with st.expander("AI Cybersecurity Analysis", expanded=True):
+                    st.markdown(f"**Score: {ai_cyber_display}**")
+                    st.write(ai_cyber_analysis)
+                    if st.button("Close", key=f"close_ai_cyber_{unique_id}"):
+                        st.session_state[f'modal_ai_cyber_{unique_id}'] = False
+                        st.rerun()
+            
+            if st.session_state.get(f'modal_q_cyber_{unique_id}', False):
+                with st.expander("Quantum Cybersecurity Analysis", expanded=True):
+                    st.markdown(f"**Score: {q_cyber_display}**")
+                    st.write(q_cyber_analysis)
+                    if st.button("Close", key=f"close_q_cyber_{unique_id}"):
+                        st.session_state[f'modal_q_cyber_{unique_id}'] = False
+                        st.rerun()
+            
+            if st.session_state.get(f'modal_ai_ethics_{unique_id}', False):
+                with st.expander("AI Ethics Analysis", expanded=True):
+                    st.markdown(f"**Score: {ai_ethics_display}**")
+                    st.write(ai_ethics_analysis)
+                    if st.button("Close", key=f"close_ai_ethics_{unique_id}"):
+                        st.session_state[f'modal_ai_ethics_{unique_id}'] = False
+                        st.rerun()
+            
+            if st.session_state.get(f'modal_q_ethics_{unique_id}', False):
+                with st.expander("Quantum Ethics Analysis", expanded=True):
+                    st.markdown(f"**Score: {q_ethics_display}**")
+                    st.write(q_ethics_analysis)
+                    if st.button("Close", key=f"close_q_ethics_{unique_id}"):
+                        st.session_state[f'modal_q_ethics_{unique_id}'] = False
+                        st.rerun()
             
 
             
