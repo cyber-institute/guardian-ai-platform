@@ -278,7 +278,7 @@ def score_quantum_ethics(text: str, title: str) -> Optional[int]:
 
 def comprehensive_document_scoring(text: str, title: str) -> Dict[str, Optional[int]]:
     """
-    Patent-based comprehensive scoring using multi-LLM ensemble with keyword identification
+    Patent-based comprehensive scoring with smart caching and multiple LLM providers
     
     Returns:
         Dict with scores for each framework or None if not applicable
@@ -289,30 +289,21 @@ def comprehensive_document_scoring(text: str, title: str) -> Dict[str, Optional[
         clean_text = clean_field(str(text)) if text else ""
         clean_title = clean_field(str(title)) if title else ""
         
-        # Use multi-LLM ensemble scoring engine
-        from utils.multi_llm_scoring_engine import multi_llm_ensemble_scoring, enhanced_document_applicability
+        # Use smart multi-LLM scoring with caching
+        from utils.smart_llm_cache import smart_multi_llm_scoring
         
-        # Check applicability first
-        applicability = enhanced_document_applicability(clean_text, clean_title)
-        
-        # Apply multi-LLM ensemble scoring for applicable frameworks
-        ensemble_scores = multi_llm_ensemble_scoring(clean_text, clean_title)
-        
-        # Filter based on applicability
-        final_scores = {}
-        for framework in ['ai_cybersecurity', 'ai_ethics', 'quantum_cybersecurity', 'quantum_ethics']:
-            score = ensemble_scores.get(framework)
-            if applicability.get(framework, False) and score is not None and score > 0:
-                final_scores[framework] = score
-            else:
-                final_scores[framework] = None
+        # Apply smart multi-LLM scoring (uses cache first, then multiple providers)
+        final_scores = smart_multi_llm_scoring(clean_text, clean_title)
         
         return final_scores
             
     except Exception as e:
-        print(f"Multi-LLM ensemble scoring failed, using fallback: {e}")
-        # Fallback to legacy scoring when ensemble fails
-        return fallback_scoring(clean_text if 'clean_text' in locals() else text, clean_title if 'clean_title' in locals() else title)
+        print(f"Smart multi-LLM scoring failed, using enhanced patterns: {e}")
+        # Fallback to enhanced pattern scoring
+        from utils.enhanced_pattern_scoring import enhanced_pattern_scoring
+        clean_text_safe = clean_text if 'clean_text' in locals() else text
+        clean_title_safe = clean_title if 'clean_title' in locals() else title
+        return enhanced_pattern_scoring(clean_text_safe, clean_title_safe)
 
 def multi_llm_intelligent_scoring(text: str, title: str) -> Dict[str, Optional[int]]:
     """
