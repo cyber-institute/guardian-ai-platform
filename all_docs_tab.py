@@ -1678,7 +1678,7 @@ def render():
                                         
                                         title = enhanced_metadata.get('title', uploaded_file.name)
                                         organization = enhanced_metadata.get('author_organization', 'Unknown')
-                                        doc_type = enhanced_metadata.get('document_type', result.get('file_type', 'Document'))
+                                        doc_type = enhanced_metadata.get('document_type', 'Document')
                                         pub_date = enhanced_metadata.get('publish_date', None)
                                         
                                         # Set author based on organization for institutional documents

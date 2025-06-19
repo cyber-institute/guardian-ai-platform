@@ -1,234 +1,227 @@
 #!/usr/bin/env python3
 """
-Comprehensive fix for quantum scoring engine and metadata extraction issues
-This script will:
-1. Fix quantum scoring algorithm bugs
-2. Rescore all quantum documents with proper algorithms
-3. Fix metadata extraction for proper title extraction
-4. Update topic classification for quantum documents
+Comprehensive Quantum Scoring System Fix
+Apply enhanced quantum scoring to all relevant documents
 """
 
 import os
-import sys
 import psycopg2
-from utils.comprehensive_scoring import comprehensive_document_scoring
-from utils.database import DatabaseManager
+from datetime import datetime
 
-def extract_proper_title_from_content(content):
-    """Extract proper title from document content using enhanced patterns"""
-    import re
+def enhanced_quantum_cybersecurity_scoring(content, title):
+    """Enhanced quantum cybersecurity scoring with comprehensive analysis"""
+    if not content or len(content) < 100:
+        return 0
+        
+    content_lower = content.lower()
+    title_lower = title.lower() if title else ""
     
-    if not content:
-        return None
+    # Core quantum cybersecurity indicators
+    quantum_security_indicators = {
+        'quantum cryptography': 15,
+        'quantum security': 15,
+        'quantum-safe': 12,
+        'post-quantum cryptography': 12,
+        'quantum key distribution': 10,
+        'quantum-resistant': 10,
+        'quantum computing security': 10,
+        'quantum threat': 8,
+        'quantum-proof': 8,
+        'quantum encryption': 8,
+        'quantum vulnerability': 6,
+        'quantum attack': 6,
+        'quantum algorithm': 5,
+        'quantum supremacy': 5,
+        'quantum advantage': 5,
+        'shor algorithm': 8,
+        'grover algorithm': 6,
+        'quantum entanglement': 4,
+        'quantum superposition': 4,
+        'qubits': 3
+    }
     
-    # Quantum-specific title patterns
-    quantum_patterns = [
-        r'(The\s+Ethics?\s+of\s+Quantum\s+Computing[^.\n]*)',
-        r'(Quantum\s+(?:Computing|Technology|Security|Cryptography)\s+(?:Ethics|Policy|Framework)[^.\n]*)',
-        r'(Post-Quantum\s+Cryptography[^.\n]*)',
-        r'(National\s+Quantum\s+Initiative[^.\n]*)',
-        r'(Quantum[^.\n]{10,100}(?:Ethics|Policy|Framework))',
-        r'([A-Z][A-Za-z\s&,.-]{20,120})\s*(?:Abstract|Introduction|\n)',
-        r'^([A-Z][A-Za-z\s&,.-]{15,100})(?:\s*\n|\s*$)',
-        r'Title:\s*([A-Za-z\s\-:&,.-]{10,150})',
-        r'^([A-Z][^.!?\n]{15,120})(?:\.|$)'
-    ]
+    score = 0
+    matched_terms = []
     
-    # Clean content
-    content_lines = content.split('\n')[:20]  # Check first 20 lines
-    clean_content = '\n'.join([line.strip() for line in content_lines if line.strip()])
+    # Check content for quantum security indicators
+    for term, weight in quantum_security_indicators.items():
+        count = content_lower.count(term)
+        if count > 0:
+            term_score = min(weight * count, weight * 2)  # Cap at 2x weight
+            score += term_score
+            matched_terms.append(f"{term}({count})")
     
-    for pattern in quantum_patterns:
-        matches = re.findall(pattern, clean_content, re.IGNORECASE | re.MULTILINE)
-        for match in matches:
-            if isinstance(match, tuple):
-                title = match[0] if match else ""
-            else:
-                title = match
-            
-            title = title.strip()
-            
-            # Validate title
-            if (10 <= len(title) <= 200 and 
-                len(title.split()) >= 3 and
-                not title.lower().startswith(('page ', 'section ', 'chapter '))):
-                return title
+    # Title boosts for quantum-focused documents
+    if any(term in title_lower for term in ['quantum', 'post-quantum']):
+        score += 10
+        matched_terms.append("quantum_title_boost")
     
-    return None
+    # National security context boost
+    if any(term in content_lower for term in ['national security', 'nsm-', 'national security memorandum']):
+        score += 8
+        matched_terms.append("national_security_boost")
+    
+    # Technology regulation context
+    if any(term in title_lower for term in ['regulating', 'transformative technology', 'intellectual property']):
+        score += 12
+        matched_terms.append("regulation_tech_boost")
+    
+    # Cap at 100
+    score = min(score, 100)
+    
+    return score, matched_terms
 
-def fix_quantum_document_scoring():
-    """Fix quantum document scoring and metadata extraction"""
+def enhanced_quantum_ethics_scoring(content, title):
+    """Enhanced quantum ethics scoring with comprehensive analysis"""
+    if not content or len(content) < 100:
+        return 0
+        
+    content_lower = content.lower()
+    title_lower = title.lower() if title else ""
+    
+    # Core quantum ethics indicators
+    quantum_ethics_indicators = {
+        'quantum ethics': 15,
+        'quantum governance': 12,
+        'quantum regulation': 10,
+        'quantum policy': 8,
+        'quantum responsibility': 8,
+        'quantum oversight': 6,
+        'quantum standards': 6,
+        'quantum fairness': 8,
+        'quantum access': 6,
+        'quantum equity': 6,
+        'quantum inclusion': 8,
+        'quantum sustainability': 8,
+        'quantum implications': 5,
+        'quantum impact': 5,
+        'ethical quantum': 10,
+        'responsible quantum': 8,
+        'quantum development': 4,
+        'quantum future': 4,
+        'quantum society': 6
+    }
+    
+    score = 0
+    matched_terms = []
+    
+    # Check content for quantum ethics indicators
+    for term, weight in quantum_ethics_indicators.items():
+        count = content_lower.count(term)
+        if count > 0:
+            term_score = min(weight * count, weight * 2)  # Cap at 2x weight
+            score += term_score
+            matched_terms.append(f"{term}({count})")
+    
+    # Title boosts for quantum ethics documents
+    if 'quantum' in title_lower and any(term in title_lower for term in ['ethics', 'inclusion', 'sustainability', 'governance']):
+        score += 15
+        matched_terms.append("quantum_ethics_title_boost")
+    
+    # Transformative technology ethics boost
+    if any(term in title_lower for term in ['transformative technology', 'intellectual property', 'sustainable innovation']):
+        score += 10
+        matched_terms.append("transformative_ethics_boost")
+    
+    # Cap at 100
+    score = min(score, 100)
+    
+    return score, matched_terms
+
+def fix_comprehensive_quantum_scoring():
+    """Apply comprehensive quantum scoring to all relevant documents"""
+    
+    conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+    cursor = conn.cursor()
+    
     try:
-        db = DatabaseManager()
-        
-        print("Starting comprehensive quantum scoring fix...")
-        
-        # Get all documents with quantum content
-        query = """
-            SELECT id, title, content, topic, ai_cybersecurity_score, quantum_cybersecurity_score, 
-                   ai_ethics_score, quantum_ethics_score 
+        # Get all documents that might have quantum content
+        cursor.execute("""
+            SELECT id, title, content, text_content, quantum_cybersecurity_score, quantum_ethics_score
             FROM documents 
-            WHERE content ILIKE '%quantum%' 
-               OR title ILIKE '%quantum%'
-               OR topic = 'Quantum'
+            WHERE (title ILIKE '%quantum%' 
+                   OR title ILIKE '%post-quantum%'
+                   OR title ILIKE '%transformative technology%'
+                   OR content ILIKE '%quantum%'
+                   OR quantum_cybersecurity_score IS NOT NULL
+                   OR quantum_ethics_score IS NOT NULL)
             ORDER BY id
-        """
+        """)
         
-        quantum_docs = db.execute_query(query)
-        if not quantum_docs:
-            print("No quantum documents found")
-            return False
-            
-        print(f"Found {len(quantum_docs)} quantum-related documents to fix")
+        documents = cursor.fetchall()
         
-        fixed_count = 0
+        print(f"Found {len(documents)} documents with potential quantum content")
         
-        for doc in quantum_docs:
-            doc_id, title, content, topic, ai_cyber, quantum_cyber, ai_ethics, quantum_ethics = doc
+        for doc_id, title, content, text_content, existing_q_cyber, existing_q_ethics in documents:
+            print(f"\nProcessing: {title[:60]}...")
             
-            print(f"\nProcessing document {doc_id}: {title[:50]}...")
+            # Use text_content if available, otherwise content
+            scoring_content = text_content if text_content else content
             
-            # Extract proper title if current title is generic
-            new_title = title
-            if title in ['AI Cybersecurity Framework', 'Document from URL', 'Untitled Document']:
-                extracted_title = extract_proper_title_from_content(content)
-                if extracted_title:
-                    new_title = extracted_title
-                    print(f"  - Fixed title: {new_title}")
+            if not scoring_content or len(scoring_content) < 100:
+                print("  Insufficient content for scoring")
+                continue
             
-            # Perform comprehensive scoring
-            try:
-                scores = comprehensive_document_scoring(content, new_title)
+            # Calculate quantum scores
+            q_cyber_score, q_cyber_terms = enhanced_quantum_cybersecurity_scoring(scoring_content, title)
+            q_ethics_score, q_ethics_terms = enhanced_quantum_ethics_scoring(scoring_content, title)
+            
+            # Determine if we should update scores
+            should_update = False
+            updates = {}
+            
+            if q_cyber_score > 0 and (existing_q_cyber is None or existing_q_cyber < q_cyber_score):
+                updates['quantum_cybersecurity_score'] = q_cyber_score
+                should_update = True
+                print(f"  Updated Quantum Cybersecurity: {q_cyber_score} (was {existing_q_cyber})")
+                print(f"  Q Cyber terms: {q_cyber_terms[:3]}...")
+            
+            if q_ethics_score > 0 and (existing_q_ethics is None or existing_q_ethics < q_ethics_score):
+                updates['quantum_ethics_score'] = q_ethics_score
+                should_update = True
+                print(f"  Updated Quantum Ethics: {q_ethics_score} (was {existing_q_ethics})")
+                print(f"  Q Ethics terms: {q_ethics_terms[:3]}...")
+            
+            # Set topic to Quantum if significant quantum scores
+            if q_cyber_score > 20 or q_ethics_score > 15:
+                updates['topic'] = 'Quantum'
+                should_update = True
+                print(f"  Set topic to Quantum")
+            elif q_cyber_score > 10 or q_ethics_score > 10:
+                updates['topic'] = 'Both'  # Mixed AI/Quantum content
+                should_update = True
+                print(f"  Set topic to Both (mixed content)")
+            
+            if should_update:
+                # Build update query dynamically
+                set_clauses = []
+                values = []
+                for field, value in updates.items():
+                    set_clauses.append(f"{field} = %s")
+                    values.append(value)
                 
-                # Determine proper topic based on content
-                content_lower = content.lower() if content else ""
+                set_clauses.append("updated_at = CURRENT_TIMESTAMP")
+                values.append(doc_id)
                 
-                # Check for quantum indicators
-                quantum_indicators = [
-                    'quantum', 'post-quantum', 'quantum computing', 'quantum cryptography',
-                    'quantum ethics', 'quantum governance', 'quantum technology',
-                    'quantum security', 'quantum threat', 'quantum mechanics'
-                ]
-                
-                ai_indicators = [
-                    'artificial intelligence', 'machine learning', 'ai system',
-                    'neural network', 'deep learning', 'ai ethics', 'ai governance'
-                ]
-                
-                quantum_count = sum(1 for term in quantum_indicators if term in content_lower)
-                ai_count = sum(1 for term in ai_indicators if term in content_lower)
-                
-                # Determine new topic
-                new_topic = topic
-                if quantum_count > ai_count and quantum_count >= 3:
-                    new_topic = 'Quantum'
-                elif ai_count > quantum_count and ai_count >= 3:
-                    new_topic = 'AI'
-                elif quantum_count >= 2 and ai_count >= 2:
-                    new_topic = 'Both'
-                
-                # Update scores with proper quantum scoring
-                new_ai_cyber = scores.get('ai_cybersecurity') or ai_cyber
-                new_quantum_cyber = scores.get('quantum_cybersecurity') or quantum_cyber
-                new_ai_ethics = scores.get('ai_ethics') or ai_ethics
-                new_quantum_ethics = scores.get('quantum_ethics') or quantum_ethics
-                
-                # Ensure quantum documents have proper quantum scores
-                if new_topic in ['Quantum', 'Both']:
-                    if new_quantum_cyber is None or new_quantum_cyber < 20:
-                        new_quantum_cyber = max(new_quantum_cyber or 0, 45)  # Minimum for quantum content
-                    if new_quantum_ethics is None or new_quantum_ethics < 20:
-                        new_quantum_ethics = max(new_quantum_ethics or 0, 55)  # Minimum for quantum content
-                
-                # Update database
-                update_query = """
-                    UPDATE documents SET 
-                        title = :title,
-                        topic = :topic,
-                        ai_cybersecurity_score = :ai_cyber,
-                        quantum_cybersecurity_score = :quantum_cyber,
-                        ai_ethics_score = :ai_ethics,
-                        quantum_ethics_score = :quantum_ethics
-                    WHERE id = :doc_id
+                update_query = f"""
+                    UPDATE documents 
+                    SET {', '.join(set_clauses)}
+                    WHERE id = %s
                 """
                 
-                params = {
-                    'title': new_title,
-                    'topic': new_topic,
-                    'ai_cyber': new_ai_cyber,
-                    'quantum_cyber': new_quantum_cyber,
-                    'ai_ethics': new_ai_ethics,
-                    'quantum_ethics': new_quantum_ethics,
-                    'doc_id': doc_id
-                }
-                
-                db.execute_query(update_query, params)
-                
-                print(f"  - Topic: {topic} → {new_topic}")
-                print(f"  - Quantum Cyber: {quantum_cyber} → {new_quantum_cyber}")
-                print(f"  - Quantum Ethics: {quantum_ethics} → {new_quantum_ethics}")
-                
-                fixed_count += 1
-                
-            except Exception as e:
-                print(f"  - Error processing document {doc_id}: {e}")
-                continue
+                cursor.execute(update_query, values)
+            else:
+                print("  No significant quantum content found")
         
-        print(f"\nFixed {fixed_count} quantum documents successfully!")
-        return True
+        conn.commit()
+        print(f"\nSuccessfully processed {len(documents)} documents for quantum scoring")
         
     except Exception as e:
-        print(f"Error fixing quantum scoring: {e}")
-        return False
-
-def validate_fixes():
-    """Validate that the fixes were applied correctly"""
-    try:
-        db = DatabaseManager()
-        
-        print("\nValidating fixes...")
-        
-        # Check quantum documents have proper scores
-        query1 = """
-            SELECT COUNT(*) FROM documents 
-            WHERE (content ILIKE '%quantum%' OR topic = 'Quantum') 
-              AND (quantum_cybersecurity_score IS NULL OR quantum_cybersecurity_score < 20)
-        """
-        
-        result1 = db.execute_query(query1)
-        low_quantum_scores = result1[0][0] if result1 else 0
-        
-        # Check for improved titles
-        query2 = """
-            SELECT COUNT(*) FROM documents 
-            WHERE title NOT IN ('AI Cybersecurity Framework', 'Document from URL', 'Untitled Document')
-              AND (content ILIKE '%quantum%' OR topic = 'Quantum')
-        """
-        
-        result2 = db.execute_query(query2)
-        proper_titles = result2[0][0] if result2 else 0
-        
-        print(f"Documents with low quantum scores: {low_quantum_scores}")
-        print(f"Documents with proper titles: {proper_titles}")
-        
-        return low_quantum_scores == 0
-        
-    except Exception as e:
-        print(f"Error validating fixes: {e}")
-        return False
+        print(f"Error: {e}")
+        conn.rollback()
+    finally:
+        cursor.close()
+        conn.close()
 
 if __name__ == "__main__":
-    print("Starting comprehensive quantum scoring and metadata fix...")
-    
-    success = fix_quantum_document_scoring()
-    
-    if success:
-        print("\nValidating fixes...")
-        if validate_fixes():
-            print("✓ All quantum scoring and metadata issues have been resolved!")
-        else:
-            print("⚠ Some issues may remain - check validation results")
-    else:
-        print("✗ Fix failed - check error messages above")
-    
-    print("\nFix complete!")
+    fix_comprehensive_quantum_scoring()
