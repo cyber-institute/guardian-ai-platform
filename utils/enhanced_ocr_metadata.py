@@ -62,8 +62,9 @@ def _extract_title_enhanced(content: str, existing_metadata = None) -> str:
     
     lines = content.split('\n')
     
-    # UNESCO specific patterns
-    unesco_patterns = [
+    # Enhanced organizational and regulatory patterns
+    enhanced_patterns = [
+        # UNESCO specific patterns
         r'(Recommendation\s+on\s+the\s+Ethics\s+of\s+Artificial\s+Intelligence)',
         r'(Quantum Science for\s*Inclusion and\s*Sustainability)',
         r'(Quantum Science for Inclusion and Sustainability)',
@@ -73,11 +74,24 @@ def _extract_title_enhanced(content: str, existing_metadata = None) -> str:
         r'([A-Z][A-Za-z\s&,-]{15,80})\s*(?:Policy brief|Policy Brief)',
         r'(Ethics\s+of\s+Artificial\s+Intelligence)',
         r'(Recommendation\s+[A-Za-z\s]{10,60}\s+Intelligence)',
+        
+        # Regulatory and policy frameworks
+        r'(Regulating\s+[A-Za-z\s&,-]{10,100}:\s*[A-Za-z\s&,-]{10,80})',
+        r'(Transformative Technology\s+in\s+[A-Za-z\s&,-]{5,60}:\s*[A-Za-z\s&,-]{10,80})',
+        r'([A-Z][A-Za-z\s&,-]{10,60}\s+in\s+The\s+Quantum\s+Age:\s*[A-Za-z\s&,-]{10,80})',
+        r'([A-Z][A-Za-z\s&,-]{10,80})\s*(?:Framework|Policy|Standard|Regulation)',
+        r'(National\s+Security\s+Memorandum[^.]{0,50})',
+        r'(NIST\s+[A-Z][A-Za-z\s\-0-9]{10,80})',
+        
+        # AI and quantum specific titles
+        r'([A-Z][A-Za-z\s&,-]{5,40}\s+(?:AI|Artificial Intelligence)[A-Za-z\s&,-]{5,60})',
+        r'([A-Z][A-Za-z\s&,-]{5,40}\s+Quantum[A-Za-z\s&,-]{5,60})',
+        r'(Post-Quantum\s+[A-Za-z\s&,-]{5,60})',
     ]
     
-    # Check for UNESCO patterns first
+    # Check for enhanced patterns first
     full_text = ' '.join(lines[:20])  # First 20 lines
-    for pattern in unesco_patterns:
+    for pattern in enhanced_patterns:
         matches = re.findall(pattern, full_text, re.IGNORECASE)
         if matches:
             title = matches[0].strip()
