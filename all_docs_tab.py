@@ -4902,45 +4902,25 @@ def render_card_view(docs):
 
             # Generate compact analysis content for modal popups
             def get_ai_cyber_analysis(content, score):
-                try:
-                    score_num = int(str(score).replace('/100', ''))
-                except:
-                    score_num = 0
-                
-                return f"""This document demonstrates an AI Cybersecurity maturity score of {score}/100. • Document addresses AI security considerations and risk assessment frameworks • Content includes guidance on AI system protection and threat mitigation • Assessment shows {'excellent' if score_num >= 75 else 'good' if score_num >= 50 else 'developing'} AI cybersecurity practices <br><br><b>RECOMMENDATIONS:</b> • Continue implementing robust AI security measures • Regular assessment of AI system vulnerabilities • Integration with existing cybersecurity frameworks"""
+                return analyze_ai_cybersecurity_content(content, score)
 
             def get_q_cyber_analysis(content, score):
-                try:
-                    score_num = int(str(score).replace('Tier ', '').split('/')[0])
-                except:
-                    score_num = 0
-                
-                return f"""This document demonstrates Quantum Cybersecurity maturity of {score}/5. • Document addresses quantum-safe cryptography and post-quantum security measures • Content includes quantum threat assessment and mitigation strategies • Assessment shows {'advanced' if score_num >= 4 else 'intermediate' if score_num >= 3 else 'basic'} quantum cybersecurity readiness <br><br><b>RECOMMENDATIONS:</b> • Implement post-quantum cryptographic standards • Prepare for quantum computing threats • Regular quantum security assessments"""
+                return analyze_quantum_cybersecurity_content(content, score)
 
             def get_ai_ethics_analysis(content, score):
-                try:
-                    score_num = int(str(score).replace('/100', ''))
-                except:
-                    score_num = 0
-                
-                return f"""This document demonstrates an AI Ethics score of {score}/100. • Document addresses ethical AI considerations and bias prevention measures • Content includes fairness, transparency, and accountability frameworks • Assessment shows {'excellent' if score_num >= 75 else 'good' if score_num >= 50 else 'developing'} AI ethics practices <br><br><b>RECOMMENDATIONS:</b> • Implement comprehensive bias detection systems • Regular ethical AI audits and assessments • Stakeholder engagement in AI ethics governance"""
+                return analyze_ai_ethics_content(content, score)
 
             def get_q_ethics_analysis(content, score):
-                try:
-                    score_num = int(str(score).replace('/100', ''))
-                except:
-                    score_num = 0
-                
-                return f"""This document demonstrates Quantum Ethics considerations scoring {score}/100. • Document addresses quantum computing ethics and access equity concerns • Content includes quantum technology governance and societal impact • Assessment shows {'excellent' if score_num >= 75 else 'good' if score_num >= 50 else 'developing'} quantum ethics considerations <br><br><b>RECOMMENDATIONS:</b> • Ensure equitable access to quantum technologies • Address quantum computing's societal implications • Develop quantum governance frameworks"""
+                return analyze_quantum_ethics_content(content, score)
 
             # Calculate database averages for NORM comparison
             db_averages = calculate_database_averages()
             
             # Generate analysis content using local functions
-            ai_cyber_analysis = get_ai_cyber_analysis(raw_content, ai_cyber) if ai_cyber != 'N/A' else "No AI cybersecurity assessment available for this document."
-            q_cyber_analysis = get_q_cyber_analysis(raw_content, q_cyber) if q_cyber != 'N/A' else "No quantum cybersecurity assessment available for this document."
-            ai_ethics_analysis = get_ai_ethics_analysis(raw_content, ai_ethics) if ai_ethics != 'N/A' else "No AI ethics assessment available for this document."
-            q_ethics_analysis = get_q_ethics_analysis(raw_content, q_ethics) if q_ethics != 'N/A' else "No quantum ethics assessment available for this document."
+            ai_cyber_analysis = get_ai_cyber_analysis(raw_content, ai_cyber)
+            q_cyber_analysis = get_q_cyber_analysis(raw_content, q_cyber)
+            ai_ethics_analysis = get_ai_ethics_analysis(raw_content, ai_ethics)
+            q_ethics_analysis = get_q_ethics_analysis(raw_content, q_ethics)
             
             # Generate NORM analyses
             ai_cyber_norm = generate_norm_analysis('ai_cyber', ai_cyber_display, db_averages) if ai_cyber != 'N/A' else ""
