@@ -5296,6 +5296,24 @@ def render_card_view(docs):
                 
                 // Global modal function that coordinates across all iframes
                 window.showGlobalModal = function(type, componentId) {{
+                    console.log('showGlobalModal called with:', type, componentId);
+                    
+                    // Safety check for modal data registry
+                    if (!window.modalDataRegistry) {{
+                        console.error('Modal data registry not found');
+                        return;
+                    }}
+                    
+                    if (!window.modalDataRegistry[componentId]) {{
+                        console.error('Component data not found:', componentId);
+                        return;
+                    }}
+                    
+                    if (!window.modalDataRegistry[componentId][type]) {{
+                        console.error('Modal type data not found:', type);
+                        return;
+                    }}
+                    
                     // Close any existing modals first
                     if (window.currentGlobalModal) {{
                         window.currentGlobalModal.style.display = 'none';
@@ -5310,6 +5328,7 @@ def render_card_view(docs):
                     }}
                     
                     var data = window.modalDataRegistry[componentId][type];
+                    console.log('Modal data found:', data);
                     var modal = parent.document.createElement('div');
                     modal.id = modalId;
                     modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.4); z-index: 2147483647; overflow: hidden; display: block;';
