@@ -73,6 +73,23 @@ from utils.comprehensive_scoring import comprehensive_document_scoring, format_s
 
 def analyze_ai_cybersecurity_content(content, score):
     """Analyze AI cybersecurity content"""
+    if score == 'N/A':
+        return """
+This document does not focus on AI-specific cybersecurity concerns.
+
+**For a high AI Cybersecurity score, documents should include:**
+- AI threat modeling and risk assessment procedures
+- AI model security and integrity protection measures
+- AI-specific incident response and recovery plans
+- AI governance frameworks and compliance structures
+- Adversarial attack detection and mitigation strategies
+- Secure AI development lifecycle practices
+- AI system monitoring and vulnerability assessment
+- Data protection measures for AI training and inference
+
+**Current Classification:** This document appears to focus on general cybersecurity or other topics rather than AI-specific security challenges.
+"""
+    
     try:
         score_num = int(str(score).replace('/100', ''))
     except:
@@ -93,6 +110,23 @@ This document demonstrates an AI Cybersecurity maturity score of {score}/100.
 
 def analyze_quantum_cybersecurity_content(content, score):
     """Analyze quantum cybersecurity content"""
+    if score == 'N/A':
+        return """
+This document does not address quantum cybersecurity concerns.
+
+**For a high Quantum Cybersecurity score, documents should include:**
+- Post-quantum cryptography planning and implementation
+- Quantum key distribution (QKD) systems and protocols
+- Quantum threat assessment and risk mitigation strategies
+- Cryptographic agility frameworks and transition planning
+- NIST post-quantum cryptographic standards adoption
+- Quantum-safe algorithm evaluation and selection
+- Quantum computing threat timeline and preparedness
+- Integration of quantum-resistant technologies
+
+**Current Classification:** This document appears to focus on general cybersecurity, AI, or other topics rather than quantum-specific security challenges.
+"""
+    
     try:
         score_num = int(str(score).replace('Tier ', '').split('/')[0])
     except:
@@ -113,6 +147,23 @@ This document demonstrates Quantum Cybersecurity maturity of {score}/5.
 
 def analyze_ai_ethics_content(content, score):
     """Analyze AI ethics content"""
+    if score == 'N/A':
+        return """
+This document does not focus on AI ethics considerations.
+
+**For a high AI Ethics score, documents should include:**
+- Bias mitigation strategies and algorithmic fairness measures
+- Transparency and explainability requirements for AI systems
+- Accountability frameworks and responsible AI governance
+- Privacy protection and data rights in AI applications
+- Human oversight and human-in-the-loop decision making
+- Stakeholder engagement and participatory AI development
+- Ethical review processes and impact assessments
+- Inclusive AI design and equitable access considerations
+
+**Current Classification:** This document appears to focus on cybersecurity, quantum technology, or other topics rather than AI ethics principles.
+"""
+    
     try:
         score_num = int(str(score).replace('/100', ''))
     except:
@@ -133,6 +184,23 @@ This document demonstrates an AI Ethics score of {score}/100.
 
 def analyze_quantum_ethics_content(content, score):
     """Analyze quantum ethics content"""
+    if score == 'N/A':
+        return """
+This document does not address quantum ethics considerations.
+
+**For a high Quantum Ethics score, documents should include:**
+- Quantum equity and digital divide considerations
+- Societal impacts of quantum technology advancement
+- Quantum governance frameworks and policy development
+- Responsible quantum research and development practices
+- Public engagement in quantum technology decisions
+- Quantum workforce development and education ethics
+- International cooperation on quantum technology governance
+- Environmental and sustainability impacts of quantum computing
+
+**Current Classification:** This document appears to focus on cybersecurity, AI, or other topics rather than quantum ethics and societal implications.
+"""
+    
     try:
         score_num = int(str(score).replace('/100', ''))
     except:
