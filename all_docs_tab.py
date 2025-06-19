@@ -4309,10 +4309,10 @@ This document does not focus on AI ethics considerations.
             strengths.append("Measurable ethics criteria")
     
     # Identify weaknesses
-    if score < 50:
+    if score_num < 50:
         weaknesses.append("Limited ethics integration")
         weaknesses.append("Missing bias mitigation")
-    if score < 70:
+    if score_num < 70:
         found_moderate = sum(1 for term in moderate_terms if term in content_lower)
         if found_moderate < 3:
             weaknesses.append("Insufficient ethical coverage")
@@ -4385,10 +4385,10 @@ This document does not focus on quantum ethics considerations.
             strengths.append("Global perspective")
     
     # Identify weaknesses
-    if score < 50:
+    if score_num < 50:
         weaknesses.append("Limited quantum ethics consideration")
         weaknesses.append("Missing equity concerns")
-    if score < 70:
+    if score_num < 70:
         if not any(term in content_lower for term in strong_terms):
             weaknesses.append("Lacks quantum-specific ethics")
     
