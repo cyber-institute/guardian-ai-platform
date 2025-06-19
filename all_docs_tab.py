@@ -4109,6 +4109,23 @@ def calculate_repository_statistics(docs):
 
 def analyze_ai_cybersecurity_content(content, score):
     """Analyze AI cybersecurity content to identify strengths, weaknesses, and recommendations."""
+    if score == 'N/A':
+        return """
+This document does not focus on AI cybersecurity considerations.
+
+**For a high AI Cybersecurity score, documents should include:**
+- AI-specific threat modeling and adversarial attack mitigation
+- Secure AI development lifecycle and security-by-design principles
+- AI model security, including protection against model poisoning and bias attacks
+- AI system vulnerability assessment and penetration testing methodologies
+- Authentication and authorization frameworks for AI systems
+- Differential privacy and federated learning security measures
+- AI red team exercises and security validation processes
+- Integration with existing cybersecurity frameworks (NIST, ISO 27001)
+
+**Current Classification:** This document appears to focus on general cybersecurity, identity management, or other topics rather than AI-specific security considerations.
+"""
+    
     content_lower = content.lower()
     
     # Key terms for analysis
@@ -4120,22 +4137,28 @@ def analyze_ai_cybersecurity_content(content, score):
     weaknesses = []
     recommendations = []
     
+    # Convert score to numeric for comparisons
+    try:
+        score_num = int(str(score).replace('/100', ''))
+    except:
+        score_num = 0
+    
     # Identify strengths based on content
     for term in strong_terms:
         if term in content_lower:
             strengths.append(f"Addresses {term}")
     
-    if score >= 70:
+    if score_num >= 70:
         if 'framework' in content_lower or 'methodology' in content_lower:
             strengths.append("Systematic security approach")
         if 'implementation' in content_lower:
             strengths.append("Practical implementation guidance")
     
     # Identify weaknesses
-    if score < 50:
+    if score_num < 50:
         weaknesses.append("Limited security depth")
         weaknesses.append("Missing threat modeling")
-    if score < 70:
+    if score_num < 70:
         found_moderate = sum(1 for term in moderate_terms if term in content_lower)
         if found_moderate < 3:
             weaknesses.append("Insufficient security coverage")
@@ -4164,6 +4187,23 @@ def analyze_ai_cybersecurity_content(content, score):
 
 def analyze_quantum_cybersecurity_content(content, score):
     """Analyze quantum cybersecurity content to identify strengths, weaknesses, and recommendations."""
+    if score == 'N/A':
+        return """
+This document does not focus on quantum cybersecurity considerations.
+
+**For a high Quantum Cybersecurity score, documents should include:**
+- Post-quantum cryptography (PQC) adoption strategies and implementation timelines
+- Quantum key distribution (QKD) protocols and quantum-safe communication methods
+- Migration planning from current cryptographic systems to quantum-resistant alternatives
+- Quantum threat assessment and risk mitigation frameworks
+- Cryptographic agility principles for quantum-safe transitions
+- NIST post-quantum cryptographic standards and algorithm selection
+- Quantum computing threat modeling and impact analysis
+- Timeline and roadmap for quantum-safe infrastructure deployment
+
+**Current Classification:** This document appears to focus on general cybersecurity, identity management, or other topics rather than quantum-specific security considerations.
+"""
+    
     content_lower = content.lower()
     
     strong_terms = ['post-quantum cryptography', 'quantum key distribution', 'quantum-safe', 'pqc', 'migration strategy', 'cryptographic agility']
@@ -4173,22 +4213,31 @@ def analyze_quantum_cybersecurity_content(content, score):
     weaknesses = []
     recommendations = []
     
+    # Convert score to numeric for comparisons
+    try:
+        if 'Tier' in str(score):
+            score_num = int(str(score).replace('Tier ', '').split('/')[0])
+        else:
+            score_num = int(str(score))
+    except:
+        score_num = 0
+    
     # Identify strengths
     for term in strong_terms:
         if term in content_lower:
             strengths.append(f"Addresses {term}")
     
-    if score >= 4:
+    if score_num >= 4:
         if 'implementation' in content_lower:
             strengths.append("Implementation focus")
         if 'timeline' in content_lower or 'roadmap' in content_lower:
             strengths.append("Strategic planning approach")
     
     # Identify weaknesses
-    if score <= 2:
+    if score_num <= 2:
         weaknesses.append("Limited quantum threat awareness")
         weaknesses.append("Missing migration planning")
-    if score <= 3:
+    if score_num <= 3:
         if not any(term in content_lower for term in strong_terms):
             weaknesses.append("Lacks specific quantum-safe measures")
     
@@ -4216,6 +4265,23 @@ def analyze_quantum_cybersecurity_content(content, score):
 
 def analyze_ai_ethics_content(content, score):
     """Analyze AI ethics content to identify strengths, weaknesses, and recommendations."""
+    if score == 'N/A':
+        return """
+This document does not focus on AI ethics considerations.
+
+**For a high AI Ethics score, documents should include:**
+- Bias mitigation strategies and algorithmic fairness measures
+- Transparency and explainability requirements for AI systems
+- Accountability frameworks and responsible AI governance
+- Privacy protection and data rights in AI applications
+- Human oversight and human-in-the-loop decision making
+- Stakeholder engagement and participatory AI development
+- Ethical review processes and impact assessments
+- Inclusive AI design and equitable access considerations
+
+**Current Classification:** This document appears to focus on cybersecurity, quantum technology, or other topics rather than AI ethics principles.
+"""
+    
     content_lower = content.lower()
     
     strong_terms = ['bias detection', 'algorithmic fairness', 'transparency', 'explainability', 'accountability', 'human oversight', 'ethical review']
@@ -4225,12 +4291,18 @@ def analyze_ai_ethics_content(content, score):
     weaknesses = []
     recommendations = []
     
+    # Convert score to numeric for comparisons
+    try:
+        score_num = int(str(score).replace('/100', ''))
+    except:
+        score_num = 0
+    
     # Identify strengths
     for term in strong_terms:
         if term in content_lower:
             strengths.append(f"Addresses {term}")
     
-    if score >= 70:
+    if score_num >= 70:
         if 'process' in content_lower or 'framework' in content_lower:
             strengths.append("Systematic ethics approach")
         if 'metrics' in content_lower:
@@ -4269,6 +4341,23 @@ def analyze_ai_ethics_content(content, score):
 
 def analyze_quantum_ethics_content(content, score):
     """Analyze quantum ethics content to identify strengths, weaknesses, and recommendations."""
+    if score == 'N/A':
+        return """
+This document does not focus on quantum ethics considerations.
+
+**For a high Quantum Ethics score, documents should include:**
+- Quantum computing ethics and equitable access frameworks
+- Quantum divide mitigation and global accessibility strategies
+- Responsible quantum technology development principles
+- Quantum governance and international cooperation frameworks
+- Privacy implications of quantum computing technologies
+- Quantum workforce development and education equity
+- Environmental and societal impact assessments of quantum technologies
+- Quantum computing democratization and open science principles
+
+**Current Classification:** This document appears to focus on cybersecurity, identity management, or other topics rather than quantum ethics considerations.
+"""
+    
     content_lower = content.lower()
     
     strong_terms = ['quantum ethics', 'equitable access', 'quantum divide', 'responsible development', 'quantum governance', 'privacy implications']
@@ -4278,12 +4367,18 @@ def analyze_quantum_ethics_content(content, score):
     weaknesses = []
     recommendations = []
     
+    # Convert score to numeric for comparisons
+    try:
+        score_num = int(str(score).replace('/100', ''))
+    except:
+        score_num = 0
+    
     # Identify strengths
     for term in strong_terms:
         if term in content_lower:
             strengths.append(f"Addresses {term}")
     
-    if score >= 70:
+    if score_num >= 70:
         if 'framework' in content_lower:
             strengths.append("Systematic ethics framework")
         if 'international' in content_lower or 'cooperation' in content_lower:
