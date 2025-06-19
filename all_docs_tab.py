@@ -1472,16 +1472,20 @@ def render():
                     with col2:
                         help_tooltips.render_help_icon('ai_cybersecurity_score', size="medium")
                     
-                    st.markdown(f"""
-                    **Identified Strengths:**
-                    {chr(10).join([f"• {strength}" for strength in analysis['strengths']])}
-                    
-                    **Areas for Improvement:**
-                    {chr(10).join([f"• {weakness}" for weakness in analysis['weaknesses']])}
-                    
-                    **Recommendations:**
-                    {chr(10).join([f"• {rec}" for rec in analysis['recommendations']])}
-                    """)
+                    # Display analysis content - handle both string and dict formats
+                    if isinstance(analysis, str):
+                        st.markdown(analysis)
+                    else:
+                        st.markdown(f"""
+                        **Identified Strengths:**
+                        {chr(10).join([f"• {strength}" for strength in analysis['strengths']])}
+                        
+                        **Areas for Improvement:**
+                        {chr(10).join([f"• {weakness}" for weakness in analysis['weaknesses']])}
+                        
+                        **Recommendations:**
+                        {chr(10).join([f"• {rec}" for rec in analysis['recommendations']])}
+                        """)
                     
                     # Add expandable help section for detailed explanations
                     help_tooltips.render_expandable_help('ai_cybersecurity_score')
