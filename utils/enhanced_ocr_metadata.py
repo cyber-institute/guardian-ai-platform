@@ -9,7 +9,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def extract_enhanced_metadata_from_content(content: str, existing_metadata: dict = None) -> Dict[str, str]:
+def extract_enhanced_metadata_from_content(content: str, existing_metadata = None) -> Dict[str, Optional[str]]:
     """
     Extract comprehensive metadata from document content with enhanced OCR capabilities
     Specifically handles UNESCO, NIST, and other organizational documents
@@ -32,10 +32,10 @@ def extract_enhanced_metadata_from_content(content: str, existing_metadata: dict
     pub_date = _extract_date_enhanced(clean_content, existing_metadata)
     
     return {
-        'title': title,
-        'author_organization': organization,
-        'document_type': doc_type,
-        'publish_date': pub_date
+        'title': title or 'Document Title Not Extracted',
+        'author_organization': organization or 'Unknown',
+        'document_type': doc_type or 'Document',
+        'publish_date': pub_date or None
     }
 
 def _clean_content_for_ocr(content: str) -> str:
@@ -51,11 +51,11 @@ def _clean_content_for_ocr(content: str) -> str:
     
     return content.strip()
 
-def _extract_title_enhanced(content: str, existing_metadata: dict = None) -> str:
+def _extract_title_enhanced(content: str, existing_metadata = None) -> str:
     """Enhanced title extraction with UNESCO and international organization support"""
     
     # First check if we have clean PDF metadata title
-    if existing_metadata and existing_metadata.get('title'):
+    if existing_metadata and isinstance(existing_metadata, dict) and existing_metadata.get('title'):
         pdf_title = existing_metadata['title'].strip()
         if len(pdf_title) > 5 and not pdf_title.lower().startswith('untitled'):
             return pdf_title
@@ -136,7 +136,7 @@ def _extract_title_enhanced(content: str, existing_metadata: dict = None) -> str
     
     return "Document Title Not Extracted"
 
-def _extract_organization_enhanced(content: str, existing_metadata: dict = None) -> str:
+def _extract_organization_enhanced(content: str, existing_metadata = None) -> str:
     """Enhanced organization extraction with UNESCO and international support"""
     
     lines = content.split('\n')
@@ -340,11 +340,11 @@ def _extract_document_type_enhanced(content: str, title: str) -> str:
     
     return 'Document'
 
-def _extract_date_enhanced(content: str, existing_metadata: dict = None) -> Optional[str]:
+def _extract_date_enhanced(content: str, existing_metadata = None) -> Optional[str]:
     """Enhanced date extraction"""
     
     # Check PDF metadata first
-    if existing_metadata and existing_metadata.get('creation_date'):
+    if existing_metadata and isinstance(existing_metadata, dict) and existing_metadata.get('creation_date'):
         pdf_date = existing_metadata['creation_date']
         if pdf_date and len(str(pdf_date)) >= 4:
             return str(pdf_date)[:10]  # Return YYYY-MM-DD format
