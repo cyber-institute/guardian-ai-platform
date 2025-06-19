@@ -60,7 +60,7 @@ def render_fast_repository_admin():
         render_llm_training_management()
         
     elif admin_section == "API Logs & Monitoring":
-        render_api_logs_monitoring()
+        render_api_logs_monitoring_with_status()
         
     elif admin_section == "Database Status & Management":
         render_fast_database_status()
@@ -729,20 +729,30 @@ def render_chatbot_configuration():
     st.markdown("### Capabilities Overview")
     show_chatbot_capabilities()
 
-def render_api_logs_monitoring():
-    """API Logs and System Monitoring"""
+def render_api_logs_monitoring_with_status():
+    """Enhanced API Logs and LLM Status Monitoring"""
     
     st.markdown(
         """<div style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f87171 100%); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
             <h2 style="color: white; margin-bottom: 1rem; font-size: 1.8rem; font-weight: 700; text-align: center;">
-                📊 API Logs & Monitoring
+                📊 API Logs & LLM Status Monitoring
             </h2>
             <p style="color: #fecaca; text-align: center; font-size: 1.1rem; line-height: 1.5; margin: 0;">
-                Real-time API activity monitoring and system logs
+                Real-time API activity monitoring, LLM status, and system performance metrics
             </p>
         </div>""", 
         unsafe_allow_html=True
     )
+    
+    # LLM Status Dashboard Section
+    st.markdown("### LLM Status & API Usage Monitor")
+    try:
+        from components.api_monitor import render_detailed_api_dashboard
+        render_detailed_api_dashboard()
+    except Exception as e:
+        st.info("API monitoring system initializing...")
+    
+    st.markdown("---")
     
     # Log Controls
     log_col1, log_col2, log_col3 = st.columns(3)

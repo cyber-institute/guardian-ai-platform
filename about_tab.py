@@ -407,14 +407,6 @@ def render():
     </div>
     """, unsafe_allow_html=True)
     
-    # API Usage Monitoring Dashboard
-    st.markdown("### API Usage Monitor")
-    try:
-        from components.api_monitor import render_detailed_api_dashboard
-        render_detailed_api_dashboard()
-    except Exception as e:
-        st.info("API monitoring system initializing...")
-    
     # Compact contact and development info
     st.markdown("""
     <div style="background: #f8fafc; padding: 1rem; border-radius: 6px; text-align: center; margin-top: 1rem;">
