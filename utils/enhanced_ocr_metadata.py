@@ -366,13 +366,18 @@ def _extract_date_enhanced(content: str, existing_metadata = None) -> Optional[s
     lines = content.split('\n')
     full_text = ' '.join(lines[:30])  # First 30 lines
     
-    # Date patterns - prioritize UNESCO adoption format
+    # Date patterns - prioritize cover page formats and UNESCO adoption format
     date_patterns = [
-        r'Adopted\s+on\s+(\d{1,2}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4})',  # UNESCO adoption format - priority
-        r'(\d{1,2}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4})',  # 23 November 2021
+        # Cover page date formats (priority)
+        r'((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4})',  # January 14, 2025
+        r'(\d{1,2}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4})',  # 14 January 2025
+        
+        # UNESCO and official document formats
+        r'Adopted\s+on\s+(\d{1,2}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4})',  # UNESCO adoption format
+        
+        # Standard formats
         r'(\d{4}-\d{2}-\d{2})',  # YYYY-MM-DD
         r'(\d{1,2}/\d{1,2}/\d{4})',  # MM/DD/YYYY or DD/MM/YYYY
-        r'((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4})',
         r'((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2},?\s+\d{4})',
         r'(\d{4})',  # Just year as fallback
     ]
