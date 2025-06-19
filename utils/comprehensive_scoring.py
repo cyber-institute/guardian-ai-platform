@@ -86,37 +86,40 @@ def score_ai_cybersecurity_maturity(text: str, title: str) -> Optional[int]:
     text_lower = text.lower()
     base_score = 0
     
-    # Encryption standards (25 points)
-    encryption_indicators = [
-        'ai encryption', 'model encryption', 'data encryption', 'encrypted training',
-        'secure computation', 'homomorphic encryption', 'federated learning security'
+    # Core cybersecurity foundations (30 points)
+    security_foundations = [
+        'cybersecurity', 'security', 'threat', 'risk', 'vulnerability', 'attack',
+        'secure', 'protection', 'defense', 'safety', 'resilience'
     ]
-    encryption_score = min(25, sum(5 for indicator in encryption_indicators if indicator in text_lower))
-    base_score += encryption_score
+    security_score = min(30, sum(3 for indicator in security_foundations if indicator in text_lower))
+    base_score += security_score
     
-    # Authentication mechanisms (25 points)
-    auth_indicators = [
-        'ai authentication', 'model authentication', 'api security', 'access control',
-        'identity verification', 'multi-factor', 'zero trust', 'credential management'
+    # AI-specific security concepts (25 points)
+    ai_security_indicators = [
+        'ai security', 'ai safety', 'secure ai', 'ai threat', 'ai risk',
+        'model security', 'ai governance', 'responsible ai', 'trustworthy ai',
+        'ai robustness', 'ai assurance', 'ai compliance'
     ]
-    auth_score = min(25, sum(3 for indicator in auth_indicators if indicator in text_lower))
-    base_score += auth_score
+    ai_security_score = min(25, sum(4 for indicator in ai_security_indicators if indicator in text_lower))
+    base_score += ai_security_score
     
-    # Threat monitoring (25 points)
-    monitoring_indicators = [
-        'adversarial attack', 'model poisoning', 'data poisoning', 'threat detection',
-        'anomaly detection', 'security monitoring', 'ai security testing', 'vulnerability assessment'
+    # Implementation and practices (25 points)
+    implementation_indicators = [
+        'framework', 'guidance', 'practices', 'guidelines', 'standards',
+        'deployment', 'implementation', 'testing', 'evaluation', 'assessment',
+        'monitoring', 'oversight', 'collaboration', 'playbook'
     ]
-    monitoring_score = min(25, sum(3 for indicator in monitoring_indicators if indicator in text_lower))
-    base_score += monitoring_score
+    impl_score = min(25, sum(2 for indicator in implementation_indicators if indicator in text_lower))
+    base_score += impl_score
     
-    # Incident response (25 points)
-    incident_indicators = [
-        'incident response', 'security incident', 'breach response', 'recovery plan',
-        'forensics', 'containment', 'ai incident', 'security playbook'
+    # Advanced security concepts (20 points)
+    advanced_indicators = [
+        'adversarial', 'poisoning', 'red team', 'penetration', 'audit',
+        'incident response', 'forensics', 'containment', 'recovery',
+        'access control', 'authentication', 'encryption'
     ]
-    incident_score = min(25, sum(3 for indicator in incident_indicators if indicator in text_lower))
-    base_score += incident_score
+    advanced_score = min(20, sum(3 for indicator in advanced_indicators if indicator in text_lower))
+    base_score += advanced_score
     
     return min(100, base_score)
 
@@ -187,37 +190,39 @@ def score_ai_ethics(text: str, title: str) -> Optional[int]:
     text_lower = text.lower()
     base_score = 0
     
-    # Fairness and bias mitigation (25 points)
-    fairness_indicators = [
-        'bias mitigation', 'algorithmic fairness', 'bias testing', 'fair ai',
-        'discrimination prevention', 'equitable', 'bias audit', 'fairness metrics'
+    # Core ethics and governance (30 points)
+    ethics_foundations = [
+        'ethics', 'ethical', 'responsible', 'governance', 'oversight',
+        'accountability', 'transparency', 'fairness', 'bias', 'trustworthy'
     ]
-    fairness_score = min(25, sum(3 for indicator in fairness_indicators if indicator in text_lower))
-    base_score += fairness_score
+    ethics_score = min(30, sum(3 for indicator in ethics_foundations if indicator in text_lower))
+    base_score += ethics_score
     
-    # Transparency and explainability (25 points)
-    transparency_indicators = [
-        'explainable ai', 'interpretable', 'transparency', 'explainability',
-        'ai explanation', 'model interpretation', 'decision transparency', 'algorithmic transparency'
+    # AI-specific ethics concepts (25 points)
+    ai_ethics_indicators = [
+        'responsible ai', 'ai ethics', 'ethical ai', 'ai governance', 'trustworthy ai',
+        'ai accountability', 'ai transparency', 'ai fairness', 'algorithmic bias',
+        'explainable ai', 'ai explainability'
     ]
-    transparency_score = min(25, sum(3 for indicator in transparency_indicators if indicator in text_lower))
-    base_score += transparency_score
+    ai_ethics_score = min(25, sum(4 for indicator in ai_ethics_indicators if indicator in text_lower))
+    base_score += ai_ethics_score
     
-    # Accountability mechanisms (25 points)
-    accountability_indicators = [
-        'accountability', 'responsible ai', 'ai governance', 'oversight',
-        'human oversight', 'ai responsibility', 'ethical review', 'ai audit'
+    # Implementation and frameworks (25 points)
+    framework_indicators = [
+        'framework', 'guidelines', 'principles', 'recommendations', 'standards',
+        'policy', 'guidance', 'practices', 'assessment', 'evaluation',
+        'compliance', 'audit', 'review'
     ]
-    accountability_score = min(25, sum(3 for indicator in accountability_indicators if indicator in text_lower))
-    base_score += accountability_score
+    framework_score = min(25, sum(2 for indicator in framework_indicators if indicator in text_lower))
+    base_score += framework_score
     
-    # Privacy protection (25 points)
-    privacy_indicators = [
-        'privacy protection', 'data privacy', 'privacy preserving', 'differential privacy',
-        'privacy by design', 'data protection', 'personal data', 'privacy rights'
+    # Social impact and rights (20 points)
+    impact_indicators = [
+        'human rights', 'social impact', 'inclusion', 'equity', 'discrimination',
+        'privacy', 'protection', 'safety', 'harm', 'benefit', 'risk'
     ]
-    privacy_score = min(25, sum(3 for indicator in privacy_indicators if indicator in text_lower))
-    base_score += privacy_score
+    impact_score = min(20, sum(3 for indicator in impact_indicators if indicator in text_lower))
+    base_score += impact_score
     
     return min(100, base_score)
 
