@@ -44,9 +44,11 @@ def analyze_document_applicability(text: str, title: str) -> Dict[str, bool]:
         'accountability', 'bias mitigation', 'fairness', 'social impact', 'inclusion'
     ]
     
-    # Check for substantial content (not just passing mentions)
-    ai_depth = sum(1 for indicator in ai_indicators if indicator in text_lower) >= 2
-    quantum_depth = sum(1 for indicator in quantum_indicators if indicator in text_lower) >= 2
+    # Check for substantial content (more inclusive for AI documents)
+    ai_depth = (sum(1 for indicator in ai_indicators if indicator in text_lower) >= 1 or 
+                'artificial intelligence' in text_lower or 'ai ' in text_lower or 
+                'machine learning' in text_lower or 'ai system' in text_lower)
+    quantum_depth = sum(1 for indicator in quantum_indicators if indicator in text_lower) >= 1
     has_cybersecurity_depth = any(indicator in text_lower for indicator in cybersecurity_indicators)
     has_ethics_depth = any(indicator in text_lower for indicator in ethics_indicators)
     
@@ -59,12 +61,13 @@ def analyze_document_applicability(text: str, title: str) -> Dict[str, bool]:
             'quantum_ethics': True
         }
     
-    # Determine applicability based on content depth analysis and context
+    # More inclusive applicability - documents with substantial AI/quantum content should be scored
+    # Even if they don't explicitly mention "cybersecurity" or "ethics" keywords
     return {
-        'ai_cybersecurity': ai_depth and has_cybersecurity_depth,
-        'quantum_cybersecurity': quantum_depth and has_cybersecurity_depth,
-        'ai_ethics': ai_depth and has_ethics_depth,
-        'quantum_ethics': quantum_depth and has_ethics_depth
+        'ai_cybersecurity': ai_depth and (has_cybersecurity_depth or 'security' in text_lower or 'risk' in text_lower),
+        'quantum_cybersecurity': quantum_depth and (has_cybersecurity_depth or 'security' in text_lower or 'cryptographic' in text_lower),
+        'ai_ethics': ai_depth and (has_ethics_depth or 'recommendation' in text_lower or 'framework' in text_lower or 'governance' in text_lower),
+        'quantum_ethics': quantum_depth and (has_ethics_depth or 'inclusion' in text_lower or 'sustainability' in text_lower)
     }
 
 def score_ai_cybersecurity_maturity(text: str, title: str) -> Optional[int]:
