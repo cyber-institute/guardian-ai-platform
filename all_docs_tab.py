@@ -412,7 +412,16 @@ def show_score_explanation(framework_type, score, content="", title=""):
     color = "#9e9e9e"
     interpretation = "Not applicable for this document type"
     
-    if score != 'N/A' and isinstance(score, (int, float)):
+    if score == 'N/A':
+        if framework_type == 'ai_cybersecurity':
+            interpretation = "This document does not focus on AI-specific cybersecurity. For a high score, documents should address AI threat modeling, model security, AI governance, and AI-specific incident response procedures."
+        elif framework_type == 'quantum_cybersecurity':
+            interpretation = "This document does not address quantum cybersecurity concerns. For a high score, documents should cover post-quantum cryptography, quantum key distribution, quantum threat assessment, and NIST post-quantum standards."
+        elif framework_type == 'ai_ethics':
+            interpretation = "This document does not focus on AI ethics. For a high score, documents should address bias mitigation, algorithmic transparency, accountability frameworks, and responsible AI development practices."
+        elif framework_type == 'quantum_ethics':
+            interpretation = "This document does not address quantum ethics. For a high score, documents should cover quantum equity, societal impacts of quantum technology, quantum governance, and responsible quantum development."
+    elif isinstance(score, (int, float)):
         for threshold, (perf, col, interp) in sorted(performance_levels.items(), reverse=True):
             if score >= threshold:
                 performance = perf
@@ -597,7 +606,7 @@ def is_probably_ai(content):
     return any(keyword in content_lower for keyword in ai_keywords)
 
 def get_document_topic(doc):
-    """Determine if document is AI, Quantum, or Both based on content."""
+    """Determine if document is AI, Quantum, Cybersecurity, or Both based on content."""
     # Check content sources
     content_sources = [
         doc.get('title', ''),
@@ -629,18 +638,36 @@ def get_document_topic(doc):
         'qubit', 'quantum state', 'quantum mechanics', 'quantum information'
     ]
     
+    # Pure cybersecurity detection (without AI/quantum focus)
+    cybersecurity_indicators = [
+        'digital identity', 'authentication', 'authorization', 'access control',
+        'identity management', 'credential', 'verification', 'digital certificates',
+        'password', 'multifactor', 'biometric', 'encryption', 'cryptography',
+        'security controls', 'threat assessment', 'vulnerability', 'risk management',
+        'incident response', 'security framework', 'cybersecurity', 'information security',
+        'network security', 'data protection', 'privacy', 'security policy',
+        'security standards', 'compliance', 'audit', 'penetration testing',
+        'intrusion detection', 'firewall', 'security monitoring'
+    ]
+    
     ai_count = sum(1 for indicator in ai_indicators if indicator in full_content)
     quantum_count = sum(1 for indicator in quantum_indicators if indicator in full_content)
+    cybersec_count = sum(1 for indicator in cybersecurity_indicators if indicator in full_content)
     
-    # Determine primary topic based on content analysis with improved sensitivity
-    if quantum_count >= 2 and quantum_count > ai_count:
+    # Determine primary topic based on content analysis
+    # Priority: Cybersecurity (if strong and minimal AI/quantum), then AI/Quantum combinations
+    if cybersec_count >= 5 and ai_count < 3 and quantum_count < 3:
+        return "Cybersecurity"
+    elif quantum_count >= 2 and quantum_count > ai_count:
         return "Quantum"
-    elif ai_count >= 1 and ai_count >= quantum_count:  # Lower threshold for AI detection
+    elif ai_count >= 1 and ai_count >= quantum_count:
         return "AI"
     elif quantum_count >= 1 and ai_count >= 1:
         return "Both"
+    elif cybersec_count >= 3:  # Fallback for moderate cybersecurity content
+        return "Cybersecurity"
     else:
-        return "AI"  # Default to AI instead of Both for policy documents
+        return "AI"  # Default to AI for policy documents
 
 def render():
     """Render the All Documents tab with comprehensive document repository and contextual help tooltips."""
