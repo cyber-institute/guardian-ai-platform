@@ -1494,26 +1494,33 @@ def render():
                     st.markdown("*Scores calculated using multi-LLM analysis against NIST AI RMF, CISA guidelines, and quantum security standards*")
                     
                 elif current_analysis == 'ai_ethics':
-                    avg_score = repo_stats.get('ai_ethics', 50)
-                    performance = "above average" if scores['ai_ethics'] > avg_score else ("average" if scores['ai_ethics'] == avg_score else "below average")
                     analysis = analyze_ai_ethics_content(raw_content, scores['ai_ethics'])
                     
                     col1, col2 = st.columns([4, 1])
                     with col1:
-                        st.markdown(f"**AI Ethics Assessment: {scores['ai_ethics']}/100** ({performance})")
+                        if scores['ai_ethics'] != 'N/A':
+                            avg_score = repo_stats.get('ai_ethics', 50)
+                            performance = "above average" if scores['ai_ethics'] > avg_score else ("average" if scores['ai_ethics'] == avg_score else "below average")
+                            st.markdown(f"**AI Ethics Assessment: {scores['ai_ethics']}/100** ({performance})")
+                        else:
+                            st.markdown(f"**AI Ethics Assessment: N/A**")
                     with col2:
                         help_tooltips.render_help_icon('ai_ethics_score', size="medium")
                     
-                    st.markdown(f"""
-                    **Identified Strengths:**
-                    {chr(10).join([f"• {strength}" for strength in analysis['strengths']])}
-                    
-                    **Areas for Improvement:**
-                    {chr(10).join([f"• {weakness}" for weakness in analysis['weaknesses']])}
-                    
-                    **Recommendations:**
-                    {chr(10).join([f"• {rec}" for rec in analysis['recommendations']])}
-                    """)
+                    # Display analysis content - handle both string and dict formats
+                    if isinstance(analysis, str):
+                        st.markdown(analysis)
+                    else:
+                        st.markdown(f"""
+                        **Identified Strengths:**
+                        {chr(10).join([f"• {strength}" for strength in analysis['strengths']])}
+                        
+                        **Areas for Improvement:**
+                        {chr(10).join([f"• {weakness}" for weakness in analysis['weaknesses']])}
+                        
+                        **Recommendations:**
+                        {chr(10).join([f"• {rec}" for rec in analysis['recommendations']])}
+                        """)
                     
                     # Add expandable help section for detailed explanations
                     help_tooltips.render_expandable_help('ai_ethics_score')
@@ -1522,26 +1529,33 @@ def render():
                     st.markdown("*Scores calculated using multi-LLM analysis against NIST AI RMF, CISA guidelines, and quantum security standards*")
                     
                 elif current_analysis == 'quantum_cybersecurity':
-                    avg_tier = repo_stats.get('quantum_cybersecurity', 3)
-                    performance = "above average" if scores['quantum_cybersecurity'] > avg_tier else ("average" if scores['quantum_cybersecurity'] == avg_tier else "below average")
                     analysis = analyze_quantum_cybersecurity_content(raw_content, scores['quantum_cybersecurity'])
                     
                     col1, col2 = st.columns([4, 1])
                     with col1:
-                        st.markdown(f"**Quantum Cybersecurity Assessment: Tier {scores['quantum_cybersecurity']}/5** ({performance})")
+                        if scores['quantum_cybersecurity'] != 'N/A':
+                            avg_tier = repo_stats.get('quantum_cybersecurity', 3)
+                            performance = "above average" if scores['quantum_cybersecurity'] > avg_tier else ("average" if scores['quantum_cybersecurity'] == avg_tier else "below average")
+                            st.markdown(f"**Quantum Cybersecurity Assessment: Tier {scores['quantum_cybersecurity']}/5** ({performance})")
+                        else:
+                            st.markdown(f"**Quantum Cybersecurity Assessment: N/A**")
                     with col2:
                         help_tooltips.render_help_icon('quantum_cybersecurity_score', size="medium")
                     
-                    st.markdown(f"""
-                    **Identified Strengths:**
-                    {chr(10).join([f"• {strength}" for strength in analysis['strengths']])}
-                    
-                    **Areas for Improvement:**
-                    {chr(10).join([f"• {weakness}" for weakness in analysis['weaknesses']])}
-                    
-                    **Recommendations:**
-                    {chr(10).join([f"• {rec}" for rec in analysis['recommendations']])}
-                    """)
+                    # Display analysis content - handle both string and dict formats
+                    if isinstance(analysis, str):
+                        st.markdown(analysis)
+                    else:
+                        st.markdown(f"""
+                        **Identified Strengths:**
+                        {chr(10).join([f"• {strength}" for strength in analysis['strengths']])}
+                        
+                        **Areas for Improvement:**
+                        {chr(10).join([f"• {weakness}" for weakness in analysis['weaknesses']])}
+                        
+                        **Recommendations:**
+                        {chr(10).join([f"• {rec}" for rec in analysis['recommendations']])}
+                        """)
                     
                     # Add expandable help section for detailed explanations
                     help_tooltips.render_expandable_help('quantum_cybersecurity_score')
@@ -1550,26 +1564,33 @@ def render():
                     st.markdown("*Scores calculated using multi-LLM analysis against NIST AI RMF, CISA guidelines, and quantum security standards*")
                     
                 elif current_analysis == 'quantum_ethics':
-                    avg_score = repo_stats.get('quantum_ethics', 50)
-                    performance = "above average" if scores['quantum_ethics'] > avg_score else ("average" if scores['quantum_ethics'] == avg_score else "below average")
                     analysis = analyze_quantum_ethics_content(raw_content, scores['quantum_ethics'])
                     
                     col1, col2 = st.columns([4, 1])
                     with col1:
-                        st.markdown(f"**Quantum Ethics Assessment: {scores['quantum_ethics']}/100** ({performance})")
+                        if scores['quantum_ethics'] != 'N/A':
+                            avg_score = repo_stats.get('quantum_ethics', 50)
+                            performance = "above average" if scores['quantum_ethics'] > avg_score else ("average" if scores['quantum_ethics'] == avg_score else "below average")
+                            st.markdown(f"**Quantum Ethics Assessment: {scores['quantum_ethics']}/100** ({performance})")
+                        else:
+                            st.markdown(f"**Quantum Ethics Assessment: N/A**")
                     with col2:
                         help_tooltips.render_help_icon('quantum_ethics_score', size="medium")
                     
-                    st.markdown(f"""
-                    **Identified Strengths:**
-                    {chr(10).join([f"• {strength}" for strength in analysis['strengths']])}
-                    
-                    **Areas for Improvement:**
-                    {chr(10).join([f"• {weakness}" for weakness in analysis['weaknesses']])}
-                    
-                    **Recommendations:**
-                    {chr(10).join([f"• {rec}" for rec in analysis['recommendations']])}
-                    """)
+                    # Display analysis content - handle both string and dict formats
+                    if isinstance(analysis, str):
+                        st.markdown(analysis)
+                    else:
+                        st.markdown(f"""
+                        **Identified Strengths:**
+                        {chr(10).join([f"• {strength}" for strength in analysis['strengths']])}
+                        
+                        **Areas for Improvement:**
+                        {chr(10).join([f"• {weakness}" for weakness in analysis['weaknesses']])}
+                        
+                        **Recommendations:**
+                        {chr(10).join([f"• {rec}" for rec in analysis['recommendations']])}
+                        """)
                     
                     # Add expandable help section for detailed explanations
                     help_tooltips.render_expandable_help('quantum_ethics_score')
@@ -1577,8 +1598,7 @@ def render():
                     st.markdown("---")
                     st.markdown("*Scores calculated using multi-LLM analysis against NIST AI RMF, CISA guidelines, and quantum security standards*")
                     
-                else:
-                    st.warning("No detailed analysis available for this framework.")
+
                 
                 # Close button
                 if st.button("Close Analysis", key="close_modal", use_container_width=True):
