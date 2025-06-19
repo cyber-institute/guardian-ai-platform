@@ -1458,14 +1458,17 @@ def render():
                     repo_stats = {"ai_cybersecurity": 50, "quantum_cybersecurity": 3, "ai_ethics": 50, "quantum_ethics": 50}
                 
                 # Show analysis based on which button was clicked
-                if current_analysis == 'ai_cybersecurity' and scores['ai_cybersecurity'] != 'N/A':
-                    avg_score = repo_stats.get('ai_cybersecurity', 50)
-                    performance = "above average" if scores['ai_cybersecurity'] > avg_score else ("average" if scores['ai_cybersecurity'] == avg_score else "below average")
+                if current_analysis == 'ai_cybersecurity':
                     analysis = analyze_ai_cybersecurity_content(raw_content, scores['ai_cybersecurity'])
                     
                     col1, col2 = st.columns([4, 1])
                     with col1:
-                        st.markdown(f"**AI Cybersecurity Assessment: {scores['ai_cybersecurity']}/100** ({performance})")
+                        if scores['ai_cybersecurity'] != 'N/A':
+                            avg_score = repo_stats.get('ai_cybersecurity', 50)
+                            performance = "above average" if scores['ai_cybersecurity'] > avg_score else ("average" if scores['ai_cybersecurity'] == avg_score else "below average")
+                            st.markdown(f"**AI Cybersecurity Assessment: {scores['ai_cybersecurity']}/100** ({performance})")
+                        else:
+                            st.markdown(f"**AI Cybersecurity Assessment: N/A**")
                     with col2:
                         help_tooltips.render_help_icon('ai_cybersecurity_score', size="medium")
                     
@@ -1486,7 +1489,7 @@ def render():
                     st.markdown("---")
                     st.markdown("*Scores calculated using multi-LLM analysis against NIST AI RMF, CISA guidelines, and quantum security standards*")
                     
-                elif current_analysis == 'ai_ethics' and scores['ai_ethics'] != 'N/A':
+                elif current_analysis == 'ai_ethics':
                     avg_score = repo_stats.get('ai_ethics', 50)
                     performance = "above average" if scores['ai_ethics'] > avg_score else ("average" if scores['ai_ethics'] == avg_score else "below average")
                     analysis = analyze_ai_ethics_content(raw_content, scores['ai_ethics'])
@@ -1514,7 +1517,7 @@ def render():
                     st.markdown("---")
                     st.markdown("*Scores calculated using multi-LLM analysis against NIST AI RMF, CISA guidelines, and quantum security standards*")
                     
-                elif current_analysis == 'quantum_cybersecurity' and scores['quantum_cybersecurity'] != 'N/A':
+                elif current_analysis == 'quantum_cybersecurity':
                     avg_tier = repo_stats.get('quantum_cybersecurity', 3)
                     performance = "above average" if scores['quantum_cybersecurity'] > avg_tier else ("average" if scores['quantum_cybersecurity'] == avg_tier else "below average")
                     analysis = analyze_quantum_cybersecurity_content(raw_content, scores['quantum_cybersecurity'])
@@ -1542,7 +1545,7 @@ def render():
                     st.markdown("---")
                     st.markdown("*Scores calculated using multi-LLM analysis against NIST AI RMF, CISA guidelines, and quantum security standards*")
                     
-                elif current_analysis == 'quantum_ethics' and scores['quantum_ethics'] != 'N/A':
+                elif current_analysis == 'quantum_ethics':
                     avg_score = repo_stats.get('quantum_ethics', 50)
                     performance = "above average" if scores['quantum_ethics'] > avg_score else ("average" if scores['quantum_ethics'] == avg_score else "below average")
                     analysis = analyze_quantum_ethics_content(raw_content, scores['quantum_ethics'])
