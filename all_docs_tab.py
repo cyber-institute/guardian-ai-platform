@@ -5415,62 +5415,65 @@ def render_card_view(docs):
             </script>
             """
             
-            # Create overlapping clickable buttons with styled badges
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                # AI Cybersecurity - clickable button first
-                if st.button(f"AI Cybersecurity: {ai_cyber_display}", key=f"ai_cyber_{unique_id}", help="Click for AI Cybersecurity analysis"):
-                    st.session_state[f'show_ai_cyber_{unique_id}'] = True
-                    st.rerun()
-                
-                # AI Ethics - clickable button first  
-                if st.button(f"AI Ethics: {ai_ethics_display}", key=f"ai_ethics_{unique_id}", help="Click for AI Ethics analysis"):
-                    st.session_state[f'show_ai_ethics_{unique_id}'] = True
-                    st.rerun()
-            
-            with col2:
-                # Quantum Cybersecurity - clickable button first
-                if st.button(f"Quantum Cybersecurity: {q_cyber_display}", key=f"q_cyber_{unique_id}", help="Click for Quantum Cybersecurity analysis"):
-                    st.session_state[f'show_q_cyber_{unique_id}'] = True
-                    st.rerun()
-                    
-                # Quantum Ethics - clickable button first
-                if st.button(f"Quantum Ethics: {q_ethics_display}", key=f"q_ethics_{unique_id}", help="Click for Quantum Ethics analysis"):
-                    st.session_state[f'show_q_ethics_{unique_id}'] = True
-                    st.rerun()
-            
-            # Apply custom CSS to style the buttons like the original badges
+            # Original styled badges with session state click detection
             st.markdown(f"""
-            <style>
-            div[data-testid="stButton"] > button[kind="secondary"]:has-text("AI Cybersecurity") {{
-                background: #f8f9fa !important;
-                border: 1px solid #dee2e6 !important;
-                color: #333 !important;
-                font-family: Arial, sans-serif !important;
-                font-size: 0.67em !important;
-                padding: 10px !important;
-                border-radius: 5px !important;
-                text-align: center !important;
-                width: 100% !important;
-            }}
-            div[data-testid="stButton"] > button[kind="secondary"] span:contains("{ai_cyber_display}") {{
-                color: {ai_cyber_color} !important;
-                font-weight: bold !important;
-            }}
-            div[data-testid="stButton"] > button[kind="secondary"] span:contains("{q_cyber_display}") {{
-                color: {q_cyber_color} !important;
-                font-weight: bold !important;
-            }}
-            div[data-testid="stButton"] > button[kind="secondary"] span:contains("{ai_ethics_display}") {{
-                color: {ai_ethics_color} !important;
-                font-weight: bold !important;
-            }}
-            div[data-testid="stButton"] > button[kind="secondary"] span:contains("{q_ethics_display}") {{
-                color: {q_ethics_color} !important;
-                font-weight: bold !important;
-            }}
-            </style>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em; position: relative;">
+                <div id="ai_cyber_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;" onclick="window.parent.postMessage({{type: 'score_click', framework: 'ai_cyber', id: '{unique_id}'}}, '*')">
+                    AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
+                </div>
+                <div id="q_cyber_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;" onclick="window.parent.postMessage({{type: 'score_click', framework: 'q_cyber', id: '{unique_id}'}}, '*')">
+                    Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
+                </div>
+                <div id="ai_ethics_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;" onclick="window.parent.postMessage({{type: 'score_click', framework: 'ai_ethics', id: '{unique_id}'}}, '*')">
+                    AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
+                </div>
+                <div id="q_ethics_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;" onclick="window.parent.postMessage({{type: 'score_click', framework: 'q_ethics', id: '{unique_id}'}}, '*')">
+                    Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
+                </div>
+            </div>
+            
+            <script>
+                // Listen for click messages from the HTML badges
+                window.addEventListener('message', function(event) {{
+                    if (event.data.type === 'score_click' && event.data.id === '{unique_id}') {{
+                        // Trigger Streamlit rerun with the appropriate session state
+                        const framework = event.data.framework;
+                        
+                        // Send click to parent Streamlit
+                        if (window.parent.streamlitClickHandler) {{
+                            window.parent.streamlitClickHandler(framework, '{unique_id}');
+                        }}
+                    }}
+                }});
+            </script>
+            """, unsafe_allow_html=True)
+            
+            # Hidden buttons to handle the actual state changes
+            if st.button("", key=f"hidden_ai_cyber_{unique_id}", help="AI Cybersecurity"):
+                st.session_state[f'show_ai_cyber_{unique_id}'] = True
+                st.rerun()
+            if st.button("", key=f"hidden_q_cyber_{unique_id}", help="Quantum Cybersecurity"):
+                st.session_state[f'show_q_cyber_{unique_id}'] = True
+                st.rerun()
+            if st.button("", key=f"hidden_ai_ethics_{unique_id}", help="AI Ethics"):
+                st.session_state[f'show_ai_ethics_{unique_id}'] = True
+                st.rerun()
+            if st.button("", key=f"hidden_q_ethics_{unique_id}", help="Quantum Ethics"):
+                st.session_state[f'show_q_ethics_{unique_id}'] = True
+                st.rerun()
+            
+            # JavaScript to connect HTML clicks to Streamlit buttons
+            st.markdown(f"""
+            <script>
+                window.streamlitClickHandler = function(framework, id) {{
+                    // Find and click the corresponding hidden button
+                    const buttonSelector = `button[data-testid*="hidden_${{framework}}_${{id}}"]`;
+                    const button = document.querySelector(buttonSelector);
+                    if (button) {{
+                        button.click();
+                    }}
+                }};
+            </script>
             """, unsafe_allow_html=True)
             
             # Show analysis expanders when triggered
