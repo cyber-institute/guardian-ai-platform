@@ -5415,50 +5415,63 @@ def render_card_view(docs):
             </script>
             """
             
-            # Use invisible buttons with original styled labels
+            # Create overlapping clickable buttons with styled badges
             col1, col2 = st.columns(2)
             
             with col1:
-                # AI Cybersecurity
-                st.markdown(f"""
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 8px; font-family: Arial, sans-serif; font-size: 0.67em;">
-                    AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
-                </div>
-                """, unsafe_allow_html=True)
-                if st.button(" ", key=f"ai_cyber_{unique_id}", help="Click for AI Cybersecurity analysis"):
+                # AI Cybersecurity - clickable button first
+                if st.button(f"AI Cybersecurity: {ai_cyber_display}", key=f"ai_cyber_{unique_id}", help="Click for AI Cybersecurity analysis"):
                     st.session_state[f'show_ai_cyber_{unique_id}'] = True
                     st.rerun()
                 
-                # AI Ethics  
-                st.markdown(f"""
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 8px; font-family: Arial, sans-serif; font-size: 0.67em;">
-                    AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
-                </div>
-                """, unsafe_allow_html=True)
-                if st.button("  ", key=f"ai_ethics_{unique_id}", help="Click for AI Ethics analysis"):
+                # AI Ethics - clickable button first  
+                if st.button(f"AI Ethics: {ai_ethics_display}", key=f"ai_ethics_{unique_id}", help="Click for AI Ethics analysis"):
                     st.session_state[f'show_ai_ethics_{unique_id}'] = True
                     st.rerun()
             
             with col2:
-                # Quantum Cybersecurity
-                st.markdown(f"""
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 8px; font-family: Arial, sans-serif; font-size: 0.67em;">
-                    Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
-                </div>
-                """, unsafe_allow_html=True)
-                if st.button("   ", key=f"q_cyber_{unique_id}", help="Click for Quantum Cybersecurity analysis"):
+                # Quantum Cybersecurity - clickable button first
+                if st.button(f"Quantum Cybersecurity: {q_cyber_display}", key=f"q_cyber_{unique_id}", help="Click for Quantum Cybersecurity analysis"):
                     st.session_state[f'show_q_cyber_{unique_id}'] = True
                     st.rerun()
                     
-                # Quantum Ethics
-                st.markdown(f"""
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 8px; font-family: Arial, sans-serif; font-size: 0.67em;">
-                    Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
-                </div>
-                """, unsafe_allow_html=True)
-                if st.button("    ", key=f"q_ethics_{unique_id}", help="Click for Quantum Ethics analysis"):
+                # Quantum Ethics - clickable button first
+                if st.button(f"Quantum Ethics: {q_ethics_display}", key=f"q_ethics_{unique_id}", help="Click for Quantum Ethics analysis"):
                     st.session_state[f'show_q_ethics_{unique_id}'] = True
                     st.rerun()
+            
+            # Apply custom CSS to style the buttons like the original badges
+            st.markdown(f"""
+            <style>
+            div[data-testid="stButton"] > button[kind="secondary"]:has-text("AI Cybersecurity") {{
+                background: #f8f9fa !important;
+                border: 1px solid #dee2e6 !important;
+                color: #333 !important;
+                font-family: Arial, sans-serif !important;
+                font-size: 0.67em !important;
+                padding: 10px !important;
+                border-radius: 5px !important;
+                text-align: center !important;
+                width: 100% !important;
+            }}
+            div[data-testid="stButton"] > button[kind="secondary"] span:contains("{ai_cyber_display}") {{
+                color: {ai_cyber_color} !important;
+                font-weight: bold !important;
+            }}
+            div[data-testid="stButton"] > button[kind="secondary"] span:contains("{q_cyber_display}") {{
+                color: {q_cyber_color} !important;
+                font-weight: bold !important;
+            }}
+            div[data-testid="stButton"] > button[kind="secondary"] span:contains("{ai_ethics_display}") {{
+                color: {ai_ethics_color} !important;
+                font-weight: bold !important;
+            }}
+            div[data-testid="stButton"] > button[kind="secondary"] span:contains("{q_ethics_display}") {{
+                color: {q_ethics_color} !important;
+                font-weight: bold !important;
+            }}
+            </style>
+            """, unsafe_allow_html=True)
             
             # Show analysis expanders when triggered
             if st.session_state.get(f'show_ai_cyber_{unique_id}', False):
