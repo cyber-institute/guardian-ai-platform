@@ -5415,66 +5415,44 @@ def render_card_view(docs):
             </script>
             """
             
-            # Original styled badges - display only
+            # Check for form submissions to show modals
+            clicked_badge = st.query_params.get('clicked_badge', None)
+            if clicked_badge:
+                framework, doc_id = clicked_badge.split('_', 1)
+                if doc_id == str(unique_id):
+                    st.session_state[f'show_{framework}_{unique_id}'] = True
+                    # Clear the query param
+                    st.query_params.clear()
+                    st.rerun()
+            
+            # Original styled badges with form-based clicking
             st.markdown(f"""
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em;">
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;">
-                    AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
-                </div>
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;">
-                    Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
-                </div>
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;">
-                    AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
-                </div>
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;">
-                    Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
-                </div>
+                <form method="get" style="margin: 0;">
+                    <input type="hidden" name="clicked_badge" value="ai_cyber_{unique_id}">
+                    <button type="submit" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; width: 100%; cursor: pointer; font-family: Arial, sans-serif; font-size: 1em;">
+                        AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
+                    </button>
+                </form>
+                <form method="get" style="margin: 0;">
+                    <input type="hidden" name="clicked_badge" value="q_cyber_{unique_id}">
+                    <button type="submit" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; width: 100%; cursor: pointer; font-family: Arial, sans-serif; font-size: 1em;">
+                        Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
+                    </button>
+                </form>
+                <form method="get" style="margin: 0;">
+                    <input type="hidden" name="clicked_badge" value="ai_ethics_{unique_id}">
+                    <button type="submit" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; width: 100%; cursor: pointer; font-family: Arial, sans-serif; font-size: 1em;">
+                        AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
+                    </button>
+                </form>
+                <form method="get" style="margin: 0;">
+                    <input type="hidden" name="clicked_badge" value="q_ethics_{unique_id}">
+                    <button type="submit" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; width: 100%; cursor: pointer; font-family: Arial, sans-serif; font-size: 1em;">
+                        Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
+                    </button>
+                </form>
             </div>
-            """, unsafe_allow_html=True)
-            
-            # Clickable buttons styled to match badges with custom CSS
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                if st.button("AI Cybersecurity", key=f"ai_cyber_{unique_id}", help="Click for AI Cybersecurity analysis"):
-                    st.session_state[f'show_ai_cyber_{unique_id}'] = True
-                    st.rerun()
-                if st.button("AI Ethics", key=f"ai_ethics_{unique_id}", help="Click for AI Ethics analysis"):
-                    st.session_state[f'show_ai_ethics_{unique_id}'] = True
-                    st.rerun()
-            
-            with col2:
-                if st.button("Quantum Cybersecurity", key=f"q_cyber_{unique_id}", help="Click for Quantum Cybersecurity analysis"):
-                    st.session_state[f'show_q_cyber_{unique_id}'] = True
-                    st.rerun()
-                if st.button("Quantum Ethics", key=f"q_ethics_{unique_id}", help="Click for Quantum Ethics analysis"):
-                    st.session_state[f'show_q_ethics_{unique_id}'] = True
-                    st.rerun()
-            
-            # CSS to make clickable buttons invisible and overlay on styled badges
-            st.markdown(f"""
-            <style>
-            /* Hide the clickable buttons by making them transparent and positioning them over the styled badges */
-            div[data-testid="column"]:has(button[kind="secondary"]) {{
-                position: relative;
-                margin-top: -90px;
-                z-index: 10;
-                pointer-events: none;
-            }}
-            div[data-testid="column"] button[kind="secondary"] {{
-                background: transparent !important;
-                border: none !important;
-                color: transparent !important;
-                height: 45px !important;
-                width: 100% !important;
-                margin-bottom: 8px !important;
-                pointer-events: auto !important;
-            }}
-            div[data-testid="column"] button[kind="secondary"]:hover {{
-                background: rgba(0,0,0,0.05) !important;
-            }}
-            </style>
             """, unsafe_allow_html=True)
             
             # Show analysis expanders when triggered
