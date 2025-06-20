@@ -5415,62 +5415,70 @@ def render_card_view(docs):
             </script>
             """
             
-            # Use Streamlit expanders styled as badges
+            # Create colored score labels for headers
+            ai_cyber_label = f"AI Cybersecurity: {ai_cyber_display}"
+            q_cyber_label = f"Quantum Cybersecurity: {q_cyber_display}"
+            ai_ethics_label = f"AI Ethics: {ai_ethics_display}"
+            q_ethics_label = f"Quantum Ethics: {q_ethics_display}"
+            
+            # Use Streamlit expanders with score in header
             col1, col2 = st.columns(2)
             
             with col1:
-                # AI Cybersecurity expander styled as badge
-                with st.expander(f"AI Cybersecurity: {ai_cyber_display}", expanded=False):
-                    st.markdown(f"**Score: {ai_cyber_display}**")
+                # AI Cybersecurity expander
+                with st.expander(ai_cyber_label, expanded=False):
+                    st.markdown(f"**Score: <span style='color: {ai_cyber_color}; font-weight: bold;'>{ai_cyber_display}</span>**", unsafe_allow_html=True)
                     st.write(ai_cyber_analysis)
                 
-                # AI Ethics expander styled as badge  
-                with st.expander(f"AI Ethics: {ai_ethics_display}", expanded=False):
-                    st.markdown(f"**Score: {ai_ethics_display}**")
+                # AI Ethics expander
+                with st.expander(ai_ethics_label, expanded=False):
+                    st.markdown(f"**Score: <span style='color: {ai_ethics_color}; font-weight: bold;'>{ai_ethics_display}</span>**", unsafe_allow_html=True)
                     st.write(ai_ethics_analysis)
             
             with col2:
-                # Quantum Cybersecurity expander styled as badge
-                with st.expander(f"Quantum Cybersecurity: {q_cyber_display}", expanded=False):
-                    st.markdown(f"**Score: {q_cyber_display}**")
+                # Quantum Cybersecurity expander
+                with st.expander(q_cyber_label, expanded=False):
+                    st.markdown(f"**Score: <span style='color: {q_cyber_color}; font-weight: bold;'>{q_cyber_display}</span>**", unsafe_allow_html=True)
                     st.write(q_cyber_analysis)
                     
-                # Quantum Ethics expander styled as badge
-                with st.expander(f"Quantum Ethics: {q_ethics_display}", expanded=False):
-                    st.markdown(f"**Score: {q_ethics_display}**")
+                # Quantum Ethics expander
+                with st.expander(q_ethics_label, expanded=False):
+                    st.markdown(f"**Score: <span style='color: {q_ethics_color}; font-weight: bold;'>{q_ethics_display}</span>**", unsafe_allow_html=True)
                     st.write(q_ethics_analysis)
             
-            # CSS to style expanders like the original badges
+            # CSS to color the score values in expander headers
             st.markdown(f"""
             <style>
-            /* Style expander headers to look like badges */
-            .streamlit-expanderHeader {{
-                background: #f8f9fa !important;
-                border: 1px solid #dee2e6 !important;
-                border-radius: 5px !important;
-                padding: 10px !important;
-                font-family: Arial, sans-serif !important;
-                font-size: 0.67em !important;
-                text-align: center !important;
-                margin-bottom: 8px !important;
-            }}
-            
-            /* Color the score values */
-            .streamlit-expanderHeader:contains("AI Cybersecurity") span {{
+            /* Target specific expander headers by their text content and color the scores */
+            div[data-testid="stExpander"] > div > div > div > p:contains("AI Cybersecurity: {ai_cyber_display}") {{
                 color: {ai_cyber_color} !important;
                 font-weight: bold !important;
             }}
-            .streamlit-expanderHeader:contains("Quantum Cybersecurity") span {{
+            
+            div[data-testid="stExpander"] > div > div > div > p:contains("Quantum Cybersecurity: {q_cyber_display}") {{
                 color: {q_cyber_color} !important;
                 font-weight: bold !important;
             }}
-            .streamlit-expanderHeader:contains("AI Ethics") span {{
+            
+            div[data-testid="stExpander"] > div > div > div > p:contains("AI Ethics: {ai_ethics_display}") {{
                 color: {ai_ethics_color} !important;
                 font-weight: bold !important;
             }}
-            .streamlit-expanderHeader:contains("Quantum Ethics") span {{
+            
+            div[data-testid="stExpander"] > div > div > div > p:contains("Quantum Ethics: {q_ethics_display}") {{
                 color: {q_ethics_color} !important;
                 font-weight: bold !important;
+            }}
+            
+            /* More specific targeting for the score part */
+            div[data-testid="stExpander"] summary > p {{
+                background: linear-gradient(to right, 
+                    black 0%, 
+                    black calc(100% - 4ch), 
+                    {ai_cyber_color} calc(100% - 4ch), 
+                    {ai_cyber_color} 100%) !important;
+                -webkit-background-clip: text !important;
+                background-clip: text !important;
             }}
             </style>
             """, unsafe_allow_html=True)
