@@ -5415,94 +5415,62 @@ def render_card_view(docs):
             </script>
             """
             
-            # Create clickable badge components using streamlit-clickable-images approach
-            from streamlit_clickable_images import clickable_images
-            
-            # Create temporary badge images as data URLs
-            badge_html = f"""
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em;">
-                <div id="ai_cyber_badge_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;">
-                    AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
-                </div>
-                <div id="q_cyber_badge_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;">
-                    Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
-                </div>
-                <div id="ai_ethics_badge_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;">
-                    AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
-                </div>
-                <div id="q_ethics_badge_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;">
-                    Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
-                </div>
-            </div>
-            """
-            
-            st.markdown(badge_html, unsafe_allow_html=True)
-            
-            # Use session state with button IDs to detect clicks
+            # Use Streamlit expanders styled as badges
             col1, col2 = st.columns(2)
             
             with col1:
-                # Use invisible buttons positioned over badges
-                if st.button("", key=f"ai_cyber_btn_{unique_id}", help="AI Cybersecurity Analysis"):
-                    st.session_state[f'show_ai_cyber_{unique_id}'] = True
-                    st.rerun()
-                    
-                if st.button(" ", key=f"ai_ethics_btn_{unique_id}", help="AI Ethics Analysis"):
-                    st.session_state[f'show_ai_ethics_{unique_id}'] = True
-                    st.rerun()
+                # AI Cybersecurity expander styled as badge
+                with st.expander(f"AI Cybersecurity: {ai_cyber_display}", expanded=False):
+                    st.markdown(f"**Score: {ai_cyber_display}**")
+                    st.write(ai_cyber_analysis)
+                
+                # AI Ethics expander styled as badge  
+                with st.expander(f"AI Ethics: {ai_ethics_display}", expanded=False):
+                    st.markdown(f"**Score: {ai_ethics_display}**")
+                    st.write(ai_ethics_analysis)
             
             with col2:
-                if st.button("  ", key=f"q_cyber_btn_{unique_id}", help="Quantum Cybersecurity Analysis"):
-                    st.session_state[f'show_q_cyber_{unique_id}'] = True
-                    st.rerun()
+                # Quantum Cybersecurity expander styled as badge
+                with st.expander(f"Quantum Cybersecurity: {q_cyber_display}", expanded=False):
+                    st.markdown(f"**Score: {q_cyber_display}**")
+                    st.write(q_cyber_analysis)
                     
-                if st.button("   ", key=f"q_ethics_btn_{unique_id}", help="Quantum Ethics Analysis"):
-                    st.session_state[f'show_q_ethics_{unique_id}'] = True
-                    st.rerun()
+                # Quantum Ethics expander styled as badge
+                with st.expander(f"Quantum Ethics: {q_ethics_display}", expanded=False):
+                    st.markdown(f"**Score: {q_ethics_display}**")
+                    st.write(q_ethics_analysis)
             
-            # CSS to overlay invisible buttons on badges
+            # CSS to style expanders like the original badges
             st.markdown(f"""
             <style>
-            /* Position buttons over badges */
-            .stButton > button[title*="AI Cybersecurity"] {{
-                position: absolute;
-                z-index: 10;
-                background: transparent !important;
-                border: none !important;
-                width: calc(50% - 4px) !important;
-                height: 45px !important;
-                margin-top: -135px !important;
-                margin-left: 0px !important;
+            /* Style expander headers to look like badges */
+            .streamlit-expanderHeader {{
+                background: #f8f9fa !important;
+                border: 1px solid #dee2e6 !important;
+                border-radius: 5px !important;
+                padding: 10px !important;
+                font-family: Arial, sans-serif !important;
+                font-size: 0.67em !important;
+                text-align: center !important;
+                margin-bottom: 8px !important;
             }}
-            .stButton > button[title*="Quantum Cybersecurity"] {{
-                position: absolute;
-                z-index: 10;
-                background: transparent !important;
-                border: none !important;
-                width: calc(50% - 4px) !important;
-                height: 45px !important;
-                margin-top: -135px !important;
-                margin-left: calc(50% + 4px) !important;
+            
+            /* Color the score values */
+            .streamlit-expanderHeader:contains("AI Cybersecurity") span {{
+                color: {ai_cyber_color} !important;
+                font-weight: bold !important;
             }}
-            .stButton > button[title*="AI Ethics"] {{
-                position: absolute;
-                z-index: 10;
-                background: transparent !important;
-                border: none !important;
-                width: calc(50% - 4px) !important;
-                height: 45px !important;
-                margin-top: -90px !important;
-                margin-left: 0px !important;
+            .streamlit-expanderHeader:contains("Quantum Cybersecurity") span {{
+                color: {q_cyber_color} !important;
+                font-weight: bold !important;
             }}
-            .stButton > button[title*="Quantum Ethics"] {{
-                position: absolute;
-                z-index: 10;
-                background: transparent !important;
-                border: none !important;
-                width: calc(50% - 4px) !important;
-                height: 45px !important;
-                margin-top: -90px !important;
-                margin-left: calc(50% + 4px) !important;
+            .streamlit-expanderHeader:contains("AI Ethics") span {{
+                color: {ai_ethics_color} !important;
+                font-weight: bold !important;
+            }}
+            .streamlit-expanderHeader:contains("Quantum Ethics") span {{
+                color: {q_ethics_color} !important;
+                font-weight: bold !important;
             }}
             </style>
             """, unsafe_allow_html=True)
