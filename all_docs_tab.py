@@ -5415,11 +5415,30 @@ def render_card_view(docs):
             </script>
             """
             
-            # Create colored score labels for headers
-            ai_cyber_label = f"AI Cybersecurity: {ai_cyber_display}"
-            q_cyber_label = f"Quantum Cybersecurity: {q_cyber_display}"
-            ai_ethics_label = f"AI Ethics: {ai_ethics_display}"
-            q_ethics_label = f"Quantum Ethics: {q_ethics_display}"
+            # Create score labels with color indicators
+            def get_color_indicator(score, color):
+                if score == "N/A":
+                    return "⚪"  # White circle for N/A
+                elif color == "#28a745":  # Green
+                    return "🟢"
+                elif color == "#ffc107":  # Yellow  
+                    return "🟡"
+                elif color == "#fd7e14":  # Orange
+                    return "🟠"
+                elif color == "#dc3545":  # Red
+                    return "🔴"
+                else:
+                    return "⚪"
+            
+            ai_cyber_indicator = get_color_indicator(ai_cyber_display, ai_cyber_color)
+            q_cyber_indicator = get_color_indicator(q_cyber_display, q_cyber_color)
+            ai_ethics_indicator = get_color_indicator(ai_ethics_display, ai_ethics_color)
+            q_ethics_indicator = get_color_indicator(q_ethics_display, q_ethics_color)
+            
+            ai_cyber_label = f"{ai_cyber_indicator} AI Cybersecurity: {ai_cyber_display}"
+            q_cyber_label = f"{q_cyber_indicator} Quantum Cybersecurity: {q_cyber_display}"
+            ai_ethics_label = f"{ai_ethics_indicator} AI Ethics: {ai_ethics_display}"
+            q_ethics_label = f"{q_ethics_indicator} Quantum Ethics: {q_ethics_display}"
             
             # Use Streamlit expanders with score in header
             col1, col2 = st.columns(2)
