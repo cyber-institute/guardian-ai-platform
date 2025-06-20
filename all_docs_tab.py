@@ -5418,12 +5418,16 @@ def render_card_view(docs):
             # Check for form submissions to show modals
             clicked_badge = st.query_params.get('clicked_badge', None)
             if clicked_badge:
-                framework, doc_id = clicked_badge.split('_', 1)
-                if doc_id == str(unique_id):
-                    st.session_state[f'show_{framework}_{unique_id}'] = True
-                    # Clear the query param
-                    st.query_params.clear()
-                    st.rerun()
+                badge_parts = clicked_badge.split('_')
+                if len(badge_parts) >= 3:
+                    framework = '_'.join(badge_parts[:-1])  # Handle ai_cyber, q_cyber, ai_ethics, q_ethics
+                    doc_id = badge_parts[-1]
+                    if doc_id == str(unique_id):
+                        session_key = f'show_{framework}_{unique_id}'
+                        st.session_state[session_key] = True
+                        # Clear the query param to prevent loop
+                        st.query_params.clear()
+                        st.rerun()
             
             # Original styled badges with form-based clicking
             st.markdown(f"""
