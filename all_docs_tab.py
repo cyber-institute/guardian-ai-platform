@@ -5415,49 +5415,47 @@ def render_card_view(docs):
             </script>
             """
             
-            # Check for form submissions to show modals
-            clicked_badge = st.query_params.get('clicked_badge', None)
-            if clicked_badge:
-                badge_parts = clicked_badge.split('_')
-                if len(badge_parts) >= 3:
-                    framework = '_'.join(badge_parts[:-1])  # Handle ai_cyber, q_cyber, ai_ethics, q_ethics
-                    doc_id = badge_parts[-1]
-                    if doc_id == str(unique_id):
-                        session_key = f'show_{framework}_{unique_id}'
-                        st.session_state[session_key] = True
-                        # Clear the query param to prevent loop
-                        st.query_params.clear()
-                        st.rerun()
-            
-            # Original styled badges with form-based clicking
+            # Display original styled badges (visual only)
             st.markdown(f"""
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em;">
-                <form method="get" style="margin: 0;">
-                    <input type="hidden" name="clicked_badge" value="ai_cyber_{unique_id}">
-                    <button type="submit" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; width: 100%; cursor: pointer; font-family: Arial, sans-serif; font-size: 1em;">
-                        AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
-                    </button>
-                </form>
-                <form method="get" style="margin: 0;">
-                    <input type="hidden" name="clicked_badge" value="q_cyber_{unique_id}">
-                    <button type="submit" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; width: 100%; cursor: pointer; font-family: Arial, sans-serif; font-size: 1em;">
-                        Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
-                    </button>
-                </form>
-                <form method="get" style="margin: 0;">
-                    <input type="hidden" name="clicked_badge" value="ai_ethics_{unique_id}">
-                    <button type="submit" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; width: 100%; cursor: pointer; font-family: Arial, sans-serif; font-size: 1em;">
-                        AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
-                    </button>
-                </form>
-                <form method="get" style="margin: 0;">
-                    <input type="hidden" name="clicked_badge" value="q_ethics_{unique_id}">
-                    <button type="submit" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; width: 100%; cursor: pointer; font-family: Arial, sans-serif; font-size: 1em;">
-                        Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
-                    </button>
-                </form>
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;">
+                    AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
+                </div>
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;">
+                    Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
+                </div>
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;">
+                    AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
+                </div>
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;">
+                    Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
+                </div>
             </div>
             """, unsafe_allow_html=True)
+            
+            # Add simple text links below for clicking
+            st.markdown("**Click for detailed analysis:**")
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                if st.button("AI Cyber", key=f"btn_ai_cyber_{unique_id}"):
+                    st.session_state[f'show_ai_cyber_{unique_id}'] = True
+                    st.rerun()
+            
+            with col2:
+                if st.button("Q Cyber", key=f"btn_q_cyber_{unique_id}"):
+                    st.session_state[f'show_q_cyber_{unique_id}'] = True
+                    st.rerun()
+            
+            with col3:
+                if st.button("AI Ethics", key=f"btn_ai_ethics_{unique_id}"):
+                    st.session_state[f'show_ai_ethics_{unique_id}'] = True
+                    st.rerun()
+            
+            with col4:
+                if st.button("Q Ethics", key=f"btn_q_ethics_{unique_id}"):
+                    st.session_state[f'show_q_ethics_{unique_id}'] = True
+                    st.rerun()
             
             # Show analysis expanders when triggered
             if st.session_state.get(f'show_ai_cyber_{unique_id}', False):
