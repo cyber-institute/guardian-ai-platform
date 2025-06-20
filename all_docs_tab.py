@@ -5415,47 +5415,97 @@ def render_card_view(docs):
             </script>
             """
             
-            # Display original styled badges (visual only)
-            st.markdown(f"""
+            # Create clickable badge components using streamlit-clickable-images approach
+            from streamlit_clickable_images import clickable_images
+            
+            # Create temporary badge images as data URLs
+            badge_html = f"""
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em;">
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;">
+                <div id="ai_cyber_badge_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;">
                     AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
                 </div>
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;">
+                <div id="q_cyber_badge_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;">
                     Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
                 </div>
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;">
+                <div id="ai_ethics_badge_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;">
                     AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
                 </div>
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center;">
+                <div id="q_ethics_badge_{unique_id}" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;">
                     Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
                 </div>
             </div>
-            """, unsafe_allow_html=True)
+            """
             
-            # Add simple text links below for clicking
-            st.markdown("**Click for detailed analysis:**")
-            col1, col2, col3, col4 = st.columns(4)
+            st.markdown(badge_html, unsafe_allow_html=True)
+            
+            # Use session state with button IDs to detect clicks
+            col1, col2 = st.columns(2)
             
             with col1:
-                if st.button("AI Cyber", key=f"btn_ai_cyber_{unique_id}"):
+                # Use invisible buttons positioned over badges
+                if st.button("", key=f"ai_cyber_btn_{unique_id}", help="AI Cybersecurity Analysis"):
                     st.session_state[f'show_ai_cyber_{unique_id}'] = True
                     st.rerun()
-            
-            with col2:
-                if st.button("Q Cyber", key=f"btn_q_cyber_{unique_id}"):
-                    st.session_state[f'show_q_cyber_{unique_id}'] = True
-                    st.rerun()
-            
-            with col3:
-                if st.button("AI Ethics", key=f"btn_ai_ethics_{unique_id}"):
+                    
+                if st.button(" ", key=f"ai_ethics_btn_{unique_id}", help="AI Ethics Analysis"):
                     st.session_state[f'show_ai_ethics_{unique_id}'] = True
                     st.rerun()
             
-            with col4:
-                if st.button("Q Ethics", key=f"btn_q_ethics_{unique_id}"):
+            with col2:
+                if st.button("  ", key=f"q_cyber_btn_{unique_id}", help="Quantum Cybersecurity Analysis"):
+                    st.session_state[f'show_q_cyber_{unique_id}'] = True
+                    st.rerun()
+                    
+                if st.button("   ", key=f"q_ethics_btn_{unique_id}", help="Quantum Ethics Analysis"):
                     st.session_state[f'show_q_ethics_{unique_id}'] = True
                     st.rerun()
+            
+            # CSS to overlay invisible buttons on badges
+            st.markdown(f"""
+            <style>
+            /* Position buttons over badges */
+            .stButton > button[title*="AI Cybersecurity"] {{
+                position: absolute;
+                z-index: 10;
+                background: transparent !important;
+                border: none !important;
+                width: calc(50% - 4px) !important;
+                height: 45px !important;
+                margin-top: -135px !important;
+                margin-left: 0px !important;
+            }}
+            .stButton > button[title*="Quantum Cybersecurity"] {{
+                position: absolute;
+                z-index: 10;
+                background: transparent !important;
+                border: none !important;
+                width: calc(50% - 4px) !important;
+                height: 45px !important;
+                margin-top: -135px !important;
+                margin-left: calc(50% + 4px) !important;
+            }}
+            .stButton > button[title*="AI Ethics"] {{
+                position: absolute;
+                z-index: 10;
+                background: transparent !important;
+                border: none !important;
+                width: calc(50% - 4px) !important;
+                height: 45px !important;
+                margin-top: -90px !important;
+                margin-left: 0px !important;
+            }}
+            .stButton > button[title*="Quantum Ethics"] {{
+                position: absolute;
+                z-index: 10;
+                background: transparent !important;
+                border: none !important;
+                width: calc(50% - 4px) !important;
+                height: 45px !important;
+                margin-top: -90px !important;
+                margin-left: calc(50% + 4px) !important;
+            }}
+            </style>
+            """, unsafe_allow_html=True)
             
             # Show analysis expanders when triggered
             if st.session_state.get(f'show_ai_cyber_{unique_id}', False):

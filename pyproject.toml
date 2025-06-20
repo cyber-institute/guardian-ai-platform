@@ -35,6 +35,7 @@ dependencies = [
     "boto3>=1.38.36",
     "flask-cors>=6.0.1",
     "pycryptodome>=3.23.0",
+    "streamlit-clickable-images>=0.0.3",
 ]
 
 [[tool.uv.index]]

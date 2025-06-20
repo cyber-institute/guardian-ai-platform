@@ -2036,6 +2036,7 @@ dependencies = [
     { name = "scikit-learn" },
     { name = "sqlalchemy" },
     { name = "streamlit" },
+    { name = "streamlit-clickable-images" },
     { name = "trafilatura" },
 ]
 
@@ -2071,6 +2072,7 @@ requires-dist = [
     { name = "scikit-learn", specifier = ">=1.7.0" },
     { name = "sqlalchemy", specifier = ">=2.0.41" },
     { name = "streamlit", specifier = ">=1.45.1" },
+    { name = "streamlit-clickable-images", specifier = ">=0.0.3" },
     { name = "trafilatura", specifier = ">=2.0.0" },
 ]
 
@@ -2498,6 +2500,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/f0/46/9b3f73886f82d27849ce1e7a74ae7c39f5323e46da0b6e8847ad4c25f44c/streamlit-1.45.1.tar.gz", hash = "sha256:e37d56c0af5240dbc240976880e81366689c290a559376417246f9b3f51b4217", size = 9463953 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/13/e6/69fcbae3dd2fcb2f54283a7cbe03c8b944b79997f1b526984f91d4796a02/streamlit-1.45.1-py3-none-any.whl", hash = "sha256:9ab6951585e9444672dd650850f81767b01bba5d87c8dac9bc2e1c859d6cc254", size = 9856294 },
+]
+
+[[package]]
+name = "streamlit-clickable-images"
+version = "0.0.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "streamlit" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/5c/50/8c1f722790538a7641a47565a27aaa7c721d2784e1c0aa6118088125b510/streamlit_clickable_images-0.0.3.tar.gz", hash = "sha256:d2800e67a7e518ae77ede61dd808231446735c139d361347b46b918c2a2f870f", size = 443199 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a1/98/17b963794df39207770a7ae91eb9b8af2cefb33be700cd04fa0c090edaa5/streamlit_clickable_images-0.0.3-py3-none-any.whl", hash = "sha256:4a32bca855913a52fd6afd1b2650d53a6aba82f4a75d58e447d1d967644cb7ab", size = 1274537 },
 ]
 
 [[package]]
