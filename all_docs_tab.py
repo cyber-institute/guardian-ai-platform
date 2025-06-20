@@ -5415,40 +5415,48 @@ def render_card_view(docs):
             </script>
             """
             
-            # Display styled score badges with click detection
-            st.markdown(f"""
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-family: Arial, sans-serif; font-size: 0.67em;">
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;">
+            # Use invisible buttons with original styled labels
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                # AI Cybersecurity
+                st.markdown(f"""
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 8px; font-family: Arial, sans-serif; font-size: 0.67em;">
                     AI Cybersecurity: <span style="color: {ai_cyber_color}; font-weight: bold;">{ai_cyber_display}</span>
                 </div>
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;">
-                    Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
-                </div>
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;">
-                    AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
-                </div>
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; cursor: pointer;">
-                    Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Hidden clickable buttons that preserve functionality
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                if st.button("🔍", key=f"ai_cyber_{unique_id}", help="AI Cybersecurity Analysis"):
+                """, unsafe_allow_html=True)
+                if st.button(" ", key=f"ai_cyber_{unique_id}", help="Click for AI Cybersecurity analysis"):
                     st.session_state[f'show_ai_cyber_{unique_id}'] = True
                     st.rerun()
-            with col2:
-                if st.button("🔍", key=f"q_cyber_{unique_id}", help="Quantum Cybersecurity Analysis"):
-                    st.session_state[f'show_q_cyber_{unique_id}'] = True
-                    st.rerun()
-            with col3:
-                if st.button("🔍", key=f"ai_ethics_{unique_id}", help="AI Ethics Analysis"):
+                
+                # AI Ethics  
+                st.markdown(f"""
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 8px; font-family: Arial, sans-serif; font-size: 0.67em;">
+                    AI Ethics: <span style="color: {ai_ethics_color}; font-weight: bold;">{ai_ethics_display}</span>
+                </div>
+                """, unsafe_allow_html=True)
+                if st.button("  ", key=f"ai_ethics_{unique_id}", help="Click for AI Ethics analysis"):
                     st.session_state[f'show_ai_ethics_{unique_id}'] = True
                     st.rerun()
-            with col4:
-                if st.button("🔍", key=f"q_ethics_{unique_id}", help="Quantum Ethics Analysis"):
+            
+            with col2:
+                # Quantum Cybersecurity
+                st.markdown(f"""
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 8px; font-family: Arial, sans-serif; font-size: 0.67em;">
+                    Quantum Cybersecurity: <span style="color: {q_cyber_color}; font-weight: bold;">{q_cyber_display}</span>
+                </div>
+                """, unsafe_allow_html=True)
+                if st.button("   ", key=f"q_cyber_{unique_id}", help="Click for Quantum Cybersecurity analysis"):
+                    st.session_state[f'show_q_cyber_{unique_id}'] = True
+                    st.rerun()
+                    
+                # Quantum Ethics
+                st.markdown(f"""
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 8px; font-family: Arial, sans-serif; font-size: 0.67em;">
+                    Quantum Ethics: <span style="color: {q_ethics_color}; font-weight: bold;">{q_ethics_display}</span>
+                </div>
+                """, unsafe_allow_html=True)
+                if st.button("    ", key=f"q_ethics_{unique_id}", help="Click for Quantum Ethics analysis"):
                     st.session_state[f'show_q_ethics_{unique_id}'] = True
                     st.rerun()
             
