@@ -4199,7 +4199,8 @@ def render_card_view(docs):
                 with col2:
                     topic = get_document_topic(doc)
                     st.write(f"**Topic:** {topic}")
-                    st.write(f"**Region:** {get_document_region(doc)}")
+                    region = doc.get('region', 'Unknown')
+                    st.write(f"**Region:** {region}")
                 
                 # Scoring badges
                 st.markdown("**Framework Scores:**")
@@ -4240,4 +4241,8 @@ def render_card_view(docs):
                         st.link_button("🔗 Source", doc['url'], use_container_width=True)
                 
                 st.divider()
+
+def get_document_region(doc):
+    """Helper function to get document region"""
+    return doc.get('region', 'Unknown')
 
