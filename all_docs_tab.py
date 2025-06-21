@@ -79,7 +79,7 @@ def analyze_ai_cybersecurity_content(content, score):
     scope_analysis = detect_document_scope(content_str, "")
     
     if scope_analysis['out_of_scope']:
-        return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
+        return "This does not appear to be a cybersecurity, AI, or quantum document. GUARDIAN is not designed to analyze this type of content."
     
     if score == 'N/A':
         
@@ -125,7 +125,7 @@ def analyze_quantum_cybersecurity_content(content, score):
     scope_analysis = detect_document_scope(content_str, "")
     
     if scope_analysis['out_of_scope']:
-        return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
+        return "This does not appear to be a cybersecurity, AI, or quantum document. GUARDIAN is not designed to analyze this type of content."
     
     if score == 'N/A':
         
@@ -178,7 +178,7 @@ def analyze_ai_ethics_content(content, score):
     scope_analysis = detect_document_scope(content_str, "")
     
     if scope_analysis['out_of_scope']:
-        return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
+        return "This does not appear to be a cybersecurity, AI, or quantum document. GUARDIAN is not designed to analyze this type of content."
     
     if score == 'N/A':
         
@@ -234,7 +234,7 @@ def analyze_quantum_ethics_content(content, score):
     scope_analysis = detect_document_scope(content_str, "")
     
     if scope_analysis['out_of_scope']:
-        return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
+        return "This does not appear to be a cybersecurity, AI, or quantum document. GUARDIAN is not designed to analyze this type of content."
     
     if score == 'N/A':
         
