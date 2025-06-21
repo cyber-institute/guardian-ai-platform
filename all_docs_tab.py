@@ -237,10 +237,8 @@ except ImportError:
 def calculate_database_averages():
     """Calculate dynamic averages from database for NORM comparison"""
     try:
-        # Simplified version that uses the documents cache
-        from utils.db import fetch_documents
-        
-        docs = fetch_documents()
+        # Use the cached document fetching function
+        docs = fetch_documents_cached()
         if not docs:
             return {
                 'ai_cybersecurity': 50,
