@@ -3682,22 +3682,11 @@ def render_compact_cards(docs):
             
             # Apply realistic scoring logic based on actual content analysis
             if is_ai_related:
-                if raw_scores['ai_cybersecurity'] and raw_scores['ai_cybersecurity'] > 0:
-                    # Use database score as-is without artificial inflation
-                    scores['ai_cybersecurity'] = raw_scores['ai_cybersecurity']
-                else:
-                    # Use database scores only for fast loading
-                    scores['ai_cybersecurity'] = 'N/A'
+                # Use database scores for AI-related documents
+                scores['ai_cybersecurity'] = doc.get('ai_cybersecurity_score', 'N/A')
+                scores['ai_ethics'] = doc.get('ai_ethics_score', 'N/A')
             else:
                 scores['ai_cybersecurity'] = 'N/A'
-                
-            if is_ai_related:
-                if raw_scores['ai_ethics'] and raw_scores['ai_ethics'] > 0:
-                    # Use database score as-is without artificial inflation
-                    scores['ai_ethics'] = raw_scores['ai_ethics']
-                else:
-                    scores['ai_ethics'] = 'N/A'
-            else:
                 scores['ai_ethics'] = 'N/A'
             
             if is_quantum_related:
@@ -3709,7 +3698,7 @@ def render_compact_cards(docs):
                         quantum_score = 1  # Minimal quantum content
                 except:
                     # Fallback to database value only if fresh scoring fails
-                    quantum_score = raw_scores.get('quantum_cybersecurity', 1) or 1
+                    quantum_score = doc.get('quantum_cybersecurity_score', 1) or 1
                 
                 # Convert to tier system (1-5) with realistic thresholds
                 if quantum_score >= 70:
@@ -3724,20 +3713,8 @@ def render_compact_cards(docs):
                 scores['quantum_cybersecurity'] = 'N/A'
             
             if is_quantum_related:
-                if raw_scores['quantum_ethics'] and raw_scores['quantum_ethics'] > 0:
-                    # Use database score as-is without artificial inflation
-                    scores['quantum_ethics'] = raw_scores['quantum_ethics']
-                else:
-                    try:
-                        computed_scores = comprehensive_document_scoring(raw_content, title)
-                        # Cap at realistic ranges (25-70 for quantum ethics)
-                        quantum_ethics_computed = computed_scores.get('quantum_ethics', 40)
-                        if quantum_ethics_computed is not None:
-                            scores['quantum_ethics'] = min(max(quantum_ethics_computed, 25), 70)
-                        else:
-                            scores['quantum_ethics'] = 40
-                    except:
-                        scores['quantum_ethics'] = 40  # Realistic default
+                # Use database scores for quantum-related documents
+                scores['quantum_ethics'] = doc.get('quantum_ethics_score', 'N/A')
             else:
                 scores['quantum_ethics'] = 'N/A'
             
