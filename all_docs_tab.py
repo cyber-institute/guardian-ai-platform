@@ -5435,6 +5435,30 @@ def render_card_view(docs):
             ai_ethics_indicator = get_color_indicator(ai_ethics_display, ai_ethics_color)
             q_ethics_indicator = get_color_indicator(q_ethics_display, q_ethics_color)
             
+            def format_analysis_output(analysis):
+                """Format analysis output properly, handling both string and dict formats"""
+                if isinstance(analysis, str):
+                    return analysis.replace('\n', '<br>')
+                elif isinstance(analysis, dict):
+                    formatted = ""
+                    if 'strengths' in analysis and analysis['strengths']:
+                        formatted += "<strong>Strengths:</strong><br>"
+                        for strength in analysis['strengths']:
+                            formatted += f"• {strength}<br>"
+                        formatted += "<br>"
+                    if 'weaknesses' in analysis and analysis['weaknesses']:
+                        formatted += "<strong>Weaknesses:</strong><br>"
+                        for weakness in analysis['weaknesses']:
+                            formatted += f"• {weakness}<br>"
+                        formatted += "<br>"
+                    if 'recommendations' in analysis and analysis['recommendations']:
+                        formatted += "<strong>Recommendations:</strong><br>"
+                        for rec in analysis['recommendations']:
+                            formatted += f"• {rec}<br>"
+                    return formatted
+                else:
+                    return str(analysis)
+            
             ai_cyber_label = f"{ai_cyber_indicator} AI Cybersecurity: {ai_cyber_display}"
             q_cyber_label = f"{q_cyber_indicator} Quantum Cybersecurity: {q_cyber_display}"
             ai_ethics_label = f"{ai_ethics_indicator} AI Ethics: {ai_ethics_display}"
@@ -5452,7 +5476,7 @@ def render_card_view(docs):
                             Score: {ai_cyber_display}
                         </h4>
                         <div style="font-family: 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; color: #333;">
-                            {str(ai_cyber_analysis).replace(chr(10), '<br>') if isinstance(ai_cyber_analysis, str) else str(ai_cyber_analysis)}
+                            {format_analysis_output(ai_cyber_analysis)}
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
@@ -5465,7 +5489,7 @@ def render_card_view(docs):
                             Score: {ai_ethics_display}
                         </h4>
                         <div style="font-family: 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; color: #333;">
-                            {str(ai_ethics_analysis).replace(chr(10), '<br>') if isinstance(ai_ethics_analysis, str) else str(ai_ethics_analysis)}
+                            {format_analysis_output(ai_ethics_analysis)}
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
@@ -5479,7 +5503,7 @@ def render_card_view(docs):
                             Score: {q_cyber_display}
                         </h4>
                         <div style="font-family: 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; color: #333;">
-                            {str(q_cyber_analysis).replace(chr(10), '<br>') if isinstance(q_cyber_analysis, str) else str(q_cyber_analysis)}
+                            {format_analysis_output(q_cyber_analysis)}
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
@@ -5492,7 +5516,7 @@ def render_card_view(docs):
                             Score: {q_ethics_display}
                         </h4>
                         <div style="font-family: 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; color: #333;">
-                            {str(q_ethics_analysis).replace(chr(10), '<br>') if isinstance(q_ethics_analysis, str) else str(q_ethics_analysis)}
+                            {format_analysis_output(q_ethics_analysis)}
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
