@@ -5452,7 +5452,7 @@ def render_card_view(docs):
                             Score: {ai_cyber_display}
                         </h4>
                         <div style="font-family: 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; color: #333;">
-                            {ai_cyber_analysis.replace(chr(10), '<br>')}
+                            {str(ai_cyber_analysis).replace(chr(10), '<br>') if isinstance(ai_cyber_analysis, str) else str(ai_cyber_analysis)}
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
@@ -5465,7 +5465,7 @@ def render_card_view(docs):
                             Score: {ai_ethics_display}
                         </h4>
                         <div style="font-family: 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; color: #333;">
-                            {ai_ethics_analysis.replace(chr(10), '<br>')}
+                            {str(ai_ethics_analysis).replace(chr(10), '<br>') if isinstance(ai_ethics_analysis, str) else str(ai_ethics_analysis)}
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
@@ -5479,7 +5479,7 @@ def render_card_view(docs):
                             Score: {q_cyber_display}
                         </h4>
                         <div style="font-family: 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; color: #333;">
-                            {q_cyber_analysis.replace(chr(10), '<br>')}
+                            {str(q_cyber_analysis).replace(chr(10), '<br>') if isinstance(q_cyber_analysis, str) else str(q_cyber_analysis)}
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
@@ -5492,7 +5492,7 @@ def render_card_view(docs):
                             Score: {q_ethics_display}
                         </h4>
                         <div style="font-family: 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; color: #333;">
-                            {q_ethics_analysis.replace(chr(10), '<br>')}
+                            {str(q_ethics_analysis).replace(chr(10), '<br>') if isinstance(q_ethics_analysis, str) else str(q_ethics_analysis)}
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
