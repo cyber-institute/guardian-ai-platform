@@ -5446,24 +5446,56 @@ def render_card_view(docs):
             with col1:
                 # AI Cybersecurity expander
                 with st.expander(ai_cyber_label, expanded=False):
-                    st.markdown(f"**Score: <span style='color: {ai_cyber_color}; font-weight: bold;'>{ai_cyber_display}</span>**", unsafe_allow_html=True)
-                    st.write(ai_cyber_analysis)
+                    st.markdown(f"""
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid {ai_cyber_color}; margin: 10px 0;">
+                        <h4 style="color: {ai_cyber_color}; margin-top: 0; font-family: 'Segoe UI', sans-serif;">
+                            Score: {ai_cyber_display}
+                        </h4>
+                        <div style="font-family: 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; color: #333;">
+                            {ai_cyber_analysis.replace(chr(10), '<br>')}
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
                 
                 # AI Ethics expander
                 with st.expander(ai_ethics_label, expanded=False):
-                    st.markdown(f"**Score: <span style='color: {ai_ethics_color}; font-weight: bold;'>{ai_ethics_display}</span>**", unsafe_allow_html=True)
-                    st.write(ai_ethics_analysis)
+                    st.markdown(f"""
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid {ai_ethics_color}; margin: 10px 0;">
+                        <h4 style="color: {ai_ethics_color}; margin-top: 0; font-family: 'Segoe UI', sans-serif;">
+                            Score: {ai_ethics_display}
+                        </h4>
+                        <div style="font-family: 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; color: #333;">
+                            {ai_ethics_analysis.replace(chr(10), '<br>')}
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
             
             with col2:
                 # Quantum Cybersecurity expander
                 with st.expander(q_cyber_label, expanded=False):
-                    st.markdown(f"**Score: <span style='color: {q_cyber_color}; font-weight: bold;'>{q_cyber_display}</span>**", unsafe_allow_html=True)
-                    st.write(q_cyber_analysis)
+                    st.markdown(f"""
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid {q_cyber_color}; margin: 10px 0;">
+                        <h4 style="color: {q_cyber_color}; margin-top: 0; font-family: 'Segoe UI', sans-serif;">
+                            Score: {q_cyber_display}
+                        </h4>
+                        <div style="font-family: 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; color: #333;">
+                            {q_cyber_analysis.replace(chr(10), '<br>')}
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
                     
                 # Quantum Ethics expander
                 with st.expander(q_ethics_label, expanded=False):
-                    st.markdown(f"**Score: <span style='color: {q_ethics_color}; font-weight: bold;'>{q_ethics_display}</span>**", unsafe_allow_html=True)
-                    st.write(q_ethics_analysis)
+                    st.markdown(f"""
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid {q_ethics_color}; margin: 10px 0;">
+                        <h4 style="color: {q_ethics_color}; margin-top: 0; font-family: 'Segoe UI', sans-serif;">
+                            Score: {q_ethics_display}
+                        </h4>
+                        <div style="font-family: 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; color: #333;">
+                            {q_ethics_analysis.replace(chr(10), '<br>')}
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
             
             # CSS to color the score values in expander headers
             st.markdown(f"""
