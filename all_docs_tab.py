@@ -4170,3 +4170,74 @@ def calculate_repository_statistics(docs):
         'quantum_ethics': sum(scores['quantum_ethics']) / len(scores['quantum_ethics']) if scores['quantum_ethics'] else 50
     }
 
+def render_minimal_list(docs):
+    """Render documents in minimal list format."""
+    for doc in docs:
+        with st.container():
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.write(f"**{doc.get('title', 'Untitled Document')}**")
+                st.caption(f"Organization: {doc.get('organization', 'Unknown')} | Date: {doc.get('date', 'Unknown')}")
+            with col2:
+                if st.button("View", key=f"view_{doc['id']}", use_container_width=True):
+                    st.session_state.selected_doc = doc
+                    st.rerun()
+
+def render_card_view(docs):
+    """Render documents in full card format."""
+    cols = st.columns(2)
+    for i, doc in enumerate(docs):
+        with cols[i % 2]:
+            with st.container():
+                st.markdown(f"### {doc.get('title', 'Untitled Document')}")
+                
+                # Document metadata
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.write(f"**Organization:** {doc.get('organization', 'Unknown')}")
+                    st.write(f"**Date:** {doc.get('date', 'Unknown')}")
+                with col2:
+                    topic = get_document_topic(doc)
+                    st.write(f"**Topic:** {topic}")
+                    st.write(f"**Region:** {get_document_region(doc)}")
+                
+                # Scoring badges
+                st.markdown("**Framework Scores:**")
+                score_cols = st.columns(4)
+                
+                with score_cols[0]:
+                    ai_cyber_score = doc.get('ai_cybersecurity_score', 'N/A')
+                    badge = get_comprehensive_badge(ai_cyber_score, 'ai_cybersecurity', doc.get('content', ''), doc.get('title', ''))
+                    st.markdown(badge, unsafe_allow_html=True)
+                    
+                with score_cols[1]:
+                    quantum_cyber_score = doc.get('quantum_cybersecurity_score', 'N/A')
+                    badge = get_comprehensive_badge(quantum_cyber_score, 'quantum_cybersecurity', doc.get('content', ''), doc.get('title', ''))
+                    st.markdown(badge, unsafe_allow_html=True)
+                    
+                with score_cols[2]:
+                    ai_ethics_score = doc.get('ai_ethics_score', 'N/A')
+                    badge = get_comprehensive_badge(ai_ethics_score, 'ai_ethics', doc.get('content', ''), doc.get('title', ''))
+                    st.markdown(badge, unsafe_allow_html=True)
+                    
+                with score_cols[3]:
+                    quantum_ethics_score = doc.get('quantum_ethics_score', 'N/A')
+                    badge = get_comprehensive_badge(quantum_ethics_score, 'quantum_ethics', doc.get('content', ''), doc.get('title', ''))
+                    st.markdown(badge, unsafe_allow_html=True)
+                
+                # Action buttons
+                btn_cols = st.columns(3)
+                with btn_cols[0]:
+                    if st.button("📄 View Full", key=f"view_full_{doc['id']}", use_container_width=True):
+                        st.session_state.selected_doc = doc
+                        st.rerun()
+                with btn_cols[1]:
+                    if st.button("📊 Analysis", key=f"analysis_{doc['id']}", use_container_width=True):
+                        st.session_state.show_analysis = doc
+                        st.rerun()
+                with btn_cols[2]:
+                    if doc.get('url'):
+                        st.link_button("🔗 Source", doc['url'], use_container_width=True)
+                
+                st.divider()
+
