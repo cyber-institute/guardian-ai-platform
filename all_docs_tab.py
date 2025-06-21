@@ -173,17 +173,7 @@ def analyze_ai_ethics_content(content, score):
         return """
 This document does not focus on AI ethics considerations.
 
-**For a high AI Ethics score, documents should include:**
-- Bias mitigation strategies and algorithmic fairness measures
-- Transparency and explainability requirements for AI systems
-- Accountability frameworks and responsible AI governance
-- Privacy protection and data rights in AI applications
-- Human oversight and human-in-the-loop decision making
-- Stakeholder engagement and participatory AI development
-- Ethical review processes and impact assessments
-- Inclusive AI design and equitable access considerations
-
-**Current Classification:** This document appears to focus on cybersecurity, quantum technology, or other topics rather than AI ethics principles.
+GUARDIAN specializes in cybersecurity, AI, and quantum technology policy assessment. This document appears to be outside these specialized domains.
 """
     
     try:
