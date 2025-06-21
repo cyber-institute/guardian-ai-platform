@@ -14,6 +14,19 @@ def analyze_document_applicability(text: str, title: str) -> Dict[str, bool]:
     Returns:
         Dict with keys: ai_cybersecurity, quantum_cybersecurity, ai_ethics, quantum_ethics
     """
+    # First check if document is out of scope using Multi-LLM detection
+    from utils.multi_llm_scoring_engine import detect_document_scope
+    scope_analysis = detect_document_scope(text, title)
+    
+    if scope_analysis['out_of_scope']:
+        return {
+            'ai_cybersecurity': False,
+            'quantum_cybersecurity': False,
+            'ai_ethics': False,
+            'quantum_ethics': False,
+            'scope_message': scope_analysis['reason']
+        }
+    
     text_lower = text.lower()
     title_lower = title.lower()
     
