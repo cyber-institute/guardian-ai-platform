@@ -1,6 +1,5 @@
 import streamlit as st
 import re
-import html
 from utils.db import fetch_documents
 from components.help_tooltips import HelpTooltips
 from components.enhanced_scoring_display import EnhancedScoringDisplay
@@ -4185,71 +4184,60 @@ def render_minimal_list(docs):
                     st.rerun()
 
 def render_card_view(docs):
-    """Render documents in card format."""
+    """Render documents in full card format."""
     cols = st.columns(2)
     for i, doc in enumerate(docs):
         with cols[i % 2]:
-            # Get document data
-            title = doc.get('title', 'Untitled Document')
-            topic = get_document_topic(doc) 
-            doc_type = doc.get('document_type', 'Unknown')
-            author_org = doc.get('author_organization', 'Unknown')
-            date = doc.get('date', 'Unknown')
-            
-            # Create bordered card container
-            st.markdown(f"""
-                <div style='border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin: 8px 0; background: white;'>
-                    <h3 style='margin: 0 0 8px 0; color: #1f2937; font-size: 18px;'>{title}</h3>
-                    <div style='margin: 8px 0;'>
-                        <strong>Topic:</strong> {topic}<br>
-                        <strong>Type:</strong> {doc_type}<br>
-                        <strong>Author/Org:</strong> {author_org}<br>
-                        <strong>Date:</strong> {date}
-                    </div>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            # Framework Scores with colored buttons
-            st.markdown("**Framework Scores:**")
-            score_cols = st.columns(4)
-            
-            with score_cols[0]:
-                ai_cyber_score = doc.get('ai_cybersecurity_score', 'N/A')
-                badge = get_comprehensive_badge(ai_cyber_score, 'ai_cybersecurity', doc.get('content', ''), title)
-                st.markdown(badge, unsafe_allow_html=True)
+            with st.container():
+                st.markdown(f"### {doc.get('title', 'Untitled Document')}")
                 
-            with score_cols[1]:
-                quantum_cyber_score = doc.get('quantum_cybersecurity_score', 'N/A')
-                badge = get_comprehensive_badge(quantum_cyber_score, 'quantum_cybersecurity', doc.get('content', ''), title)
-                st.markdown(badge, unsafe_allow_html=True)
+                # Document metadata
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.write(f"**Organization:** {doc.get('organization', 'Unknown')}")
+                    st.write(f"**Date:** {doc.get('date', 'Unknown')}")
+                with col2:
+                    topic = get_document_topic(doc)
+                    st.write(f"**Topic:** {topic}")
+                    st.write(f"**Region:** {get_document_region(doc)}")
                 
-            with score_cols[2]:
-                ai_ethics_score = doc.get('ai_ethics_score', 'N/A')
-                badge = get_comprehensive_badge(ai_ethics_score, 'ai_ethics', doc.get('content', ''), title)
-                st.markdown(badge, unsafe_allow_html=True)
+                # Scoring badges
+                st.markdown("**Framework Scores:**")
+                score_cols = st.columns(4)
                 
-            with score_cols[3]:
-                quantum_ethics_score = doc.get('quantum_ethics_score', 'N/A')
-                badge = get_comprehensive_badge(quantum_ethics_score, 'quantum_ethics', doc.get('content', ''), title)
-                st.markdown(badge, unsafe_allow_html=True)
-            
-            # Action buttons
-            btn_cols = st.columns(3)
-            with btn_cols[0]:
-                if st.button("📄 View Full", key=f"view_full_{doc['id']}", use_container_width=True):
-                    st.session_state.selected_doc = doc
-                    st.rerun()
-            with btn_cols[1]:
-                if st.button("📊 Analysis", key=f"analysis_{doc['id']}", use_container_width=True):
-                    st.session_state.show_analysis = doc
-                    st.rerun()
-            with btn_cols[2]:
-                if doc.get('url'):
-                    st.link_button("🔗 Source", doc['url'], use_container_width=True)
-            
-            st.divider()
-
-def get_document_region(doc):
-    """Helper function to get document region"""
-    return doc.get('region', 'Unknown')
+                with score_cols[0]:
+                    ai_cyber_score = doc.get('ai_cybersecurity_score', 'N/A')
+                    badge = get_comprehensive_badge(ai_cyber_score, 'ai_cybersecurity', doc.get('content', ''), doc.get('title', ''))
+                    st.markdown(badge, unsafe_allow_html=True)
+                    
+                with score_cols[1]:
+                    quantum_cyber_score = doc.get('quantum_cybersecurity_score', 'N/A')
+                    badge = get_comprehensive_badge(quantum_cyber_score, 'quantum_cybersecurity', doc.get('content', ''), doc.get('title', ''))
+                    st.markdown(badge, unsafe_allow_html=True)
+                    
+                with score_cols[2]:
+                    ai_ethics_score = doc.get('ai_ethics_score', 'N/A')
+                    badge = get_comprehensive_badge(ai_ethics_score, 'ai_ethics', doc.get('content', ''), doc.get('title', ''))
+                    st.markdown(badge, unsafe_allow_html=True)
+                    
+                with score_cols[3]:
+                    quantum_ethics_score = doc.get('quantum_ethics_score', 'N/A')
+                    badge = get_comprehensive_badge(quantum_ethics_score, 'quantum_ethics', doc.get('content', ''), doc.get('title', ''))
+                    st.markdown(badge, unsafe_allow_html=True)
+                
+                # Action buttons
+                btn_cols = st.columns(3)
+                with btn_cols[0]:
+                    if st.button("📄 View Full", key=f"view_full_{doc['id']}", use_container_width=True):
+                        st.session_state.selected_doc = doc
+                        st.rerun()
+                with btn_cols[1]:
+                    if st.button("📊 Analysis", key=f"analysis_{doc['id']}", use_container_width=True):
+                        st.session_state.show_analysis = doc
+                        st.rerun()
+                with btn_cols[2]:
+                    if doc.get('url'):
+                        st.link_button("🔗 Source", doc['url'], use_container_width=True)
+                
+                st.divider()
 
