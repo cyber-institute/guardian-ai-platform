@@ -1,5 +1,6 @@
 import streamlit as st
 import re
+import html
 from utils.db import fetch_documents
 from components.help_tooltips import HelpTooltips
 from components.enhanced_scoring_display import EnhancedScoringDisplay
