@@ -4184,63 +4184,93 @@ def render_minimal_list(docs):
                     st.rerun()
 
 def render_card_view(docs):
-    """Render documents in full card format."""
-    cols = st.columns(2)
+    """Render documents in card format with original styling preserved."""
     for i, doc in enumerate(docs):
-        with cols[i % 2]:
-            with st.container():
-                st.markdown(f"### {doc.get('title', 'Untitled Document')}")
-                
-                # Document metadata
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.write(f"**Organization:** {doc.get('organization', 'Unknown')}")
-                    st.write(f"**Date:** {doc.get('date', 'Unknown')}")
-                with col2:
-                    topic = get_document_topic(doc)
-                    st.write(f"**Topic:** {topic}")
-                    region = doc.get('region', 'Unknown')
-                    st.write(f"**Region:** {region}")
-                
-                # Scoring badges
-                st.markdown("**Framework Scores:**")
-                score_cols = st.columns(4)
-                
-                with score_cols[0]:
-                    ai_cyber_score = doc.get('ai_cybersecurity_score', 'N/A')
-                    badge = get_comprehensive_badge(ai_cyber_score, 'ai_cybersecurity', doc.get('content', ''), doc.get('title', ''))
-                    st.markdown(badge, unsafe_allow_html=True)
-                    
-                with score_cols[1]:
-                    quantum_cyber_score = doc.get('quantum_cybersecurity_score', 'N/A')
-                    badge = get_comprehensive_badge(quantum_cyber_score, 'quantum_cybersecurity', doc.get('content', ''), doc.get('title', ''))
-                    st.markdown(badge, unsafe_allow_html=True)
-                    
-                with score_cols[2]:
-                    ai_ethics_score = doc.get('ai_ethics_score', 'N/A')
-                    badge = get_comprehensive_badge(ai_ethics_score, 'ai_ethics', doc.get('content', ''), doc.get('title', ''))
-                    st.markdown(badge, unsafe_allow_html=True)
-                    
-                with score_cols[3]:
-                    quantum_ethics_score = doc.get('quantum_ethics_score', 'N/A')
-                    badge = get_comprehensive_badge(quantum_ethics_score, 'quantum_ethics', doc.get('content', ''), doc.get('title', ''))
-                    st.markdown(badge, unsafe_allow_html=True)
-                
-                # Action buttons
-                btn_cols = st.columns(3)
-                with btn_cols[0]:
-                    if st.button("📄 View Full", key=f"view_full_{doc['id']}", use_container_width=True):
-                        st.session_state.selected_doc = doc
-                        st.rerun()
-                with btn_cols[1]:
-                    if st.button("📊 Analysis", key=f"analysis_{doc['id']}", use_container_width=True):
-                        st.session_state.show_analysis = doc
-                        st.rerun()
-                with btn_cols[2]:
-                    if doc.get('url'):
-                        st.link_button("🔗 Source", doc['url'], use_container_width=True)
-                
-                st.divider()
+        title = ultra_clean_metadata(doc.get('title', 'Untitled Document'))
+        safe_title = html.escape(title) if title else "Untitled Document"
+        
+        # Document content and metadata
+        content = doc.get('content', '')
+        safe_content_preview = html.escape(content[:120] if content else "No content available") + ('...' if len(content) > 120 else '')
+        
+        # Clean metadata fields 
+        doc_type = ultra_clean_metadata(doc.get('doc_type', ''))
+        safe_doc_type = html.escape(doc_type) if doc_type else 'Unknown Type'
+        
+        author_org = ultra_clean_metadata(doc.get('organization', ''))
+        safe_author_org = html.escape(author_org) if author_org else 'Unknown'
+        
+        pub_date = clean_date_safely(doc)
+        safe_pub_date = html.escape(pub_date) if pub_date else 'Unknown Date'
+        
+        source_url = doc.get('url', '')
+        url_valid = doc.get('url_valid')
+        
+        # Title with URL validation styling
+        if source_url and url_valid:
+            title_html = f'<a href="{source_url}" target="_blank" style="text-decoration: none; color: #1f2937;">{html.escape(title[:40])}{"..." if len(title) > 40 else ""}</a> <span style="color: #10b981; font-size: 12px;" title="Link verified">✓</span>'
+        elif source_url and url_valid is False:
+            title_html = f'{html.escape(title[:40])}{"..." if len(title) > 40 else ""} <span style="color: #ef4444; font-size: 12px;" title="Link broken">✗'
+        elif source_url and url_valid is None:
+            title_html = f'{html.escape(title[:40])}{"..." if len(title) > 40 else ""} <span style="color: #f59e0b; font-size: 12px;" title="Link not yet verified">⚠️</span>'
+        else:
+            title_html = html.escape(title[:40]) + ('...' if len(title) > 40 else '')
+        
+        # Create document card container
+        with st.container():
+            st.markdown(f"""
+                <div style='border:2px solid #f0f0f0;padding:12px;border-radius:8px;margin:6px;
+                background:white;box-shadow:0 2px 4px rgba(0,0,0,0.08);
+                border-left:4px solid #3B82F6'>
+                    <h4 style='margin:0 0 6px 0;font-size:15px'>{title_html}</h4>
+                    <div style='font-size:10px;color:#666;margin-bottom:8px' title='Type: {safe_doc_type} • Author/Org: {safe_author_org} • Published: {safe_pub_date}'>{safe_doc_type} • {safe_author_org} • {safe_pub_date}</div>
+                    <p style='font-size:11px;color:#666;margin:8px 0'>{safe_content_preview}</p>
+                </div>
+            """, unsafe_allow_html=True)
+        
+        # Framework scoring with colored badges
+        doc_id = doc.get('id', str(hash(title + doc.get('url', ''))))
+        
+        # Get scores and create badges
+        ai_cyber_score = doc.get('ai_cybersecurity_score', 'N/A')
+        quantum_cyber_score = doc.get('quantum_cybersecurity_score', 'N/A')
+        ai_ethics_score = doc.get('ai_ethics_score', 'N/A')
+        quantum_ethics_score = doc.get('quantum_ethics_score', 'N/A')
+        
+        # Create scoring section with expandable analysis
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            ai_cyber_badge = get_comprehensive_badge(ai_cyber_score, 'ai_cybersecurity', content, title)
+            st.markdown(ai_cyber_badge, unsafe_allow_html=True)
+            
+        with col2:
+            quantum_cyber_badge = get_comprehensive_badge(quantum_cyber_score, 'quantum_cybersecurity', content, title)
+            st.markdown(quantum_cyber_badge, unsafe_allow_html=True)
+            
+        with col3:
+            ai_ethics_badge = get_comprehensive_badge(ai_ethics_score, 'ai_ethics', content, title)
+            st.markdown(ai_ethics_badge, unsafe_allow_html=True)
+            
+        with col4:
+            quantum_ethics_badge = get_comprehensive_badge(quantum_ethics_score, 'quantum_ethics', content, title)
+            st.markdown(quantum_ethics_badge, unsafe_allow_html=True)
+        
+        # Action buttons
+        btn_col1, btn_col2, btn_col3 = st.columns(3)
+        with btn_col1:
+            if st.button("📄 View Full", key=f"view_full_{doc_id}", use_container_width=True):
+                st.session_state.selected_doc = doc
+                st.rerun()
+        with btn_col2:
+            if st.button("🔍 Preview", key=f"preview_{doc_id}", use_container_width=True):
+                st.session_state.show_preview = doc
+                st.rerun()
+        with btn_col3:
+            if source_url:
+                st.link_button("🔗 Source", source_url, use_container_width=True)
+        
+        st.divider()
 
 def get_document_region(doc):
     """Helper function to get document region"""
