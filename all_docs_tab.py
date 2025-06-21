@@ -4172,6 +4172,14 @@ def calculate_repository_statistics(docs):
 
 def analyze_ai_cybersecurity_content(content, score):
     """Analyze AI cybersecurity content to identify strengths, weaknesses, and recommendations."""
+    # Always check scope first regardless of score
+    from utils.multi_llm_scoring_engine import detect_document_scope
+    content_str = str(content) if content else ""
+    scope_analysis = detect_document_scope(content_str, "")
+    
+    if scope_analysis['out_of_scope']:
+        return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
+    
     if score == 'N/A':
         return """
 This document does not focus on AI cybersecurity considerations.
@@ -4250,6 +4258,14 @@ This document does not focus on AI cybersecurity considerations.
 
 def analyze_quantum_cybersecurity_content(content, score):
     """Analyze quantum cybersecurity content to identify strengths, weaknesses, and recommendations."""
+    # Always check scope first regardless of score
+    from utils.multi_llm_scoring_engine import detect_document_scope
+    content_str = str(content) if content else ""
+    scope_analysis = detect_document_scope(content_str, "")
+    
+    if scope_analysis['out_of_scope']:
+        return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
+    
     if score == 'N/A':
         return """
 This document does not focus on quantum cybersecurity considerations.
@@ -4328,6 +4344,14 @@ This document does not focus on quantum cybersecurity considerations.
 
 def analyze_ai_ethics_content(content, score):
     """Analyze AI ethics content to identify strengths, weaknesses, and recommendations."""
+    # Always check scope first regardless of score
+    from utils.multi_llm_scoring_engine import detect_document_scope
+    content_str = str(content) if content else ""
+    scope_analysis = detect_document_scope(content_str, "")
+    
+    if scope_analysis['out_of_scope']:
+        return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
+    
     if score == 'N/A':
         return """
 This document does not focus on AI ethics considerations.
@@ -4404,6 +4428,14 @@ This document does not focus on AI ethics considerations.
 
 def analyze_quantum_ethics_content(content, score):
     """Analyze quantum ethics content to identify strengths, weaknesses, and recommendations."""
+    # Always check scope first regardless of score
+    from utils.multi_llm_scoring_engine import detect_document_scope
+    content_str = str(content) if content else ""
+    scope_analysis = detect_document_scope(content_str, "")
+    
+    if scope_analysis['out_of_scope']:
+        return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
+    
     if score == 'N/A':
         return """
 This document does not focus on quantum ethics considerations.
