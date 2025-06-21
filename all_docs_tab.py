@@ -396,18 +396,29 @@ def analyze_quantum_ethics_content(content, score):
 
 
 def get_score_color(score):
-    """Get color for score based on value"""
+    """Get color for score based on value and scoring system"""
     if score == 'N/A' or score is None:
         return '#808080'  # Gray
     
     try:
         score_num = int(score)
-        if score_num >= 80:
-            return '#22C55E'  # Green
-        elif score_num >= 60:
-            return '#EAB308'  # Yellow/Orange
+        
+        # Check if this is a quantum cybersecurity score (1-5 scale)
+        if score_num <= 5:
+            if score_num >= 4:
+                return '#22C55E'  # Green for 4-5
+            elif score_num >= 3:
+                return '#EAB308'  # Orange for 3
+            else:
+                return '#EF4444'  # Red for 1-2
         else:
-            return '#EF4444'  # Red
+            # Standard 0-100 scale
+            if score_num >= 80:
+                return '#22C55E'  # Green
+            elif score_num >= 60:
+                return '#EAB308'  # Orange
+            else:
+                return '#EF4444'  # Red
     except:
         return '#808080'  # Gray for any parsing issues
 
@@ -440,67 +451,7 @@ def render():
     # Apply ultra-compact CSS to eliminate all spacing
     apply_ultra_compact_css()
     
-    # Add comprehensive color styling using both CSS and JavaScript
-    st.markdown("""
-    <style>
-    /* Ultra-high specificity CSS targeting for score buttons with intelligent color coding */
-    .stButton > button[data-testid*="button"] { background-color: #22C55E !important; color: white !important; border: 2px solid #16A34A !important; }
-    .stButton > button:contains("0/") { background-color: #EF4444 !important; color: white !important; border: 2px solid #DC2626 !important; }
-    .stButton > button:contains("N/A") { background-color: #808080 !important; color: white !important; border: 2px solid #6B7280 !important; }
-    
-    /* Apply color-coded borders to buttons based on their text content */
-    .stButton:has(button:contains("0/100")) button { background-color: #EF4444 !important; border-color: #DC2626 !important; }
-    .stButton:has(button:contains("1/100")) button { background-color: #EF4444 !important; border-color: #DC2626 !important; }
-    .stButton:has(button:contains("2/100")) button { background-color: #EF4444 !important; border-color: #DC2626 !important; }
-    
-    /* JavaScript function to dynamically color buttons */
-    </style>
-    
-    <script>
-    function applyButtonColors() {
-        const buttons = document.querySelectorAll('.stButton button');
-        buttons.forEach(button => {
-            const text = button.textContent;
-            if (text.includes('N/A')) {
-                button.style.backgroundColor = '#808080';
-                button.style.borderColor = '#6B7280';
-            } else if (text.includes('/100') || text.includes('/5')) {
-                const score = parseInt(text.split('/')[0]);
-                if (text.includes('/5')) {
-                    // Quantum cybersecurity tier system
-                    if (score >= 4) {
-                        button.style.backgroundColor = '#22C55E';
-                        button.style.borderColor = '#16A34A';
-                    } else if (score >= 3) {
-                        button.style.backgroundColor = '#EAB308';
-                        button.style.borderColor = '#D97706';
-                    } else {
-                        button.style.backgroundColor = '#EF4444';
-                        button.style.borderColor = '#DC2626';
-                    }
-                } else {
-                    // Standard 0-100 scoring
-                    if (score >= 80) {
-                        button.style.backgroundColor = '#22C55E';
-                        button.style.borderColor = '#16A34A';
-                    } else if (score >= 60) {
-                        button.style.backgroundColor = '#EAB308';
-                        button.style.borderColor = '#D97706';
-                    } else {
-                        button.style.backgroundColor = '#EF4444';
-                        button.style.borderColor = '#DC2626';
-                    }
-                }
-            }
-        });
-    }
-    
-    // Apply colors when page loads and when content changes
-    document.addEventListener('DOMContentLoaded', applyButtonColors);
-    const observer = new MutationObserver(applyButtonColors);
-    observer.observe(document.body, { childList: true, subtree: true });
-    </script>
-    """, unsafe_allow_html=True)
+
     
     st.title("📚 Policy Repository")
     st.markdown("*Comprehensive cybersecurity, AI, and quantum policy document collection*")
@@ -570,46 +521,103 @@ def render():
             </div>
             """, unsafe_allow_html=True)
             
-            # Score buttons row
+            # Score buttons row with proper color coding
             col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 2, 2])
             
             with col1:
-                if st.button(ai_cyber_display, key=f"ai_cyber_{doc_id}"):
-                    pass
-                st.markdown("<div style='text-align: center; font-size: 10px;'>AI Cyber</div>", unsafe_allow_html=True)
-            
-            with col2:
-                if st.button(q_cyber_display, key=f"q_cyber_{doc_id}"):
-                    pass
-                st.markdown("<div style='text-align: center; font-size: 10px;'>Q Cyber</div>", unsafe_allow_html=True)
-            
-            with col3:
-                if st.button(ai_ethics_display, key=f"ai_ethics_{doc_id}"):
-                    pass
-                st.markdown("<div style='text-align: center; font-size: 10px;'>AI Ethics</div>", unsafe_allow_html=True)
-            
-            with col4:
-                if st.button(q_ethics_display, key=f"q_ethics_{doc_id}"):
-                    pass
-                st.markdown("<div style='text-align: center; font-size: 10px;'>Q Ethics</div>", unsafe_allow_html=True)
-            
-            with col5:
-                if source and source.startswith('http'):
-                    st.markdown(f"""
-                    <a href="{source}" target="_blank" style="
-                        background-color: #3498db; 
+                ai_cyber_color = get_score_color(ai_cyber)
+                st.markdown(f"""
+                <div style="text-align: center;">
+                    <button style="
+                        background-color: {ai_cyber_color}; 
                         color: white; 
-                        text-decoration: none; 
+                        border: none; 
                         padding: 5px 10px; 
                         border-radius: 3px; 
                         font-size: 12px; 
                         font-weight: bold;
-                        display: inline-block;
-                        width: 90%;
-                        text-align: center;
-                    ">View</a>
+                        width: 100%;
+                        cursor: pointer;
+                    ">{ai_cyber_display}</button>
+                    <div style="font-size: 10px; margin-top: 2px;">AI Cyber</div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with col2:
+                q_cyber_color = get_score_color(q_cyber)
+                st.markdown(f"""
+                <div style="text-align: center;">
+                    <button style="
+                        background-color: {q_cyber_color}; 
+                        color: white; 
+                        border: none; 
+                        padding: 5px 10px; 
+                        border-radius: 3px; 
+                        font-size: 12px; 
+                        font-weight: bold;
+                        width: 100%;
+                        cursor: pointer;
+                    ">{q_cyber_display}</button>
+                    <div style="font-size: 10px; margin-top: 2px;">Q Cyber</div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with col3:
+                ai_ethics_color = get_score_color(ai_ethics)
+                st.markdown(f"""
+                <div style="text-align: center;">
+                    <button style="
+                        background-color: {ai_ethics_color}; 
+                        color: white; 
+                        border: none; 
+                        padding: 5px 10px; 
+                        border-radius: 3px; 
+                        font-size: 12px; 
+                        font-weight: bold;
+                        width: 100%;
+                        cursor: pointer;
+                    ">{ai_ethics_display}</button>
+                    <div style="font-size: 10px; margin-top: 2px;">AI Ethics</div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with col4:
+                q_ethics_color = get_score_color(q_ethics)
+                st.markdown(f"""
+                <div style="text-align: center;">
+                    <button style="
+                        background-color: {q_ethics_color}; 
+                        color: white; 
+                        border: none; 
+                        padding: 5px 10px; 
+                        border-radius: 3px; 
+                        font-size: 12px; 
+                        font-weight: bold;
+                        width: 100%;
+                        cursor: pointer;
+                    ">{q_ethics_display}</button>
+                    <div style="font-size: 10px; margin-top: 2px;">Q Ethics</div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with col5:
+                if source and source.startswith('http'):
+                    st.markdown(f"""
+                    <div style="text-align: center;">
+                        <a href="{source}" target="_blank" style="
+                            background-color: #3498db; 
+                            color: white; 
+                            text-decoration: none; 
+                            padding: 5px 10px; 
+                            border-radius: 3px; 
+                            font-size: 12px; 
+                            font-weight: bold;
+                            display: inline-block;
+                            width: 90%;
+                        ">View</a>
+                        <div style="font-size: 10px; margin-top: 2px;">Source</div>
+                    </div>
                     """, unsafe_allow_html=True)
-                st.markdown("<div style='text-align: center; font-size: 10px;'>Source</div>", unsafe_allow_html=True)
             
             # Analysis expandable sections
             st.markdown("**Analysis:**")
