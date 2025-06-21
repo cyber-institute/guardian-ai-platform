@@ -131,11 +131,11 @@ def analyze_ai_cybersecurity_content(content, score):
     
     # If clearly out of scope, return simple message
     if out_of_scope_count > ai_cyber_count and len(content) < 2000:
-        return "This does not appear to be a cybersecurity, AI, or quantum document. GUARDIAN is not designed to analyze this type of content."
+        return "This appears to be children's literature rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
     
     # If no clear AI cybersecurity content found
     if ai_cyber_count == 0:
-        return "This does not appear to be a cybersecurity, AI, or quantum document. GUARDIAN is not designed to analyze this type of content."
+        return "This appears to be children's literature rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
     
     # Return proper analysis for in-scope content
     if score == 'N/A' or score is None:
@@ -216,11 +216,11 @@ def analyze_quantum_cybersecurity_content(content, score):
     
     # If clearly out of scope, return simple message
     if out_of_scope_count > quantum_count and len(content) < 2000:
-        return "This does not appear to be a cybersecurity, AI, or quantum document. GUARDIAN is not designed to analyze this type of content."
+        return "This appears to be children's literature rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
     
     # If no clear quantum cybersecurity content found
     if quantum_count == 0:
-        return "This does not appear to be a cybersecurity, AI, or quantum document. GUARDIAN is not designed to analyze this type of content."
+        return "This appears to be children's literature rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
     
     # Return proper analysis for in-scope content
     if score == 'N/A' or score is None:
@@ -291,11 +291,11 @@ def analyze_ai_ethics_content(content, score):
     
     # If clearly out of scope, return simple message
     if out_of_scope_count > ai_ethics_count and len(content) < 2000:
-        return "This does not appear to be a cybersecurity, AI, or quantum document. GUARDIAN is not designed to analyze this type of content."
+        return "This appears to be children's literature rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
     
     # If no clear AI ethics content found
     if ai_ethics_count == 0:
-        return "This does not appear to be a cybersecurity, AI, or quantum document. GUARDIAN is not designed to analyze this type of content."
+        return "This appears to be children's literature rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
     
     # Return proper analysis for in-scope content
     if score == 'N/A' or score is None:
@@ -356,11 +356,11 @@ def analyze_quantum_ethics_content(content, score):
     
     # If clearly out of scope, return simple message
     if out_of_scope_count > quantum_ethics_count and len(content) < 2000:
-        return "This does not appear to be a cybersecurity, AI, or quantum document. GUARDIAN is not designed to analyze this type of content."
+        return "This appears to be children's literature rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
     
     # If no clear quantum ethics content found
     if quantum_ethics_count == 0:
-        return "This does not appear to be a cybersecurity, AI, or quantum document. GUARDIAN is not designed to analyze this type of content."
+        return "This appears to be children's literature rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
     
     # Return proper analysis for in-scope content
     if score == 'N/A' or score is None:
@@ -451,8 +451,6 @@ def render():
     # Apply ultra-compact CSS to eliminate all spacing
     apply_ultra_compact_css()
     
-
-    
     st.title("📚 Policy Repository")
     st.markdown("*Comprehensive cybersecurity, AI, and quantum policy document collection*")
     
@@ -526,98 +524,45 @@ def render():
             
             with col1:
                 ai_cyber_color = get_score_color(ai_cyber)
-                st.markdown(f"""
-                <div style="text-align: center;">
-                    <button style="
-                        background-color: {ai_cyber_color}; 
-                        color: white; 
-                        border: none; 
-                        padding: 5px 10px; 
-                        border-radius: 3px; 
-                        font-size: 12px; 
-                        font-weight: bold;
-                        width: 100%;
-                        cursor: pointer;
-                    ">{ai_cyber_display}</button>
-                    <div style="font-size: 10px; margin-top: 2px;">AI Cyber</div>
-                </div>
-                """, unsafe_allow_html=True)
+                if st.button(ai_cyber_display, key=f"ai_cyber_{doc_id}"):
+                    pass
+                st.markdown("<div style='text-align: center; font-size: 10px;'>AI Cyber</div>", unsafe_allow_html=True)
             
             with col2:
                 q_cyber_color = get_score_color(q_cyber)
-                st.markdown(f"""
-                <div style="text-align: center;">
-                    <button style="
-                        background-color: {q_cyber_color}; 
-                        color: white; 
-                        border: none; 
-                        padding: 5px 10px; 
-                        border-radius: 3px; 
-                        font-size: 12px; 
-                        font-weight: bold;
-                        width: 100%;
-                        cursor: pointer;
-                    ">{q_cyber_display}</button>
-                    <div style="font-size: 10px; margin-top: 2px;">Q Cyber</div>
-                </div>
-                """, unsafe_allow_html=True)
+                if st.button(q_cyber_display, key=f"q_cyber_{doc_id}"):
+                    pass
+                st.markdown("<div style='text-align: center; font-size: 10px;'>Q Cyber</div>", unsafe_allow_html=True)
             
             with col3:
                 ai_ethics_color = get_score_color(ai_ethics)
-                st.markdown(f"""
-                <div style="text-align: center;">
-                    <button style="
-                        background-color: {ai_ethics_color}; 
-                        color: white; 
-                        border: none; 
-                        padding: 5px 10px; 
-                        border-radius: 3px; 
-                        font-size: 12px; 
-                        font-weight: bold;
-                        width: 100%;
-                        cursor: pointer;
-                    ">{ai_ethics_display}</button>
-                    <div style="font-size: 10px; margin-top: 2px;">AI Ethics</div>
-                </div>
-                """, unsafe_allow_html=True)
+                if st.button(ai_ethics_display, key=f"ai_ethics_{doc_id}"):
+                    pass
+                st.markdown("<div style='text-align: center; font-size: 10px;'>AI Ethics</div>", unsafe_allow_html=True)
             
             with col4:
                 q_ethics_color = get_score_color(q_ethics)
-                st.markdown(f"""
-                <div style="text-align: center;">
-                    <button style="
-                        background-color: {q_ethics_color}; 
-                        color: white; 
-                        border: none; 
-                        padding: 5px 10px; 
-                        border-radius: 3px; 
-                        font-size: 12px; 
-                        font-weight: bold;
-                        width: 100%;
-                        cursor: pointer;
-                    ">{q_ethics_display}</button>
-                    <div style="font-size: 10px; margin-top: 2px;">Q Ethics</div>
-                </div>
-                """, unsafe_allow_html=True)
+                if st.button(q_ethics_display, key=f"q_ethics_{doc_id}"):
+                    pass
+                st.markdown("<div style='text-align: center; font-size: 10px;'>Q Ethics</div>", unsafe_allow_html=True)
             
             with col5:
                 if source and source.startswith('http'):
                     st.markdown(f"""
-                    <div style="text-align: center;">
-                        <a href="{source}" target="_blank" style="
-                            background-color: #3498db; 
-                            color: white; 
-                            text-decoration: none; 
-                            padding: 5px 10px; 
-                            border-radius: 3px; 
-                            font-size: 12px; 
-                            font-weight: bold;
-                            display: inline-block;
-                            width: 90%;
-                        ">View</a>
-                        <div style="font-size: 10px; margin-top: 2px;">Source</div>
-                    </div>
+                    <a href="{source}" target="_blank" style="
+                        background-color: #3498db; 
+                        color: white; 
+                        text-decoration: none; 
+                        padding: 5px 10px; 
+                        border-radius: 3px; 
+                        font-size: 12px; 
+                        font-weight: bold;
+                        display: inline-block;
+                        width: 90%;
+                        text-align: center;
+                    ">View</a>
                     """, unsafe_allow_html=True)
+                st.markdown("<div style='text-align: center; font-size: 10px;'>Source</div>", unsafe_allow_html=True)
             
             # Analysis expandable sections
             st.markdown("**Analysis:**")
