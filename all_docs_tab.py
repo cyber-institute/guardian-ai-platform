@@ -60,12 +60,12 @@ def fetch_documents_cached():
         
         cur.execute("""
             SELECT 
-                id, title, organization, url, document_date, 
+                id, title, organization, source, publication_date, 
                 ai_cybersecurity_score, quantum_cybersecurity_score,
                 ai_ethics_score, quantum_ethics_score,
-                topic_category, content
+                topic, content
             FROM documents 
-            ORDER BY document_date DESC NULLS LAST, title ASC
+            ORDER BY publication_date DESC NULLS LAST, title ASC
         """)
         
         documents = cur.fetchall()
@@ -376,7 +376,7 @@ def get_score_color(score):
 
 def render_document_card(doc):
     """Render a document card with enhanced functionality"""
-    doc_id, title, organization, url, doc_date, ai_cyber, q_cyber, ai_ethics, q_ethics, topic, content = doc
+    doc_id, title, organization, source, pub_date, ai_cyber, q_cyber, ai_ethics, q_ethics, topic, content = doc
     
     # Clean and format display values
     title = title or "Untitled Document"
@@ -394,7 +394,7 @@ def render_document_card(doc):
         <div style="border: 1px solid #ddd; padding: 10px; margin: 5px 0; border-radius: 5px;">
             <h4 style="margin: 0 0 5px 0; color: #2c3e50;">{title}</h4>
             <p style="margin: 0 0 5px 0; color: #7f8c8d; font-size: 14px;"><strong>{organization}</strong></p>
-            <p style="margin: 0 0 10px 0; color: #95a5a6; font-size: 12px;">{doc_date or 'Date not available'}</p>
+            <p style="margin: 0 0 10px 0; color: #95a5a6; font-size: 12px;">{pub_date or 'Date not available'}</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -474,10 +474,10 @@ def render_document_card(doc):
             """, unsafe_allow_html=True)
         
         with col5:
-            if url and url.startswith('http'):
+            if source and source.startswith('http'):
                 st.markdown(f"""
                 <div style="text-align: center;">
-                    <a href="{url}" target="_blank" style="
+                    <a href="{source}" target="_blank" style="
                         background-color: #3498db; 
                         color: white; 
                         text-decoration: none; 
