@@ -74,6 +74,17 @@ from utils.comprehensive_scoring import comprehensive_document_scoring, format_s
 def analyze_ai_cybersecurity_content(content, score):
     """Analyze AI cybersecurity content"""
     if score == 'N/A':
+        # Check if document is out of scope
+        try:
+            from utils.multi_llm_scoring_engine import detect_document_scope
+            content_str = str(content) if content else ""
+            scope_analysis = detect_document_scope(content_str, "")
+            
+            if scope_analysis['out_of_scope']:
+                return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. AI Cybersecurity scoring is not applicable for this content type."
+        except:
+            pass
+            
         return """
 This document does not focus on AI-specific cybersecurity concerns.
 
@@ -111,6 +122,17 @@ This document demonstrates an AI Cybersecurity maturity score of {score}/100.
 def analyze_quantum_cybersecurity_content(content, score):
     """Analyze quantum cybersecurity content"""
     if score == 'N/A':
+        # Check if document is out of scope
+        try:
+            from utils.multi_llm_scoring_engine import detect_document_scope
+            content_str = str(content) if content else ""
+            scope_analysis = detect_document_scope(content_str, "")
+            
+            if scope_analysis['out_of_scope']:
+                return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Quantum Cybersecurity scoring is not applicable for this content type."
+        except:
+            pass
+            
         return """
 This document does not address quantum cybersecurity concerns.
 
@@ -185,6 +207,17 @@ This document demonstrates an AI Ethics score of {score}/100.
 def analyze_quantum_ethics_content(content, score):
     """Analyze quantum ethics content"""
     if score == 'N/A':
+        # Check if document is out of scope
+        try:
+            from utils.multi_llm_scoring_engine import detect_document_scope
+            content_str = str(content) if content else ""
+            scope_analysis = detect_document_scope(content_str, "")
+            
+            if scope_analysis['out_of_scope']:
+                return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Quantum Ethics scoring is not applicable for this content type."
+        except:
+            pass
+            
         return """
 This document does not address quantum ethics considerations.
 
@@ -739,6 +772,13 @@ def get_document_topic(doc):
 
 def render():
     """Render the All Documents tab with comprehensive document repository and contextual help tooltips."""
+    
+    # CRITICAL: Validate UI protection before rendering
+    try:
+        from utils.ui_protection import validate_ui_integrity
+        validate_ui_integrity()
+    except ImportError:
+        pass  # UI protection not available, continue safely
     
     # Apply ultra-compact CSS to eliminate all spacing
     apply_ultra_compact_css()
