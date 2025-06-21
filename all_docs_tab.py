@@ -392,71 +392,102 @@ def render():
     for i, doc in enumerate(docs):
         unique_id = f"doc_{doc[0]}_{i}"
         
-        # Create card HTML exactly as shown in screenshots
+        # Create card with bordered sections and metadata exactly as shown in screenshot
         st.markdown(f"""
-        <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
-                    border: 2px solid #dee2e6; 
-                    border-radius: 15px; 
-                    padding: 20px; 
-                    margin: 15px 0; 
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-            
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                <h3 style="margin: 0; color: #2c3e50; font-size: 18px; font-weight: 600; line-height: 1.3; max-width: 70%;">
-                    {ultra_clean_metadata(doc[1])}
-                </h3>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <span style="background: linear-gradient(135deg, #3498db, #2980b9); 
-                                color: white; 
-                                padding: 4px 8px; 
-                                border-radius: 8px; 
-                                font-size: 12px; 
-                                font-weight: 500;">
-                        {get_document_topic(doc)}
-                    </span>
-                </div>
-            </div>
-            
-            <div style="margin: 12px 0; color: #7f8c8d; font-size: 14px;">
-                <strong>{ultra_clean_metadata(doc[9])}</strong> | 
-                <strong>{ultra_clean_metadata(doc[10])}</strong> | 
-                <strong>{clean_date_safely(doc)}</strong>
+        <div style="background: white; border: 2px solid #4da6ff; border-radius: 15px; padding: 15px; margin: 10px 0;">
+            <h3 style="margin: 0 0 8px 0; color: #2c3e50; font-size: 16px; font-weight: 600;">
+                {ultra_clean_metadata(doc[1])} 🔗
+            </h3>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <span style="background: #007bff; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
+                    {get_document_topic(doc)}
+                </span>
+                <span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
+                    {ultra_clean_metadata(doc[10])}
+                </span>
+                <span style="background: #28a745; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
+                    {ultra_clean_metadata(doc[9])}
+                </span>
+                <span style="background: #ffc107; color: black; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
+                    {clean_date_safely(doc)}
+                </span>
             </div>
         </div>
         """, unsafe_allow_html=True)
         
-        # Create scoring section with expandable dropdowns exactly as shown
+        # Create scoring section with colored dropdown selectboxes exactly as shown
         col1, col2 = st.columns([1, 1])
         
         with col1:
-            # AI Cybersecurity Score with exact styling
+            # AI Cybersecurity Score with colored indicator
             ai_cyber_score = doc[4] if doc[4] is not None else 'N/A'
             ai_cyber_display = str(ai_cyber_score).replace('/100', '') if ai_cyber_score != 'N/A' else 'N/A'
             
-            if st.button(f"🔒 AI Cybersecurity: {ai_cyber_display}", key=f"ai_cyber_{unique_id}"):
-                st.session_state[f'show_ai_cyber_{unique_id}'] = not st.session_state.get(f'show_ai_cyber_{unique_id}', False)
+            # Color coding based on score
+            if ai_cyber_score == 'N/A':
+                color = "#6c757d"  # Gray
+            elif isinstance(ai_cyber_score, (int, float)) and ai_cyber_score >= 75:
+                color = "#28a745"  # Green
+            elif isinstance(ai_cyber_score, (int, float)) and ai_cyber_score >= 50:
+                color = "#fd7e14"  # Orange
+            else:
+                color = "#dc3545"  # Red
             
-            # Quantum Cybersecurity Score
-            q_cyber_score = doc[5] if doc[5] is not None else 'N/A'
-            q_cyber_display = str(q_cyber_score).replace('/100', '') if q_cyber_score != 'N/A' else 'N/A'
+            st.markdown(f"<div style='color: {color}; font-weight: bold; margin: 5px 0;'>● AI Cybersecurity: {ai_cyber_display}</div>", unsafe_allow_html=True)
+            if st.selectbox("", ["▼"], key=f"ai_cyber_select_{unique_id}", label_visibility="collapsed"):
+                st.session_state[f'show_ai_cyber_{unique_id}'] = True
             
-            if st.button(f"⚡ Quantum Cybersecurity: {q_cyber_display}", key=f"q_cyber_{unique_id}"):
-                st.session_state[f'show_q_cyber_{unique_id}'] = not st.session_state.get(f'show_q_cyber_{unique_id}', False)
-        
-        with col2:
-            # AI Ethics Score
+            # AI Ethics Score with colored indicator
             ai_ethics_score = doc[6] if doc[6] is not None else 'N/A'
             ai_ethics_display = str(ai_ethics_score).replace('/100', '') if ai_ethics_score != 'N/A' else 'N/A'
             
-            if st.button(f"🤖 AI Ethics: {ai_ethics_display}", key=f"ai_ethics_{unique_id}"):
-                st.session_state[f'show_ai_ethics_{unique_id}'] = not st.session_state.get(f'show_ai_ethics_{unique_id}', False)
+            if ai_ethics_score == 'N/A':
+                color = "#6c757d"  # Gray
+            elif isinstance(ai_ethics_score, (int, float)) and ai_ethics_score >= 75:
+                color = "#28a745"  # Green
+            elif isinstance(ai_ethics_score, (int, float)) and ai_ethics_score >= 50:
+                color = "#fd7e14"  # Orange
+            else:
+                color = "#dc3545"  # Red
+                
+            st.markdown(f"<div style='color: {color}; font-weight: bold; margin: 5px 0;'>● AI Ethics: {ai_ethics_display}</div>", unsafe_allow_html=True)
+            if st.selectbox("", ["▼"], key=f"ai_ethics_select_{unique_id}", label_visibility="collapsed"):
+                st.session_state[f'show_ai_ethics_{unique_id}'] = True
+        
+        with col2:
+            # Quantum Cybersecurity Score with colored indicator
+            q_cyber_score = doc[5] if doc[5] is not None else 'N/A'
+            q_cyber_display = str(q_cyber_score).replace('/100', '') if q_cyber_score != 'N/A' else 'N/A'
             
-            # Quantum Ethics Score
+            if q_cyber_score == 'N/A':
+                color = "#6c757d"  # Gray
+            elif isinstance(q_cyber_score, (int, float)) and q_cyber_score >= 4:
+                color = "#28a745"  # Green
+            elif isinstance(q_cyber_score, (int, float)) and q_cyber_score >= 3:
+                color = "#fd7e14"  # Orange
+            else:
+                color = "#dc3545"  # Red
+                
+            st.markdown(f"<div style='color: {color}; font-weight: bold; margin: 5px 0;'>● Quantum Cybersecurity: {q_cyber_display}</div>", unsafe_allow_html=True)
+            if st.selectbox("", ["▼"], key=f"q_cyber_select_{unique_id}", label_visibility="collapsed"):
+                st.session_state[f'show_q_cyber_{unique_id}'] = True
+            
+            # Quantum Ethics Score with colored indicator
             q_ethics_score = doc[7] if doc[7] is not None else 'N/A'
             q_ethics_display = str(q_ethics_score).replace('/100', '') if q_ethics_score != 'N/A' else 'N/A'
             
-            if st.button(f"⚡ Quantum Ethics: {q_ethics_display}", key=f"q_ethics_{unique_id}"):
-                st.session_state[f'show_q_ethics_{unique_id}'] = not st.session_state.get(f'show_q_ethics_{unique_id}', False)
+            if q_ethics_score == 'N/A':
+                color = "#6c757d"  # Gray
+            elif isinstance(q_ethics_score, (int, float)) and q_ethics_score >= 75:
+                color = "#28a745"  # Green
+            elif isinstance(q_ethics_score, (int, float)) and q_ethics_score >= 50:
+                color = "#fd7e14"  # Orange
+            else:
+                color = "#dc3545"  # Red
+                
+            st.markdown(f"<div style='color: {color}; font-weight: bold; margin: 5px 0;'>● Quantum Ethics: {q_ethics_display}</div>", unsafe_allow_html=True)
+            if st.selectbox("", ["▼"], key=f"q_ethics_select_{unique_id}", label_visibility="collapsed"):
+                st.session_state[f'show_q_ethics_{unique_id}'] = True
         
         # Expandable analysis sections with exact emoji styling as shown in screenshots
         if st.session_state.get(f'show_ai_cyber_{unique_id}', False):
