@@ -220,17 +220,35 @@ def multi_llm_ensemble_scoring(text: str, title: str) -> Dict[str, Optional[int]
     Combines keyword identification with contextual AI analysis
     """
     
-    # Step 1: Keyword-based initial scoring
+    # Step 1: Check document scope and applicability
+    applicability = enhanced_document_applicability(text, title)
+    
+    # If document is out of scope, return None for all scores
+    if applicability.get('scope_message'):
+        return {
+            'ai_cybersecurity': None,
+            'ai_ethics': None, 
+            'quantum_cybersecurity': None,
+            'quantum_ethics': None,
+            'scope_message': applicability['scope_message']
+        }
+    
+    # Step 2: Keyword-based initial scoring
     keyword_scores = keyword_based_scoring(text, title)
     
-    # Step 2: Multi-LLM contextual analysis
+    # Step 3: Multi-LLM contextual analysis
     openai_scores = analyze_document_with_openai(text, title)
     anthropic_scores = analyze_document_with_anthropic(text, title)
     
-    # Step 3: Ensemble combination following patent formulas
+    # Step 4: Ensemble combination following patent formulas
     final_scores = {}
     
     for framework in ['ai_cybersecurity', 'ai_ethics', 'quantum_cybersecurity', 'quantum_ethics']:
+        # Check if framework applies to this document
+        if not applicability.get(framework, False):
+            final_scores[framework] = None
+            continue
+            
         keyword_score = keyword_scores[framework]
         openai_score = openai_scores[framework]
         anthropic_score = anthropic_scores[framework]
@@ -268,8 +286,79 @@ def multi_llm_ensemble_scoring(text: str, title: str) -> Dict[str, Optional[int]
     
     return final_scores
 
+def detect_document_scope(text: str, title: str) -> Dict[str, any]:
+    """
+    Detect if document is out of scope (children's books, religious texts, etc.)
+    Returns scope analysis with recommendations for handling
+    """
+    text_lower = text.lower()
+    title_lower = title.lower()
+    combined = f"{title_lower} {text_lower}"
+    
+    # Out-of-scope indicators
+    childrens_indicators = [
+        'once upon a time', 'fairy tale', 'children\'s book', 'bedtime story',
+        'picture book', 'nursery rhyme', 'little red riding hood', 'goldilocks',
+        'three little pigs', 'sleeping beauty', 'cinderella'
+    ]
+    
+    religious_indicators = [
+        'bible', 'quran', 'torah', 'gospel', 'scripture', 'holy book',
+        'religious text', 'prayer', 'psalm', 'verse', 'biblical',
+        'jesus', 'allah', 'god almighty', 'prophet', 'blessing'
+    ]
+    
+    legal_foundational_indicators = [
+        'constitution', 'bill of rights', 'amendment', 'we the people',
+        'declaration of independence', 'magna carta', 'founding fathers',
+        'constitutional convention', 'federalist papers'
+    ]
+    
+    literature_indicators = [
+        'novel', 'poetry', 'poem', 'fiction', 'literature', 'chapter one',
+        'shakespeare', 'dickens', 'twain', 'austen', 'hemingway'
+    ]
+    
+    # Check for out-of-scope content
+    is_childrens = any(indicator in combined for indicator in childrens_indicators)
+    is_religious = any(indicator in combined for indicator in religious_indicators)
+    is_foundational_legal = any(indicator in combined for indicator in legal_foundational_indicators)
+    is_literature = any(indicator in combined for indicator in literature_indicators)
+    
+    # Check if document is likely out of scope
+    out_of_scope = is_childrens or is_religious or is_foundational_legal or is_literature
+    
+    # Determine document type for messaging
+    document_type = "unknown"
+    if is_childrens:
+        document_type = "children's literature"
+    elif is_religious:
+        document_type = "religious text"
+    elif is_foundational_legal:
+        document_type = "foundational legal document"
+    elif is_literature:
+        document_type = "literary work"
+    
+    return {
+        'out_of_scope': out_of_scope,
+        'document_type': document_type,
+        'reason': f"This appears to be {document_type} rather than a cybersecurity, AI, or quantum technology policy document."
+    }
+
 def enhanced_document_applicability(text: str, title: str) -> Dict[str, bool]:
     """Enhanced applicability check using multi-LLM insights"""
+    
+    # First check if document is out of scope
+    scope_analysis = detect_document_scope(text, title)
+    if scope_analysis['out_of_scope']:
+        return {
+            'ai_cybersecurity': False,
+            'quantum_cybersecurity': False,
+            'ai_ethics': False,
+            'quantum_ethics': False,
+            'scope_message': scope_analysis['reason']
+        }
+    
     text_lower = text.lower()
     title_lower = title.lower()
     combined = f"{title_lower} {text_lower}"
