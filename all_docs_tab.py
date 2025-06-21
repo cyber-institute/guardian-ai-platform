@@ -1,6 +1,6 @@
 """
 All Documents Tab for GUARDIAN Policy Repository
-Comprehensive document repository with intelligent scoring, content preview, and multi-LLM analysis
+Comprehensive document repository with intelligent scoring and analysis
 """
 
 import streamlit as st
@@ -8,9 +8,6 @@ import psycopg2
 import os
 from functools import lru_cache
 import hashlib
-import time
-from datetime import datetime, timedelta
-import re
 
 
 def apply_ultra_compact_css():
@@ -45,6 +42,35 @@ def apply_ultra_compact_css():
     [data-testid="metric-container"] {
         padding: 0.2rem !important;
         margin: 0.1rem !important;
+    }
+    
+    /* Button styling with intelligent color coding */
+    div[data-testid="stVerticalBlock"] div[data-testid="stButton"] > button,
+    div[data-testid="column"] div[data-testid="stButton"] > button,
+    .main .stButton > button,
+    .stApp .stButton > button {
+        font-size: 8px !important;
+        font-weight: bold !important;
+        height: 18px !important;
+        padding: 2px 4px !important;
+        line-height: 1.0 !important;
+        border-radius: 0px !important;
+        margin: 0px !important;
+    }
+    
+    /* Target button content specifically */
+    .stButton > button > div,
+    .stButton > button > p,
+    .stButton button * {
+        font-size: 8px !important;
+        font-weight: bold !important;
+        line-height: 1.0 !important;
+    }
+    
+    /* Global button override with maximum specificity */
+    html body .stApp .main .stButton button {
+        font-size: 8px !important;
+        font-weight: bold !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -82,7 +108,7 @@ def analyze_ai_cybersecurity_content(content, score):
     """Analyze AI cybersecurity content"""
     
     # Check if content appears to be out of scope
-    content_lower = content.lower()
+    content_lower = content.lower() if content else ""
     
     # Define scope indicators
     ai_cyber_indicators = [
@@ -112,10 +138,13 @@ def analyze_ai_cybersecurity_content(content, score):
         return "This does not appear to be a cybersecurity, AI, or quantum document. GUARDIAN is not designed to analyze this type of content."
     
     # Return proper analysis for in-scope content
-    if score == 'N/A':
+    if score == 'N/A' or score is None:
         return "This document appears to contain AI cybersecurity content but has not been scored by GUARDIAN's assessment system."
     
-    score_num = int(score) if str(score).isdigit() else 0
+    try:
+        score_num = int(score)
+    except (ValueError, TypeError):
+        return "This document appears to contain AI cybersecurity content but has not been scored by GUARDIAN's assessment system."
     
     if score_num >= 80:
         analysis = f"This document demonstrates excellent AI Cybersecurity maturity with a score of {score}/100.\n\n"
@@ -164,7 +193,7 @@ def analyze_quantum_cybersecurity_content(content, score):
     """Analyze quantum cybersecurity content"""
     
     # Check if content appears to be out of scope
-    content_lower = content.lower()
+    content_lower = content.lower() if content else ""
     
     # Define scope indicators
     quantum_cyber_indicators = [
@@ -194,10 +223,13 @@ def analyze_quantum_cybersecurity_content(content, score):
         return "This does not appear to be a cybersecurity, AI, or quantum document. GUARDIAN is not designed to analyze this type of content."
     
     # Return proper analysis for in-scope content
-    if score == 'N/A':
+    if score == 'N/A' or score is None:
         return "This document appears to contain quantum cybersecurity content but has not been scored by GUARDIAN's assessment system."
     
-    score_num = int(score) if str(score).isdigit() else 0
+    try:
+        score_num = int(score)
+    except (ValueError, TypeError):
+        return "This document appears to contain quantum cybersecurity content but has not been scored by GUARDIAN's assessment system."
     
     if score_num >= 4:
         analysis = f"This document demonstrates Quantum Cybersecurity maturity of {score}/5.\n\n"
@@ -236,7 +268,7 @@ def analyze_ai_ethics_content(content, score):
     """Analyze AI ethics content"""
     
     # Check if content appears to be out of scope
-    content_lower = content.lower()
+    content_lower = content.lower() if content else ""
     
     # Define scope indicators
     ai_ethics_indicators = [
@@ -266,10 +298,13 @@ def analyze_ai_ethics_content(content, score):
         return "This does not appear to be a cybersecurity, AI, or quantum document. GUARDIAN is not designed to analyze this type of content."
     
     # Return proper analysis for in-scope content
-    if score == 'N/A':
+    if score == 'N/A' or score is None:
         return "This document appears to contain AI ethics content but has not been scored by GUARDIAN's assessment system."
     
-    score_num = int(score) if str(score).isdigit() else 0
+    try:
+        score_num = int(score)
+    except (ValueError, TypeError):
+        return "This document appears to contain AI ethics content but has not been scored by GUARDIAN's assessment system."
     
     if score_num >= 80:
         analysis = f"This document demonstrates an AI Ethics score of {score}/100.\n\n"
@@ -299,7 +334,7 @@ def analyze_quantum_ethics_content(content, score):
     """Analyze quantum ethics content"""
     
     # Check if content appears to be out of scope
-    content_lower = content.lower()
+    content_lower = content.lower() if content else ""
     
     # Define scope indicators
     quantum_ethics_indicators = [
@@ -328,10 +363,13 @@ def analyze_quantum_ethics_content(content, score):
         return "This does not appear to be a cybersecurity, AI, or quantum document. GUARDIAN is not designed to analyze this type of content."
     
     # Return proper analysis for in-scope content
-    if score == 'N/A':
+    if score == 'N/A' or score is None:
         return "This document appears to contain quantum ethics content but has not been scored by GUARDIAN's assessment system."
     
-    score_num = int(score) if str(score).isdigit() else 0
+    try:
+        score_num = int(score)
+    except (ValueError, TypeError):
+        return "This document appears to contain quantum ethics content but has not been scored by GUARDIAN's assessment system."
     
     if score_num >= 80:
         analysis = f"This document demonstrates Quantum Ethics considerations scoring {score}/100.\n\n"
@@ -374,153 +412,95 @@ def get_score_color(score):
         return '#808080'  # Gray for any parsing issues
 
 
-def render_document_card(doc):
-    """Render a document card with enhanced functionality"""
-    doc_id, title, organization, source, pub_date, ai_cyber, q_cyber, ai_ethics, q_ethics, topic, content = doc
+def comprehensive_document_scoring_cached(content, title):
+    """Cached version of comprehensive scoring with content hashing"""
+    if not content:
+        return {
+            'ai_cybersecurity': 'N/A',
+            'quantum_cybersecurity': 'N/A',
+            'ai_ethics': 'N/A',
+            'quantum_ethics': 'N/A'
+        }
     
-    # Clean and format display values
-    title = title or "Untitled Document"
-    organization = organization or "Unknown Organization"
+    # Create hash for caching
+    content_hash = hashlib.md5(f"{content[:1000]}{title}".encode()).hexdigest()
     
-    # Format scores for display
-    ai_cyber_display = f"{ai_cyber}/100" if ai_cyber != 'N/A' and ai_cyber is not None else "N/A"
-    ai_ethics_display = f"{ai_ethics}/100" if ai_ethics != 'N/A' and ai_ethics is not None else "N/A"
-    q_cyber_display = f"{q_cyber}/5" if q_cyber != 'N/A' and q_cyber is not None else "N/A"
-    q_ethics_display = f"{q_ethics}/100" if q_ethics != 'N/A' and q_ethics is not None else "N/A"
-    
-    # Create colored score buttons
-    with st.container():
-        st.markdown(f"""
-        <div style="border: 1px solid #ddd; padding: 10px; margin: 5px 0; border-radius: 5px;">
-            <h4 style="margin: 0 0 5px 0; color: #2c3e50;">{title}</h4>
-            <p style="margin: 0 0 5px 0; color: #7f8c8d; font-size: 14px;"><strong>{organization}</strong></p>
-            <p style="margin: 0 0 10px 0; color: #95a5a6; font-size: 12px;">{pub_date or 'Date not available'}</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Score buttons row
-        col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 2, 2])
-        
-        with col1:
-            ai_cyber_color = get_score_color(ai_cyber)
-            st.markdown(f"""
-            <div style="text-align: center;">
-                <button style="
-                    background-color: {ai_cyber_color}; 
-                    color: white; 
-                    border: none; 
-                    padding: 5px 10px; 
-                    border-radius: 3px; 
-                    font-size: 12px; 
-                    font-weight: bold;
-                    width: 100%;
-                ">{ai_cyber_display}</button>
-                <div style="font-size: 10px; margin-top: 2px;">AI Cyber</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col2:
-            q_cyber_color = get_score_color(q_cyber)
-            st.markdown(f"""
-            <div style="text-align: center;">
-                <button style="
-                    background-color: {q_cyber_color}; 
-                    color: white; 
-                    border: none; 
-                    padding: 5px 10px; 
-                    border-radius: 3px; 
-                    font-size: 12px; 
-                    font-weight: bold;
-                    width: 100%;
-                ">{q_cyber_display}</button>
-                <div style="font-size: 10px; margin-top: 2px;">Q Cyber</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col3:
-            ai_ethics_color = get_score_color(ai_ethics)
-            st.markdown(f"""
-            <div style="text-align: center;">
-                <button style="
-                    background-color: {ai_ethics_color}; 
-                    color: white; 
-                    border: none; 
-                    padding: 5px 10px; 
-                    border-radius: 3px; 
-                    font-size: 12px; 
-                    font-weight: bold;
-                    width: 100%;
-                ">{ai_ethics_display}</button>
-                <div style="font-size: 10px; margin-top: 2px;">AI Ethics</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col4:
-            q_ethics_color = get_score_color(q_ethics)
-            st.markdown(f"""
-            <div style="text-align: center;">
-                <button style="
-                    background-color: {q_ethics_color}; 
-                    color: white; 
-                    border: none; 
-                    padding: 5px 10px; 
-                    border-radius: 3px; 
-                    font-size: 12px; 
-                    font-weight: bold;
-                    width: 100%;
-                ">{q_ethics_display}</button>
-                <div style="font-size: 10px; margin-top: 2px;">Q Ethics</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col5:
-            if source and source.startswith('http'):
-                st.markdown(f"""
-                <div style="text-align: center;">
-                    <a href="{source}" target="_blank" style="
-                        background-color: #3498db; 
-                        color: white; 
-                        text-decoration: none; 
-                        padding: 5px 10px; 
-                        border-radius: 3px; 
-                        font-size: 12px; 
-                        font-weight: bold;
-                        display: inline-block;
-                        width: 90%;
-                    ">View</a>
-                    <div style="font-size: 10px; margin-top: 2px;">Source</div>
-                </div>
-                """, unsafe_allow_html=True)
-        
-        # Analysis expandable sections
-        st.markdown("**Analysis:**")
-        
-        # AI Cybersecurity Analysis
-        with st.expander("🔒 AI Cybersecurity Analysis", expanded=False):
-            ai_cyber_analysis = analyze_ai_cybersecurity_content(content or "", ai_cyber)
-            st.write(ai_cyber_analysis)
-        
-        # Quantum Cybersecurity Analysis
-        with st.expander("⚛️ Quantum Cybersecurity Analysis", expanded=False):
-            q_cyber_analysis = analyze_quantum_cybersecurity_content(content or "", q_cyber)
-            st.write(q_cyber_analysis)
-        
-        # AI Ethics Analysis
-        with st.expander("🤖 AI Ethics Analysis", expanded=False):
-            ai_ethics_analysis = analyze_ai_ethics_content(content or "", ai_ethics)
-            st.write(ai_ethics_analysis)
-        
-        # Quantum Ethics Analysis
-        with st.expander("🔬 Quantum Ethics Analysis", expanded=False):
-            q_ethics_analysis = analyze_quantum_ethics_content(content or "", q_ethics)
-            st.write(q_ethics_analysis)
+    # Simple mock scoring for now
+    return {
+        'ai_cybersecurity': 75,
+        'quantum_cybersecurity': 3,
+        'ai_ethics': 68,
+        'quantum_ethics': 72
+    }
 
 
 def render():
-    """Render the All Documents tab"""
+    """Render the All Documents tab with comprehensive document repository and contextual help tooltips."""
     
-    # Apply compact styling
+    # Apply ultra-compact CSS to eliminate all spacing
     apply_ultra_compact_css()
+    
+    # Add comprehensive color styling using both CSS and JavaScript
+    st.markdown("""
+    <style>
+    /* Ultra-high specificity CSS targeting for score buttons with intelligent color coding */
+    .stButton > button[data-testid*="button"] { background-color: #22C55E !important; color: white !important; border: 2px solid #16A34A !important; }
+    .stButton > button:contains("0/") { background-color: #EF4444 !important; color: white !important; border: 2px solid #DC2626 !important; }
+    .stButton > button:contains("N/A") { background-color: #808080 !important; color: white !important; border: 2px solid #6B7280 !important; }
+    
+    /* Apply color-coded borders to buttons based on their text content */
+    .stButton:has(button:contains("0/100")) button { background-color: #EF4444 !important; border-color: #DC2626 !important; }
+    .stButton:has(button:contains("1/100")) button { background-color: #EF4444 !important; border-color: #DC2626 !important; }
+    .stButton:has(button:contains("2/100")) button { background-color: #EF4444 !important; border-color: #DC2626 !important; }
+    
+    /* JavaScript function to dynamically color buttons */
+    </style>
+    
+    <script>
+    function applyButtonColors() {
+        const buttons = document.querySelectorAll('.stButton button');
+        buttons.forEach(button => {
+            const text = button.textContent;
+            if (text.includes('N/A')) {
+                button.style.backgroundColor = '#808080';
+                button.style.borderColor = '#6B7280';
+            } else if (text.includes('/100') || text.includes('/5')) {
+                const score = parseInt(text.split('/')[0]);
+                if (text.includes('/5')) {
+                    // Quantum cybersecurity tier system
+                    if (score >= 4) {
+                        button.style.backgroundColor = '#22C55E';
+                        button.style.borderColor = '#16A34A';
+                    } else if (score >= 3) {
+                        button.style.backgroundColor = '#EAB308';
+                        button.style.borderColor = '#D97706';
+                    } else {
+                        button.style.backgroundColor = '#EF4444';
+                        button.style.borderColor = '#DC2626';
+                    }
+                } else {
+                    // Standard 0-100 scoring
+                    if (score >= 80) {
+                        button.style.backgroundColor = '#22C55E';
+                        button.style.borderColor = '#16A34A';
+                    } else if (score >= 60) {
+                        button.style.backgroundColor = '#EAB308';
+                        button.style.borderColor = '#D97706';
+                    } else {
+                        button.style.backgroundColor = '#EF4444';
+                        button.style.borderColor = '#DC2626';
+                    }
+                }
+            }
+        });
+    }
+    
+    // Apply colors when page loads and when content changes
+    document.addEventListener('DOMContentLoaded', applyButtonColors);
+    const observer = new MutationObserver(applyButtonColors);
+    observer.observe(document.body, { childList: true, subtree: true });
+    </script>
+    """, unsafe_allow_html=True)
     
     st.title("📚 Policy Repository")
     st.markdown("*Comprehensive cybersecurity, AI, and quantum policy document collection*")
@@ -566,7 +546,92 @@ def render():
     
     st.markdown(f"**Showing {len(filtered_docs)} of {total_docs} documents**")
     
-    # Render documents
+    # Display documents
     for doc in filtered_docs:
-        render_document_card(doc)
-        st.markdown("---")
+        doc_id, title, organization, source, pub_date, ai_cyber, q_cyber, ai_ethics, q_ethics, topic, content = doc
+        
+        # Clean and format display values
+        title = title or "Untitled Document"
+        organization = organization or "Unknown Organization"
+        
+        # Format scores for display with proper color coding
+        ai_cyber_display = f"{ai_cyber}/100" if ai_cyber not in ['N/A', None] else "N/A"
+        ai_ethics_display = f"{ai_ethics}/100" if ai_ethics not in ['N/A', None] else "N/A"
+        q_cyber_display = f"{q_cyber}/5" if q_cyber not in ['N/A', None] else "N/A"
+        q_ethics_display = f"{q_ethics}/100" if q_ethics not in ['N/A', None] else "N/A"
+        
+        # Create document card
+        with st.container():
+            st.markdown(f"""
+            <div style="border: 1px solid #ddd; padding: 10px; margin: 5px 0; border-radius: 5px;">
+                <h4 style="margin: 0 0 5px 0; color: #2c3e50;">{title}</h4>
+                <p style="margin: 0 0 5px 0; color: #7f8c8d; font-size: 14px;"><strong>{organization}</strong></p>
+                <p style="margin: 0 0 10px 0; color: #95a5a6; font-size: 12px;">{pub_date or 'Date not available'}</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Score buttons row
+            col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 2, 2])
+            
+            with col1:
+                if st.button(ai_cyber_display, key=f"ai_cyber_{doc_id}"):
+                    pass
+                st.markdown("<div style='text-align: center; font-size: 10px;'>AI Cyber</div>", unsafe_allow_html=True)
+            
+            with col2:
+                if st.button(q_cyber_display, key=f"q_cyber_{doc_id}"):
+                    pass
+                st.markdown("<div style='text-align: center; font-size: 10px;'>Q Cyber</div>", unsafe_allow_html=True)
+            
+            with col3:
+                if st.button(ai_ethics_display, key=f"ai_ethics_{doc_id}"):
+                    pass
+                st.markdown("<div style='text-align: center; font-size: 10px;'>AI Ethics</div>", unsafe_allow_html=True)
+            
+            with col4:
+                if st.button(q_ethics_display, key=f"q_ethics_{doc_id}"):
+                    pass
+                st.markdown("<div style='text-align: center; font-size: 10px;'>Q Ethics</div>", unsafe_allow_html=True)
+            
+            with col5:
+                if source and source.startswith('http'):
+                    st.markdown(f"""
+                    <a href="{source}" target="_blank" style="
+                        background-color: #3498db; 
+                        color: white; 
+                        text-decoration: none; 
+                        padding: 5px 10px; 
+                        border-radius: 3px; 
+                        font-size: 12px; 
+                        font-weight: bold;
+                        display: inline-block;
+                        width: 90%;
+                        text-align: center;
+                    ">View</a>
+                    """, unsafe_allow_html=True)
+                st.markdown("<div style='text-align: center; font-size: 10px;'>Source</div>", unsafe_allow_html=True)
+            
+            # Analysis expandable sections
+            st.markdown("**Analysis:**")
+            
+            # AI Cybersecurity Analysis
+            with st.expander("🔒 AI Cybersecurity Analysis", expanded=False):
+                ai_cyber_analysis = analyze_ai_cybersecurity_content(content or "", ai_cyber)
+                st.write(ai_cyber_analysis)
+            
+            # Quantum Cybersecurity Analysis
+            with st.expander("⚛️ Quantum Cybersecurity Analysis", expanded=False):
+                q_cyber_analysis = analyze_quantum_cybersecurity_content(content or "", q_cyber)
+                st.write(q_cyber_analysis)
+            
+            # AI Ethics Analysis
+            with st.expander("🤖 AI Ethics Analysis", expanded=False):
+                ai_ethics_analysis = analyze_ai_ethics_content(content or "", ai_ethics)
+                st.write(ai_ethics_analysis)
+            
+            # Quantum Ethics Analysis
+            with st.expander("🔬 Quantum Ethics Analysis", expanded=False):
+                q_ethics_analysis = analyze_quantum_ethics_content(content or "", q_ethics)
+                st.write(q_ethics_analysis)
+            
+            st.markdown("---")
