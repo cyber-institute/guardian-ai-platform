@@ -1800,6 +1800,19 @@ def render():
                             if content and len(content.strip()) > 50:
                                 st.info("Content extracted successfully")
                                 
+                                # Check document scope before processing
+                                st.info("Analyzing document scope...")
+                                from utils.multi_llm_scoring_engine import detect_document_scope
+                                scope_analysis = detect_document_scope(content, uploaded_file.name)
+                                
+                                if scope_analysis['out_of_scope']:
+                                    st.warning(f"⚠️ Document Scope Check Failed")
+                                    st.error(f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document.")
+                                    st.info("GUARDIAN is designed for analyzing cybersecurity, AI, and quantum technology policy documents. Please upload a relevant policy document.")
+                                    st.stop()  # Stop processing this upload
+                                
+                                st.success("✅ Document scope validation passed - proceeding with ingestion")
+                                
                                 # Use enhanced metadata extraction (same as URL uploads)
                                 basic_metadata = extract_enhanced_metadata_from_content(content, uploaded_file.name)
                                 
@@ -2213,6 +2226,19 @@ def render():
                             st.text(preview)
                         
                         if content and len(content.strip()) > 100:
+                            # Check document scope before processing
+                            st.info("🔍 Analyzing document scope...")
+                            from utils.multi_llm_scoring_engine import detect_document_scope
+                            scope_analysis = detect_document_scope(content, url_input)
+                            
+                            if scope_analysis['out_of_scope']:
+                                st.warning(f"⚠️ Document Scope Check Failed")
+                                st.error(f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document.")
+                                st.info("GUARDIAN is designed for analyzing cybersecurity, AI, and quantum technology policy documents. Please provide a relevant policy document URL.")
+                                return  # Stop processing this URL
+                            
+                            st.success("✅ Document scope validation passed - proceeding with ingestion")
+                            
                             # Extract proper title, author, and date using enhanced OCR metadata extraction
                             st.info("🔍 Analyzing content for enhanced metadata extraction...")
                             
@@ -4199,7 +4225,7 @@ def render_card_view(docs):
                 with col2:
                     topic = get_document_topic(doc)
                     st.write(f"**Topic:** {topic}")
-                    st.write(f"**Region:** {get_document_region(doc)}")
+                    st.write(f"**Region:** {doc.get('region', 'Unknown')}")
                 
                 # Scoring badges
                 st.markdown("**Framework Scores:**")
