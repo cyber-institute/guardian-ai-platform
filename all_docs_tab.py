@@ -153,13 +153,6 @@ This document does not focus on quantum cybersecurity considerations.
 • Adopt NIST post-quantum cryptographic standards and algorithm selection
 • Conduct quantum computing threat modeling and impact analysis
 • Develop timeline and roadmap for quantum-safe infrastructure deployment
-- Cryptographic agility frameworks and transition planning
-- NIST post-quantum cryptographic standards adoption
-- Quantum-safe algorithm evaluation and selection
-- Quantum computing threat timeline and preparedness
-- Integration of quantum-resistant technologies
-
-**Current Classification:** This document appears to focus on general cybersecurity, AI, or other topics rather than quantum-specific security challenges.
 """
     
     try:
@@ -211,16 +204,6 @@ This document does not focus on AI ethics considerations.
 • Develop stakeholder engagement and participatory AI development
 • Create ethical review processes and impact assessments
 • Design inclusive AI and equitable access considerations
-- Bias mitigation strategies and algorithmic fairness measures
-- Transparency and explainability requirements for AI systems
-- Accountability frameworks and responsible AI governance
-- Privacy protection and data rights in AI applications
-- Human oversight and human-in-the-loop decision making
-- Stakeholder engagement and participatory AI development
-- Ethical review processes and impact assessments
-- Inclusive AI design and equitable access considerations
-
-**Current Classification:** This document appears to focus on cybersecurity, quantum technology, or other topics rather than AI ethics principles.
 """
     
     try:
