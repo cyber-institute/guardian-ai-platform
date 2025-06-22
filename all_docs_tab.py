@@ -21,27 +21,48 @@ def render():
     st.markdown("## 📚 **Policy Repository**")
     st.markdown("Repository with comprehensive document analysis and risk assessment frameworks.")
     
-    # Topic Filter Section
-    st.markdown("**Topic Filter:**")
-    topic_filter = st.radio("Topic Filter", ["AI", "Quantum", "Both"], index=2, label_visibility="collapsed", horizontal=True)
+    # Create the exact filter layout from the reference
+    col_filter, col_view = st.columns([1, 2])
     
-    # View Mode Section
-    st.markdown("**View Mode:**")
-    view_mode = st.radio("View Mode", ["Cards", "Compact", "Table", "Grid", "Minimal"], index=0, label_visibility="collapsed", horizontal=True)
+    with col_filter:
+        st.markdown("**Topic Filter:**")
+        topic_ai = st.checkbox("AI", value=False)
+        topic_quantum = st.checkbox("Quantum", value=False) 
+        topic_both = st.checkbox("Both", value=True)
     
-    # Filter Controls
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.selectbox("Document Type", ["Choose an option"])
-    with col2:
-        st.selectbox("Author/Organization", ["Choose an option"])
-    with col3:
-        st.selectbox("Year", ["Choose an option"])
-    with col4:
-        st.selectbox("Region", ["Choose an option"])
+    with col_view:
+        st.markdown("**View Mode:**")
+        view_col1, view_col2, view_col3, view_col4, view_col5 = st.columns(5)
+        with view_col1:
+            cards_selected = st.radio("", ["Cards"], index=0, key="cards_radio")
+        with view_col2:
+            compact_selected = st.checkbox("Compact", value=False)
+        with view_col3:
+            table_selected = st.checkbox("Table", value=False)
+        with view_col4:
+            grid_selected = st.checkbox("Grid", value=False) 
+        with view_col5:
+            minimal_selected = st.checkbox("Minimal", value=False)
     
-    # Pagination
-    st.markdown("**Page 1 of 4**")
+    # Filter dropdowns
+    filter_col1, filter_col2, filter_col3, filter_col4 = st.columns(4)
+    with filter_col1:
+        st.selectbox("Document Type", ["Choose an option"], key="doc_type_filter")
+    with filter_col2:
+        st.selectbox("Author/Organization", ["Choose an option"], key="author_filter")  
+    with filter_col3:
+        st.selectbox("Year", ["Choose an option"], key="year_filter")
+    with filter_col4:
+        st.selectbox("Region", ["Choose an option"], key="region_filter")
+    
+    # Add navigation arrows and pagination
+    nav_col1, nav_col2, nav_col3 = st.columns([1, 2, 1])
+    with nav_col1:
+        st.markdown("◀")
+    with nav_col2:
+        st.markdown("**Page 1 of 4**")
+    with nav_col3:
+        st.markdown("▶")
     
     # Sample Documents with Cards
     documents = [
@@ -68,8 +89,8 @@ def render():
         </div>
         """, unsafe_allow_html=True)
         
-        # Scoring Dropdowns with proper color styling
-        col1, col2, col3, col4 = st.columns(4)
+        # Create colored scoring dropdowns matching the reference exactly
+        scoring_col1, scoring_col2, scoring_col3, scoring_col4 = st.columns(4)
         
         def get_analysis_text(framework, score):
             if score == "N/A":
@@ -80,18 +101,31 @@ GUARDIAN specializes in cybersecurity, AI, and quantum technology policy assessm
 """
             return f"{framework} analysis for score: {score}"
         
-        with col1:
-            with st.expander(f"🔧 AI Cybersecurity: {doc['scores']['ai_cyber']}", expanded=False):
-                st.markdown(get_analysis_text("AI cybersecurity", doc['scores']['ai_cyber']))
+        # Create dropdown styling to match reference colors
+        with scoring_col1:
+            st.selectbox(f"🔧 AI Cybersecurity: {doc['scores']['ai_cyber']}", 
+                        [doc['scores']['ai_cyber']], 
+                        key=f"ai_cyber_{doc['title'][:10]}")
+            if st.button("View Analysis", key=f"ai_cyber_btn_{doc['title'][:10]}"):
+                st.info(get_analysis_text("AI cybersecurity", doc['scores']['ai_cyber']))
         
-        with col2:
-            with st.expander(f"🔐 Quantum Cybersecurity: {doc['scores']['quantum_cyber']}", expanded=False):
-                st.markdown(get_analysis_text("quantum cybersecurity", doc['scores']['quantum_cyber']))
+        with scoring_col2:
+            st.selectbox(f"🔐 Quantum Cybersecurity: {doc['scores']['quantum_cyber']}", 
+                        [doc['scores']['quantum_cyber']], 
+                        key=f"q_cyber_{doc['title'][:10]}")
+            if st.button("View Analysis", key=f"q_cyber_btn_{doc['title'][:10]}"):
+                st.info(get_analysis_text("quantum cybersecurity", doc['scores']['quantum_cyber']))
         
-        with col3:
-            with st.expander(f"⚖️ AI Ethics: {doc['scores']['ai_ethics']}", expanded=False):
-                st.markdown(get_analysis_text("AI ethics", doc['scores']['ai_ethics']))
+        with scoring_col3:
+            st.selectbox(f"⚖️ AI Ethics: {doc['scores']['ai_ethics']}", 
+                        [doc['scores']['ai_ethics']], 
+                        key=f"ai_ethics_{doc['title'][:10]}")
+            if st.button("View Analysis", key=f"ai_ethics_btn_{doc['title'][:10]}"):
+                st.info(get_analysis_text("AI ethics", doc['scores']['ai_ethics']))
         
-        with col4:
-            with st.expander(f"🌟 Quantum Ethics: {doc['scores']['quantum_ethics']}", expanded=False):
-                st.markdown(get_analysis_text("quantum ethics", doc['scores']['quantum_ethics']))
+        with scoring_col4:
+            st.selectbox(f"🌟 Quantum Ethics: {doc['scores']['quantum_ethics']}", 
+                        [doc['scores']['quantum_ethics']], 
+                        key=f"q_ethics_{doc['title'][:10]}")
+            if st.button("View Analysis", key=f"q_ethics_btn_{doc['title'][:10]}"):
+                st.info(get_analysis_text("quantum ethics", doc['scores']['quantum_ethics']))
