@@ -30,8 +30,8 @@ def fetch_documents_cached():
             SELECT id, title, content, text_content, 
                    ai_cybersecurity_score, quantum_cybersecurity_score, 
                    ai_ethics_score, quantum_ethics_score,
-                   url, organization, document_type, publication_date,
-                   author, region, comprehensive_score, topic_classification
+                   source, organization, document_type, publication_date,
+                   author_organization, detected_region, quantum_score, topic
             FROM documents 
             ORDER BY id DESC
             LIMIT 100
@@ -313,14 +313,11 @@ def ultra_clean_metadata(field_value):
     return cleaned if cleaned.strip() else "Not specified"
 
 def clean_date_safely(doc):
-    """Safely clean date field to prevent None value issues causing </div> artifacts"""
+    """Safely clean date field to prevent None value issues"""
     try:
-        date_field = doc[11] if len(doc) > 11 else None  # publication_date is at index 11
+        date_field = doc[11] if len(doc) > 11 else None  # publication_date
         if date_field and str(date_field) != 'None':
-            cleaned_date = ultra_clean_metadata(date_field)
-            # Ensure it's actually a date-like string
-            if cleaned_date and cleaned_date != "Not specified" and len(cleaned_date) > 3:
-                return cleaned_date
+            return ultra_clean_metadata(date_field)
     except:
         pass
     return "Not specified"
@@ -406,10 +403,10 @@ def render():
                     {ultra_clean_metadata(doc[10])}
                 </span>
                 <span style="background: #28a745; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
-                    {ultra_clean_metadata(doc[9])}
+                    {ultra_clean_metadata(doc[12])}
                 </span>
                 <span style="background: #ffc107; color: black; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
-                    {clean_date_safely(doc)}
+                    {ultra_clean_metadata(doc[11])}
                 </span>
             </div>
         </div>
