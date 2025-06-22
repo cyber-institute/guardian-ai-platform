@@ -389,127 +389,103 @@ def render():
     for i, doc in enumerate(docs):
         unique_id = f"doc_{doc[0]}_{i}"
         
-        # Create card with bordered sections and metadata exactly as shown in screenshot
-        st.markdown(f"""
-        <div style="background: white; border: 2px solid #4da6ff; border-radius: 15px; padding: 15px; margin: 10px 0;">
-            <h3 style="margin: 0 0 8px 0; color: #2c3e50; font-size: 16px; font-weight: 600;">
-                {ultra_clean_metadata(doc[1])} 🔗
-            </h3>
-            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                <span style="background: #007bff; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
-                    {get_document_topic(doc)}
-                </span>
-                <span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
-                    {ultra_clean_metadata(doc[10])}
-                </span>
-                <span style="background: #28a745; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
-                    {ultra_clean_metadata(doc[12])}
-                </span>
-                <span style="background: #ffc107; color: black; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
-                    {ultra_clean_metadata(doc[11])}
-                </span>
+        # Create card container with blue border exactly as shown in screenshot
+        with st.container():
+            st.markdown(f"""
+            <div style="background: white; border: 2px solid #4da6ff; border-radius: 8px; padding: 15px; margin: 10px 0;">
+                <h3 style="margin: 0 0 8px 0; color: #4da6ff; font-size: 16px; font-weight: 600;">
+                    {ultra_clean_metadata(doc[1])} 🔗
+                </h3>
+                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                    <span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
+                        {get_document_topic(doc)}
+                    </span>
+                    <span style="background: #007bff; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
+                        {ultra_clean_metadata(doc[10])}
+                    </span>
+                    <span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
+                        {ultra_clean_metadata(doc[9])}
+                    </span>
+                    <span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
+                        {clean_date_safely(doc)}
+                    </span>
+                </div>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Create scoring section with colored dropdown selectboxes exactly as shown
-        col1, col2 = st.columns([1, 1])
-        
-        with col1:
-            # AI Cybersecurity Score with colored indicator
-            ai_cyber_score = doc[4] if doc[4] is not None else 'N/A'
-            ai_cyber_display = str(ai_cyber_score).replace('/100', '') if ai_cyber_score != 'N/A' else 'N/A'
+            """, unsafe_allow_html=True)
             
-            # Color coding based on score
-            if ai_cyber_score == 'N/A':
-                color = "#6c757d"  # Gray
-            elif isinstance(ai_cyber_score, (int, float)) and ai_cyber_score >= 75:
-                color = "#28a745"  # Green
-            elif isinstance(ai_cyber_score, (int, float)) and ai_cyber_score >= 50:
-                color = "#fd7e14"  # Orange
-            else:
-                color = "#dc3545"  # Red
+            # Create 2x2 grid for scoring exactly as shown in screenshot
+            col1, col2 = st.columns([1, 1])
             
-            st.markdown(f"<div style='color: {color}; font-weight: bold; margin: 5px 0;'>● AI Cybersecurity: {ai_cyber_display}</div>", unsafe_allow_html=True)
-            if st.selectbox("", ["▼"], key=f"ai_cyber_select_{unique_id}", label_visibility="collapsed"):
-                st.session_state[f'show_ai_cyber_{unique_id}'] = True
-            
-            # AI Ethics Score with colored indicator
-            ai_ethics_score = doc[6] if doc[6] is not None else 'N/A'
-            ai_ethics_display = str(ai_ethics_score).replace('/100', '') if ai_ethics_score != 'N/A' else 'N/A'
-            
-            if ai_ethics_score == 'N/A':
-                color = "#6c757d"  # Gray
-            elif isinstance(ai_ethics_score, (int, float)) and ai_ethics_score >= 75:
-                color = "#28a745"  # Green
-            elif isinstance(ai_ethics_score, (int, float)) and ai_ethics_score >= 50:
-                color = "#fd7e14"  # Orange
-            else:
-                color = "#dc3545"  # Red
+            with col1:
+                # AI Cybersecurity Score
+                ai_cyber_score = doc[4] if doc[4] is not None else 'N/A'
+                ai_cyber_display = str(ai_cyber_score).replace('/100', '') if ai_cyber_score != 'N/A' else 'N/A'
                 
-            st.markdown(f"<div style='color: {color}; font-weight: bold; margin: 5px 0;'>● AI Ethics: {ai_ethics_display}</div>", unsafe_allow_html=True)
-            if st.selectbox("", ["▼"], key=f"ai_ethics_select_{unique_id}", label_visibility="collapsed"):
-                st.session_state[f'show_ai_ethics_{unique_id}'] = True
-        
-        with col2:
-            # Quantum Cybersecurity Score with colored indicator
-            q_cyber_score = doc[5] if doc[5] is not None else 'N/A'
-            q_cyber_display = str(q_cyber_score).replace('/100', '') if q_cyber_score != 'N/A' else 'N/A'
-            
-            if q_cyber_score == 'N/A':
-                color = "#6c757d"  # Gray
-            elif isinstance(q_cyber_score, (int, float)) and q_cyber_score >= 4:
-                color = "#28a745"  # Green
-            elif isinstance(q_cyber_score, (int, float)) and q_cyber_score >= 3:
-                color = "#fd7e14"  # Orange
-            else:
-                color = "#dc3545"  # Red
+                ai_cyber_selectbox = st.selectbox(
+                    f"● AI Cybersecurity: {ai_cyber_display}",
+                    ["▼"],
+                    key=f"ai_cyber_{unique_id}",
+                    index=0
+                )
                 
-            st.markdown(f"<div style='color: {color}; font-weight: bold; margin: 5px 0;'>● Quantum Cybersecurity: {q_cyber_display}</div>", unsafe_allow_html=True)
-            if st.selectbox("", ["▼"], key=f"q_cyber_select_{unique_id}", label_visibility="collapsed"):
-                st.session_state[f'show_q_cyber_{unique_id}'] = True
-            
-            # Quantum Ethics Score with colored indicator
-            q_ethics_score = doc[7] if doc[7] is not None else 'N/A'
-            q_ethics_display = str(q_ethics_score).replace('/100', '') if q_ethics_score != 'N/A' else 'N/A'
-            
-            if q_ethics_score == 'N/A':
-                color = "#6c757d"  # Gray
-            elif isinstance(q_ethics_score, (int, float)) and q_ethics_score >= 75:
-                color = "#28a745"  # Green
-            elif isinstance(q_ethics_score, (int, float)) and q_ethics_score >= 50:
-                color = "#fd7e14"  # Orange
-            else:
-                color = "#dc3545"  # Red
+                # AI Ethics Score
+                ai_ethics_score = doc[6] if doc[6] is not None else 'N/A'
+                ai_ethics_display = str(ai_ethics_score).replace('/100', '') if ai_ethics_score != 'N/A' else 'N/A'
                 
-            st.markdown(f"<div style='color: {color}; font-weight: bold; margin: 5px 0;'>● Quantum Ethics: {q_ethics_display}</div>", unsafe_allow_html=True)
-            if st.selectbox("", ["▼"], key=f"q_ethics_select_{unique_id}", label_visibility="collapsed"):
-                st.session_state[f'show_q_ethics_{unique_id}'] = True
+                ai_ethics_selectbox = st.selectbox(
+                    f"● AI Ethics: {ai_ethics_display}",
+                    ["▼"],
+                    key=f"ai_ethics_{unique_id}",
+                    index=0
+                )
+            
+            with col2:
+                # Quantum Cybersecurity Score
+                q_cyber_score = doc[5] if doc[5] is not None else 'N/A'
+                q_cyber_display = str(q_cyber_score).replace('/100', '') if q_cyber_score != 'N/A' else 'N/A'
+                
+                q_cyber_selectbox = st.selectbox(
+                    f"● Quantum Cybersecurity: {q_cyber_display}",
+                    ["▼"],
+                    key=f"q_cyber_{unique_id}",
+                    index=0
+                )
+                
+                # Quantum Ethics Score
+                q_ethics_score = doc[7] if doc[7] is not None else 'N/A'
+                q_ethics_display = str(q_ethics_score).replace('/100', '') if q_ethics_score != 'N/A' else 'N/A'
+                
+                q_ethics_selectbox = st.selectbox(
+                    f"● Quantum Ethics: {q_ethics_display}",
+                    ["▼"],
+                    key=f"q_ethics_{unique_id}",
+                    index=0
+                )
         
-        # Expandable analysis sections with exact emoji styling as shown in screenshots
-        if st.session_state.get(f'show_ai_cyber_{unique_id}', False):
-            with st.expander("🔒 AI Cybersecurity Analysis", expanded=True):
-                ai_cyber_analysis = analyze_ai_cybersecurity_content(doc[2], ai_cyber_score)
-                st.markdown(f"**Score: {ai_cyber_display}**")
-                st.write(ai_cyber_analysis)
-        
-        if st.session_state.get(f'show_q_cyber_{unique_id}', False):
-            with st.expander("⚡ Quantum Cybersecurity Analysis", expanded=True):
-                q_cyber_analysis = analyze_quantum_cybersecurity_content(doc[2], q_cyber_score)
-                st.markdown(f"**Score: {q_cyber_display}**")
-                st.write(q_cyber_analysis)
-        
-        if st.session_state.get(f'show_ai_ethics_{unique_id}', False):
-            with st.expander("🤖 AI Ethics Analysis", expanded=True):
-                ai_ethics_analysis = analyze_ai_ethics_content(doc[2], ai_ethics_score)
-                st.markdown(f"**Score: {ai_ethics_display}**")
-                st.write(ai_ethics_analysis)
-        
-        if st.session_state.get(f'show_q_ethics_{unique_id}', False):
-            with st.expander("⚡ Quantum Ethics Analysis", expanded=True):
-                q_ethics_analysis = analyze_quantum_ethics_content(doc[2], q_ethics_score)
-                st.markdown(f"**Score: {q_ethics_display}**")
-                st.write(q_ethics_analysis)
+            # Check if selectboxes are clicked to show expandable analysis
+            if ai_cyber_selectbox and ai_cyber_selectbox == "▼":
+                with st.expander("🔒 AI Cybersecurity Analysis", expanded=True):
+                    ai_cyber_analysis = analyze_ai_cybersecurity_content(doc[2], ai_cyber_score)
+                    st.markdown(f"**Score: {ai_cyber_display}**")
+                    st.write(ai_cyber_analysis)
+            
+            if q_cyber_selectbox and q_cyber_selectbox == "▼":
+                with st.expander("⚡ Quantum Cybersecurity Analysis", expanded=True):
+                    q_cyber_analysis = analyze_quantum_cybersecurity_content(doc[2], q_cyber_score)
+                    st.markdown(f"**Score: {q_cyber_display}**")
+                    st.write(q_cyber_analysis)
+            
+            if ai_ethics_selectbox and ai_ethics_selectbox == "▼":
+                with st.expander("🤖 AI Ethics Analysis", expanded=True):
+                    ai_ethics_analysis = analyze_ai_ethics_content(doc[2], ai_ethics_score)
+                    st.markdown(f"**Score: {ai_ethics_display}**")
+                    st.write(ai_ethics_analysis)
+            
+            if q_ethics_selectbox and q_ethics_selectbox == "▼":
+                with st.expander("⚡ Quantum Ethics Analysis", expanded=True):
+                    q_ethics_analysis = analyze_quantum_ethics_content(doc[2], q_ethics_score)
+                    st.markdown(f"**Score: {q_ethics_display}**")
+                    st.write(q_ethics_analysis)
         
         # Add spacing between cards
         st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
