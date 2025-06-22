@@ -5,8 +5,6 @@ import streamlit as st
 import sqlite3
 import hashlib
 from functools import lru_cache
-from utils.ultra_compact_css import apply_ultra_compact_css
-from utils import help_tooltips
 import time
 import json
 
