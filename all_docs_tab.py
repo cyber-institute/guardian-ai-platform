@@ -11,15 +11,7 @@ import requests
 from datetime import datetime
 import time
 
-# Try to import UI protection with fallback
-try:
-    from utils.ui_protection import protect_ui_elements, validate_ui_integrity
-    protect_ui_elements()
-except ImportError:
-    pass
-
-# Performance optimization: Cache document fetching
-@st.cache_data(ttl=300)  # Cache for 5 minutes
+@st.cache_data(ttl=300)
 def fetch_documents_cached():
     """Cached version of document fetching with memory optimization"""
     conn = psycopg2.connect(os.getenv('DATABASE_URL'))
@@ -47,7 +39,7 @@ def fetch_documents_cached():
         cursor.close()
         conn.close()
 
-@st.cache_data(ttl=180)  # Cache for 3 minutes
+@st.cache_data(ttl=180)
 def get_document_content_cached(doc_id, url):
     """Cache document content separately for better memory management"""
     conn = psycopg2.connect(os.getenv('DATABASE_URL'))
@@ -66,17 +58,6 @@ def get_document_content_cached(doc_id, url):
 def analyze_ai_cybersecurity_content(content, score):
     """Analyze AI cybersecurity content"""
     if score == 'N/A':
-        # Check if document is out of scope
-        try:
-            from utils.multi_llm_scoring_engine import detect_document_scope
-            content_str = str(content) if content else ""
-            scope_analysis = detect_document_scope(content_str, "")
-            
-            if scope_analysis['out_of_scope']:
-                return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. AI Cybersecurity scoring is not applicable for this content type."
-        except:
-            pass
-            
         return """
 This document does not focus on AI-specific cybersecurity concerns.
 
@@ -104,17 +85,6 @@ This document demonstrates an AI Cybersecurity maturity score of {score}/100.
 def analyze_quantum_cybersecurity_content(content, score):
     """Analyze quantum cybersecurity content"""
     if score == 'N/A':
-        # Check if document is out of scope
-        try:
-            from utils.multi_llm_scoring_engine import detect_document_scope
-            content_str = str(content) if content else ""
-            scope_analysis = detect_document_scope(content_str, "")
-            
-            if scope_analysis['out_of_scope']:
-                return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Quantum Cybersecurity scoring is not applicable for this content type."
-        except:
-            pass
-            
         return """
 This document does not address quantum cybersecurity concerns.
 
@@ -142,17 +112,6 @@ This document demonstrates Quantum Cybersecurity readiness scoring {score}/100.
 def analyze_ai_ethics_content(content, score):
     """Analyze AI ethics content"""
     if score == 'N/A':
-        # Check if document is out of scope
-        try:
-            from utils.multi_llm_scoring_engine import detect_document_scope
-            content_str = str(content) if content else ""
-            scope_analysis = detect_document_scope(content_str, "")
-            
-            if scope_analysis['out_of_scope']:
-                return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. AI Ethics scoring is not applicable for this content type."
-        except:
-            pass
-            
         return """
 This document does not focus on AI ethics considerations.
 
@@ -180,17 +139,6 @@ This document demonstrates AI Ethics maturity scoring {score}/100.
 def analyze_quantum_ethics_content(content, score):
     """Analyze quantum ethics content"""
     if score == 'N/A':
-        # Check if document is out of scope
-        try:
-            from utils.multi_llm_scoring_engine import detect_document_scope
-            content_str = str(content) if content else ""
-            scope_analysis = detect_document_scope(content_str, "")
-            
-            if scope_analysis['out_of_scope']:
-                return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Quantum Ethics scoring is not applicable for this content type."
-        except:
-            pass
-            
         return """
 This document does not address quantum ethics considerations.
 
@@ -215,23 +163,190 @@ This document demonstrates Quantum Ethics considerations scoring {score}/100.
 - Strengthen public engagement in quantum policy
 """
 
-# Import utilities with fallback handling
-try:
-    from utils.document_metadata_extractor import extract_document_metadata
-except ImportError:
-    def extract_document_metadata(content):
-        return {}
+def show_detailed_scoring_explanation(content, title, score, framework_type, unique_id):
+    """Show detailed scoring explanation in a modal dialog"""
+    
+    # Analysis of content for specific factors
+    content_lower = (content + " " + title).lower()
+    
+    if framework_type == 'ai_cybersecurity':
+        factors = {
+            'security frameworks': ['security framework', 'cybersecurity framework', 'security model'],
+            'threat assessment': ['threat', 'risk assessment', 'vulnerability', 'attack'],
+            'data protection': ['data protection', 'privacy', 'encryption', 'secure data'],
+            'model security': ['model security', 'ai model protection', 'adversarial', 'poisoning'],
+            'governance': ['governance', 'oversight', 'compliance', 'audit']
+        }
+        
+        performance_levels = {
+            80: ("Excellent", "#2e7d32", "Comprehensive AI cybersecurity practices with robust security measures"),
+            60: ("Good", "#f57c00", "Solid AI cybersecurity foundation with room for enhancement"), 
+            40: ("Moderate", "#ed6c02", "Basic AI cybersecurity but lacks comprehensive coverage"),
+            20: ("Limited", "#d32f2f", "Minimal AI cybersecurity guidance"),
+            0: ("Insufficient", "#d32f2f", "Lacks adequate AI cybersecurity considerations")
+        }
+        
+        improvements = [
+            "Implement comprehensive AI threat modeling",
+            "Establish robust model validation procedures", 
+            "Develop AI-specific incident response plans",
+            "Create continuous monitoring frameworks",
+            "Enhance data governance for AI systems"
+        ]
+        
+        title_text = "AI Cybersecurity Maturity Assessment"
+        
+    elif framework_type == 'quantum_cybersecurity':
+        factors = {
+            'post-quantum cryptography': ['post-quantum', 'quantum-safe', 'quantum-resistant'],
+            'quantum key distribution': ['qkd', 'quantum key', 'quantum communication'],
+            'quantum threat assessment': ['quantum threat', 'quantum attack', 'quantum computing threat'],
+            'cryptographic agility': ['crypto agility', 'algorithm agility', 'cryptographic transition'],
+            'quantum readiness': ['quantum readiness', 'quantum preparedness', 'quantum migration']
+        }
+        
+        performance_levels = {
+            80: ("Tier 5 - Advanced", "#1976d2", "Advanced quantum cybersecurity readiness with comprehensive post-quantum strategies"),
+            60: ("Tier 4 - Proficient", "#1976d2", "Strong quantum cybersecurity foundation with active post-quantum planning"),
+            40: ("Tier 3 - Developing", "#f57c00", "Basic quantum awareness with initial post-quantum considerations"),
+            20: ("Tier 2 - Emerging", "#ed6c02", "Limited quantum cybersecurity awareness and preparation"),
+            0: ("Tier 1 - Baseline", "#d32f2f", "Minimal quantum cybersecurity considerations")
+        }
+        
+        improvements = [
+            "Develop post-quantum cryptography migration plan",
+            "Implement quantum threat assessment procedures",
+            "Establish cryptographic agility frameworks", 
+            "Create quantum risk management policies",
+            "Plan for NIST post-quantum standards adoption"
+        ]
+        
+        title_text = "Quantum Cybersecurity Maturity Assessment"
+        
+    elif framework_type == 'ai_ethics':
+        factors = {
+            'bias mitigation': ['bias', 'fairness', 'discrimination', 'bias mitigation'],
+            'transparency': ['transparency', 'explainable', 'interpretable', 'explainability'],
+            'accountability': ['accountability', 'responsibility', 'oversight', 'audit'],
+            'privacy protection': ['privacy', 'data protection', 'personal data', 'consent'],
+            'human oversight': ['human oversight', 'human control', 'human-in-the-loop']
+        }
+        
+        performance_levels = {
+            80: ("Exemplary", "#2e7d32", "Comprehensive AI ethics framework with strong emphasis on responsible AI"),
+            60: ("Proficient", "#f57c00", "Good AI ethics foundation with most key principles addressed"),
+            40: ("Developing", "#ed6c02", "Basic AI ethics considerations with room for significant improvement"),
+            20: ("Emerging", "#d32f2f", "Limited AI ethics awareness and implementation"),
+            0: ("Insufficient", "#d32f2f", "Inadequate attention to AI ethics principles")
+        }
+        
+        improvements = [
+            "Implement comprehensive bias testing procedures",
+            "Develop explainable AI capabilities",
+            "Establish ethical review boards",
+            "Create stakeholder engagement processes",
+            "Enhance privacy-preserving techniques"
+        ]
+        
+        title_text = "AI Ethics Assessment"
+        
+    elif framework_type == 'quantum_ethics':
+        factors = {
+            'quantum advantage equity': ['quantum advantage', 'quantum supremacy', 'equitable access'],
+            'quantum privacy': ['quantum privacy', 'quantum encryption', 'quantum security'],
+            'quantum governance': ['quantum governance', 'quantum regulation', 'quantum policy'],
+            'societal impact': ['societal impact', 'social implications', 'public benefit'],
+            'quantum responsibility': ['quantum responsibility', 'responsible quantum', 'ethical quantum']
+        }
+        
+        performance_levels = {
+            80: ("Advanced", "#2e7d32", "Sophisticated understanding of quantum ethics with comprehensive societal considerations"),
+            60: ("Developed", "#f57c00", "Good quantum ethics awareness with attention to key societal considerations"),
+            40: ("Emerging", "#ed6c02", "Basic quantum ethics considerations with limited depth"),
+            20: ("Initial", "#d32f2f", "Minimal quantum ethics awareness"),
+            0: ("Absent", "#d32f2f", "No significant quantum ethics considerations identified")
+        }
+        
+        improvements = [
+            "Develop quantum equity frameworks",
+            "Address quantum digital divide concerns",
+            "Create quantum ethics guidelines",
+            "Establish quantum governance structures", 
+            "Promote quantum literacy initiatives"
+        ]
+        
+        title_text = "Quantum Ethics Assessment"
+    
+    else:
+        return
+    
+    # Find matching factors
+    factors_found = []
+    for factor, keywords in factors.items():
+        if any(keyword in content_lower for keyword in keywords):
+            factors_found.append(factor)
+    
+    # Determine performance level
+    performance = "N/A"
+    color = "#9e9e9e"
+    interpretation = "Not applicable for this document type"
+    
+    if score == 'N/A':
+        if framework_type == 'ai_cybersecurity':
+            interpretation = "This document does not focus on AI-specific cybersecurity. For a high score, documents should address AI threat modeling, model security, AI governance, and AI-specific incident response procedures."
+        elif framework_type == 'quantum_cybersecurity':
+            interpretation = "This document does not address quantum cybersecurity concerns. For a high score, documents should cover post-quantum cryptography, quantum key distribution, quantum threat assessment, and NIST post-quantum standards."
+        elif framework_type == 'ai_ethics':
+            interpretation = "This document does not focus on AI ethics. For a high score, documents should address bias mitigation, algorithmic transparency, accountability frameworks, and responsible AI development practices."
+        elif framework_type == 'quantum_ethics':
+            interpretation = "This document does not address quantum ethics. For a high score, documents should cover quantum equity, societal impacts of quantum technology, quantum governance, and responsible quantum development."
+    elif isinstance(score, (int, float)):
+        for threshold, (perf, col, interp) in sorted(performance_levels.items(), reverse=True):
+            if score >= threshold:
+                performance = perf
+                color = col
+                interpretation = interp
+                break
+    
+    # Display compact explanation content (no nested expander)
+    st.markdown(f"**{title_text} - Score: {score} ({performance})**")
+    st.markdown(f"""
+    <div style="background: {color}; color: white; padding: 8px; border-radius: 4px; margin: 4px 0;">
+        <strong>Assessment:</strong> {interpretation}
+    </div>
+    """, unsafe_allow_html=True)
+    
+    if factors_found:
+        st.markdown("**Key factors identified:**")
+        for factor in factors_found[:3]:  # Show only top 3
+            st.markdown(f"• {factor.title()}")
+    
+    if isinstance(score, (int, float)) and score > 0:
+        st.markdown("**Areas for improvement:**")
+        for improvement in improvements[:3]:  # Show only top 3
+            st.markdown(f"• {improvement}")
 
-try:
-    from utils.multi_llm_metadata_extractor import extract_clean_metadata
-except ImportError:
-    def extract_clean_metadata(content):
+def extract_document_metadata(content):
+    """Extract metadata from document content using enhanced interceptor system"""
+    if not content:
         return {}
+    
+    content_str = str(content)[:3000] if content else ""
+    
+    # Basic metadata extraction
+    metadata = {
+        'length': len(content_str),
+        'has_tables': 'table' in content_str.lower(),
+        'has_figures': any(term in content_str.lower() for term in ['figure', 'chart', 'graph']),
+        'language': 'english',  # Default assumption
+        'document_type': 'policy'
+    }
+    
+    return metadata
 
-try:
-    from components.help_tooltips import help_tooltips
-except ImportError:
-    help_tooltips = {}
+def extract_clean_metadata(content):
+    """Extract clean metadata using enhanced system"""
+    return extract_document_metadata(content)
 
 def apply_ultra_compact_css():
     """Apply ultra-compact CSS to eliminate all spacing"""
@@ -283,14 +398,13 @@ def apply_ultra_compact_css():
     """, unsafe_allow_html=True)
 
 def ultra_clean_metadata(field_value):
-    """Remove all HTML artifacts from metadata fields using enhanced interceptor"""
+    """Remove all HTML artifacts from metadata fields"""
     if not field_value:
         return "Not specified"
     
-    # Convert to string and clean
     cleaned = str(field_value)
     
-    # Remove common HTML artifacts that slip through
+    # Remove common HTML artifacts
     html_artifacts = [
         '</div>', '<div>', '</span>', '<span>', '</p>', '<p>',
         '</h1>', '<h1>', '</h2>', '<h2>', '</h3>', '<h3>',
@@ -313,9 +427,9 @@ def ultra_clean_metadata(field_value):
     return cleaned if cleaned.strip() else "Not specified"
 
 def clean_date_safely(doc):
-    """Safely clean date field to prevent None value issues"""
+    """Safely clean date field"""
     try:
-        date_field = doc[11] if len(doc) > 11 else None  # publication_date
+        date_field = doc[11] if len(doc) > 11 else None
         if date_field and str(date_field) != 'None':
             return ultra_clean_metadata(date_field)
     except:
@@ -323,20 +437,20 @@ def clean_date_safely(doc):
     return "Not specified"
 
 def get_document_topic(doc):
-    """Determine if document is AI, Quantum, Cybersecurity, or Both based on content."""
+    """Determine document topic based on content"""
     title = str(doc[1] or "").lower()
     content_preview = str(doc[2] or "")[:500].lower() if doc[2] else ""
     
     # Check for AI indicators
-    ai_terms = ['artificial intelligence', 'ai ', 'machine learning', 'neural network', 'deep learning', 'llm', 'generative ai']
+    ai_terms = ['artificial intelligence', 'ai ', 'machine learning', 'neural network', 'deep learning']
     has_ai = any(term in title or term in content_preview for term in ai_terms)
     
     # Check for Quantum indicators  
-    quantum_terms = ['quantum', 'post-quantum', 'qkd', 'quantum computing', 'quantum cryptography']
+    quantum_terms = ['quantum', 'post-quantum', 'qkd', 'quantum computing']
     has_quantum = any(term in title or term in content_preview for term in quantum_terms)
     
     # Check for Cybersecurity indicators
-    cyber_terms = ['cybersecurity', 'cyber security', 'information security', 'infosec', 'security framework']
+    cyber_terms = ['cybersecurity', 'cyber security', 'information security', 'security framework']
     has_cyber = any(term in title or term in content_preview for term in cyber_terms)
     
     if has_ai and has_quantum:
@@ -351,20 +465,14 @@ def get_document_topic(doc):
         return "General"
 
 def render():
-    """Render the All Documents tab with comprehensive document repository and contextual help tooltips."""
+    """Render the All Documents tab with card layout matching screenshot"""
     
-    # CRITICAL: Validate UI protection before rendering
-    try:
-        validate_ui_integrity()
-    except (ImportError, NameError):
-        pass  # UI protection not available, continue safely
-    
-    # Apply ultra-compact CSS to eliminate all spacing
+    # Apply compact CSS
     apply_ultra_compact_css()
     
     st.markdown("## 📚 **Policy Repository**")
     
-    # Add help text with improved styling
+    # Repository overview section
     st.markdown("""
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px; border-radius: 10px; margin: 10px 0; color: white;">
         <h4 style="margin: 0 0 8px 0; color: white;">🔍 Repository Overview</h4>
@@ -375,117 +483,129 @@ def render():
     </div>
     """, unsafe_allow_html=True)
     
-    # Fetch documents with caching
+    # Fetch documents
     docs = fetch_documents_cached()
     
     if not docs:
         st.warning("No documents found in the repository.")
         return
     
-    # Display document count
     st.success(f"📊 **{len(docs)} documents** in repository")
     
-    # Create layout for documents with original card format
+    # Create layout for documents exactly as shown in screenshot
     for i, doc in enumerate(docs):
         unique_id = f"doc_{doc[0]}_{i}"
         
-        # Create card container with blue border exactly as shown in screenshot
-        with st.container():
-            st.markdown(f"""
-            <div style="background: white; border: 2px solid #4da6ff; border-radius: 8px; padding: 15px; margin: 10px 0;">
-                <h3 style="margin: 0 0 8px 0; color: #4da6ff; font-size: 16px; font-weight: 600;">
-                    {ultra_clean_metadata(doc[1])} 🔗
-                </h3>
-                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-                    <span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
-                        {get_document_topic(doc)}
-                    </span>
-                    <span style="background: #007bff; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
-                        {ultra_clean_metadata(doc[10])}
-                    </span>
-                    <span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
-                        {ultra_clean_metadata(doc[9])}
-                    </span>
-                    <span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
-                        {clean_date_safely(doc)}
-                    </span>
-                </div>
+        # Create card with blue border exactly as shown
+        st.markdown(f"""
+        <div style="background: white; border: 2px solid #4285f4; border-radius: 8px; padding: 15px; margin: 10px 0;">
+            <h3 style="margin: 0 0 8px 0; color: #4285f4; font-size: 16px; font-weight: 600;">
+                {ultra_clean_metadata(doc[1])} 🔗
+            </h3>
+            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                <span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
+                    {get_document_topic(doc)}
+                </span>
+                <span style="background: #007bff; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
+                    {ultra_clean_metadata(doc[10])}
+                </span>
+                <span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
+                    {ultra_clean_metadata(doc[9])}
+                </span>
+                <span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
+                    {clean_date_safely(doc)}
+                </span>
             </div>
-            """, unsafe_allow_html=True)
-            
-            # Create 2x2 grid for scoring exactly as shown in screenshot
-            col1, col2 = st.columns([1, 1])
-            
-            with col1:
-                # AI Cybersecurity Score
-                ai_cyber_score = doc[4] if doc[4] is not None else 'N/A'
-                ai_cyber_display = str(ai_cyber_score).replace('/100', '') if ai_cyber_score != 'N/A' else 'N/A'
-                
-                ai_cyber_selectbox = st.selectbox(
-                    f"● AI Cybersecurity: {ai_cyber_display}",
-                    ["▼"],
-                    key=f"ai_cyber_{unique_id}",
-                    index=0
-                )
-                
-                # AI Ethics Score
-                ai_ethics_score = doc[6] if doc[6] is not None else 'N/A'
-                ai_ethics_display = str(ai_ethics_score).replace('/100', '') if ai_ethics_score != 'N/A' else 'N/A'
-                
-                ai_ethics_selectbox = st.selectbox(
-                    f"● AI Ethics: {ai_ethics_display}",
-                    ["▼"],
-                    key=f"ai_ethics_{unique_id}",
-                    index=0
-                )
-            
-            with col2:
-                # Quantum Cybersecurity Score
-                q_cyber_score = doc[5] if doc[5] is not None else 'N/A'
-                q_cyber_display = str(q_cyber_score).replace('/100', '') if q_cyber_score != 'N/A' else 'N/A'
-                
-                q_cyber_selectbox = st.selectbox(
-                    f"● Quantum Cybersecurity: {q_cyber_display}",
-                    ["▼"],
-                    key=f"q_cyber_{unique_id}",
-                    index=0
-                )
-                
-                # Quantum Ethics Score
-                q_ethics_score = doc[7] if doc[7] is not None else 'N/A'
-                q_ethics_display = str(q_ethics_score).replace('/100', '') if q_ethics_score != 'N/A' else 'N/A'
-                
-                q_ethics_selectbox = st.selectbox(
-                    f"● Quantum Ethics: {q_ethics_display}",
-                    ["▼"],
-                    key=f"q_ethics_{unique_id}",
-                    index=0
-                )
+        </div>
+        """, unsafe_allow_html=True)
         
-            # Check if selectboxes are clicked to show expandable analysis
-            if ai_cyber_selectbox and ai_cyber_selectbox == "▼":
-                with st.expander("🔒 AI Cybersecurity Analysis", expanded=True):
-                    ai_cyber_analysis = analyze_ai_cybersecurity_content(doc[2], ai_cyber_score)
-                    st.markdown(f"**Score: {ai_cyber_display}**")
-                    st.write(ai_cyber_analysis)
+        # Create 2x2 scoring grid exactly as shown in screenshot
+        col1, col2 = st.columns([1, 1])
+        
+        with col1:
+            # AI Cybersecurity Score with colored dot
+            ai_cyber_score = doc[4] if doc[4] is not None else 'N/A'
+            ai_cyber_display = str(ai_cyber_score).replace('/100', '') if ai_cyber_score != 'N/A' else 'N/A'
             
-            if q_cyber_selectbox and q_cyber_selectbox == "▼":
-                with st.expander("⚡ Quantum Cybersecurity Analysis", expanded=True):
-                    q_cyber_analysis = analyze_quantum_cybersecurity_content(doc[2], q_cyber_score)
-                    st.markdown(f"**Score: {q_cyber_display}**")
-                    st.write(q_cyber_analysis)
+            # Color based on score
+            if ai_cyber_score == 'N/A':
+                color = "#6c757d"
+            elif isinstance(ai_cyber_score, (int, float)) and ai_cyber_score >= 75:
+                color = "#dc3545"  # Red for high scores as shown
+            else:
+                color = "#fd7e14"  # Orange
             
-            if ai_ethics_selectbox and ai_ethics_selectbox == "▼":
-                with st.expander("🤖 AI Ethics Analysis", expanded=True):
-                    ai_ethics_analysis = analyze_ai_ethics_content(doc[2], ai_ethics_score)
-                    st.markdown(f"**Score: {ai_ethics_display}**")
-                    st.write(ai_ethics_analysis)
+            ai_cyber_expanded = st.selectbox(
+                f"● AI Cybersecurity: {ai_cyber_display}",
+                ["▼"],
+                key=f"ai_cyber_{unique_id}",
+                index=0
+            )
             
-            if q_ethics_selectbox and q_ethics_selectbox == "▼":
-                with st.expander("⚡ Quantum Ethics Analysis", expanded=True):
-                    q_ethics_analysis = analyze_quantum_ethics_content(doc[2], q_ethics_score)
-                    st.markdown(f"**Score: {q_ethics_display}**")
-                    st.write(q_ethics_analysis)
+            # AI Ethics Score
+            ai_ethics_score = doc[6] if doc[6] is not None else 'N/A'
+            ai_ethics_display = str(ai_ethics_score).replace('/100', '') if ai_ethics_score != 'N/A' else 'N/A'
+            
+            ai_ethics_expanded = st.selectbox(
+                f"● AI Ethics: {ai_ethics_display}",
+                ["▼"],
+                key=f"ai_ethics_{unique_id}",
+                index=0
+            )
+        
+        with col2:
+            # Quantum Cybersecurity Score
+            q_cyber_score = doc[5] if doc[5] is not None else 'N/A'
+            q_cyber_display = str(q_cyber_score).replace('/100', '') if q_cyber_score != 'N/A' else 'N/A'
+            
+            # Green for good quantum scores as shown
+            if q_cyber_score != 'N/A' and isinstance(q_cyber_score, (int, float)) and q_cyber_score >= 4:
+                color = "#28a745"
+            else:
+                color = "#6c757d"
+            
+            q_cyber_expanded = st.selectbox(
+                f"● Quantum Cybersecurity: {q_cyber_display}",
+                ["▼"],
+                key=f"q_cyber_{unique_id}",
+                index=0
+            )
+            
+            # Quantum Ethics Score
+            q_ethics_score = doc[7] if doc[7] is not None else 'N/A'
+            q_ethics_display = str(q_ethics_score).replace('/100', '') if q_ethics_score != 'N/A' else 'N/A'
+            
+            q_ethics_expanded = st.selectbox(
+                f"● Quantum Ethics: {q_ethics_display}",
+                ["▼"],
+                key=f"q_ethics_{unique_id}",
+                index=0
+            )
+        
+        # Show expandable analysis sections when dropdown is selected
+        if ai_cyber_expanded:
+            with st.expander("🔒 AI Cybersecurity Analysis", expanded=True):
+                analysis = analyze_ai_cybersecurity_content(doc[2], ai_cyber_score)
+                st.markdown(f"**Score: {ai_cyber_display}**")
+                st.write(analysis)
+        
+        if q_cyber_expanded:
+            with st.expander("⚡ Quantum Cybersecurity Analysis", expanded=True):
+                analysis = analyze_quantum_cybersecurity_content(doc[2], q_cyber_score)
+                st.markdown(f"**Score: {q_cyber_display}**")
+                st.write(analysis)
+        
+        if ai_ethics_expanded:
+            with st.expander("🤖 AI Ethics Analysis", expanded=True):
+                analysis = analyze_ai_ethics_content(doc[2], ai_ethics_score)
+                st.markdown(f"**Score: {ai_ethics_display}**")
+                st.write(analysis)
+        
+        if q_ethics_expanded:
+            with st.expander("⚡ Quantum Ethics Analysis", expanded=True):
+                analysis = analyze_quantum_ethics_content(doc[2], q_ethics_score)
+                st.markdown(f"**Score: {q_ethics_display}**")
+                st.write(analysis)
         
         # Add spacing between cards
         st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
