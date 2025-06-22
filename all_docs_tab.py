@@ -191,17 +191,7 @@ def analyze_quantum_ethics_content(content, score):
         return """
 This document does not address quantum ethics considerations.
 
-**For a high Quantum Ethics score, documents should include:**
-- Quantum equity and digital divide considerations
-- Societal impacts of quantum technology advancement
-- Quantum governance frameworks and policy development
-- Responsible quantum research and development practices
-- Public engagement in quantum technology decisions
-- Quantum workforce development and education ethics
-- International cooperation on quantum technology governance
-- Environmental and sustainability impacts of quantum computing
-
-**Current Classification:** This document appears to focus on cybersecurity, AI, or other topics rather than quantum ethics and societal implications.
+GUARDIAN specializes in cybersecurity, AI, and quantum technology policy assessment. This document appears to be outside these specialized domains.
 """
     
     try:
@@ -902,7 +892,8 @@ def render():
                 colorClass = 'score-button-gray';
                 bgColor = '#6c757d';
             } else {
-                // Check for numeric scores - fixed regex pattern
+                // Default handling for other cases
+            }
                 const scoreMatch = text.match(/(\d+)\/100/);
                 if (scoreMatch) {
                     const score = parseInt(scoreMatch[1]);
@@ -5546,3 +5537,14 @@ def render_card_view(docs):
             if st.session_state.get(f'show_q_ethics_{unique_id}', False):
                 with st.expander("⚡ Quantum Ethics Analysis", expanded=True):
                     st.markdown(f"**Score: {q_ethics_display}**")
+                    st.write(q_ethics_analysis)
+                    if st.button("Close", key=f"close_q_ethics_{unique_id}"):
+                        st.session_state[f'show_q_ethics_{unique_id}'] = False
+                        st.rerun()
+            
+
+            
+            st.markdown("</div>", unsafe_allow_html=True)
+            
+            # Add spacing between cards
+            st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
