@@ -177,52 +177,122 @@ def render_card_view(docs):
         content = get_document_content_cached(doc_id, url)
         scores = comprehensive_document_scoring_cached(content, title)
         
-        # Create card layout
+        # Create detailed card layout matching target design
         with st.container():
             st.markdown(f"""
-            <div style='border:1px solid #007bff;padding:20px;border-radius:12px;margin:8px;
-                        background:linear-gradient(135deg, #f8f9ff 0%, #e3f2fd 100%);
-                        box-shadow:0 4px 12px rgba(0,123,255,0.15);'>
-                <h3 style='color:#1976d2;margin:0 0 12px 0;font-family:"Segoe UI",sans-serif;
-                          font-size:18px;font-weight:600;'>{title}</h3>
-                <p style='color:#666;margin:4px 0;font-size:14px;'>
-                    <strong>Organization:</strong> {organization}<br>
-                    <strong>Date:</strong> {upload_date}<br>
-                    <strong>Type:</strong> {metadata.get('document_type', 'Policy Document')}
-                </p>
+            <div style='border: 2px solid #007bff; border-radius: 12px; padding: 20px; margin: 10px 0; 
+                        background: linear-gradient(135deg, #f8f9ff 0%, #e8f4fd 100%);
+                        box-shadow: 0 6px 20px rgba(0, 123, 255, 0.15);'>
+                <h3 style='color: #1976d2; margin: 0 0 15px 0; font-family: "Segoe UI", Arial, sans-serif;
+                          font-size: 20px; font-weight: 600; line-height: 1.3;'>{title}</h3>
+                <div style='margin-bottom: 15px;'>
+                    <p style='color: #666; margin: 0; font-size: 14px; line-height: 1.5;'>
+                        <span style='font-weight: 600; color: #444;'>Organization:</span> {organization}<br>
+                        <span style='font-weight: 600; color: #444;'>Date:</span> {upload_date}<br>
+                        <span style='font-weight: 600; color: #444;'>Type:</span> {metadata.get('document_type', 'Policy Document')}
+                    </p>
+                </div>
             </div>
             """, unsafe_allow_html=True)
             
-            # Scoring section
+            # Create scoring section with colored dropdowns matching target design
             col1, col2, col3, col4 = st.columns(4)
             
+            def get_score_color(score):
+                if score == 'N/A':
+                    return '#6c757d'
+                elif 'Tier 1' in str(score) or 'Tier 2' in str(score):
+                    return '#dc3545'
+                elif 'Tier 3' in str(score):
+                    return '#fd7e14'
+                elif 'Tier 4' in str(score) or 'Tier 5' in str(score):
+                    return '#28a745'
+                else:
+                    return '#6c757d'
+            
             with col1:
-                if st.button(f"AI Cyber: {scores['ai_cybersecurity']}", key=f"ai_cyber_{doc_id}"):
-                    with st.expander("🤖 AI Cybersecurity Analysis", expanded=True):
-                        analysis = analyze_ai_cybersecurity_content(content, scores['ai_cybersecurity'])
-                        st.markdown(analysis)
+                score_color = get_score_color(scores['ai_cybersecurity'])
+                with st.expander(f"🔧 AI Cybersecurity: {scores['ai_cybersecurity']}", expanded=False):
+                    st.markdown(f"""
+                    <style>
+                    div[data-testid="stExpander"] > div:first-child {{
+                        background-color: {score_color} !important;
+                        color: white !important;
+                        border-radius: 6px !important;
+                        font-weight: bold !important;
+                        font-size: 12px !important;
+                    }}
+                    </style>
+                    """, unsafe_allow_html=True)
+                    analysis = analyze_ai_cybersecurity_content(content, scores['ai_cybersecurity'])
+                    st.markdown(analysis)
             
             with col2:
-                if st.button(f"Q Cyber: {scores['quantum_cybersecurity']}", key=f"q_cyber_{doc_id}"):
-                    with st.expander("🔐 Quantum Cybersecurity Analysis", expanded=True):
-                        analysis = analyze_quantum_cybersecurity_content(content, scores['quantum_cybersecurity'])
-                        st.markdown(analysis)
+                score_color = get_score_color(scores['quantum_cybersecurity'])
+                with st.expander(f"🔐 Quantum Cybersecurity: {scores['quantum_cybersecurity']}", expanded=False):
+                    st.markdown(f"""
+                    <style>
+                    div[data-testid="stExpander"] > div:first-child {{
+                        background-color: {score_color} !important;
+                        color: white !important;
+                        border-radius: 6px !important;
+                        font-weight: bold !important;
+                        font-size: 12px !important;
+                    }}
+                    </style>
+                    """, unsafe_allow_html=True)
+                    analysis = analyze_quantum_cybersecurity_content(content, scores['quantum_cybersecurity'])
+                    st.markdown(analysis)
             
             with col3:
-                if st.button(f"AI Ethics: {scores['ai_ethics']}", key=f"ai_ethics_{doc_id}"):
-                    with st.expander("⚖️ AI Ethics Analysis", expanded=True):
-                        analysis = analyze_ai_ethics_content(content, scores['ai_ethics'])
-                        st.markdown(analysis)
+                score_color = get_score_color(scores['ai_ethics'])
+                with st.expander(f"⚖️ AI Ethics: {scores['ai_ethics']}", expanded=False):
+                    st.markdown(f"""
+                    <style>
+                    div[data-testid="stExpander"] > div:first-child {{
+                        background-color: {score_color} !important;
+                        color: white !important;
+                        border-radius: 6px !important;
+                        font-weight: bold !important;
+                        font-size: 12px !important;
+                    }}
+                    </style>
+                    """, unsafe_allow_html=True)
+                    analysis = analyze_ai_ethics_content(content, scores['ai_ethics'])
+                    st.markdown(analysis)
             
             with col4:
-                if st.button(f"Q Ethics: {scores['quantum_ethics']}", key=f"q_ethics_{doc_id}"):
-                    with st.expander("🌟 Quantum Ethics Analysis", expanded=True):
-                        analysis = analyze_quantum_ethics_content(content, scores['quantum_ethics'])
-                        st.markdown(analysis)
+                score_color = get_score_color(scores['quantum_ethics'])
+                with st.expander(f"🌟 Quantum Ethics: {scores['quantum_ethics']}", expanded=False):
+                    st.markdown(f"""
+                    <style>
+                    div[data-testid="stExpander"] > div:first-child {{
+                        background-color: {score_color} !important;
+                        color: white !important;
+                        border-radius: 6px !important;
+                        font-weight: bold !important;
+                        font-size: 12px !important;
+                    }}
+                    </style>
+                    """, unsafe_allow_html=True)
+                    analysis = analyze_quantum_ethics_content(content, scores['quantum_ethics'])
+                    st.markdown(analysis)
 
 def render():
     """Render the All Documents tab"""
+    # Add GUARDIAN header with logo
+    st.markdown("""
+    <div style='text-align: center; margin-bottom: 30px;'>
+        <div style='display: inline-block; margin-bottom: 20px;'>
+            <span style='font-size: 48px; color: #dc3545;'>🦅</span>
+            <h1 style='display: inline; margin-left: 15px; color: #dc3545; font-family: "Arial Black", Arial, sans-serif; 
+                      font-size: 36px; font-weight: 900; letter-spacing: 2px;'>GUARDIAN</h1>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
     st.markdown("## 📚 **Policy Repository**")
+    st.markdown("Repository with comprehensive document analysis and risk assessment frameworks.")
     
     docs = fetch_documents_cached()
     if not docs:
@@ -231,5 +301,5 @@ def render():
     
     st.success(f"📊 **{len(docs)} documents** in repository")
     
-    # Display documents with card view
+    # Display documents with enhanced card view
     render_card_view(docs)
