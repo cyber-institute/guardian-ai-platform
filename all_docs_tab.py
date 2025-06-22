@@ -82,21 +82,26 @@ def analyze_ai_cybersecurity_content(content, score):
         return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
     
     if score == 'N/A':
-        
         return """
-This document does not focus on AI-specific cybersecurity concerns.
-
-**For a high AI Cybersecurity score, documents should include:**
-- AI-specific threat modeling and adversarial attack mitigation
-- Secure AI development lifecycle and security-by-design principles
-- AI model security, including protection against model poisoning and bias attacks
-- AI system vulnerability assessment and penetration testing methodologies
-- Authentication and authorization frameworks for AI systems
-- Differential privacy and federated learning security measures
-- AI red team exercises and security validation processes
-- Integration with existing cybersecurity frameworks (NIST, ISO 27001)
+This document does not focus on AI cybersecurity considerations.
 
 **Current Classification:** This document appears to focus on general cybersecurity, identity management, or other topics rather than AI-specific security considerations.
+
+**Strengths:**
+• N/A
+
+**Weaknesses:**
+• N/A
+
+**Recommendations:**
+• Include AI-specific threat modeling and adversarial attack mitigation
+• Develop secure AI development lifecycle and security-by-design principles
+• Add AI model security, including protection against model poisoning and bias attacks
+• Implement AI system vulnerability assessment and penetration testing methodologies
+• Establish authentication and authorization frameworks for AI systems
+• Incorporate differential privacy and federated learning security measures
+• Conduct AI red team exercises and security validation processes
+• Integrate with existing cybersecurity frameworks (NIST, ISO 27001)
 """
     
     try:
@@ -128,21 +133,26 @@ def analyze_quantum_cybersecurity_content(content, score):
         return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
     
     if score == 'N/A':
-        
         return """
 This document does not focus on quantum cybersecurity considerations.
 
-**For a high Quantum Cybersecurity score, documents should include:**
-- Post-quantum cryptography (PQC) adoption strategies and implementation timelines
-- Quantum key distribution (QKD) protocols and quantum-safe communication methods
-- Migration planning from current cryptographic systems to quantum-resistant alternatives
-- Quantum threat assessment and risk mitigation frameworks
-- Cryptographic agility principles for quantum-safe transitions
-- NIST post-quantum cryptographic standards and algorithm selection
-- Quantum computing threat modeling and impact analysis
-- Timeline and roadmap for quantum-safe infrastructure deployment
-
 **Current Classification:** This document appears to focus on general cybersecurity, identity management, or other topics rather than quantum-specific security considerations.
+
+**Strengths:**
+• N/A
+
+**Weaknesses:**
+• N/A
+
+**Recommendations:**
+• Include post-quantum cryptography (PQC) adoption strategies and implementation timelines
+• Develop quantum key distribution (QKD) protocols and quantum-safe communication methods
+• Create migration planning from current cryptographic systems to quantum-resistant alternatives
+• Establish quantum threat assessment and risk mitigation frameworks
+• Implement cryptographic agility principles for quantum-safe transitions
+• Adopt NIST post-quantum cryptographic standards and algorithm selection
+• Conduct quantum computing threat modeling and impact analysis
+• Develop timeline and roadmap for quantum-safe infrastructure deployment
 - Cryptographic agility frameworks and transition planning
 - NIST post-quantum cryptographic standards adoption
 - Quantum-safe algorithm evaluation and selection
@@ -181,21 +191,26 @@ def analyze_ai_ethics_content(content, score):
         return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
     
     if score == 'N/A':
-        
         return """
 This document does not focus on AI ethics considerations.
 
-**For a high AI Ethics score, documents should include:**
-- Bias mitigation strategies and algorithmic fairness measures
-- Transparency and explainability requirements for AI systems
-- Accountability frameworks and responsible AI governance
-- Privacy protection and data rights in AI applications
-- Human oversight and human-in-the-loop decision making
-- Stakeholder engagement and participatory AI development
-- Ethical review processes and impact assessments
-- Inclusive AI design and equitable access considerations
-
 **Current Classification:** This document appears to focus on cybersecurity, quantum technology, or other topics rather than AI ethics principles.
+
+**Strengths:**
+• N/A
+
+**Weaknesses:**
+• N/A
+
+**Recommendations:**
+• Include bias mitigation strategies and algorithmic fairness measures
+• Add transparency and explainability requirements for AI systems
+• Establish accountability frameworks and responsible AI governance
+• Implement privacy protection and data rights in AI applications
+• Ensure human oversight and human-in-the-loop decision making
+• Develop stakeholder engagement and participatory AI development
+• Create ethical review processes and impact assessments
+• Design inclusive AI and equitable access considerations
 - Bias mitigation strategies and algorithmic fairness measures
 - Transparency and explainability requirements for AI systems
 - Accountability frameworks and responsible AI governance
@@ -237,21 +252,26 @@ def analyze_quantum_ethics_content(content, score):
         return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
     
     if score == 'N/A':
-        
         return """
 This document does not focus on quantum ethics considerations.
 
-**For a high Quantum Ethics score, documents should include:**
-- Quantum computing ethics and equitable access frameworks
-- Quantum divide mitigation and global accessibility strategies
-- Responsible quantum technology development principles
-- Quantum governance and international cooperation frameworks
-- Privacy implications of quantum computing technologies
-- Quantum workforce development and education equity
-- Environmental and societal impact assessments of quantum technologies
-- Quantum computing democratization and open science principles
-
 **Current Classification:** This document appears to focus on cybersecurity, identity management, or other topics rather than quantum ethics considerations.
+
+**Strengths:**
+• N/A
+
+**Weaknesses:**
+• N/A
+
+**Recommendations:**
+• Include quantum computing ethics and equitable access frameworks
+• Develop quantum divide mitigation and global accessibility strategies
+• Establish responsible quantum technology development principles
+• Create quantum governance and international cooperation frameworks
+• Address privacy implications of quantum computing technologies
+• Implement quantum workforce development and education equity
+• Conduct environmental and societal impact assessments of quantum technologies
+• Promote quantum computing democratization and open science principles
 - Quantum equity and digital divide considerations
 - Societal impacts of quantum technology advancement
 - Quantum governance frameworks and policy development
