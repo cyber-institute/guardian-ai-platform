@@ -743,7 +743,208 @@ def render():
     # Apply ultra-compact CSS to eliminate all spacing
     apply_ultra_compact_css()
     
-    # Override button font with intelligent color coding
+    # Apply basic button styling without CSS conflicts
+    
+    # Add comprehensive color styling using both CSS and JavaScript
+    st.markdown("""
+    <style>
+    /* Ultra-high specificity CSS targeting for score buttons */
+    button[data-testid="baseButton-secondary"]:has-text("/100"),
+    button[data-testid="baseButton-secondary"]:has-text("Tier"),
+    button[data-testid="baseButton-secondary"]:has-text("N/A"),
+    .stButton > button:has-text("/100"),
+    .stButton > button:has-text("Tier"),
+    .stButton > button:has-text("N/A") {
+        font-size: 8px !important;
+        font-weight: bold !important;
+        padding: 2px 6px !important;
+        margin: 1px !important;
+        border-radius: 4px !important;
+    }
+    
+    /* Color classes with maximum specificity */
+    .score-button-red,
+    button.score-button-red,
+    .stButton > button.score-button-red,
+    div[data-testid="stButton"] > button.score-button-red,
+    button[data-testid="baseButton-secondary"].score-button-red {
+        background-color: #dc3545 !important;
+        color: #ffffff !important;
+        border-color: #dc3545 !important;
+        background-image: none !important;
+        background: #dc3545 !important;
+    }
+    
+    .score-button-orange,
+    button.score-button-orange,
+    .stButton > button.score-button-orange,
+    div[data-testid="stButton"] > button.score-button-orange,
+    button[data-testid="baseButton-secondary"].score-button-orange {
+        background-color: #fd7e14 !important;
+        color: #ffffff !important;
+        border-color: #fd7e14 !important;
+        background-image: none !important;
+        background: #fd7e14 !important;
+    }
+    
+    .score-button-green,
+    button.score-button-green,
+    .stButton > button.score-button-green,
+    div[data-testid="stButton"] > button.score-button-green,
+    button[data-testid="baseButton-secondary"].score-button-green {
+        background-color: #28a745 !important;
+        color: #ffffff !important;
+        border-color: #28a745 !important;
+        background-image: none !important;
+        background: #28a745 !important;
+    }
+    
+    .score-button-gray,
+    button.score-button-gray,
+    .stButton > button.score-button-gray,
+    div[data-testid="stButton"] > button.score-button-gray,
+    button[data-testid="baseButton-secondary"].score-button-gray {
+        background-color: #6c757d !important;
+        color: #ffffff !important;
+        border-color: #6c757d !important;
+        background-image: none !important;
+        background: #6c757d !important;
+    }
+    
+    /* Direct targeting by button text content */
+    button:contains("75/100"), button:contains("76/100"), button:contains("77/100"), button:contains("78/100"), button:contains("79/100"),
+    button:contains("80/100"), button:contains("81/100"), button:contains("82/100"), button:contains("83/100"), button:contains("84/100"),
+    button:contains("85/100"), button:contains("86/100"), button:contains("87/100"), button:contains("88/100"), button:contains("89/100"),
+    button:contains("90/100"), button:contains("91/100"), button:contains("92/100"), button:contains("93/100"), button:contains("94/100"),
+    button:contains("95/100"), button:contains("96/100"), button:contains("97/100"), button:contains("98/100"), button:contains("99/100"), button:contains("100/100"),
+    button:contains("Tier 4"), button:contains("Tier 5") {
+        background-color: #28a745 !important;
+        color: #ffffff !important;
+        border-color: #28a745 !important;
+    }
+    
+    button:contains("50/100"), button:contains("51/100"), button:contains("52/100"), button:contains("53/100"), button:contains("54/100"),
+    button:contains("55/100"), button:contains("56/100"), button:contains("57/100"), button:contains("58/100"), button:contains("59/100"),
+    button:contains("60/100"), button:contains("61/100"), button:contains("62/100"), button:contains("63/100"), button:contains("64/100"),
+    button:contains("65/100"), button:contains("66/100"), button:contains("67/100"), button:contains("68/100"), button:contains("69/100"),
+    button:contains("70/100"), button:contains("71/100"), button:contains("72/100"), button:contains("73/100"), button:contains("74/100"),
+    button:contains("Tier 3") {
+        background-color: #fd7e14 !important;
+        color: #ffffff !important;
+        border-color: #fd7e14 !important;
+    }
+    </style>
+    
+    <script>
+    function applyButtonColors() {
+        const buttons = document.querySelectorAll('button');
+        let coloredCount = 0;
+        
+        buttons.forEach(button => {
+            const text = button.textContent || button.innerText || '';
+            
+            // Skip if not a scoring button
+            if (!text.includes('/100') && !text.includes('Tier') && !text.includes('N/A') && 
+                !text.includes('AI Cyber') && !text.includes('AI Ethics') && 
+                !text.includes('Q Cyber') && !text.includes('Q Ethics')) {
+                return;
+            }
+            
+            // Remove existing color classes
+            button.classList.remove('score-button-red', 'score-button-orange', 'score-button-green', 'score-button-gray');
+            
+            let colorClass = '';
+            let bgColor = '';
+            
+            // Determine color based on content
+            if (text.includes('Tier 1') || text.includes('Tier 2')) {
+                colorClass = 'score-button-red';
+                bgColor = '#dc3545';
+            } else if (text.includes('Tier 3')) {
+                colorClass = 'score-button-orange';
+                bgColor = '#fd7e14';
+            } else if (text.includes('Tier 4') || text.includes('Tier 5')) {
+                colorClass = 'score-button-green';
+                bgColor = '#28a745';
+            } else if (text.includes('N/A')) {
+                colorClass = 'score-button-gray';
+                bgColor = '#6c757d';
+            } else {
+                // Check for numeric scores - fixed regex pattern
+                const scoreMatch = text.match(/(\d+)\/100/);
+                if (scoreMatch) {
+                    const score = parseInt(scoreMatch[1]);
+                    if (score >= 75) {
+                        colorClass = 'score-button-green';
+                        bgColor = '#28a745';
+                    } else if (score >= 50) {
+                        colorClass = 'score-button-orange';
+                        bgColor = '#fd7e14';
+                    } else {
+                        colorClass = 'score-button-red';
+                        bgColor = '#dc3545';
+                    }
+                }
+            }
+            
+            // Apply styles directly
+            if (bgColor) {
+                button.classList.add(colorClass);
+                button.style.setProperty('background-color', bgColor, 'important');
+                button.style.setProperty('color', '#ffffff', 'important');
+                button.style.setProperty('border-color', bgColor, 'important');
+                button.style.setProperty('background-image', 'none', 'important');
+                button.style.setProperty('background-gradient', 'none', 'important');
+                coloredCount++;
+            }
+        });
+        
+        console.log(`Applied colors to ${coloredCount} scoring buttons`);
+    }
+    
+    // Enhanced application strategy
+    function initButtonColorSystem() {
+        applyButtonColors();
+        
+        // Set up mutation observer for dynamic content
+        const observer = new MutationObserver((mutations) => {
+            let shouldUpdate = false;
+            mutations.forEach(mutation => {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    shouldUpdate = true;
+                }
+            });
+            if (shouldUpdate) {
+                setTimeout(applyButtonColors, 100);
+            }
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        
+        // Multiple application attempts
+        setTimeout(applyButtonColors, 200);
+        setTimeout(applyButtonColors, 600);
+        setTimeout(applyButtonColors, 1200);
+        setTimeout(applyButtonColors, 2500);
+    }
+    
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initButtonColorSystem);
+    } else {
+        initButtonColorSystem();
+    }
+    </script>
+    """, unsafe_allow_html=True)
+    
+    # Add custom CSS for help tooltips
+    help_tooltips.add_custom_css()
+    
+
+    
     # Add contextual help tooltips throughout the interface
     visible_terms = [
         'ai_cybersecurity_score', 'quantum_cybersecurity_score', 'ai_ethics_score', 'quantum_ethics_score', 
