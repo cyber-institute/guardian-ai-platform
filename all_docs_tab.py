@@ -79,21 +79,21 @@ def analyze_ai_cybersecurity_content(content, score):
     scope_analysis = detect_document_scope(content_str, "")
     
     if scope_analysis['out_of_scope']:
-        return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
+        return "This document does not focus on AI cybersecurity considerations."
     
     if score == 'N/A':
         return """
 This document does not focus on AI cybersecurity considerations.
 
-**Current Classification:** This document appears to focus on general cybersecurity, identity management, or other topics rather than AI-specific security considerations.
+<b>Current Classification:</b> This document appears to focus on other topics rather than AI-specific security considerations.
 
-**Strengths:**
+<b>Strengths:</b>
 • N/A
 
-**Weaknesses:**
+<b>Weaknesses:</b>
 • N/A
 
-**Recommendations:**
+<b>Recommendations:</b>
 • Include AI-specific threat modeling and adversarial attack mitigation
 • Develop secure AI development lifecycle and security-by-design principles
 • Add AI model security, including protection against model poisoning and bias attacks
@@ -130,21 +130,21 @@ def analyze_quantum_cybersecurity_content(content, score):
     scope_analysis = detect_document_scope(content_str, "")
     
     if scope_analysis['out_of_scope']:
-        return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
+        return "This document does not focus on quantum cybersecurity considerations."
     
     if score == 'N/A':
         return """
 This document does not focus on quantum cybersecurity considerations.
 
-**Current Classification:** This document appears to focus on general cybersecurity, identity management, or other topics rather than quantum-specific security considerations.
+<b>Current Classification:</b> This document appears to focus on other topics rather than quantum-specific security considerations.
 
-**Strengths:**
+<b>Strengths:</b>
 • N/A
 
-**Weaknesses:**
+<b>Weaknesses:</b>
 • N/A
 
-**Recommendations:**
+<b>Recommendations:</b>
 • Include post-quantum cryptography (PQC) adoption strategies and implementation timelines
 • Develop quantum key distribution (QKD) protocols and quantum-safe communication methods
 • Create migration planning from current cryptographic systems to quantum-resistant alternatives
@@ -181,21 +181,21 @@ def analyze_ai_ethics_content(content, score):
     scope_analysis = detect_document_scope(content_str, "")
     
     if scope_analysis['out_of_scope']:
-        return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
+        return "This document does not focus on AI ethics considerations."
     
     if score == 'N/A':
         return """
 This document does not focus on AI ethics considerations.
 
-**Current Classification:** This document appears to focus on cybersecurity, quantum technology, or other topics rather than AI ethics principles.
+<b>Current Classification:</b> This document appears to focus on other topics rather than AI ethics principles.
 
-**Strengths:**
+<b>Strengths:</b>
 • N/A
 
-**Weaknesses:**
+<b>Weaknesses:</b>
 • N/A
 
-**Recommendations:**
+<b>Recommendations:</b>
 • Include bias mitigation strategies and algorithmic fairness measures
 • Add transparency and explainability requirements for AI systems
 • Establish accountability frameworks and responsible AI governance
@@ -232,21 +232,21 @@ def analyze_quantum_ethics_content(content, score):
     scope_analysis = detect_document_scope(content_str, "")
     
     if scope_analysis['out_of_scope']:
-        return f"This document appears to be {scope_analysis['document_type']} rather than a cybersecurity, AI, or quantum technology policy document. Scoring may not be meaningful for this content type."
+        return "This document does not focus on quantum ethics considerations."
     
     if score == 'N/A':
         return """
 This document does not focus on quantum ethics considerations.
 
-**Current Classification:** This document appears to focus on cybersecurity, identity management, or other topics rather than quantum ethics considerations.
+<b>Current Classification:</b> This document appears to focus on other topics rather than quantum ethics considerations.
 
-**Strengths:**
+<b>Strengths:</b>
 • N/A
 
-**Weaknesses:**
+<b>Weaknesses:</b>
 • N/A
 
-**Recommendations:**
+<b>Recommendations:</b>
 • Include quantum computing ethics and equitable access frameworks
 • Develop quantum divide mitigation and global accessibility strategies
 • Establish responsible quantum technology development principles
