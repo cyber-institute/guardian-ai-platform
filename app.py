@@ -2,6 +2,7 @@ import streamlit as st
 from all_docs_tab import render
 from datetime import datetime
 from components.chatbot_widget import render_chatbot_widget, inject_chatbot_css
+from components.floating_chat import render_floating_chat
 from components.ai_assistant_mascot import render_ai_assistant
 
 # Performance optimization: Cache database queries
@@ -425,7 +426,11 @@ def main():
     
 
     
-    # Move onboarding functionality to chatbot
+    # Render chatbot widget in sidebar
+    render_chatbot_widget()
+    
+    # Render floating chat interface
+    render_floating_chat()
     
     # Sidebar hamburger menu for navigation
     with st.sidebar:
