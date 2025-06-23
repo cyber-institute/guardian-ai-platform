@@ -94,14 +94,7 @@ This document does not focus on AI cybersecurity considerations.
 • N/A
 
 <b>Recommendations:</b>
-• Include AI-specific threat modeling and adversarial attack mitigation
-• Develop secure AI development lifecycle and security-by-design principles
-• Add AI model security, including protection against model poisoning and bias attacks
-• Implement AI system vulnerability assessment and penetration testing methodologies
-• Establish authentication and authorization frameworks for AI systems
-• Incorporate differential privacy and federated learning security measures
-• Conduct AI red team exercises and security validation processes
-• Integrate with existing cybersecurity frameworks (NIST, ISO 27001)
+• N/A
 """
     
     try:
@@ -112,14 +105,21 @@ This document does not focus on AI cybersecurity considerations.
     return f"""
 This document demonstrates an AI Cybersecurity maturity score of {score}/100.
 
-- Document addresses AI security considerations and risk assessment frameworks
-- Content includes guidance on AI system protection and threat mitigation
-- Assessment shows {'excellent' if score_num >= 75 else 'good' if score_num >= 50 else 'developing'} AI cybersecurity practices
+<b>Current Classification:</b> {'Excellent' if score_num >= 75 else 'Good' if score_num >= 50 else 'Developing'} AI cybersecurity practices
 
-**Recommendations:**
-- Continue implementing robust AI security measures
-- Regular assessment of AI system vulnerabilities
-- Integration with existing cybersecurity frameworks
+<b>Strengths:</b>
+• Document addresses AI security considerations and risk assessment frameworks
+• Content includes guidance on AI system protection and threat mitigation
+• Shows systematic approach to AI cybersecurity
+
+<b>Weaknesses:</b>
+• {'Could expand threat modeling depth' if score_num < 75 else 'Minor gaps in implementation details' if score_num < 90 else 'Minimal areas for enhancement'}
+• {'Limited adversarial attack mitigation' if score_num < 60 else 'Could strengthen monitoring frameworks' if score_num < 85 else 'Advanced optimization opportunities'}
+
+<b>Recommendations:</b>
+• Continue implementing robust AI security measures
+• Regular assessment of AI system vulnerabilities  
+• Integration with existing cybersecurity frameworks
 """
 
 def analyze_quantum_cybersecurity_content(content, score):
@@ -145,14 +145,7 @@ This document does not focus on quantum cybersecurity considerations.
 • N/A
 
 <b>Recommendations:</b>
-• Include post-quantum cryptography (PQC) adoption strategies and implementation timelines
-• Develop quantum key distribution (QKD) protocols and quantum-safe communication methods
-• Create migration planning from current cryptographic systems to quantum-resistant alternatives
-• Establish quantum threat assessment and risk mitigation frameworks
-• Implement cryptographic agility principles for quantum-safe transitions
-• Adopt NIST post-quantum cryptographic standards and algorithm selection
-• Conduct quantum computing threat modeling and impact analysis
-• Develop timeline and roadmap for quantum-safe infrastructure deployment
+• N/A
 """
     
     try:
@@ -163,14 +156,21 @@ This document does not focus on quantum cybersecurity considerations.
     return f"""
 This document demonstrates Quantum Cybersecurity maturity of {score}/5.
 
-- Document addresses quantum-safe cryptography and post-quantum security measures
-- Content includes quantum threat assessment and mitigation strategies
-- Assessment shows {'advanced' if score_num >= 4 else 'intermediate' if score_num >= 3 else 'basic'} quantum cybersecurity readiness
+<b>Current Classification:</b> {'Advanced' if score_num >= 4 else 'Intermediate' if score_num >= 3 else 'Basic'} quantum cybersecurity readiness
 
-**Recommendations:**
-- Implement post-quantum cryptographic standards
-- Prepare for quantum computing threats
-- Regular quantum security assessments
+<b>Strengths:</b>
+• Document addresses quantum-safe cryptography and post-quantum security measures
+• Content includes quantum threat assessment and mitigation strategies
+• Shows understanding of quantum computing security implications
+
+<b>Weaknesses:</b>
+• {'Could improve quantum threat modeling' if score_num < 4 else 'Minor implementation gaps' if score_num < 5 else 'Minimal enhancement opportunities'}
+• {'Limited PQC migration planning' if score_num < 3 else 'Could strengthen quantum key distribution protocols' if score_num < 5 else 'Advanced optimization potential'}
+
+<b>Recommendations:</b>
+• Implement post-quantum cryptographic standards
+• Prepare for quantum computing threats
+• Regular quantum security assessments
 """
 
 def analyze_ai_ethics_content(content, score):
@@ -196,14 +196,7 @@ This document does not focus on AI ethics considerations.
 • N/A
 
 <b>Recommendations:</b>
-• Include bias mitigation strategies and algorithmic fairness measures
-• Add transparency and explainability requirements for AI systems
-• Establish accountability frameworks and responsible AI governance
-• Implement privacy protection and data rights in AI applications
-• Ensure human oversight and human-in-the-loop decision making
-• Develop stakeholder engagement and participatory AI development
-• Create ethical review processes and impact assessments
-• Design inclusive AI and equitable access considerations
+• N/A
 """
     
     try:
@@ -214,14 +207,21 @@ This document does not focus on AI ethics considerations.
     return f"""
 This document demonstrates an AI Ethics score of {score}/100.
 
-- Document addresses ethical AI considerations and bias prevention measures
-- Content includes fairness, transparency, and accountability frameworks
-- Assessment shows {'excellent' if score_num >= 75 else 'good' if score_num >= 50 else 'developing'} AI ethics practices
+<b>Current Classification:</b> {'Excellent' if score_num >= 75 else 'Good' if score_num >= 50 else 'Developing'} AI ethics practices
 
-**Recommendations:**
-- Implement comprehensive bias detection systems
-- Regular ethical AI audits and assessments
-- Stakeholder engagement in AI ethics governance
+<b>Strengths:</b>
+• Document addresses ethical AI considerations and bias prevention measures
+• Content includes fairness, transparency, and accountability frameworks
+• Shows commitment to responsible AI development
+
+<b>Weaknesses:</b>
+• {'Could strengthen bias mitigation strategies' if score_num < 75 else 'Minor gaps in stakeholder engagement' if score_num < 90 else 'Minimal areas for enhancement'}
+• {'Limited explainability frameworks' if score_num < 60 else 'Could improve transparency mechanisms' if score_num < 85 else 'Advanced optimization opportunities'}
+
+<b>Recommendations:</b>
+• Implement comprehensive bias detection systems
+• Regular ethical AI audits and assessments
+• Stakeholder engagement in AI ethics governance
 """
 
 def analyze_quantum_ethics_content(content, score):
@@ -247,14 +247,7 @@ This document does not focus on quantum ethics considerations.
 • N/A
 
 <b>Recommendations:</b>
-• Include quantum computing ethics and equitable access frameworks
-• Develop quantum divide mitigation and global accessibility strategies
-• Establish responsible quantum technology development principles
-• Create quantum governance and international cooperation frameworks
-• Address privacy implications of quantum computing technologies
-• Implement quantum workforce development and education equity
-• Conduct environmental and societal impact assessments of quantum technologies
-• Promote quantum computing democratization and open science principles
+• N/A
 - Quantum equity and digital divide considerations
 - Societal impacts of quantum technology advancement
 - Quantum governance frameworks and policy development
@@ -275,14 +268,21 @@ This document does not focus on quantum ethics considerations.
     return f"""
 This document demonstrates Quantum Ethics considerations scoring {score}/100.
 
-- Document addresses quantum computing ethics and access equity concerns
-- Content includes quantum technology governance and societal impact
-- Assessment shows {'excellent' if score_num >= 75 else 'good' if score_num >= 50 else 'developing'} quantum ethics considerations
+<b>Current Classification:</b> {'Excellent' if score_num >= 75 else 'Good' if score_num >= 50 else 'Developing'} quantum ethics considerations
 
-**Recommendations:**
-- Ensure equitable access to quantum technologies
-- Address quantum computing's societal implications
-- Develop quantum governance frameworks
+<b>Strengths:</b>
+• Document addresses quantum computing ethics and access equity concerns
+• Content includes quantum technology governance and societal impact
+• Shows awareness of quantum technology implications
+
+<b>Weaknesses:</b>
+• {'Could improve equity frameworks' if score_num < 75 else 'Minor gaps in governance structures' if score_num < 90 else 'Minimal areas for enhancement'}
+• {'Limited global accessibility strategies' if score_num < 60 else 'Could strengthen international cooperation' if score_num < 85 else 'Advanced optimization opportunities'}
+
+<b>Recommendations:</b>
+• Ensure equitable access to quantum technologies
+• Address quantum computing's societal implications
+• Develop quantum governance frameworks
 """
 
 # Performance optimization: Cache scoring calculations
