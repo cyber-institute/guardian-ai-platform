@@ -8,7 +8,7 @@ import uuid
 from utils.dialogflow_chatbot import chatbot
 
 def render_floating_chat():
-    """Render a simple floating chat interface using Streamlit components."""
+    """Render a floating chat bubble interface."""
     
     # Initialize chat state
     if 'chat_open' not in st.session_state:
@@ -18,93 +18,174 @@ def render_floating_chat():
     if 'chat_messages' not in st.session_state:
         st.session_state.chat_messages = []
 
-    # Simple CSS for positioned elements
+    # CSS for floating chat bubble
     st.markdown("""
     <style>
-    .fixed-chat-button {
+    /* Floating chat button */
+    .floating-chat-btn {
         position: fixed;
         bottom: 20px;
         right: 20px;
-        z-index: 9999;
-        width: 70px;
-        height: 40px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+        color: white;
+        border: none;
+        font-weight: 600;
+        font-size: 12px;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
     }
     
-    .fixed-chat-window {
+    .floating-chat-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6);
+    }
+    
+    /* Floating chat window overlay */
+    .chat-overlay {
         position: fixed;
-        top: 20px;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.1);
+        z-index: 9999;
+        backdrop-filter: blur(1px);
+    }
+    
+    /* Chat bubble window */
+    .chat-bubble {
+        position: fixed;
+        bottom: 90px;
         right: 20px;
         width: 350px;
         max-height: 500px;
-        z-index: 9998;
         background: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
         border: 1px solid #e5e7eb;
+        z-index: 10001;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
     
-    /* Simple button styling */
-    .stButton > button {
-        background-color: #f8f9fa !important;
-        color: #374151 !important;
-        border: 1px solid #d1d5db !important;
-        border-radius: 8px !important;
-        font-weight: 500 !important;
-        font-size: 12px !important;
-        padding: 8px 12px !important;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
-        transition: all 0.2s ease !important;
+    /* Chat header */
+    .chat-header {
+        background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+        color: white;
+        padding: 15px 20px;
+        font-weight: 600;
+        font-size: 14px;
     }
     
-    .stButton > button:hover {
-        background-color: #e5e7eb !important;
-        border-color: #9ca3af !important;
-        transform: translateY(-1px) !important;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+    /* Chat body */
+    .chat-body {
+        flex: 1;
+        padding: 15px;
+        max-height: 350px;
+        overflow-y: auto;
     }
     
-    /* Special styling for send button - sleek paper airplane */
-    .stButton[data-testid*="floating_send"] > button {
-        width: 40px !important;
-        height: 40px !important;
-        border-radius: 8px !important;
-        padding: 0 !important;
-        font-size: 16px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        background-color: #6b7280 !important;
-        color: white !important;
+    /* Chat input area */
+    .chat-input-area {
+        padding: 15px;
+        border-top: 1px solid #e5e7eb;
+        background: #fafafa;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    /* Send button styling */
+    .chat-send-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background-color: #6b7280;
+        color: white;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        transition: all 0.2s ease;
+    }
+    
+    .chat-send-btn:hover {
+        background-color: #4b5563;
+        transform: translateY(-1px);
+    }
+    
+    /* Hide default streamlit button styling for chat */
+    .chat-container .stButton > button {
+        background: none !important;
         border: none !important;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-    }
-    
-    .stButton[data-testid*="floating_send"] > button:hover {
-        background-color: #4b5563 !important;
-        transform: translateY(-1px) !important;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
     }
     </style>
+    
+    <script>
+    // Close chat when clicking overlay
+    function closeChatOverlay() {
+        const overlay = document.querySelector('.chat-overlay');
+        if (overlay) {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    // Send message to Streamlit to close chat
+                    window.parent.postMessage({type: 'close_chat'}, '*');
+                }
+            });
+        }
+    }
+    
+    // Initialize overlay click handler
+    setTimeout(closeChatOverlay, 100);
+    </script>
     """, unsafe_allow_html=True)
 
-    # Create a simple floating chat button
+    # Floating chat button
     if not st.session_state.chat_open:
-        st.markdown('<div class="fixed-chat-button">', unsafe_allow_html=True)
-        if st.button("ARIA", key="floating_chat_toggle", help="ARIA - Advanced Risk Intelligence Assistant"):
+        st.markdown("""
+        <div class="floating-chat-btn" onclick="window.parent.postMessage({type: 'open_chat'}, '*')">
+            ARIA
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Hidden button for Streamlit interaction
+        if st.button("", key="floating_chat_toggle", help="ARIA - Advanced Risk Intelligence Assistant"):
             st.session_state.chat_open = True
             st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
     
-    # Render chat window if open
+    # Chat bubble overlay
     if st.session_state.chat_open:
-        render_chat_window()
+        render_chat_bubble()
 
-def render_chat_window():
-    """Render the floating chat window as a sidebar expander."""
+def render_chat_bubble():
+    """Render the floating chat bubble with overlay."""
     
-    # Use an expander in the main content area for the chat window
-    with st.expander("ARIA - Advanced Risk Intelligence Assistant", expanded=True):
+    # Chat overlay (closes chat when clicked)
+    st.markdown('<div class="chat-overlay"></div>', unsafe_allow_html=True)
+    
+    # Chat bubble
+    st.markdown('<div class="chat-bubble">', unsafe_allow_html=True)
+    
+    # Chat header
+    st.markdown('<div class="chat-header">ARIA - Advanced Risk Intelligence Assistant</div>', unsafe_allow_html=True)
+    
+    # Chat body with container
+    with st.container():
+        st.markdown('<div class="chat-body">', unsafe_allow_html=True)
         
         # Display rotating tip
         tips = [
@@ -116,14 +197,9 @@ def render_chat_window():
             "Tip: I can explain GUARDIAN's patent-protected algorithms and methodologies"
         ]
         
-        # Initialize tip index if not exists
-        if 'aria_tip_index' not in st.session_state:
-            st.session_state.aria_tip_index = 0
-        
-        # Show current tip and rotate every 5 seconds (simulated by user interaction)
         import time
         current_time = int(time.time())
-        tip_rotation_interval = 10  # Change tip every 10 seconds
+        tip_rotation_interval = 10
         current_tip_index = (current_time // tip_rotation_interval) % len(tips)
         
         st.info(tips[current_tip_index])
@@ -131,18 +207,35 @@ def render_chat_window():
         # Chat messages
         if st.session_state.chat_messages:
             st.markdown("**Recent Conversation:**")
-            for message in st.session_state.chat_messages[-3:]:  # Show last 3 messages
+            for message in st.session_state.chat_messages[-3:]:
                 if message['role'] == 'user':
                     st.markdown(f"**You:** {message['content']}")
                 else:
                     st.markdown(f"**ARIA:** {message['content']}")
         
-        # Chat input with paper airplane send
-        user_input = st.text_input("Ask ARIA about GUARDIAN:", key="floating_chat_input", placeholder="e.g., How do I upload a policy document?")
-        
-        # Single send button with sleek paper airplane
-        if st.button("▷", key="floating_send", help="Send message") and user_input:
-            handle_user_message(user_input)
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Chat input area
+    st.markdown('<div class="chat-input-area">', unsafe_allow_html=True)
+    
+    col1, col2 = st.columns([4, 1])
+    with col1:
+        user_input = st.text_input("Ask ARIA about GUARDIAN:", key="floating_chat_input", placeholder="e.g., How do I upload a policy document?", label_visibility="collapsed")
+    
+    with col2:
+        st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+        if st.button("▷", key="floating_send", help="Send message"):
+            if user_input:
+                handle_user_message(user_input)
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Handle overlay clicks to close chat
+    if st.button("", key="close_chat_overlay", help="Close chat"):
+        st.session_state.chat_open = False
+        st.rerun()
 
 def handle_user_message(message: str):
     """Handle user chat messages."""
