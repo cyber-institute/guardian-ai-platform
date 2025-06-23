@@ -8,7 +8,7 @@ import uuid
 from utils.dialogflow_chatbot import chatbot
 
 def render_floating_chat():
-    """Render a simple floating chat interface."""
+    """Render a floating chat bubble interface using component state."""
     
     # Initialize chat state
     if 'chat_open' not in st.session_state:
@@ -18,116 +18,334 @@ def render_floating_chat():
     if 'chat_messages' not in st.session_state:
         st.session_state.chat_messages = []
 
-    # Simple CSS for clean styling
+    # CSS for floating chat bubble
     st.markdown("""
     <style>
-    .fixed-chat-button {
+    /* Floating chat button */
+    .floating-chat-btn {
         position: fixed;
         bottom: 20px;
         right: 20px;
-        z-index: 9999;
-        width: 70px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+        color: white;
+        border: none;
+        font-weight: 600;
+        font-size: 12px;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        animation: pulse 3s infinite;
+    }
+    
+    .floating-chat-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6);
+    }
+    
+    @keyframes pulse {
+        0%, 100% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4); }
+        50% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.8); }
+    }
+    
+    /* Chat bubble window */
+    .chat-bubble {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 350px;
+        max-height: 500px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        border: 1px solid #e5e7eb;
+        z-index: 10001;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        animation: slideUp 0.3s ease;
+    }
+    
+    @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    /* Chat header */
+    .chat-header {
+        background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+        color: white;
+        padding: 15px 20px;
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .chat-close-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 0;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Chat body */
+    .chat-body {
+        flex: 1;
+        padding: 15px;
+        max-height: 350px;
+        overflow-y: auto;
+    }
+    
+    /* Chat input area */
+    .chat-input-area {
+        padding: 15px;
+        border-top: 1px solid #e5e7eb;
+        background: #fafafa;
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+    }
+    
+    .chat-input {
+        flex: 1;
+        border: 1px solid #d1d5db;
+        border-radius: 20px;
+        padding: 10px 15px;
+        font-size: 14px;
+        outline: none;
+        resize: none;
+        max-height: 100px;
+        min-height: 40px;
+    }
+    
+    .chat-input:focus {
+        border-color: #3B82F6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Send button */
+    .chat-send-btn {
+        width: 40px;
         height: 40px;
+        border-radius: 50%;
+        background-color: #3B82F6;
+        color: white;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
     }
     
-    /* Simple button styling */
-    .stButton > button {
-        background-color: #f8f9fa !important;
-        color: #374151 !important;
-        border: 1px solid #d1d5db !important;
-        border-radius: 8px !important;
-        font-weight: 500 !important;
-        font-size: 12px !important;
-        padding: 8px 12px !important;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
-        transition: all 0.2s ease !important;
+    .chat-send-btn:hover {
+        background-color: #1E40AF;
+        transform: scale(1.05);
     }
     
-    .stButton > button:hover {
-        background-color: #e5e7eb !important;
-        border-color: #9ca3af !important;
-        transform: translateY(-1px) !important;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+    .chat-send-btn:disabled {
+        background-color: #9CA3AF;
+        cursor: not-allowed;
+        transform: none;
     }
     
-    /* Special styling for send button */
-    .stButton[data-testid*="floating_send"] > button {
-        width: 40px !important;
-        height: 40px !important;
-        border-radius: 8px !important;
-        padding: 0 !important;
-        font-size: 16px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        background-color: #6b7280 !important;
-        color: white !important;
+    /* Message styling */
+    .chat-message {
+        margin-bottom: 12px;
+        line-height: 1.4;
+    }
+    
+    .chat-message.user {
+        text-align: right;
+    }
+    
+    .chat-message.assistant {
+        background: #f3f4f6;
+        padding: 10px;
+        border-radius: 10px;
+        margin-right: 20px;
+    }
+    
+    /* Tip styling */
+    .chat-tip {
+        background: #dbeafe;
+        border: 1px solid #93c5fd;
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 15px;
+        font-size: 13px;
+        color: #1e40af;
+    }
+    
+    /* Hide streamlit elements in chat */
+    .chat-bubble .stTextInput > div > div > input {
         border: none !important;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+        background: transparent !important;
+        padding: 0 !important;
     }
     
-    .stButton[data-testid*="floating_send"] > button:hover {
-        background-color: #4b5563 !important;
-        transform: translateY(-1px) !important;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+    .chat-bubble .stButton > button {
+        background: none !important;
+        border: none !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
-    # Simple floating chat button
+    # Render floating button or chat
     if not st.session_state.chat_open:
-        st.markdown('<div class="fixed-chat-button">', unsafe_allow_html=True)
-        if st.button("ARIA", key="floating_chat_toggle", help="ARIA - Advanced Risk Intelligence Assistant"):
-            st.session_state.chat_open = True
-            st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Chat window
-    if st.session_state.chat_open:
-        render_chat_bubble()
+        render_floating_button()
+    else:
+        render_chat_window()
 
-def render_chat_bubble():
-    """Render the chat window as a clean expander."""
+def render_floating_button():
+    """Render the floating chat button."""
+    # Use a session state key to trigger reopening
+    if st.button("", key="chat_trigger", help="Open ARIA Chat"):
+        st.session_state.chat_open = True
+        st.rerun()
     
-    # Use an expander for the chat window
-    with st.expander("ARIA - Advanced Risk Intelligence Assistant", expanded=True):
-        # Display rotating tip
-        tips = [
-            "Tip: Ask me about document scoring to understand the assessment frameworks",
-            "Tip: Upload documents in PDF, TXT, or URL format for instant analysis", 
-            "Tip: Click on any score badge to see detailed breakdown and recommendations",
-            "Tip: Use filters to find documents by region, organization, or document type",
-            "Tip: Try asking 'What are the critical gaps in my policy?' for targeted insights",
-            "Tip: I can explain GUARDIAN's patent-protected algorithms and methodologies"
-        ]
+    # HTML floating button overlay
+    st.markdown("""
+    <div class="floating-chat-btn" id="chatBtn">
+        ARIA
+    </div>
+    
+    <script>
+    // Pure CSS/HTML approach - no onClick handlers
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatBtn = document.getElementById('chatBtn');
+        if (chatBtn) {
+            chatBtn.addEventListener('click', function() {
+                // Find and click the hidden Streamlit button
+                const hiddenBtn = document.querySelector('button[kind="secondary"][data-testid*="chat_trigger"]');
+                if (hiddenBtn) {
+                    hiddenBtn.click();
+                }
+            });
+        }
+    });
+    </script>
+    """, unsafe_allow_html=True)
+
+def render_chat_window():
+    """Render the chat bubble window."""
+    
+    # Hidden close button
+    if st.button("", key="chat_close_trigger", help="Close chat"):
+        st.session_state.chat_open = False
+        st.rerun()
+    
+    # Hidden send button  
+    user_input = st.text_input("", key="chat_input_hidden", label_visibility="collapsed")
+    if st.button("", key="chat_send_trigger", help="Send"):
+        if user_input:
+            handle_user_message(user_input)
+    
+    # Chat bubble HTML
+    tips = [
+        "Tip: Ask me about document scoring to understand the assessment frameworks",
+        "Tip: Upload documents in PDF, TXT, or URL format for instant analysis", 
+        "Tip: Click on any score badge to see detailed breakdown and recommendations",
+        "Tip: Use filters to find documents by region, organization, or document type",
+        "Tip: Try asking 'What are the critical gaps in my policy?' for targeted insights",
+        "Tip: I can explain GUARDIAN's patent-protected algorithms and methodologies"
+    ]
+    
+    import time
+    current_time = int(time.time())
+    current_tip_index = (current_time // 10) % len(tips)
+    
+    # Format chat messages
+    messages_html = ""
+    if st.session_state.chat_messages:
+        for message in st.session_state.chat_messages[-3:]:
+            if message['role'] == 'user':
+                messages_html += f'<div class="chat-message user"><strong>You:</strong> {message["content"]}</div>'
+            else:
+                messages_html += f'<div class="chat-message assistant"><strong>ARIA:</strong> {message["content"]}</div>'
+    
+    st.markdown(f"""
+    <div class="chat-bubble" id="chatBubble">
+        <div class="chat-header">
+            <span>ARIA - Advanced Risk Intelligence Assistant</span>
+            <button class="chat-close-btn" id="closeBtn">×</button>
+        </div>
         
-        import time
-        current_time = int(time.time())
-        tip_rotation_interval = 10
-        current_tip_index = (current_time // tip_rotation_interval) % len(tips)
+        <div class="chat-body">
+            <div class="chat-tip">{tips[current_tip_index]}</div>
+            
+            {messages_html if messages_html else '<div style="text-align: center; color: #6b7280; padding: 20px;">Start a conversation with ARIA!</div>'}
+        </div>
         
-        st.info(tips[current_tip_index])
+        <div class="chat-input-area">
+            <textarea class="chat-input" id="chatInput" placeholder="Ask ARIA about GUARDIAN..." rows="1"></textarea>
+            <button class="chat-send-btn" id="sendBtn">▷</button>
+        </div>
+    </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {{
+        // Close button functionality
+        const closeBtn = document.getElementById('closeBtn');
+        if (closeBtn) {{
+            closeBtn.addEventListener('click', function() {{
+                const hiddenCloseBtn = document.querySelector('button[data-testid*="chat_close_trigger"]');
+                if (hiddenCloseBtn) hiddenCloseBtn.click();
+            }});
+        }}
         
-        # Chat messages
-        if st.session_state.chat_messages:
-            st.markdown("**Recent Conversation:**")
-            for message in st.session_state.chat_messages[-3:]:
-                if message['role'] == 'user':
-                    st.markdown(f"**You:** {message['content']}")
-                else:
-                    st.markdown(f"**ARIA:** {message['content']}")
+        // Send button functionality
+        const sendBtn = document.getElementById('sendBtn');
+        const chatInput = document.getElementById('chatInput');
+        const hiddenInput = document.querySelector('input[data-testid*="chat_input_hidden"]');
         
-        # Chat input
-        user_input = st.text_input("Ask ARIA about GUARDIAN:", key="floating_chat_input", placeholder="e.g., How do I upload a policy document?")
-        
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            if st.button("▷", key="floating_send", help="Send message") and user_input:
-                handle_user_message(user_input)
-        with col2:
-            if st.button("Close", key="floating_close", use_container_width=True):
-                st.session_state.chat_open = False
-                st.rerun()
+        if (sendBtn && chatInput && hiddenInput) {{
+            sendBtn.addEventListener('click', function() {{
+                if (chatInput.value.trim()) {{
+                    hiddenInput.value = chatInput.value;
+                    hiddenInput.dispatchEvent(new Event('input', {{ bubbles: true }}));
+                    
+                    setTimeout(() => {{
+                        const hiddenSendBtn = document.querySelector('button[data-testid*="chat_send_trigger"]');
+                        if (hiddenSendBtn) {{
+                            hiddenSendBtn.click();
+                            chatInput.value = '';
+                        }}
+                    }}, 100);
+                }}
+            }});
+            
+            // Enter key to send
+            chatInput.addEventListener('keypress', function(e) {{
+                if (e.key === 'Enter' && !e.shiftKey) {{
+                    e.preventDefault();
+                    sendBtn.click();
+                }}
+            }});
+        }}
+    }});
+    </script>
+    """, unsafe_allow_html=True)
 
 def handle_user_message(message: str):
     """Handle user chat messages."""
