@@ -8,7 +8,7 @@ import uuid
 from utils.dialogflow_chatbot import chatbot
 
 def render_floating_chat():
-    """Render a floating chat bubble interface."""
+    """Render a simple floating chat interface."""
     
     # Initialize chat state
     if 'chat_open' not in st.session_state:
@@ -18,229 +18,78 @@ def render_floating_chat():
     if 'chat_messages' not in st.session_state:
         st.session_state.chat_messages = []
 
-    # CSS for floating chat bubble
+    # Simple CSS for clean styling
     st.markdown("""
     <style>
-    /* Floating chat button */
-    .floating-chat-btn {
+    .fixed-chat-button {
         position: fixed;
         bottom: 20px;
         right: 20px;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
-        color: white;
-        border: none;
-        font-weight: 600;
-        font-size: 12px;
-        cursor: pointer;
-        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
-        z-index: 10000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-    }
-    
-    .floating-chat-btn:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6);
-    }
-    
-    /* Floating chat window overlay */
-    .chat-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.1);
         z-index: 9999;
-        backdrop-filter: blur(1px);
-    }
-    
-    /* Chat bubble window */
-    .chat-bubble {
-        position: fixed;
-        bottom: 90px;
-        right: 20px;
-        width: 350px;
-        max-height: 500px;
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-        border: 1px solid #e5e7eb;
-        z-index: 10001;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-    }
-    
-    /* Chat header */
-    .chat-header {
-        background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
-        color: white;
-        padding: 15px 20px;
-        font-weight: 600;
-        font-size: 14px;
-    }
-    
-    /* Chat body */
-    .chat-body {
-        flex: 1;
-        padding: 15px;
-        max-height: 350px;
-        overflow-y: auto;
-    }
-    
-    /* Chat input area */
-    .chat-input-area {
-        padding: 15px;
-        border-top: 1px solid #e5e7eb;
-        background: #fafafa;
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
-    
-    /* Send button styling */
-    .chat-send-btn {
-        width: 40px;
+        width: 70px;
         height: 40px;
-        border-radius: 8px;
-        background-color: #6b7280;
-        color: white;
-        border: none;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        transition: all 0.2s ease;
     }
     
-    .chat-send-btn:hover {
-        background-color: #4b5563;
-        transform: translateY(-1px);
+    /* Simple button styling */
+    .stButton > button {
+        background-color: #f8f9fa !important;
+        color: #374151 !important;
+        border: 1px solid #d1d5db !important;
+        border-radius: 8px !important;
+        font-weight: 500 !important;
+        font-size: 12px !important;
+        padding: 8px 12px !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+        transition: all 0.2s ease !important;
     }
     
-    /* Hide default streamlit button styling for chat */
-    .chat-container .stButton > button {
-        background: none !important;
-        border: none !important;
+    .stButton > button:hover {
+        background-color: #e5e7eb !important;
+        border-color: #9ca3af !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+    }
+    
+    /* Special styling for send button */
+    .stButton[data-testid*="floating_send"] > button {
+        width: 40px !important;
+        height: 40px !important;
+        border-radius: 8px !important;
         padding: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
+        font-size: 16px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background-color: #6b7280 !important;
+        color: white !important;
+        border: none !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    }
+    
+    .stButton[data-testid*="floating_send"] > button:hover {
+        background-color: #4b5563 !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
     }
     </style>
-    
-    <script>
-    // Close chat when clicking overlay
-    function closeChatOverlay() {
-        const overlay = document.querySelector('.chat-overlay');
-        if (overlay) {
-            overlay.addEventListener('click', function(e) {
-                if (e.target === overlay) {
-                    // Send message to Streamlit to close chat
-                    window.parent.postMessage({type: 'close_chat'}, '*');
-                }
-            });
-        }
-    }
-    
-    // Initialize overlay click handler
-    setTimeout(closeChatOverlay, 100);
-    </script>
     """, unsafe_allow_html=True)
 
-    # Floating chat button
+    # Simple floating chat button
     if not st.session_state.chat_open:
-        # Position Streamlit button as floating
-        col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 0.2])
-        with col5:
-            st.markdown("""
-            <style>
-            div[data-testid="column"] > div {
-                position: fixed !important;
-                bottom: 20px !important;
-                right: 20px !important;
-                z-index: 10000 !important;
-                width: 60px !important;
-                height: 60px !important;
-            }
-            div[data-testid="column"] > div > div > div > button {
-                width: 60px !important;
-                height: 60px !important;
-                border-radius: 50% !important;
-                background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
-                color: white !important;
-                border: none !important;
-                font-weight: 600 !important;
-                font-size: 12px !important;
-                box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4) !important;
-                transition: all 0.3s ease !important;
-            }
-            div[data-testid="column"] > div > div > div > button:hover {
-                transform: scale(1.1) !important;
-                box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6) !important;
-            }
-            </style>
-            """, unsafe_allow_html=True)
-            
-            if st.button("ARIA", key="floating_chat_toggle", help="ARIA - Advanced Risk Intelligence Assistant"):
-                st.session_state.chat_open = True
-                st.rerun()
+        st.markdown('<div class="fixed-chat-button">', unsafe_allow_html=True)
+        if st.button("ARIA", key="floating_chat_toggle", help="ARIA - Advanced Risk Intelligence Assistant"):
+            st.session_state.chat_open = True
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
     
-    # Chat bubble overlay
+    # Chat window
     if st.session_state.chat_open:
         render_chat_bubble()
 
 def render_chat_bubble():
-    """Render the floating chat bubble with overlay."""
+    """Render the chat window as a clean expander."""
     
-    # Create chat window using expander positioned as overlay
-    st.markdown("""
-    <style>
-    /* Position the expander as floating chat */
-    .floating-chat-expander {
-        position: fixed !important;
-        bottom: 90px !important;
-        right: 20px !important;
-        width: 350px !important;
-        max-height: 500px !important;
-        z-index: 10001 !important;
-        background: white !important;
-        border-radius: 15px !important;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
-        border: 1px solid #e5e7eb !important;
-    }
-    
-    /* Style the expander header */
-    .floating-chat-expander summary {
-        background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
-        color: white !important;
-        padding: 15px 20px !important;
-        font-weight: 600 !important;
-        border-radius: 15px 15px 0 0 !important;
-        margin: 0 !important;
-    }
-    
-    /* Style the expander content */
-    .floating-chat-expander > div {
-        padding: 15px !important;
-        max-height: 400px !important;
-        overflow-y: auto !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-    
-    # Create close button first (invisible overlay)
-    if st.button("Close Chat", key="close_chat_overlay", help="Close chat"):
-        st.session_state.chat_open = False
-        st.rerun()
-    
-    # Chat content using expander
+    # Use an expander for the chat window
     with st.expander("ARIA - Advanced Risk Intelligence Assistant", expanded=True):
         # Display rotating tip
         tips = [
@@ -271,11 +120,10 @@ def render_chat_bubble():
         # Chat input
         user_input = st.text_input("Ask ARIA about GUARDIAN:", key="floating_chat_input", placeholder="e.g., How do I upload a policy document?")
         
-        col1, col2 = st.columns([4, 1])
+        col1, col2 = st.columns([3, 1])
         with col1:
-            if st.button("Send Message", key="floating_send_full", use_container_width=True):
-                if user_input:
-                    handle_user_message(user_input)
+            if st.button("▷", key="floating_send", help="Send message") and user_input:
+                handle_user_message(user_input)
         with col2:
             if st.button("Close", key="floating_close", use_container_width=True):
                 st.session_state.chat_open = False
