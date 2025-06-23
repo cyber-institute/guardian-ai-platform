@@ -156,16 +156,41 @@ def render_floating_chat():
 
     # Floating chat button
     if not st.session_state.chat_open:
-        st.markdown("""
-        <div class="floating-chat-btn" onclick="window.parent.postMessage({type: 'open_chat'}, '*')">
-            ARIA
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Hidden button for Streamlit interaction
-        if st.button("", key="floating_chat_toggle", help="ARIA - Advanced Risk Intelligence Assistant"):
-            st.session_state.chat_open = True
-            st.rerun()
+        # Position Streamlit button as floating
+        col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 0.2])
+        with col5:
+            st.markdown("""
+            <style>
+            div[data-testid="column"] > div {
+                position: fixed !important;
+                bottom: 20px !important;
+                right: 20px !important;
+                z-index: 10000 !important;
+                width: 60px !important;
+                height: 60px !important;
+            }
+            div[data-testid="column"] > div > div > div > button {
+                width: 60px !important;
+                height: 60px !important;
+                border-radius: 50% !important;
+                background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
+                color: white !important;
+                border: none !important;
+                font-weight: 600 !important;
+                font-size: 12px !important;
+                box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4) !important;
+                transition: all 0.3s ease !important;
+            }
+            div[data-testid="column"] > div > div > div > button:hover {
+                transform: scale(1.1) !important;
+                box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6) !important;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+            
+            if st.button("ARIA", key="floating_chat_toggle", help="ARIA - Advanced Risk Intelligence Assistant"):
+                st.session_state.chat_open = True
+                st.rerun()
     
     # Chat bubble overlay
     if st.session_state.chat_open:
@@ -174,19 +199,49 @@ def render_floating_chat():
 def render_chat_bubble():
     """Render the floating chat bubble with overlay."""
     
-    # Chat overlay (closes chat when clicked)
-    st.markdown('<div class="chat-overlay"></div>', unsafe_allow_html=True)
+    # Create chat window using expander positioned as overlay
+    st.markdown("""
+    <style>
+    /* Position the expander as floating chat */
+    .floating-chat-expander {
+        position: fixed !important;
+        bottom: 90px !important;
+        right: 20px !important;
+        width: 350px !important;
+        max-height: 500px !important;
+        z-index: 10001 !important;
+        background: white !important;
+        border-radius: 15px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+        border: 1px solid #e5e7eb !important;
+    }
     
-    # Chat bubble
-    st.markdown('<div class="chat-bubble">', unsafe_allow_html=True)
+    /* Style the expander header */
+    .floating-chat-expander summary {
+        background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
+        color: white !important;
+        padding: 15px 20px !important;
+        font-weight: 600 !important;
+        border-radius: 15px 15px 0 0 !important;
+        margin: 0 !important;
+    }
     
-    # Chat header
-    st.markdown('<div class="chat-header">ARIA - Advanced Risk Intelligence Assistant</div>', unsafe_allow_html=True)
+    /* Style the expander content */
+    .floating-chat-expander > div {
+        padding: 15px !important;
+        max-height: 400px !important;
+        overflow-y: auto !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
     
-    # Chat body with container
-    with st.container():
-        st.markdown('<div class="chat-body">', unsafe_allow_html=True)
-        
+    # Create close button first (invisible overlay)
+    if st.button("Close Chat", key="close_chat_overlay", help="Close chat"):
+        st.session_state.chat_open = False
+        st.rerun()
+    
+    # Chat content using expander
+    with st.expander("ARIA - Advanced Risk Intelligence Assistant", expanded=True):
         # Display rotating tip
         tips = [
             "Tip: Ask me about document scoring to understand the assessment frameworks",
@@ -213,29 +268,18 @@ def render_chat_bubble():
                 else:
                     st.markdown(f"**ARIA:** {message['content']}")
         
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Chat input area
-    st.markdown('<div class="chat-input-area">', unsafe_allow_html=True)
-    
-    col1, col2 = st.columns([4, 1])
-    with col1:
-        user_input = st.text_input("Ask ARIA about GUARDIAN:", key="floating_chat_input", placeholder="e.g., How do I upload a policy document?", label_visibility="collapsed")
-    
-    with col2:
-        st.markdown('<div class="chat-container">', unsafe_allow_html=True)
-        if st.button("▷", key="floating_send", help="Send message"):
-            if user_input:
-                handle_user_message(user_input)
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Handle overlay clicks to close chat
-    if st.button("", key="close_chat_overlay", help="Close chat"):
-        st.session_state.chat_open = False
-        st.rerun()
+        # Chat input
+        user_input = st.text_input("Ask ARIA about GUARDIAN:", key="floating_chat_input", placeholder="e.g., How do I upload a policy document?")
+        
+        col1, col2 = st.columns([4, 1])
+        with col1:
+            if st.button("Send Message", key="floating_send_full", use_container_width=True):
+                if user_input:
+                    handle_user_message(user_input)
+        with col2:
+            if st.button("Close", key="floating_close", use_container_width=True):
+                st.session_state.chat_open = False
+                st.rerun()
 
 def handle_user_message(message: str):
     """Handle user chat messages."""
