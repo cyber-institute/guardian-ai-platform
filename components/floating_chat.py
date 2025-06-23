@@ -64,16 +64,26 @@ def render_floating_chat():
         box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
     }
     
-    /* Special styling for send button */
+    /* Special styling for send button - sleek paper airplane */
     .stButton[data-testid*="floating_send"] > button {
         width: 40px !important;
         height: 40px !important;
-        border-radius: 50% !important;
+        border-radius: 8px !important;
         padding: 0 !important;
         font-size: 16px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
+        background-color: #6b7280 !important;
+        color: white !important;
+        border: none !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    }
+    
+    .stButton[data-testid*="floating_send"] > button:hover {
+        background-color: #4b5563 !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -130,15 +140,16 @@ def render_chat_window():
         # Chat input with paper airplane send
         user_input = st.text_input("Ask ARIA about GUARDIAN:", key="floating_chat_input", placeholder="e.g., How do I upload a policy document?")
         
-        # Single send button with folded paper airplane
-        if st.button("📤", key="floating_send", help="Send message") and user_input:
+        # Single send button with sleek paper airplane
+        if st.button("▷", key="floating_send", help="Send message") and user_input:
             handle_user_message(user_input)
 
 def handle_user_message(message: str):
     """Handle user chat messages."""
     try:
-        # Use chatbot for response
-        response = chatbot.get_response(message, st.session_state.chat_session_id)
+        # Use chatbot for response with correct method
+        response = chatbot.detect_intent(message, st.session_state.chat_session_id)
+        response_text = response.get('response_text', 'I understand your question. Let me help you with GUARDIAN.')
         
         # Add to chat history
         st.session_state.chat_messages.append({
@@ -147,7 +158,7 @@ def handle_user_message(message: str):
         })
         st.session_state.chat_messages.append({
             'role': 'assistant',
-            'content': response
+            'content': response_text
         })
         
         # Keep only last 10 messages for performance
