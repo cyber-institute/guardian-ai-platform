@@ -19,14 +19,14 @@ def render_chatbot_widget():
     
     # Always show chatbot in sidebar
     with st.sidebar:
-        st.markdown("### GUARDIAN Assistant")
+        st.markdown("### ARIA - Advanced Risk Intelligence Assistant")
         
         # Onboarding and Quick Help
         from components.streamlit_tooltips import streamlit_tooltips
         
         # Welcome message for new users
         if not st.session_state.get("guardian_welcome_shown", False):
-            st.info("Welcome to GUARDIAN! Start a guided tour?")
+            st.info("Welcome to GUARDIAN! I'm ARIA, your AI assistant. Start a guided tour?")
             if st.button("Start Tour", key="start_tour_chat", use_container_width=True):
                 st.session_state.guardian_tour_active = True
                 st.session_state.guardian_tour_step = 1
@@ -57,7 +57,7 @@ def render_chatbot_widget():
                 handle_quick_question("What is policy gap analysis?")
         
         # Chat input
-        user_input = st.text_input("Ask me anything about GUARDIAN:", key="chat_input", placeholder="e.g., How do I upload a policy?")
+        user_input = st.text_input("Ask ARIA about GUARDIAN:", key="chat_input", placeholder="e.g., How do I upload a policy?")
         
         if st.button("Send", key="send_message", use_container_width=True) and user_input:
             handle_user_message(user_input)
@@ -72,7 +72,7 @@ def render_chatbot_widget():
                 if message['role'] == 'user':
                     st.markdown(f"**You:** {message['content']}")
                 else:
-                    st.markdown(f"**Assistant:** {message['content'][:200]}{'...' if len(message['content']) > 200 else ''}")
+                    st.markdown(f"**ARIA:** {message['content'][:200]}{'...' if len(message['content']) > 200 else ''}")
         
         # Clear chat button
         if st.session_state.chat_messages and st.button("Clear Chat", key="clear_chat"):
