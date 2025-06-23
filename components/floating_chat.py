@@ -135,7 +135,7 @@ def render_chat_window():
                 if message['role'] == 'user':
                     st.markdown(f"**You:** {message['content']}")
                 else:
-                    st.markdown(f"**ARIA:** {message['content'][:200]}{'...' if len(message['content']) > 200 else ''}")
+                    st.markdown(f"**ARIA:** {message['content']}")
         
         # Chat input with paper airplane send
         user_input = st.text_input("Ask ARIA about GUARDIAN:", key="floating_chat_input", placeholder="e.g., How do I upload a policy document?")

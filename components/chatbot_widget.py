@@ -72,7 +72,7 @@ def render_chatbot_widget():
                 if message['role'] == 'user':
                     st.markdown(f"**You:** {message['content']}")
                 else:
-                    st.markdown(f"**ARIA:** {message['content'][:200]}{'...' if len(message['content']) > 200 else ''}")
+                    st.markdown(f"**ARIA:** {message['content']}")
         
         # Clear chat button
         if st.session_state.chat_messages and st.button("Clear Chat", key="clear_chat"):
