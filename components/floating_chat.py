@@ -26,8 +26,8 @@ def render_floating_chat():
         bottom: 20px;
         right: 20px;
         z-index: 9999;
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 40px;
     }
     
     .fixed-chat-window {
@@ -38,53 +38,50 @@ def render_floating_chat():
         max-height: 500px;
         z-index: 9998;
         background: white;
-        border-radius: 15px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         border: 1px solid #e5e7eb;
         overflow: hidden;
+    }
+    
+    /* Simple button styling */
+    .stButton > button {
+        background-color: #f8f9fa !important;
+        color: #374151 !important;
+        border: 1px solid #d1d5db !important;
+        border-radius: 8px !important;
+        font-weight: 500 !important;
+        font-size: 12px !important;
+        padding: 8px 12px !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .stButton > button:hover {
+        background-color: #e5e7eb !important;
+        border-color: #9ca3af !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+    }
+    
+    /* Special styling for send button */
+    .stButton[data-testid*="floating_send"] > button {
+        width: 40px !important;
+        height: 40px !important;
+        border-radius: 50% !important;
+        padding: 0 !important;
+        font-size: 16px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
-    # Create a fixed position container for the chat button
+    # Create a simple floating chat button
     if not st.session_state.chat_open:
-        # Show floating chat button with professional styling
-        st.markdown("""
-        <div class="fixed-chat-button">
-            <style>
-            .professional-chat-btn {
-                background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-                border: none;
-                color: white;
-                width: 60px;
-                height: 60px;
-                border-radius: 50%;
-                box-shadow: 0 4px 20px rgba(30, 64, 175, 0.4);
-                font-weight: 600;
-                font-size: 11px;
-                text-align: center;
-                line-height: 1.2;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                animation: professionalPulse 3s infinite;
-            }
-            .professional-chat-btn:hover {
-                transform: scale(1.05);
-                box-shadow: 0 6px 30px rgba(30, 64, 175, 0.6);
-            }
-            @keyframes professionalPulse {
-                0%, 100% { box-shadow: 0 4px 20px rgba(30, 64, 175, 0.4); }
-                50% { box-shadow: 0 4px 20px rgba(30, 64, 175, 0.7); }
-            }
-            </style>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        if st.button("ARIA\nAI", key="floating_chat_toggle", help="ARIA - Advanced Risk Intelligence Assistant"):
+        st.markdown('<div class="fixed-chat-button">', unsafe_allow_html=True)
+        if st.button("ARIA", key="floating_chat_toggle", help="ARIA - Advanced Risk Intelligence Assistant"):
             st.session_state.chat_open = True
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
@@ -97,23 +94,32 @@ def render_chat_window():
     """Render the floating chat window as a sidebar expander."""
     
     # Use an expander in the main content area for the chat window
-    with st.expander("⚡ ARIA - Advanced Risk Intelligence Assistant", expanded=True):
-        st.markdown("**Quick Help:**")
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("Scoring Guide", key="floating_scoring", help="Understanding scores"):
-                handle_quick_question("How does GUARDIAN scoring work?")
-            if st.button("Navigation", key="floating_nav", help="Learn navigation"):
-                handle_quick_question("How do I navigate the Policy Repository?")
-        with col2:
-            if st.button("Upload Help", key="floating_upload", help="Document upload"):
-                handle_quick_question("How do I upload and analyze a policy document?")
-            if st.button("Gap Analysis", key="floating_gaps", help="Policy gaps"):
-                handle_quick_question("What is policy gap analysis?")
+    with st.expander("ARIA - Advanced Risk Intelligence Assistant", expanded=True):
+        
+        # Display rotating tip
+        tips = [
+            "💡 Tip: Ask me about document scoring to understand the assessment frameworks",
+            "💡 Tip: Upload documents in PDF, TXT, or URL format for instant analysis", 
+            "💡 Tip: Click on any score badge to see detailed breakdown and recommendations",
+            "💡 Tip: Use filters to find documents by region, organization, or document type",
+            "💡 Tip: Try asking 'What are the critical gaps in my policy?' for targeted insights",
+            "💡 Tip: I can explain GUARDIAN's patent-protected algorithms and methodologies"
+        ]
+        
+        # Initialize tip index if not exists
+        if 'aria_tip_index' not in st.session_state:
+            st.session_state.aria_tip_index = 0
+        
+        # Show current tip and rotate every 5 seconds (simulated by user interaction)
+        import time
+        current_time = int(time.time())
+        tip_rotation_interval = 10  # Change tip every 10 seconds
+        current_tip_index = (current_time // tip_rotation_interval) % len(tips)
+        
+        st.info(tips[current_tip_index])
         
         # Chat messages
         if st.session_state.chat_messages:
-            st.markdown("---")
             st.markdown("**Recent Conversation:**")
             for message in st.session_state.chat_messages[-3:]:  # Show last 3 messages
                 if message['role'] == 'user':
@@ -121,17 +127,12 @@ def render_chat_window():
                 else:
                     st.markdown(f"**ARIA:** {message['content'][:200]}{'...' if len(message['content']) > 200 else ''}")
         
-        # Chat input
+        # Chat input with paper airplane send
         user_input = st.text_input("Ask ARIA about GUARDIAN:", key="floating_chat_input", placeholder="e.g., How do I upload a policy document?")
         
-        col_send, col_close = st.columns([2, 1])
-        with col_send:
-            if st.button("Send", key="floating_send", use_container_width=True) and user_input:
-                handle_user_message(user_input)
-        with col_close:
-            if st.button("Close Chat", key="close_floating_chat", use_container_width=True):
-                st.session_state.chat_open = False
-                st.rerun()
+        # Single send button with paper airplane
+        if st.button("✈️", key="floating_send", help="Send message") and user_input:
+            handle_user_message(user_input)
 
 def handle_user_message(message: str):
     """Handle user chat messages."""
