@@ -8,7 +8,7 @@ import uuid
 from utils.dialogflow_chatbot import chatbot
 
 def render_floating_chat():
-    """Render a floating chat button that opens a chat interface."""
+    """Render a simple floating chat interface using Streamlit components."""
     
     # Initialize chat state
     if 'chat_open' not in st.session_state:
@@ -18,196 +18,52 @@ def render_floating_chat():
     if 'chat_messages' not in st.session_state:
         st.session_state.chat_messages = []
 
-    # CSS for floating chat
+    # Simple CSS for positioned elements
     st.markdown("""
     <style>
-    .floating-chat-container {
+    .fixed-chat-button {
         position: fixed;
         bottom: 20px;
         right: 20px;
         z-index: 9999;
-        font-family: 'Inter', sans-serif;
-    }
-    
-    .chat-toggle-btn {
         width: 60px;
         height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
-        border: none;
-        color: white;
-        font-size: 24px;
-        cursor: pointer;
-        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        animation: pulse 2s infinite;
     }
     
-    .chat-toggle-btn:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6);
-    }
-    
-    @keyframes pulse {
-        0% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4); }
-        50% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.8); }
-        100% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4); }
-    }
-    
-    .chat-window {
+    .fixed-chat-window {
         position: fixed;
-        bottom: 90px;
+        top: 20px;
         right: 20px;
         width: 350px;
-        height: 500px;
+        max-height: 500px;
+        z-index: 9998;
         background: white;
         border-radius: 15px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         border: 1px solid #e5e7eb;
-        z-index: 9998;
-        display: flex;
-        flex-direction: column;
         overflow: hidden;
-    }
-    
-    .chat-header {
-        background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
-        color: white;
-        padding: 15px;
-        font-weight: 600;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .chat-close {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 18px;
-        cursor: pointer;
-        padding: 0;
-        width: 20px;
-        height: 20px;
-    }
-    
-    .chat-body {
-        flex: 1;
-        padding: 15px;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .chat-message {
-        padding: 10px;
-        border-radius: 10px;
-        max-width: 85%;
-        word-wrap: break-word;
-    }
-    
-    .user-message {
-        background: #3B82F6;
-        color: white;
-        align-self: flex-end;
-        margin-left: auto;
-    }
-    
-    .assistant-message {
-        background: #f3f4f6;
-        color: #374151;
-        align-self: flex-start;
-    }
-    
-    .quick-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 5px;
-        margin-bottom: 10px;
-    }
-    
-    .quick-btn {
-        background: #f3f4f6;
-        border: 1px solid #d1d5db;
-        color: #374151;
-        padding: 5px 8px;
-        border-radius: 15px;
-        font-size: 11px;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    
-    .quick-btn:hover {
-        background: #3B82F6;
-        color: white;
-        border-color: #3B82F6;
-    }
-    
-    .chat-input-area {
-        padding: 15px;
-        border-top: 1px solid #e5e7eb;
-        background: #fafafa;
     }
     </style>
     """, unsafe_allow_html=True)
 
-    # Render floating chat button
-    chat_button_html = f"""
-    <div class="floating-chat-container">
-        <div class="chat-toggle-btn" onclick="toggleChat()" title="Chat with GUARDIAN Assistant">
-            💬
-        </div>
-    </div>
-    
-    <script>
-    function toggleChat() {{
-        // Send message to Streamlit to toggle chat
-        window.parent.postMessage({{type: 'toggle_chat'}}, '*');
-    }}
-    </script>
-    """
-    
-    st.markdown(chat_button_html, unsafe_allow_html=True)
-
-    # Chat toggle logic
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col3:
+    # Create a fixed position container for the chat button
+    if not st.session_state.chat_open:
+        # Show floating chat button
+        st.markdown('<div class="fixed-chat-button">', unsafe_allow_html=True)
         if st.button("💬", key="floating_chat_toggle", help="Open GUARDIAN Assistant"):
-            st.session_state.chat_open = not st.session_state.chat_open
+            st.session_state.chat_open = True
             st.rerun()
-
+        st.markdown('</div>', unsafe_allow_html=True)
+    
     # Render chat window if open
     if st.session_state.chat_open:
         render_chat_window()
 
 def render_chat_window():
-    """Render the floating chat window."""
+    """Render the floating chat window as a sidebar expander."""
     
-    # Chat window HTML structure
-    chat_window_html = """
-    <div class="chat-window">
-        <div class="chat-header">
-            <span>🤖 GUARDIAN Assistant</span>
-            <button class="chat-close" onclick="closeChat()">×</button>
-        </div>
-    </div>
-    
-    <script>
-    function closeChat() {
-        window.parent.postMessage({type: 'close_chat'}, '*');
-    }
-    </script>
-    """
-    
-    # Use container for chat content
-    with st.container():
-        st.markdown("### 🤖 GUARDIAN Assistant")
-        
-        # Quick help buttons
+    # Use an expander in the main content area for the chat window
+    with st.expander("🤖 GUARDIAN Assistant", expanded=True):
         st.markdown("**Quick Help:**")
         col1, col2 = st.columns(2)
         with col1:
@@ -224,22 +80,24 @@ def render_chat_window():
         # Chat messages
         if st.session_state.chat_messages:
             st.markdown("---")
+            st.markdown("**Recent Conversation:**")
             for message in st.session_state.chat_messages[-3:]:  # Show last 3 messages
                 if message['role'] == 'user':
                     st.markdown(f"**You:** {message['content']}")
                 else:
-                    st.markdown(f"**Assistant:** {message['content'][:150]}{'...' if len(message['content']) > 150 else ''}")
+                    st.markdown(f"**Assistant:** {message['content'][:200]}{'...' if len(message['content']) > 200 else ''}")
         
         # Chat input
         user_input = st.text_input("Ask me anything about GUARDIAN:", key="floating_chat_input", placeholder="e.g., How do I upload a policy?")
         
-        if st.button("Send", key="floating_send", use_container_width=True) and user_input:
-            handle_user_message(user_input)
-        
-        # Close button
-        if st.button("Close Chat", key="close_floating_chat"):
-            st.session_state.chat_open = False
-            st.rerun()
+        col_send, col_close = st.columns([2, 1])
+        with col_send:
+            if st.button("Send", key="floating_send", use_container_width=True) and user_input:
+                handle_user_message(user_input)
+        with col_close:
+            if st.button("Close Chat", key="close_floating_chat", use_container_width=True):
+                st.session_state.chat_open = False
+                st.rerun()
 
 def handle_user_message(message: str):
     """Handle user chat messages."""
