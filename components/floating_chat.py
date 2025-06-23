@@ -98,12 +98,12 @@ def render_chat_window():
         
         # Display rotating tip
         tips = [
-            "💡 Tip: Ask me about document scoring to understand the assessment frameworks",
-            "💡 Tip: Upload documents in PDF, TXT, or URL format for instant analysis", 
-            "💡 Tip: Click on any score badge to see detailed breakdown and recommendations",
-            "💡 Tip: Use filters to find documents by region, organization, or document type",
-            "💡 Tip: Try asking 'What are the critical gaps in my policy?' for targeted insights",
-            "💡 Tip: I can explain GUARDIAN's patent-protected algorithms and methodologies"
+            "Tip: Ask me about document scoring to understand the assessment frameworks",
+            "Tip: Upload documents in PDF, TXT, or URL format for instant analysis", 
+            "Tip: Click on any score badge to see detailed breakdown and recommendations",
+            "Tip: Use filters to find documents by region, organization, or document type",
+            "Tip: Try asking 'What are the critical gaps in my policy?' for targeted insights",
+            "Tip: I can explain GUARDIAN's patent-protected algorithms and methodologies"
         ]
         
         # Initialize tip index if not exists
@@ -130,8 +130,8 @@ def render_chat_window():
         # Chat input with paper airplane send
         user_input = st.text_input("Ask ARIA about GUARDIAN:", key="floating_chat_input", placeholder="e.g., How do I upload a policy document?")
         
-        # Single send button with paper airplane
-        if st.button("✈️", key="floating_send", help="Send message") and user_input:
+        # Single send button with folded paper airplane
+        if st.button("📤", key="floating_send", help="Send message") and user_input:
             handle_user_message(user_input)
 
 def handle_user_message(message: str):
