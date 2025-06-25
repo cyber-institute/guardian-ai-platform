@@ -34,7 +34,7 @@ def main():
     
     # Onboarding system moved to chatbot widget
     
-    # Custom CSS styling - Government/Nonprofit Theme
+    # Custom CSS styling - Government/Nonprofit Theme with BLUE BUTTONS
     st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Serif+Pro:wght@400;600&display=swap');
@@ -47,6 +47,44 @@ def main():
     
     .stApp {
         background-color: #ffffff;
+    }
+    
+    /* GLOBAL BLUE BUTTON OVERRIDE - FORCE ALL SIDEBAR BUTTONS TO BE BLUE WITH WHITE TEXT */
+    div[data-testid="stSidebar"] .stButton > button,
+    div[data-testid="stSidebar"] .stFormSubmitButton > button {
+        background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
+        color: #FFFFFF !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-size: 28px !important;
+        font-weight: 700 !important;
+        padding: 18px 25px !important;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+        transition: all 0.3s ease !important;
+        min-height: 65px !important;
+        width: auto !important;
+    }
+    
+    div[data-testid="stSidebar"] .stButton > button:hover,
+    div[data-testid="stSidebar"] .stFormSubmitButton > button:hover {
+        background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
+        color: #FFFFFF !important;
+        box-shadow: 0 6px 18px rgba(59, 130, 246, 0.6) !important;
+        transform: translateY(-2px) !important;
+    }
+    
+    div[data-testid="stSidebar"] .stButton > button:active,
+    div[data-testid="stSidebar"] .stFormSubmitButton > button:active {
+        color: #FFFFFF !important;
+        transform: translateY(0px) !important;
+    }
+    
+    /* Force white text for ALL button content */
+    div[data-testid="stSidebar"] .stButton > button *,
+    div[data-testid="stSidebar"] .stFormSubmitButton > button * {
+        color: #FFFFFF !important;
+        font-size: 28px !important;
+        font-weight: 700 !important;
     }
     
     .stApp > header {
