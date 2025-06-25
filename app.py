@@ -66,10 +66,10 @@ def main():
         border-radius: 8px !important;
         font-size: 11px !important;
         font-weight: 400 !important;
-        padding: 15px 20px !important;
+        padding: 8px 10px !important;
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
         transition: all 0.3s ease !important;
-        min-height: 60px !important;
+        min-height: 30px !important;
         width: auto !important;
         text-shadow: none !important;
     }
