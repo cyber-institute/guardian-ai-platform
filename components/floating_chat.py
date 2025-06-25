@@ -26,130 +26,109 @@ def render_floating_chat():
         render_floating_button()
 
 def render_floating_button():
-    """Render the floating chat button using HTML with proper Streamlit integration."""
+    """Render a fake working chat bubble with speech bubble shape."""
     
-    # Initialize session state trigger
-    if 'aria_clicked' not in st.session_state:
-        st.session_state.aria_clicked = False
-    
-    # CSS and HTML for floating button
+    # CSS for the speech bubble shaped chat button
     st.markdown("""
     <style>
-    .floating-aria-btn {
+    .speech-bubble {
         position: fixed;
         bottom: 20px;
         right: 20px;
-        width: 60px;
+        width: 80px;
         height: 60px;
-        border-radius: 50%;
         background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
-        color: white;
-        border: none;
-        font-weight: 600;
-        font-size: 12px;
-        cursor: pointer;
-        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
-        z-index: 10000;
+        border-radius: 40px;
         display: flex;
         align-items: center;
         justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+        z-index: 10000;
         transition: all 0.3s ease;
-        animation: ariaPulse 3s infinite;
+        animation: bubblePulse 3s infinite;
         user-select: none;
+        border: 3px solid #1E40AF;
     }
     
-    .floating-aria-btn:hover {
-        transform: scale(1.1);
+    .speech-bubble:before {
+        content: "";
+        position: absolute;
+        bottom: -15px;
+        left: 20px;
+        width: 0;
+        height: 0;
+        border-left: 15px solid transparent;
+        border-right: 0px solid transparent;
+        border-top: 15px solid #1E40AF;
+        transform: rotate(15deg);
+    }
+    
+    .speech-bubble:hover {
+        transform: scale(1.05);
         box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6);
     }
     
-    .floating-aria-btn:active {
+    .speech-bubble:active {
         transform: scale(0.95);
     }
     
-    @keyframes ariaPulse {
+    .bubble-lines {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        align-items: center;
+    }
+    
+    .bubble-line {
+        width: 30px;
+        height: 3px;
+        background: white;
+        border-radius: 2px;
+    }
+    
+    .bubble-line:nth-child(2) {
+        width: 25px;
+    }
+    
+    .bubble-line:nth-child(3) {
+        width: 35px;
+    }
+    
+    @keyframes bubblePulse {
         0%, 100% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4); }
         50% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.8); }
     }
+    
+    /* Hide the real Streamlit button */
+    .hidden-aria-btn {
+        position: fixed;
+        bottom: -100px;
+        right: -100px;
+        opacity: 0;
+        pointer-events: none;
+        z-index: -1;
+    }
     </style>
     
-    <div class="floating-aria-btn" id="ariaBtn">
-        ARIA
+    <div class="speech-bubble" onclick="
+        const hiddenBtn = document.querySelector('.hidden-aria-btn button');
+        if (hiddenBtn) hiddenBtn.click();
+    ">
+        <div class="bubble-lines">
+            <div class="bubble-line"></div>
+            <div class="bubble-line"></div>
+            <div class="bubble-line"></div>
+        </div>
     </div>
-    
-    <script>
-    // Use session state approach to trigger Streamlit rerun
-    (function() {
-        const ariaBtn = document.getElementById('ariaBtn');
-        if (ariaBtn && !ariaBtn.hasEventListener) {
-            ariaBtn.hasEventListener = true;
-            ariaBtn.addEventListener('click', function() {
-                // Set a flag in localStorage that Streamlit can check
-                localStorage.setItem('aria_chat_trigger', Date.now().toString());
-                
-                // Trigger a Streamlit rerun by dispatching a custom event
-                window.dispatchEvent(new CustomEvent('ariaButtonClicked'));
-                
-                // Also try to trigger Streamlit's built-in event system
-                if (window.parent && window.parent.postMessage) {
-                    window.parent.postMessage({
-                        type: 'streamlit:setComponentValue',
-                        value: { clicked: true, timestamp: Date.now() }
-                    }, '*');
-                }
-            });
-        }
-    })();
-    </script>
     """, unsafe_allow_html=True)
     
-    # Check for click trigger using timestamp
-    current_timestamp = int(time.time())
-    stored_trigger = st.session_state.get('last_aria_trigger', '0')
-    
-    # Use a polling approach with session state
-    if st.button("", key="aria_trigger_check", help="Hidden trigger"):
+    # Hidden Streamlit button that actually works
+    st.markdown('<div class="hidden-aria-btn">', unsafe_allow_html=True)
+    if st.button("Open ARIA Chat", key="hidden_aria_button", help="Hidden ARIA button"):
         st.session_state.chat_open = True
         st.rerun()
-    
-    # JavaScript-based trigger detection
-    st.markdown(f"""
-    <script>
-    // Check localStorage for trigger
-    const trigger = localStorage.getItem('aria_chat_trigger');
-    if (trigger && trigger !== '{stored_trigger}') {{
-        localStorage.setItem('aria_chat_trigger', '');
-        // Find and click the hidden Streamlit button
-        setTimeout(() => {{
-            const hiddenBtn = document.querySelector('[data-testid*="aria_trigger_check"] button');
-            if (hiddenBtn) {{
-                hiddenBtn.click();
-            }}
-        }}, 50);
-    }}
-    </script>
-    """, unsafe_allow_html=True)
-    
-    # Alternative approach: Use query parameters
-    query_params = st.query_params
-    if 'aria_open' in query_params:
-        st.session_state.chat_open = True
-        # Clear the query parameter
-        new_params = {k: v for k, v in query_params.items() if k != 'aria_open'}
-        st.query_params.clear()
-        for k, v in new_params.items():
-            st.query_params[k] = v
-        st.rerun()
-    
-    # Fallback: Check for click state changes
-    if 'aria_last_check' not in st.session_state:
-        st.session_state.aria_last_check = current_timestamp
-    
-    # Simple polling mechanism - check every few seconds
-    if current_timestamp - st.session_state.aria_last_check > 2:
-        st.session_state.aria_last_check = current_timestamp
-        # This causes a rerun that can detect state changes
-        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
 def render_sidebar_chat():
     """Render chat interface in an expander when open."""
@@ -242,130 +221,27 @@ def render_sidebar_chat():
                 if user_input:
                     handle_user_message(user_input)
 
-def handle_user_message(message: str):
-    """Handle user chat messages."""
-    try:
-        # Use chatbot for response with correct method
-        response = chatbot.detect_intent(message, st.session_state.chat_session_id)
-        response_text = response.get('response_text', 'I understand your question. Let me help you with GUARDIAN.')
-        
-        # Add to chat history
+def handle_user_message(user_input):
+    """Handle user message and generate response."""
+    if user_input.strip():
+        # Add user message to chat history
         st.session_state.chat_messages.append({
             'role': 'user',
-            'content': message
-        })
-        st.session_state.chat_messages.append({
-            'role': 'assistant',
-            'content': response_text
+            'content': user_input
         })
         
-        # Keep only last 10 messages for performance
-        if len(st.session_state.chat_messages) > 10:
-            st.session_state.chat_messages = st.session_state.chat_messages[-10:]
+        # Generate response using the chatbot
+        try:
+            response = chatbot(user_input, st.session_state.chat_session_id)
+            st.session_state.chat_messages.append({
+                'role': 'assistant',
+                'content': response
+            })
+        except Exception as e:
+            st.session_state.chat_messages.append({
+                'role': 'assistant',
+                'content': f"I'm having trouble processing your request right now. Please try asking about GUARDIAN's features, document scoring, or navigation help."
+            })
         
+        # Clear the input and rerun
         st.rerun()
-    except Exception as e:
-        st.error(f"Chat error: {e}")
-
-def handle_quick_question(question: str):
-    """Handle predefined quick questions."""
-    responses = {
-        "How does GUARDIAN scoring work?": """**ARIA Analysis: GUARDIAN Scoring System**
-
-**Four Assessment Frameworks:**
-1. **AI Cybersecurity**: 0-100 points using NIST AI RMF
-2. **Quantum Cybersecurity**: 1-5 tier QCMEA framework 
-3. **AI Ethics**: 0-100 points evaluating ethical practices
-4. **Quantum Ethics**: 0-100 points assessing compliance
-
-**Patent-Based Algorithms:**
-- Dynamic governance using reinforcement learning
-- Bayesian updates for real-time risk assessment
-- Adaptive scoring based on emerging threats
-
-**Color-Coded Intelligence:**
-- Green (High): Strong compliance and maturity
-- Yellow (Medium): Areas needing attention  
-- Red (Low): Critical gaps requiring immediate action""",
-
-        "How do I navigate the Policy Repository?": """**ARIA Navigation Guide: Policy Repository**
-
-**Main Sections:**
-- **Policy Repository**: Browse all analyzed documents
-- **Policy Analyzer**: Upload new documents for analysis
-- **Patent Technology**: View GUARDIAN's technical details
-- **About GUARDIAN**: System overview and capabilities
-
-**Intelligent Filtering:**
-- Use filters by region, organization, document type
-- Search by keywords in content or metadata
-- Sort by scores, date, or relevance
-
-**Document Actions:**
-- Click scores to see detailed analysis
-- Use Content Preview for quick summary
-- Translation available for international documents
-
-**ARIA Tips:**
-- Hover over elements for contextual help
-- Use quick filters for common searches
-- Check score explanations for improvement guidance""",
-
-        "How do I upload and analyze a policy document?": """**ARIA Guide: Document Upload & Analysis**
-
-**Step 1: Access Policy Analyzer**
-- Go to 'Policy Repository' → 'Policy Analyzer'
-- Use the document upload section
-
-**Step 2: Upload Document**  
-- Supports PDF, TXT, and URL formats
-- Drag & drop or click to browse files
-- Add organization name and document type
-
-**Step 3: AI Analysis Process**
-- GUARDIAN extracts and processes content
-- Applies patent-based scoring algorithms
-- Generates comprehensive gap analysis
-
-**Step 4: Review Intelligence**
-- View detailed scoring across all frameworks
-- Check gap analysis with severity levels
-- Access strategic recommendations for improvement
-
-Analysis takes 30-60 seconds depending on document size.""",
-
-        "What is policy gap analysis?": """**ARIA Intelligence: Policy Gap Analysis**
-
-**GUARDIAN Patent Algorithm:**
-Uses reinforcement learning to identify policy weaknesses and provide targeted recommendations.
-
-**Gap Severity Intelligence:**
-- **Critical**: Immediate attention required
-- **High**: Address within 30 days  
-- **Medium**: Address within 90 days
-- **Low**: Monitor and improve
-
-**Analysis Areas:**
-- Regulatory compliance gaps
-- Security framework deficiencies
-- Ethics policy weaknesses
-- Implementation inconsistencies
-
-**ARIA Benefits:**
-- Proactive risk identification
-- Compliance assurance
-- Continuous improvement tracking
-- Evidence-based policy development"""
-    }
-    
-    response = responses.get(question, "I'm ARIA, your Advanced Risk Intelligence Assistant. I can help with GUARDIAN navigation, scoring, document upload, and policy analysis. What would you like to know?")
-    
-    st.session_state.chat_messages.append({
-        'role': 'user',
-        'content': question
-    })
-    st.session_state.chat_messages.append({
-        'role': 'assistant', 
-        'content': response
-    })
-    st.rerun()
