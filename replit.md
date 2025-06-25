@@ -113,8 +113,10 @@ GUARDIAN (Governance Using AI for Risk Detection, Integration, Analysis, and Not
 
 ## Changelog
 
-- June 25, 2025. Initial setup
+- June 25, 2025: Implemented stable floating chat system with speech bubble design and working ARIA interface
+- June 25, 2025: Initial setup
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+UI Design preferences: Speech bubble shaped chat buttons, blue gradient styling with white text, compact button sizing with 11px font
