@@ -134,7 +134,32 @@ def render_floating_button():
     with st.sidebar:
         st.markdown("---")
         st.markdown("**Test Chat Interface**")
-        if st.button("🗨️ Test ARIA Chat", key="test_aria_chat", use_container_width=True):
+        
+        # Blue button styling for test button
+        st.markdown("""
+        <style>
+        /* Specific styling for test button */
+        div[data-testid="column"] .stButton > button {
+            background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            padding: 12px 24px !important;
+            box-shadow: 0 3px 10px rgba(59, 130, 246, 0.4) !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        div[data-testid="column"] .stButton > button:hover {
+            background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.6) !important;
+            transform: translateY(-2px) !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        if st.button("Test ARIA Chat", key="test_aria_chat"):
             st.session_state.chat_open = True
             st.rerun()
 
@@ -144,8 +169,44 @@ def render_sidebar_chat():
         st.markdown("### 💬 ARIA Chat")
         st.markdown("*Advanced Risk Intelligence Assistant*")
         
+        # Custom CSS for blue button styling
+        st.markdown("""
+        <style>
+        /* Blue button styling for ARIA chat */
+        .stButton > button {
+            background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            padding: 10px 20px !important;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+            transition: all 0.3s ease !important;
+            width: auto !important;
+            max-width: 200px !important;
+        }
+        
+        .stButton > button:hover {
+            background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5) !important;
+            transform: translateY(-1px) !important;
+        }
+        
+        .stButton > button:active {
+            transform: translateY(0px) !important;
+        }
+        
+        /* Adjust text input styling */
+        .stTextInput > div > div > input {
+            font-size: 14px !important;
+            padding: 8px 12px !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
         # Close button
-        if st.button("❌ Close Chat", key="aria_close_chat", use_container_width=True):
+        if st.button("Close Chat", key="aria_close_chat"):
             st.session_state.chat_open = False
             st.rerun()
         
@@ -189,17 +250,17 @@ def render_sidebar_chat():
         
         # Chat input section
         user_input = st.text_input(
-            "Ask ARIA:", 
+            "Type your message:", 
             key="aria_chat_input_real", 
-            placeholder="How do I upload documents?",
-            label_visibility="collapsed"
+            placeholder="Ask ARIA about GUARDIAN features...",
+            label_visibility="visible"
         )
         
-        col1, col2 = st.columns([3, 1])
+        col1, col2 = st.columns([2, 1])
         with col1:
-            send_clicked = st.button("Send", key="aria_send_btn", use_container_width=True)
+            send_clicked = st.button("Send Message", key="aria_send_btn")
         with col2:
-            clear_clicked = st.button("🗑️", key="aria_clear_btn", help="Clear chat")
+            clear_clicked = st.button("Clear", key="aria_clear_btn")
         
         # Handle button clicks
         if send_clicked and user_input.strip():
