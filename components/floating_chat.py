@@ -25,67 +25,60 @@ def render_floating_chat():
         render_floating_button()
 
 def render_floating_button():
-    """Render the floating chat button."""
-    # CSS for floating button
-    st.markdown("""
-    <style>
-    .floating-chat-btn {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
-        color: white;
-        border: none;
-        font-weight: 600;
-        font-size: 12px;
-        cursor: pointer;
-        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
-        z-index: 10000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        animation: pulse 3s infinite;
-    }
+    """Render the floating chat button using container positioning."""
+    # Create columns to position button in bottom right
+    col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 0.15])
     
-    .floating-chat-btn:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6);
-    }
-    
-    @keyframes pulse {
-        0%, 100% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4); }
-        50% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.8); }
-    }
-    </style>
-    """, unsafe_allow_html=True)
-    
-    # Hidden Streamlit button for functionality
-    if st.button("", key="aria_chat_btn", help="Open ARIA Chat"):
-        st.session_state.chat_open = True
-        st.rerun()
-    
-    # Floating button HTML
-    st.markdown("""
-    <div class="floating-chat-btn" onclick="document.querySelector('[data-testid*=\"aria_chat_btn\"] button').click()">
-        ARIA
-    </div>
-    """, unsafe_allow_html=True)
+    with col5:
+        # CSS for the positioned button
+        st.markdown("""
+        <style>
+        div[data-testid="column"]:last-child {
+            position: fixed !important;
+            bottom: 20px !important;
+            right: 20px !important;
+            z-index: 10000 !important;
+            width: 70px !important;
+        }
+        
+        div[data-testid="column"]:last-child .stButton > button {
+            width: 60px !important;
+            height: 60px !important;
+            border-radius: 50% !important;
+            background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
+            color: white !important;
+            border: none !important;
+            font-weight: 600 !important;
+            font-size: 12px !important;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4) !important;
+            transition: all 0.3s ease !important;
+            animation: chatPulse 3s infinite !important;
+        }
+        
+        div[data-testid="column"]:last-child .stButton > button:hover {
+            transform: scale(1.05) !important;
+            box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6) !important;
+        }
+        
+        @keyframes chatPulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4); }
+            50% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.8); }
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        if st.button("ARIA", key="aria_floating_btn", help="ARIA - Advanced Risk Intelligence Assistant"):
+            st.session_state.chat_open = True
+            st.rerun()
 
 def render_sidebar_chat():
-    """Render chat interface in sidebar when open."""
-    with st.sidebar:
-        # Chat header with close button
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            st.markdown("**ARIA** - Advanced Risk Intelligence Assistant")
-        with col2:
-            if st.button("×", key="close_chat", help="Close chat"):
-                st.session_state.chat_open = False
-                st.rerun()
+    """Render chat interface in an expander when open."""
+    # Create a floating chat window using expander
+    with st.expander("💬 ARIA - Advanced Risk Intelligence Assistant", expanded=True):
+        # Close button
+        if st.button("Close Chat", key="aria_close_chat", use_container_width=True):
+            st.session_state.chat_open = False
+            st.rerun()
         
         st.markdown("---")
         
@@ -112,46 +105,61 @@ def render_sidebar_chat():
             # CSS for conversation bubbles
             st.markdown("""
             <style>
-            .user-message {
+            .user-bubble {
                 background: #3B82F6;
                 color: white;
-                padding: 8px 12px;
-                border-radius: 18px 18px 4px 18px;
-                margin: 8px 0 8px 20px;
-                text-align: right;
-                display: block;
+                padding: 10px 15px;
+                border-radius: 20px 20px 5px 20px;
+                margin: 8px 0 8px 40px;
+                display: inline-block;
+                max-width: 80%;
+                word-wrap: break-word;
+                float: right;
+                clear: both;
             }
             
-            .assistant-message {
-                background: #f1f5f9;
-                color: #1e293b;
-                padding: 8px 12px;
-                border-radius: 18px 18px 18px 4px;
-                margin: 8px 20px 8px 0;
+            .assistant-bubble {
+                background: #f8fafc;
+                color: #334155;
+                padding: 10px 15px;
+                border-radius: 20px 20px 20px 5px;
+                margin: 8px 40px 8px 0;
                 border: 1px solid #e2e8f0;
-                display: block;
+                display: inline-block;
+                max-width: 80%;
+                word-wrap: break-word;
+                float: left;
+                clear: both;
+            }
+            
+            .chat-container::after {
+                content: "";
+                display: table;
+                clear: both;
             }
             </style>
             """, unsafe_allow_html=True)
             
+            st.markdown('<div class="chat-container">', unsafe_allow_html=True)
             for message in st.session_state.chat_messages[-4:]:
                 if message['role'] == 'user':
-                    st.markdown(f'<div class="user-message">{message["content"]}</div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="user-bubble">{message["content"]}</div>', unsafe_allow_html=True)
                 else:
-                    st.markdown(f'<div class="assistant-message">{message["content"]}</div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="assistant-bubble">{message["content"]}</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
         else:
-            st.markdown("Start a conversation with ARIA!")
+            st.markdown("*Start a conversation with ARIA by typing below!*")
         
         # Chat input
-        user_input = st.text_input("Ask ARIA about GUARDIAN:", key="floating_chat_input_sidebar", placeholder="e.g., How do I upload a policy document?")
+        user_input = st.text_input("Type your message:", key="aria_chat_input", placeholder="Ask ARIA about GUARDIAN features...")
         
-        col1, col2 = st.columns([3, 1])
+        col1, col2 = st.columns([4, 1])
         with col1:
-            if st.button("Send Message", key="floating_send_msg", use_container_width=True):
+            if st.button("Send Message", key="aria_send_full", use_container_width=True):
                 if user_input:
                     handle_user_message(user_input)
         with col2:
-            if st.button("▷", key="floating_send_arrow", help="Send"):
+            if st.button("▷", key="aria_send_arrow", help="Send"):
                 if user_input:
                     handle_user_message(user_input)
 
