@@ -26,95 +26,11 @@ def render_floating_chat():
         render_floating_button()
 
 def render_floating_button():
-    """Render floating chat button using Streamlit's HTML component bridge."""
-    
-    # The proven solution: Use st.components.v1.html with bidirectional communication
-    import streamlit.components.v1 as components
-    
-    # Create the HTML component with embedded JavaScript
-    html_code = f"""
-    <div id="aria-chat-container">
-        <style>
-        #aria-chat-container {{
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 10000;
-            pointer-events: none;
-        }}
-        
-        .floating-aria-btn {{
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
-            color: white;
-            border: none;
-            font-weight: 600;
-            font-size: 12px;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            animation: ariaPulse 3s infinite;
-            user-select: none;
-            pointer-events: auto;
-        }}
-        
-        .floating-aria-btn:hover {{
-            transform: scale(1.1);
-            box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6);
-        }}
-        
-        .floating-aria-btn:active {{
-            transform: scale(0.95);
-        }}
-        
-        @keyframes ariaPulse {{
-            0%, 100% {{ box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4); }}
-            50% {{ box-shadow: 0 4px 20px rgba(59, 130, 246, 0.8); }}
-        }}
-        </style>
-        
-        <button class="floating-aria-btn" onclick="openAriaChat()">
-            ARIA
-        </button>
-        
-        <script>
-        function openAriaChat() {{
-            // Send data back to Streamlit using the component communication method
-            window.parent.postMessage({{
-                type: 'streamlit:setComponentValue',
-                value: {{ action: 'open_chat', timestamp: Date.now() }}
-            }}, '*');
-            
-            // Visual feedback
-            document.querySelector('.floating-aria-btn').style.transform = 'scale(0.9)';
-            setTimeout(() => {{
-                document.querySelector('.floating-aria-btn').style.transform = '';
-            }}, 150);
-        }}
-        </script>
-    </div>
-    """
-    
-    # Use Streamlit's HTML component for reliable communication
-    component_value = components.html(html_code, height=80, width=80)
-    
-    # Check if the component sent back a value
-    if component_value and isinstance(component_value, dict):
-        if component_value.get('action') == 'open_chat':
-            st.session_state.chat_open = True
-            st.rerun()
-
-def render_sidebar_chat():
-    """Render floating chat bubble using Streamlit components."""
+    """Render floating chat button using proven postMessage approach."""
     
     import streamlit.components.v1 as components
     
-    # Get current tip and messages
+    # Get current tip for chat bubble
     tips = [
         "Ask me about document scoring to understand the assessment frameworks",
         "Upload documents in PDF, TXT, or URL format for instant analysis", 
@@ -125,232 +41,215 @@ def render_sidebar_chat():
     ]
     current_tip_index = (int(time.time()) // 10) % len(tips)
     
-    # Format messages for HTML
+    # Format messages for display
     messages_html = ""
     if st.session_state.chat_messages:
         for message in st.session_state.chat_messages[-4:]:
             if message['role'] == 'user':
-                messages_html += f'''
-                <div class="user-message">
-                    <div class="message-content">{message["content"]}</div>
-                </div>'''
+                messages_html += f'<div class="user-msg">{message["content"]}</div>'
             else:
-                messages_html += f'''
-                <div class="assistant-message">
-                    <div class="message-content">{message["content"]}</div>
-                </div>'''
+                messages_html += f'<div class="aria-msg">{message["content"]}</div>'
     else:
-        messages_html = '<div class="empty-chat">Start a conversation with ARIA!</div>'
+        messages_html = '<div class="empty-msg">Start a conversation with ARIA!</div>'
     
-    # Create floating chat bubble HTML
-    chat_html = f"""
-    <div id="chat-bubble-container">
-        <style>
-        #chat-bubble-container {{
-            position: fixed;
-            bottom: 90px;
-            right: 20px;
-            width: 350px;
-            max-height: 500px;
-            z-index: 10001;
-            pointer-events: auto;
+    # Complete HTML with floating button and chat bubble
+    html_code = f"""
+    <div style="position: fixed; bottom: 20px; right: 20px; z-index: 10000;">
+        <!-- Floating ARIA Button -->
+        <button onclick="openChat()" style="
+            width: 60px; 
+            height: 60px; 
+            border-radius: 50%; 
+            background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%); 
+            color: white; 
+            border: none; 
+            font-weight: 600; 
+            font-size: 12px; 
+            cursor: pointer; 
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4); 
+            transition: all 0.3s ease;
+            animation: ariaPulse 3s infinite;
+        ">ARIA</button>
+    </div>
+
+    <!-- Floating Chat Bubble -->
+    <div id="chatBubble" style="
+        display: none; 
+        position: fixed; 
+        bottom: 90px; 
+        right: 20px; 
+        width: 350px; 
+        height: 500px; 
+        background: white; 
+        border-radius: 15px; 
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15); 
+        border: 1px solid #e5e7eb; 
+        z-index: 10001;
+        animation: slideUp 0.3s ease;
+        overflow: hidden;
+    ">
+        <!-- Chat Header -->
+        <div style="
+            background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%); 
+            color: white; 
+            padding: 15px 20px; 
+            font-weight: 600; 
+            font-size: 14px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+        ">
+            <span>ARIA - Advanced Risk Intelligence Assistant</span>
+            <button onclick="closeChat()" style="
+                background: rgba(255, 255, 255, 0.2); 
+                border: none; 
+                color: white; 
+                width: 24px; 
+                height: 24px; 
+                border-radius: 50%; 
+                cursor: pointer; 
+                font-size: 16px;
+            ">&times;</button>
+        </div>
+        
+        <!-- Chat Body -->
+        <div style="padding: 15px; max-height: 300px; overflow-y: auto;">
+            <div style="
+                background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); 
+                border: 1px solid #93c5fd; 
+                border-radius: 10px; 
+                padding: 10px; 
+                margin-bottom: 15px; 
+                font-size: 13px; 
+                color: #1e40af;
+            ">💡 {tips[current_tip_index]}</div>
+            
+            <div id="chatMessages">{messages_html}</div>
+        </div>
+        
+        <!-- Chat Input -->
+        <div style="
+            padding: 15px; 
+            border-top: 1px solid #e5e7eb; 
+            background: #fafafa; 
+            display: flex; 
+            gap: 10px; 
+            align-items: center;
+        ">
+            <input type="text" id="chatInput" placeholder="Ask ARIA about GUARDIAN..." style="
+                flex: 1; 
+                border: 1px solid #d1d5db; 
+                border-radius: 20px; 
+                padding: 10px 15px; 
+                font-size: 14px; 
+                outline: none;
+            " onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()" style="
+                width: 40px; 
+                height: 40px; 
+                border-radius: 50%; 
+                background: #3B82F6; 
+                color: white; 
+                border: none; 
+                cursor: pointer; 
+                font-size: 16px;
+            ">▷</button>
+        </div>
+    </div>
+
+    <style>
+        @keyframes ariaPulse {{
+            0%, 100% {{ box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4); }}
+            50% {{ box-shadow: 0 4px 20px rgba(59, 130, 246, 0.8); }}
         }}
         
-        .chat-bubble-window {{
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-            border: 1px solid #e5e7eb;
-            animation: slideUpChat 0.3s ease;
-            overflow: hidden;
-        }}
-        
-        @keyframes slideUpChat {{
+        @keyframes slideUp {{
             from {{ transform: translateY(20px); opacity: 0; }}
             to {{ transform: translateY(0); opacity: 1; }}
         }}
         
-        .chat-bubble-header {{
-            background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
-            color: white;
-            padding: 15px 20px;
-            font-weight: 600;
-            font-size: 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }}
-        
-        .chat-close-btn {{
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }}
-        
-        .chat-close-btn:hover {{
-            background: rgba(255, 255, 255, 0.3);
-        }}
-        
-        .chat-bubble-body {{
-            padding: 15px;
-            max-height: 300px;
-            overflow-y: auto;
-        }}
-        
-        .chat-tip {{
-            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-            border: 1px solid #93c5fd;
-            border-radius: 10px;
-            padding: 10px;
-            margin-bottom: 15px;
-            font-size: 13px;
-            color: #1e40af;
-        }}
-        
-        .user-message {{
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 10px;
-        }}
-        
-        .user-message .message-content {{
+        .user-msg {{
             background: #3B82F6;
             color: white;
             padding: 10px 15px;
             border-radius: 18px 18px 4px 18px;
+            margin: 8px 0 8px 40px;
             max-width: 80%;
             word-wrap: break-word;
         }}
         
-        .assistant-message {{
-            display: flex;
-            justify-content: flex-start;
-            margin-bottom: 10px;
-        }}
-        
-        .assistant-message .message-content {{
+        .aria-msg {{
             background: #f8fafc;
             color: #334155;
             padding: 10px 15px;
             border-radius: 18px 18px 18px 4px;
             border: 1px solid #e2e8f0;
+            margin: 8px 40px 8px 0;
             max-width: 80%;
             word-wrap: break-word;
         }}
         
-        .empty-chat {{
+        .empty-msg {{
             text-align: center;
             color: #64748b;
             font-style: italic;
             padding: 20px;
         }}
-        
-        .chat-bubble-input {{
-            padding: 15px;
-            border-top: 1px solid #e5e7eb;
-            background: #fafafa;
-            display: flex;
-            gap: 10px;
-            align-items: center;
+    </style>
+
+    <script>
+        function openChat() {{
+            document.getElementById("chatBubble").style.display = "block";
+            parent.postMessage({{
+                isStreamlitMessage: true, 
+                type: "streamlit:setComponentValue", 
+                value: "open_chat"
+            }}, "*");
         }}
         
-        .chat-input-field {{
-            flex: 1;
-            border: 1px solid #d1d5db;
-            border-radius: 20px;
-            padding: 10px 15px;
-            font-size: 14px;
-            outline: none;
-        }}
-        
-        .chat-input-field:focus {{
-            border-color: #3B82F6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }}
-        
-        .chat-send-btn {{
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #3B82F6;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }}
-        
-        .chat-send-btn:hover {{
-            background: #1E40AF;
-            transform: scale(1.05);
-        }}
-        </style>
-        
-        <div class="chat-bubble-window">
-            <div class="chat-bubble-header">
-                <span>ARIA - Advanced Risk Intelligence Assistant</span>
-                <button class="chat-close-btn" onclick="closeChat()">×</button>
-            </div>
-            
-            <div class="chat-bubble-body">
-                <div class="chat-tip">💡 {tips[current_tip_index]}</div>
-                {messages_html}
-            </div>
-            
-            <div class="chat-bubble-input">
-                <input type="text" class="chat-input-field" id="chatInput" placeholder="Ask ARIA about GUARDIAN..." 
-                       onkeypress="if(event.key==='Enter') sendMessage()">
-                <button class="chat-send-btn" onclick="sendMessage()">▷</button>
-            </div>
-        </div>
-        
-        <script>
         function closeChat() {{
-            window.parent.postMessage({{
-                type: 'streamlit:setComponentValue',
-                value: {{ action: 'close_chat', timestamp: Date.now() }}
-            }}, '*');
+            document.getElementById("chatBubble").style.display = "none";
+            parent.postMessage({{
+                isStreamlitMessage: true, 
+                type: "streamlit:setComponentValue", 
+                value: "close_chat"
+            }}, "*");
         }}
         
         function sendMessage() {{
-            const input = document.getElementById('chatInput');
+            const input = document.getElementById("chatInput");
             const message = input.value.trim();
             if (message) {{
-                window.parent.postMessage({{
-                    type: 'streamlit:setComponentValue',
-                    value: {{ action: 'send_message', message: message, timestamp: Date.now() }}
-                }}, '*');
-                input.value = '';
+                parent.postMessage({{
+                    isStreamlitMessage: true, 
+                    type: "streamlit:setComponentValue", 
+                    value: "send_message:" + message
+                }}, "*");
+                input.value = "";
             }}
         }}
-        </script>
-    </div>
+    </script>
     """
     
-    # Render the chat bubble component
-    component_value = components.html(chat_html, height=500, width=350)
+    # Use the proven component method with proper height
+    component_value = components.html(html_code, height=600)
     
-    # Handle component responses
-    if component_value and isinstance(component_value, dict):
-        action = component_value.get('action')
-        if action == 'close_chat':
-            st.session_state.chat_open = False
-            st.rerun()
-        elif action == 'send_message':
-            message = component_value.get('message')
-            if message:
-                handle_user_message(message)
+    # Handle the component return value
+    if component_value == "open_chat":
+        st.session_state.chat_open = True
+        st.rerun()
+    elif component_value == "close_chat":
+        st.session_state.chat_open = False
+        st.rerun()
+    elif component_value and component_value.startswith("send_message:"):
+        message = component_value.replace("send_message:", "")
+        handle_user_message(message)
+
+def render_sidebar_chat():
+    """Render floating chat bubble when open (this function is called when chat is open)."""
+    # When chat is open, we actually don't need to render anything here 
+    # because the floating button component handles both states
+    pass
 
 def handle_user_message(message: str):
     """Handle user chat messages."""

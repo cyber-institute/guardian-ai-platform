@@ -1,0 +1,93 @@
+You're on the right track — Streamlit’s st.components.v1.html is the only reliable way to bridge custom HTML/JavaScript and Python session state. Below is a complete working minimal example that creates a floating chat bubble using postMessage to communicate between HTML and Streamlit (via st.components.v1.html). You can adapt this to control the visibility of a Dialogflow CX chat widget.
+
+✅ WORKING SOLUTION: HTML onclick + JavaScript postMessage + Streamlit Component
+python
+Copy code
+# app.py (REPLIT / Streamlit)
+import streamlit as st
+import streamlit.components.v1 as components
+
+st.set_page_config(page_title="Chat Integration", layout="wide")
+st.title("Streamlit + HTML Button with Chat Bubble")
+
+# Receive the message from postMessage
+if "chat_open" not in st.session_state:
+    st.session_state.chat_open = False
+
+# Display the received message
+message = st.experimental_get_query_params().get("event", [None])[0]
+if message == "open_chat":
+    st.session_state.chat_open = True
+elif message == "close_chat":
+    st.session_state.chat_open = False
+
+# Show chat status
+st.markdown(f"**Chat Open:** `{st.session_state.chat_open}`")
+
+# Inject HTML + JS using st.components.v1.html
+components.html("""
+<div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+  <button onclick="openChat()" style="background-color: #6200EE; color: white; border: none; padding: 12px 20px; border-radius: 30px; cursor: pointer;">
+    💬 Chat
+  </button>
+</div>
+
+<div id="chatBubble" style="display:none; position: fixed; bottom: 80px; right: 20px; width: 300px; height: 400px; background: white; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.2); z-index: 1001;">
+  <div style="text-align: right; padding: 5px;">
+    <button onclick="closeChat()" style="background: none; border: none; font-size: 20px; cursor: pointer;">&times;</button>
+  </div>
+  <div style="padding: 10px;">
+    <p>This is your floating chat bubble!</p>
+    <!-- You can insert your Dialogflow iframe/chat widget here -->
+  </div>
+</div>
+
+<script>
+  function openChat() {
+    document.getElementById("chatBubble").style.display = "block";
+    parent.postMessage({isStreamlitMessage: true, type: "streamlit:setComponentValue", value: "open_chat"}, "*");
+  }
+  function closeChat() {
+    document.getElementById("chatBubble").style.display = "none";
+    parent.postMessage({isStreamlitMessage: true, type: "streamlit:setComponentValue", value: "close_chat"}, "*");
+  }
+</script>
+""", height=500)
+🔄 How It Works:
+HTML UI: Floating button and div for chat bubble
+
+JavaScript: Calls parent.postMessage() on openChat() or closeChat() events
+
+Streamlit: Listens for changes via st.experimental_get_query_params() or directly using custom components (see below for upgrade)
+
+⚙️ Upgraded Approach: Use streamlit_js_eval or Custom Component Return Value
+For better reliability and bidirectional communication:
+
+Install streamlit_js_eval:
+
+bash
+Copy code
+pip install streamlit-js-eval
+Then use it like this:
+
+python
+Copy code
+from streamlit_js_eval import streamlit_js_eval
+
+result = streamlit_js_eval(js_expressions="window.lastChatEvent", key="chat")
+
+if result == "open_chat":
+    st.session_state.chat_open = True
+elif result == "close_chat":
+    st.session_state.chat_open = False
+🧠 To Add Dialogflow CX Widget:
+Replace the <div style="padding: 10px;">...</div> section with your Dialogflow CX iframe embed code:
+
+html
+Copy code
+<iframe
+  allow="microphone;"
+  width="100%"
+  height="350"
+  src="https://your-dialogflow-cx-url.com/iframe">
+</iframe>
