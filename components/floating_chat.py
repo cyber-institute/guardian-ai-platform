@@ -129,13 +129,13 @@ def render_floating_button():
         st.markdown("---")
         st.markdown("**Test Chat Interface**")
         
-        # Blue button styling for test button
+        # Enhanced test button styling with forced white text
         st.markdown("""
         <style>
-        /* Test button styling */
-        .stButton > button {
+        /* Test button styling with forced white text */
+        div[data-testid="stSidebar"] .stButton > button {
             background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
-            color: white !important;
+            color: #FFFFFF !important;
             border: none !important;
             border-radius: 8px !important;
             font-size: 32px !important;
@@ -144,18 +144,29 @@ def render_floating_button():
             box-shadow: 0 3px 10px rgba(59, 130, 246, 0.4) !important;
             transition: all 0.3s ease !important;
             width: auto !important;
-            min-width: 180px !important;
+            min-width: 200px !important;
+            min-height: 65px !important;
         }
         
-        .stButton > button:hover {
+        div[data-testid="stSidebar"] .stButton > button:hover {
             background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
             box-shadow: 0 5px 15px rgba(59, 130, 246, 0.6) !important;
             transform: translateY(-2px) !important;
-            color: white !important;
+            color: #FFFFFF !important;
         }
         
-        .stButton > button:active {
-            color: white !important;
+        div[data-testid="stSidebar"] .stButton > button:active {
+            color: #FFFFFF !important;
+            transform: translateY(0px) !important;
+        }
+        
+        /* Force white text for ALL button content */
+        div[data-testid="stSidebar"] .stButton > button span,
+        div[data-testid="stSidebar"] .stButton > button p,
+        div[data-testid="stSidebar"] .stButton > button div {
+            color: #FFFFFF !important;
+            font-size: 32px !important;
+            font-weight: 700 !important;
         }
         </style>
         """, unsafe_allow_html=True)
@@ -170,59 +181,53 @@ def render_sidebar_chat():
         st.markdown("### 💬 ARIA Chat")
         st.markdown("*Advanced Risk Intelligence Assistant*")
         
-        # Custom CSS for blue button styling
+        # Enhanced CSS for blue button styling with forced white text
         st.markdown("""
         <style>
-        /* Blue button styling for ARIA chat */
-        .stButton > button {
+        /* Force white text and large font for sidebar buttons */
+        div[data-testid="stSidebar"] .stButton > button,
+        div[data-testid="stSidebar"] .stFormSubmitButton > button {
             background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
-            color: white !important;
+            color: #FFFFFF !important;
             border: none !important;
             border-radius: 8px !important;
             font-size: 32px !important;
             font-weight: 700 !important;
             padding: 15px 25px !important;
-            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+            box-shadow: 0 3px 10px rgba(59, 130, 246, 0.4) !important;
             transition: all 0.3s ease !important;
+            min-height: 60px !important;
             width: auto !important;
-            max-width: 250px !important;
+            max-width: 280px !important;
         }
         
-        .stButton > button:hover {
+        div[data-testid="stSidebar"] .stButton > button:hover,
+        div[data-testid="stSidebar"] .stFormSubmitButton > button:hover {
             background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5) !important;
-            transform: translateY(-1px) !important;
-            color: white !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.6) !important;
+            transform: translateY(-2px) !important;
         }
         
-        .stButton > button:active {
+        div[data-testid="stSidebar"] .stButton > button:active,
+        div[data-testid="stSidebar"] .stFormSubmitButton > button:active {
+            color: #FFFFFF !important;
             transform: translateY(0px) !important;
-            color: white !important;
         }
         
-        /* Form submit buttons */
-        .stFormSubmitButton > button {
-            background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
-            color: white !important;
-            border: none !important;
-            border-radius: 8px !important;
+        /* Force text color for button text content */
+        div[data-testid="stSidebar"] .stButton > button span,
+        div[data-testid="stSidebar"] .stFormSubmitButton > button span,
+        div[data-testid="stSidebar"] .stButton > button p,
+        div[data-testid="stSidebar"] .stFormSubmitButton > button p {
+            color: #FFFFFF !important;
             font-size: 32px !important;
             font-weight: 700 !important;
-            padding: 15px 25px !important;
-            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
-            transition: all 0.3s ease !important;
-        }
-        
-        .stFormSubmitButton > button:hover {
-            background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5) !important;
-            transform: translateY(-1px) !important;
-            color: white !important;
         }
         
         /* Adjust text input styling */
         .stTextInput > div > div > input {
-            font-size: 16px !important;
+            font-size: 18px !important;
             padding: 12px 16px !important;
         }
         </style>

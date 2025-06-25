@@ -17,6 +17,48 @@ def render_chatbot_widget():
     if 'chat_messages' not in st.session_state:
         st.session_state.chat_messages = []
     
+    # Inject enhanced button styling first
+    st.markdown("""
+    <style>
+    /* Force white text and large font for ALL sidebar buttons */
+    div[data-testid="stSidebar"] .stButton > button,
+    div[data-testid="stSidebar"] .stFormSubmitButton > button {
+        background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
+        color: #FFFFFF !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-size: 32px !important;
+        font-weight: 700 !important;
+        padding: 15px 25px !important;
+        box-shadow: 0 3px 10px rgba(59, 130, 246, 0.4) !important;
+        transition: all 0.3s ease !important;
+        min-height: 60px !important;
+    }
+    
+    div[data-testid="stSidebar"] .stButton > button:hover,
+    div[data-testid="stSidebar"] .stFormSubmitButton > button:hover {
+        background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
+        color: #FFFFFF !important;
+        box-shadow: 0 5px 15px rgba(59, 130, 246, 0.6) !important;
+        transform: translateY(-2px) !important;
+    }
+    
+    div[data-testid="stSidebar"] .stButton > button:active,
+    div[data-testid="stSidebar"] .stFormSubmitButton > button:active {
+        color: #FFFFFF !important;
+        transform: translateY(0px) !important;
+    }
+    
+    /* Force text color for button spans */
+    div[data-testid="stSidebar"] .stButton > button span,
+    div[data-testid="stSidebar"] .stFormSubmitButton > button span {
+        color: #FFFFFF !important;
+        font-size: 32px !important;
+        font-weight: 700 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
     # Always show chatbot in sidebar
     with st.sidebar:
         st.markdown("### ARIA - Advanced Risk Intelligence Assistant")
