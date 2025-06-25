@@ -235,15 +235,16 @@ def render_floating_button():
     component_value = components.html(html_code, height=600)
     
     # Handle the component return value
-    if component_value == "open_chat":
-        st.session_state.chat_open = True
-        st.rerun()
-    elif component_value == "close_chat":
-        st.session_state.chat_open = False
-        st.rerun()
-    elif component_value and component_value.startswith("send_message:"):
-        message = component_value.replace("send_message:", "")
-        handle_user_message(message)
+    if component_value:
+        if str(component_value) == "open_chat":
+            st.session_state.chat_open = True
+            st.rerun()
+        elif str(component_value) == "close_chat":
+            st.session_state.chat_open = False
+            st.rerun()
+        elif str(component_value).startswith("send_message:"):
+            message = str(component_value).replace("send_message:", "")
+            handle_user_message(message)
 
 def render_sidebar_chat():
     """Render floating chat bubble when open (this function is called when chat is open)."""
