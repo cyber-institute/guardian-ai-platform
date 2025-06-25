@@ -48,11 +48,12 @@ def render_draggable_chat():
 
     <style>
     #floating-chat-container {{
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 10000;
+        position: fixed !important;
+        bottom: 20px !important;
+        right: 20px !important;
+        z-index: 99999 !important;
         font-family: 'Inter', sans-serif;
+        pointer-events: auto !important;
     }}
     
     .chat-bubble {{
@@ -325,6 +326,9 @@ def render_draggable_chat():
             }}
         }});
         
+        // Debug logging
+        console.log('Chat bubble initialized');
+        
         // Return value to Streamlit (required for components)
         window.parent.postMessage({{
             type: 'streamlit:setComponentValue',
@@ -334,7 +338,7 @@ def render_draggable_chat():
     </script>
     """
     
-    # Render the component
-    result = components.html(chat_html, height=0)
+    # Render the component with proper height
+    result = components.html(chat_html, height=100)
     
     return result
