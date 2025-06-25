@@ -26,16 +26,17 @@ def render_floating_chat():
         render_floating_button()
 
 def render_floating_button():
-    """Render the floating chat button using HTML with proper Streamlit integration."""
+    """Render floating chat button with working HTML onclick."""
     
-    # Initialize session state trigger
-    if 'aria_clicked' not in st.session_state:
-        st.session_state.aria_clicked = False
+    # Initialize click counter for reliable state tracking
+    if 'aria_click_count' not in st.session_state:
+        st.session_state.aria_click_count = 0
     
-    # CSS and HTML for floating button
-    st.markdown("""
+    # Create the floating button and chat bubble HTML
+    st.markdown(f"""
     <style>
-    .floating-aria-btn {
+    /* Floating chat button */
+    .floating-chat-btn {{
         position: fixed;
         bottom: 20px;
         right: 20px;
@@ -54,194 +55,342 @@ def render_floating_button():
         align-items: center;
         justify-content: center;
         transition: all 0.3s ease;
-        animation: ariaPulse 3s infinite;
+        animation: chatPulse 3s infinite;
         user-select: none;
-    }
+    }}
     
-    .floating-aria-btn:hover {
+    .floating-chat-btn:hover {{
         transform: scale(1.1);
         box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6);
-    }
+    }}
     
-    .floating-aria-btn:active {
+    .floating-chat-btn:active {{
         transform: scale(0.95);
-    }
+    }}
     
-    @keyframes ariaPulse {
-        0%, 100% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4); }
-        50% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.8); }
-    }
+    @keyframes chatPulse {{
+        0%, 100% {{ box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4); }}
+        50% {{ box-shadow: 0 4px 20px rgba(59, 130, 246, 0.8); }}
+    }}
+    
+    /* Hidden form for Streamlit communication */
+    .hidden-form {{
+        display: none;
+    }}
     </style>
     
-    <div class="floating-aria-btn" id="ariaBtn">
+    <!-- Hidden form method for reliable Streamlit communication -->
+    <form class="hidden-form" id="ariaForm">
+        <input type="text" id="ariaClickInput" value="{st.session_state.aria_click_count}">
+        <button type="submit" id="ariaSubmit">Submit</button>
+    </form>
+    
+    <!-- Floating chat button -->
+    <div class="floating-chat-btn" id="ariaChatBtn">
         ARIA
     </div>
     
     <script>
-    // Use session state approach to trigger Streamlit rerun
-    (function() {
-        const ariaBtn = document.getElementById('ariaBtn');
-        if (ariaBtn && !ariaBtn.hasEventListener) {
-            ariaBtn.hasEventListener = true;
-            ariaBtn.addEventListener('click', function() {
-                // Set a flag in localStorage that Streamlit can check
-                localStorage.setItem('aria_chat_trigger', Date.now().toString());
+    // Reliable HTML to Streamlit communication using form submission
+    (function() {{
+        const chatBtn = document.getElementById('ariaChatBtn');
+        const clickInput = document.getElementById('ariaClickInput');
+        const form = document.getElementById('ariaForm');
+        
+        if (chatBtn && clickInput && form && !chatBtn.hasStreamlitHandler) {{
+            chatBtn.hasStreamlitHandler = true;
+            
+            chatBtn.addEventListener('click', function(e) {{
+                e.preventDefault();
                 
-                // Trigger a Streamlit rerun by dispatching a custom event
-                window.dispatchEvent(new CustomEvent('ariaButtonClicked'));
+                // Method 1: Update hidden input and trigger change
+                const currentCount = parseInt(clickInput.value) || 0;
+                clickInput.value = currentCount + 1;
                 
-                // Also try to trigger Streamlit's built-in event system
-                if (window.parent && window.parent.postMessage) {
-                    window.parent.postMessage({
-                        type: 'streamlit:setComponentValue',
-                        value: { clicked: true, timestamp: Date.now() }
-                    }, '*');
-                }
-            });
-        }
-    })();
+                // Trigger input change event
+                clickInput.dispatchEvent(new Event('input', {{ bubbles: true }}));
+                clickInput.dispatchEvent(new Event('change', {{ bubbles: true }}));
+                
+                // Method 2: Find and trigger Streamlit number input
+                setTimeout(() => {{
+                    const stInputs = document.querySelectorAll('input[type="number"]');
+                    stInputs.forEach(input => {{
+                        if (input.step === '1' && input.min === '0') {{
+                            input.value = currentCount + 1;
+                            input.dispatchEvent(new Event('input', {{ bubbles: true }}));
+                            input.dispatchEvent(new Event('change', {{ bubbles: true }}));
+                        }}
+                    }});
+                }}, 10);
+                
+                // Method 3: URL hash change detection
+                window.location.hash = '#aria-clicked-' + (currentCount + 1);
+                
+                // Visual feedback
+                chatBtn.style.transform = 'scale(0.9)';
+                setTimeout(() => {{
+                    chatBtn.style.transform = '';
+                }}, 150);
+            }});
+        }}
+    }})();
     </script>
     """, unsafe_allow_html=True)
     
-    # Check for click trigger using timestamp
-    current_timestamp = int(time.time())
-    stored_trigger = st.session_state.get('last_aria_trigger', '0')
+    # Hidden number input for click detection
+    click_count = st.number_input("", min_value=0, step=1, value=st.session_state.aria_click_count, key="aria_click_detector", label_visibility="collapsed")
     
-    # Use a polling approach with session state
-    if st.button("", key="aria_trigger_check", help="Hidden trigger"):
+    # Check if click count changed
+    if click_count > st.session_state.aria_click_count:
+        st.session_state.aria_click_count = click_count
         st.session_state.chat_open = True
         st.rerun()
     
-    # JavaScript-based trigger detection
+    # Check URL hash for click detection
+    hash_value = st.query_params.get("aria_clicked", None)
+    if hash_value and hash_value != st.session_state.get("last_hash", ""):
+        st.session_state.last_hash = hash_value
+        st.session_state.chat_open = True
+        st.rerun()
+
+def render_sidebar_chat():
+    """Render floating chat bubble window."""
+    
+    # Get current tip
+    tips = [
+        "Ask me about document scoring to understand the assessment frameworks",
+        "Upload documents in PDF, TXT, or URL format for instant analysis", 
+        "Click on any score badge to see detailed breakdown and recommendations",
+        "Use filters to find documents by region, organization, or document type",
+        "Try asking 'What are the critical gaps in my policy?' for targeted insights",
+        "I can explain GUARDIAN's patent-protected algorithms and methodologies"
+    ]
+    current_tip_index = (int(time.time()) // 10) % len(tips)
+    
+    # Format chat messages for display
+    messages_html = ""
+    if st.session_state.chat_messages:
+        for message in st.session_state.chat_messages[-4:]:
+            if message['role'] == 'user':
+                messages_html += f'''
+                <div class="user-message">
+                    <div class="message-content">{message["content"]}</div>
+                </div>'''
+            else:
+                messages_html += f'''
+                <div class="assistant-message">
+                    <div class="message-content">{message["content"]}</div>
+                </div>'''
+    else:
+        messages_html = '<div class="empty-chat">Start a conversation with ARIA!</div>'
+    
+    # Render floating chat bubble
     st.markdown(f"""
+    <style>
+    /* Floating chat bubble window */
+    .chat-bubble-window {{
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 350px;
+        max-height: 500px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        border: 1px solid #e5e7eb;
+        z-index: 10001;
+        animation: slideUpChat 0.3s ease;
+        overflow: hidden;
+    }}
+    
+    @keyframes slideUpChat {{
+        from {{ transform: translateY(20px); opacity: 0; }}
+        to {{ transform: translateY(0); opacity: 1; }}
+    }}
+    
+    /* Chat header */
+    .chat-bubble-header {{
+        background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+        color: white;
+        padding: 15px 20px;
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }}
+    
+    .chat-close-btn {{
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }}
+    
+    .chat-close-btn:hover {{
+        background: rgba(255, 255, 255, 0.3);
+    }}
+    
+    /* Chat body */
+    .chat-bubble-body {{
+        padding: 15px;
+        max-height: 300px;
+        overflow-y: auto;
+    }}
+    
+    /* Tip styling */
+    .chat-tip {{
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        border: 1px solid #93c5fd;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 15px;
+        font-size: 13px;
+        color: #1e40af;
+    }}
+    
+    /* Message bubbles */
+    .user-message {{
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 10px;
+    }}
+    
+    .user-message .message-content {{
+        background: #3B82F6;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 18px 18px 4px 18px;
+        max-width: 80%;
+        word-wrap: break-word;
+    }}
+    
+    .assistant-message {{
+        display: flex;
+        justify-content: flex-start;
+        margin-bottom: 10px;
+    }}
+    
+    .assistant-message .message-content {{
+        background: #f8fafc;
+        color: #334155;
+        padding: 10px 15px;
+        border-radius: 18px 18px 18px 4px;
+        border: 1px solid #e2e8f0;
+        max-width: 80%;
+        word-wrap: break-word;
+    }}
+    
+    .empty-chat {{
+        text-align: center;
+        color: #64748b;
+        font-style: italic;
+        padding: 20px;
+    }}
+    
+    /* Chat input area */
+    .chat-bubble-input {{
+        padding: 15px;
+        border-top: 1px solid #e5e7eb;
+        background: #fafafa;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }}
+    
+    .chat-input-field {{
+        flex: 1;
+        border: 1px solid #d1d5db;
+        border-radius: 20px;
+        padding: 10px 15px;
+        font-size: 14px;
+        outline: none;
+    }}
+    
+    .chat-input-field:focus {{
+        border-color: #3B82F6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }}
+    
+    .chat-send-btn {{
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #3B82F6;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }}
+    
+    .chat-send-btn:hover {{
+        background: #1E40AF;
+        transform: scale(1.05);
+    }}
+    </style>
+    
+    <div class="chat-bubble-window">
+        <div class="chat-bubble-header">
+            <span>ARIA - Advanced Risk Intelligence Assistant</span>
+            <button class="chat-close-btn" onclick="document.getElementById('closeChatTrigger').click()">×</button>
+        </div>
+        
+        <div class="chat-bubble-body">
+            <div class="chat-tip">💡 {tips[current_tip_index]}</div>
+            {messages_html}
+        </div>
+        
+        <div class="chat-bubble-input">
+            <input type="text" class="chat-input-field" id="chatInput" placeholder="Ask ARIA about GUARDIAN..." 
+                   onkeypress="if(event.key==='Enter') document.getElementById('sendChatBtn').click()">
+            <button class="chat-send-btn" id="sendChatBtn" onclick="sendChatMessage()">▷</button>
+        </div>
+    </div>
+    
     <script>
-    // Check localStorage for trigger
-    const trigger = localStorage.getItem('aria_chat_trigger');
-    if (trigger && trigger !== '{stored_trigger}') {{
-        localStorage.setItem('aria_chat_trigger', '');
-        // Find and click the hidden Streamlit button
-        setTimeout(() => {{
-            const hiddenBtn = document.querySelector('[data-testid*="aria_trigger_check"] button');
-            if (hiddenBtn) {{
-                hiddenBtn.click();
+    function sendChatMessage() {{
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        if (message) {{
+            // Set message in hidden Streamlit input
+            const hiddenInput = document.getElementById('hiddenChatInput');
+            if (hiddenInput) {{
+                hiddenInput.value = message;
+                hiddenInput.dispatchEvent(new Event('input', {{ bubbles: true }}));
+                hiddenInput.dispatchEvent(new Event('change', {{ bubbles: true }}));
             }}
-        }}, 50);
+            
+            // Trigger send button
+            setTimeout(() => {{
+                document.getElementById('sendMessageTrigger').click();
+                input.value = '';
+            }}, 100);
+        }}
     }}
     </script>
     """, unsafe_allow_html=True)
     
-    # Alternative approach: Use query parameters
-    query_params = st.query_params
-    if 'aria_open' in query_params:
-        st.session_state.chat_open = True
-        # Clear the query parameter
-        new_params = {k: v for k, v in query_params.items() if k != 'aria_open'}
-        st.query_params.clear()
-        for k, v in new_params.items():
-            st.query_params[k] = v
+    # Hidden Streamlit components for functionality
+    if st.button("", key="closeChatTrigger", help="Close chat"):
+        st.session_state.chat_open = False
         st.rerun()
     
-    # Fallback: Check for click state changes
-    if 'aria_last_check' not in st.session_state:
-        st.session_state.aria_last_check = current_timestamp
+    user_input = st.text_input("", key="hiddenChatInput", label_visibility="collapsed")
     
-    # Simple polling mechanism - check every few seconds
-    if current_timestamp - st.session_state.aria_last_check > 2:
-        st.session_state.aria_last_check = current_timestamp
-        # This causes a rerun that can detect state changes
-        st.rerun()
-
-def render_sidebar_chat():
-    """Render chat interface in an expander when open."""
-    # Create a floating chat window using expander
-    with st.expander("💬 ARIA - Advanced Risk Intelligence Assistant", expanded=True):
-        # Close button
-        if st.button("Close Chat", key="aria_close_chat", use_container_width=True):
-            st.session_state.chat_open = False
-            st.rerun()
-        
-        st.markdown("---")
-        
-        # Display rotating tip
-        tips = [
-            "Ask me about document scoring to understand the assessment frameworks",
-            "Upload documents in PDF, TXT, or URL format for instant analysis", 
-            "Click on any score badge to see detailed breakdown and recommendations",
-            "Use filters to find documents by region, organization, or document type",
-            "Try asking 'What are the critical gaps in my policy?' for targeted insights",
-            "I can explain GUARDIAN's patent-protected algorithms and methodologies"
-        ]
-        
-        import time
-        current_time = int(time.time())
-        current_tip_index = (current_time // 10) % len(tips)
-        
-        st.info(f"💡 {tips[current_tip_index]}")
-        
-        # Chat messages with conversation bubbles
-        if st.session_state.chat_messages:
-            st.markdown("**Recent Conversation:**")
-            
-            # CSS for conversation bubbles
-            st.markdown("""
-            <style>
-            .user-bubble {
-                background: #3B82F6;
-                color: white;
-                padding: 10px 15px;
-                border-radius: 20px 20px 5px 20px;
-                margin: 8px 0 8px 40px;
-                display: inline-block;
-                max-width: 80%;
-                word-wrap: break-word;
-                float: right;
-                clear: both;
-            }
-            
-            .assistant-bubble {
-                background: #f8fafc;
-                color: #334155;
-                padding: 10px 15px;
-                border-radius: 20px 20px 20px 5px;
-                margin: 8px 40px 8px 0;
-                border: 1px solid #e2e8f0;
-                display: inline-block;
-                max-width: 80%;
-                word-wrap: break-word;
-                float: left;
-                clear: both;
-            }
-            
-            .chat-container::after {
-                content: "";
-                display: table;
-                clear: both;
-            }
-            </style>
-            """, unsafe_allow_html=True)
-            
-            st.markdown('<div class="chat-container">', unsafe_allow_html=True)
-            for message in st.session_state.chat_messages[-4:]:
-                if message['role'] == 'user':
-                    st.markdown(f'<div class="user-bubble">{message["content"]}</div>', unsafe_allow_html=True)
-                else:
-                    st.markdown(f'<div class="assistant-bubble">{message["content"]}</div>', unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-        else:
-            st.markdown("*Start a conversation with ARIA by typing below!*")
-        
-        # Chat input
-        user_input = st.text_input("Type your message:", key="aria_chat_input", placeholder="Ask ARIA about GUARDIAN features...")
-        
-        col1, col2 = st.columns([4, 1])
-        with col1:
-            if st.button("Send Message", key="aria_send_full", use_container_width=True):
-                if user_input:
-                    handle_user_message(user_input)
-        with col2:
-            if st.button("▷", key="aria_send_arrow", help="Send"):
-                if user_input:
-                    handle_user_message(user_input)
+    if st.button("", key="sendMessageTrigger", help="Send"):
+        if user_input:
+            handle_user_message(user_input)
 
 def handle_user_message(message: str):
     """Handle user chat messages."""
