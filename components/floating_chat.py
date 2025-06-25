@@ -143,15 +143,15 @@ def render_sidebar_chat():
             st.markdown("Start a conversation with ARIA!")
         
         # Chat input
-        user_input = st.text_input("Ask ARIA about GUARDIAN:", key="chat_input", placeholder="e.g., How do I upload a policy document?")
+        user_input = st.text_input("Ask ARIA about GUARDIAN:", key="floating_chat_input_sidebar", placeholder="e.g., How do I upload a policy document?")
         
         col1, col2 = st.columns([3, 1])
         with col1:
-            if st.button("Send Message", key="send_msg", use_container_width=True):
+            if st.button("Send Message", key="floating_send_msg", use_container_width=True):
                 if user_input:
                     handle_user_message(user_input)
         with col2:
-            if st.button("▷", key="send_arrow", help="Send"):
+            if st.button("▷", key="floating_send_arrow", help="Send"):
                 if user_input:
                     handle_user_message(user_input)
 

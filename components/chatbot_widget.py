@@ -296,14 +296,14 @@ def render_chat_window():
                 st.markdown("---")
             
             # Chat input
-            user_input = st.text_input("Ask about GUARDIAN features, scoring, or navigation:", key="chat_input")
+            user_input = st.text_input("Ask about GUARDIAN features, scoring, or navigation:", key="chatbot_input")
             
             col_send, col_close = st.columns([1, 1])
             with col_send:
-                if st.button("Send", key="send_message") and user_input:
+                if st.button("Send", key="chatbot_send_message") and user_input:
                     handle_user_message(user_input)
             with col_close:
-                if st.button("Close Chat", key="close_chat"):
+                if st.button("Close Chat", key="chatbot_close_chat"):
                     st.session_state.chat_open = False
                     st.rerun()
 
