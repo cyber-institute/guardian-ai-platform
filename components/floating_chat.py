@@ -5,6 +5,7 @@ Provides a persistent floating chat button and expandable chat window
 
 import streamlit as st
 import uuid
+import time
 from utils.dialogflow_chatbot import chatbot
 
 def render_floating_chat():
@@ -25,51 +26,130 @@ def render_floating_chat():
         render_floating_button()
 
 def render_floating_button():
-    """Render the floating chat button using container positioning."""
-    # Create columns to position button in bottom right
-    col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 0.15])
+    """Render the floating chat button using HTML with proper Streamlit integration."""
     
-    with col5:
-        # CSS for the positioned button
-        st.markdown("""
-        <style>
-        div[data-testid="column"]:last-child {
-            position: fixed !important;
-            bottom: 20px !important;
-            right: 20px !important;
-            z-index: 10000 !important;
-            width: 70px !important;
+    # Initialize session state trigger
+    if 'aria_clicked' not in st.session_state:
+        st.session_state.aria_clicked = False
+    
+    # CSS and HTML for floating button
+    st.markdown("""
+    <style>
+    .floating-aria-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+        color: white;
+        border: none;
+        font-weight: 600;
+        font-size: 12px;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        animation: ariaPulse 3s infinite;
+        user-select: none;
+    }
+    
+    .floating-aria-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6);
+    }
+    
+    .floating-aria-btn:active {
+        transform: scale(0.95);
+    }
+    
+    @keyframes ariaPulse {
+        0%, 100% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4); }
+        50% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.8); }
+    }
+    </style>
+    
+    <div class="floating-aria-btn" id="ariaBtn">
+        ARIA
+    </div>
+    
+    <script>
+    // Use session state approach to trigger Streamlit rerun
+    (function() {
+        const ariaBtn = document.getElementById('ariaBtn');
+        if (ariaBtn && !ariaBtn.hasEventListener) {
+            ariaBtn.hasEventListener = true;
+            ariaBtn.addEventListener('click', function() {
+                // Set a flag in localStorage that Streamlit can check
+                localStorage.setItem('aria_chat_trigger', Date.now().toString());
+                
+                // Trigger a Streamlit rerun by dispatching a custom event
+                window.dispatchEvent(new CustomEvent('ariaButtonClicked'));
+                
+                // Also try to trigger Streamlit's built-in event system
+                if (window.parent && window.parent.postMessage) {
+                    window.parent.postMessage({
+                        type: 'streamlit:setComponentValue',
+                        value: { clicked: true, timestamp: Date.now() }
+                    }, '*');
+                }
+            });
         }
-        
-        div[data-testid="column"]:last-child .stButton > button {
-            width: 60px !important;
-            height: 60px !important;
-            border-radius: 50% !important;
-            background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
-            color: white !important;
-            border: none !important;
-            font-weight: 600 !important;
-            font-size: 12px !important;
-            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4) !important;
-            transition: all 0.3s ease !important;
-            animation: chatPulse 3s infinite !important;
-        }
-        
-        div[data-testid="column"]:last-child .stButton > button:hover {
-            transform: scale(1.05) !important;
-            box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6) !important;
-        }
-        
-        @keyframes chatPulse {
-            0%, 100% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4); }
-            50% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.8); }
-        }
-        </style>
-        """, unsafe_allow_html=True)
-        
-        if st.button("ARIA", key="aria_floating_btn", help="ARIA - Advanced Risk Intelligence Assistant"):
-            st.session_state.chat_open = True
-            st.rerun()
+    })();
+    </script>
+    """, unsafe_allow_html=True)
+    
+    # Check for click trigger using timestamp
+    current_timestamp = int(time.time())
+    stored_trigger = st.session_state.get('last_aria_trigger', '0')
+    
+    # Use a polling approach with session state
+    if st.button("", key="aria_trigger_check", help="Hidden trigger"):
+        st.session_state.chat_open = True
+        st.rerun()
+    
+    # JavaScript-based trigger detection
+    st.markdown(f"""
+    <script>
+    // Check localStorage for trigger
+    const trigger = localStorage.getItem('aria_chat_trigger');
+    if (trigger && trigger !== '{stored_trigger}') {{
+        localStorage.setItem('aria_chat_trigger', '');
+        // Find and click the hidden Streamlit button
+        setTimeout(() => {{
+            const hiddenBtn = document.querySelector('[data-testid*="aria_trigger_check"] button');
+            if (hiddenBtn) {{
+                hiddenBtn.click();
+            }}
+        }}, 50);
+    }}
+    </script>
+    """, unsafe_allow_html=True)
+    
+    # Alternative approach: Use query parameters
+    query_params = st.query_params
+    if 'aria_open' in query_params:
+        st.session_state.chat_open = True
+        # Clear the query parameter
+        new_params = {k: v for k, v in query_params.items() if k != 'aria_open'}
+        st.query_params.clear()
+        for k, v in new_params.items():
+            st.query_params[k] = v
+        st.rerun()
+    
+    # Fallback: Check for click state changes
+    if 'aria_last_check' not in st.session_state:
+        st.session_state.aria_last_check = current_timestamp
+    
+    # Simple polling mechanism - check every few seconds
+    if current_timestamp - st.session_state.aria_last_check > 2:
+        st.session_state.aria_last_check = current_timestamp
+        # This causes a rerun that can detect state changes
+        st.rerun()
 
 def render_sidebar_chat():
     """Render chat interface in an expander when open."""
