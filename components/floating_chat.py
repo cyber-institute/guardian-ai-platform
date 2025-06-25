@@ -172,7 +172,6 @@ def render_sidebar_chat():
             "I can explain GUARDIAN's patent-protected algorithms and methodologies"
         ]
         
-        import time
         current_time = int(time.time())
         current_tip_index = (current_time // 10) % len(tips)
         
