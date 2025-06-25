@@ -49,42 +49,62 @@ def main():
         background-color: #ffffff;
     }
     
-    /* GLOBAL BLUE BUTTON OVERRIDE - FORCE ALL SIDEBAR BUTTONS TO BE BLUE WITH WHITE TEXT */
+    /* ULTIMATE BUTTON OVERRIDE - MULTIPLE SELECTORS FOR MAXIMUM COVERAGE */
+    [data-testid="stSidebar"] button,
+    [data-testid="stSidebar"] .stButton button,
+    [data-testid="stSidebar"] .stFormSubmitButton button,
+    .stSidebar button,
+    .stSidebar .stButton button,
+    .stSidebar .stFormSubmitButton button,
+    div[data-testid="stSidebar"] button,
     div[data-testid="stSidebar"] .stButton > button,
     div[data-testid="stSidebar"] .stFormSubmitButton > button {
+        background-color: #3B82F6 !important;
         background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
         color: #FFFFFF !important;
-        border: none !important;
+        border: 2px solid #1E40AF !important;
         border-radius: 8px !important;
-        font-size: 28px !important;
+        font-size: 24px !important;
         font-weight: 700 !important;
-        padding: 18px 25px !important;
+        padding: 15px 20px !important;
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
         transition: all 0.3s ease !important;
-        min-height: 65px !important;
+        min-height: 60px !important;
         width: auto !important;
+        text-shadow: none !important;
     }
     
+    [data-testid="stSidebar"] button:hover,
+    [data-testid="stSidebar"] .stButton button:hover,
+    [data-testid="stSidebar"] .stFormSubmitButton button:hover,
+    .stSidebar button:hover,
+    .stSidebar .stButton button:hover,
+    .stSidebar .stFormSubmitButton button:hover,
+    div[data-testid="stSidebar"] button:hover,
     div[data-testid="stSidebar"] .stButton > button:hover,
     div[data-testid="stSidebar"] .stFormSubmitButton > button:hover {
+        background-color: #2563EB !important;
         background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
         color: #FFFFFF !important;
         box-shadow: 0 6px 18px rgba(59, 130, 246, 0.6) !important;
         transform: translateY(-2px) !important;
+        border-color: #1D4ED8 !important;
     }
     
-    div[data-testid="stSidebar"] .stButton > button:active,
-    div[data-testid="stSidebar"] .stFormSubmitButton > button:active {
-        color: #FFFFFF !important;
-        transform: translateY(0px) !important;
-    }
-    
-    /* Force white text for ALL button content */
+    /* Force white text for ALL possible button text elements */
+    [data-testid="stSidebar"] button *,
+    [data-testid="stSidebar"] .stButton button *,
+    [data-testid="stSidebar"] .stFormSubmitButton button *,
+    .stSidebar button *,
+    .stSidebar .stButton button *,
+    .stSidebar .stFormSubmitButton button *,
+    div[data-testid="stSidebar"] button *,
     div[data-testid="stSidebar"] .stButton > button *,
     div[data-testid="stSidebar"] .stFormSubmitButton > button * {
         color: #FFFFFF !important;
-        font-size: 28px !important;
+        font-size: 24px !important;
         font-weight: 700 !important;
+        text-shadow: none !important;
     }
     
     .stApp > header {
