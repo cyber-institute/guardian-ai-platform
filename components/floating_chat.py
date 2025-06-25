@@ -138,19 +138,24 @@ def render_floating_button():
             color: white !important;
             border: none !important;
             border-radius: 8px !important;
-            font-size: 16px !important;
-            font-weight: 600 !important;
-            padding: 12px 24px !important;
+            font-size: 32px !important;
+            font-weight: 700 !important;
+            padding: 18px 30px !important;
             box-shadow: 0 3px 10px rgba(59, 130, 246, 0.4) !important;
             transition: all 0.3s ease !important;
             width: auto !important;
-            min-width: 120px !important;
+            min-width: 180px !important;
         }
         
         .stButton > button:hover {
             background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
             box-shadow: 0 5px 15px rgba(59, 130, 246, 0.6) !important;
             transform: translateY(-2px) !important;
+            color: white !important;
+        }
+        
+        .stButton > button:active {
+            color: white !important;
         }
         </style>
         """, unsafe_allow_html=True)
@@ -174,29 +179,51 @@ def render_sidebar_chat():
             color: white !important;
             border: none !important;
             border-radius: 8px !important;
-            font-size: 16px !important;
-            font-weight: 600 !important;
-            padding: 10px 20px !important;
+            font-size: 32px !important;
+            font-weight: 700 !important;
+            padding: 15px 25px !important;
             box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
             transition: all 0.3s ease !important;
             width: auto !important;
-            max-width: 200px !important;
+            max-width: 250px !important;
         }
         
         .stButton > button:hover {
             background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5) !important;
             transform: translateY(-1px) !important;
+            color: white !important;
         }
         
         .stButton > button:active {
             transform: translateY(0px) !important;
+            color: white !important;
+        }
+        
+        /* Form submit buttons */
+        .stFormSubmitButton > button {
+            background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-size: 32px !important;
+            font-weight: 700 !important;
+            padding: 15px 25px !important;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .stFormSubmitButton > button:hover {
+            background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5) !important;
+            transform: translateY(-1px) !important;
+            color: white !important;
         }
         
         /* Adjust text input styling */
         .stTextInput > div > div > input {
-            font-size: 14px !important;
-            padding: 8px 12px !important;
+            font-size: 16px !important;
+            padding: 12px 16px !important;
         }
         </style>
         """, unsafe_allow_html=True)
