@@ -102,8 +102,8 @@ def main():
     div[data-testid="stSidebar"] .stButton > button *,
     div[data-testid="stSidebar"] .stFormSubmitButton > button * {
         color: #FFFFFF !important;
-        font-size: 24px !important;
-        font-weight: 700 !important;
+        font-size: 16px !important;
+        font-weight: 400 !important;
         text-shadow: none !important;
     }
     
