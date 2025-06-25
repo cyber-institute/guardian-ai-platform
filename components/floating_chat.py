@@ -19,11 +19,12 @@ def render_floating_chat():
     if 'chat_messages' not in st.session_state:
         st.session_state.chat_messages = []
 
-    # Render chat in sidebar when open, button when closed
+    # Always render the floating button (fake speech bubble)
+    render_floating_button()
+    
+    # Render chat in sidebar when open
     if st.session_state.chat_open:
         render_sidebar_chat()
-    else:
-        render_floating_button()
 
 def render_floating_button():
     """Render a fake working chat bubble with speech bubble shape."""
@@ -130,7 +131,7 @@ def render_floating_button():
         st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Temporary visible button for testing chat functionality
+    # Always show test button in sidebar for now
     with st.sidebar:
         st.markdown("---")
         st.markdown("**Test Chat Interface**")
@@ -138,8 +139,8 @@ def render_floating_button():
         # Blue button styling for test button
         st.markdown("""
         <style>
-        /* Specific styling for test button */
-        div[data-testid="column"] .stButton > button {
+        /* Test button styling */
+        .stButton > button[data-testid="baseButton-secondary"] {
             background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
             color: white !important;
             border: none !important;
@@ -151,7 +152,7 @@ def render_floating_button():
             transition: all 0.3s ease !important;
         }
         
-        div[data-testid="column"] .stButton > button:hover {
+        .stButton > button[data-testid="baseButton-secondary"]:hover {
             background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
             box-shadow: 0 5px 15px rgba(59, 130, 246, 0.6) !important;
             transform: translateY(-2px) !important;
