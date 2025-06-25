@@ -8,7 +8,7 @@ import uuid
 from utils.dialogflow_chatbot import chatbot
 
 def render_floating_chat():
-    """Render a floating chat bubble interface within Streamlit."""
+    """Render floating chat that works properly in Streamlit."""
     
     # Initialize chat state
     if 'chat_open' not in st.session_state:
@@ -18,220 +18,76 @@ def render_floating_chat():
     if 'chat_messages' not in st.session_state:
         st.session_state.chat_messages = []
 
-    # CSS for floating chat interface
+    # Render chat in sidebar when open, button when closed
+    if st.session_state.chat_open:
+        render_sidebar_chat()
+    else:
+        render_floating_button()
+
+def render_floating_button():
+    """Render the floating chat button."""
+    # CSS for floating button
     st.markdown("""
     <style>
-    /* Position the container to hold chat elements */
-    .floating-chat-container {
-        position: fixed !important;
-        bottom: 20px !important;
-        right: 20px !important;
-        z-index: 10000 !important;
-        pointer-events: none !important;
-    }
-    
-    .floating-chat-container * {
-        pointer-events: auto !important;
-    }
-    
-    /* Floating chat button styling */
-    .floating-chat-container .stButton > button {
-        width: 60px !important;
-        height: 60px !important;
-        border-radius: 50% !important;
-        background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
-        color: white !important;
-        border: none !important;
-        font-weight: 600 !important;
-        font-size: 12px !important;
-        box-shadow: 0 6px 25px rgba(59, 130, 246, 0.4) !important;
-        transition: all 0.3s ease !important;
-        animation: chatPulse 3s infinite !important;
-    }
-    
-    .floating-chat-container .stButton > button:hover {
-        transform: scale(1.05) !important;
-        box-shadow: 0 8px 35px rgba(59, 130, 246, 0.6) !important;
-    }
-    
-    @keyframes chatPulse {
-        0%, 100% { box-shadow: 0 6px 25px rgba(59, 130, 246, 0.4); }
-        50% { box-shadow: 0 6px 25px rgba(59, 130, 246, 0.8); }
-    }
-    
-    /* Chat bubble positioning */
-    .chat-bubble-container {
-        position: fixed !important;
-        bottom: 90px !important;
-        right: 20px !important;
-        width: 350px !important;
-        z-index: 10001 !important;
-        pointer-events: auto !important;
-    }
-    
-    /* Chat bubble styling */
-    .chat-bubble-container .stContainer {
-        background: white !important;
-        border-radius: 15px !important;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
-        border: 1px solid #e5e7eb !important;
-        padding: 0 !important;
-        animation: slideUpBubble 0.3s ease !important;
-    }
-    
-    @keyframes slideUpBubble {
-        from { transform: translateY(20px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-    }
-    
-    /* Chat header styling */
-    .chat-header {
-        background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
-        color: white !important;
-        padding: 15px 20px !important;
-        font-weight: 600 !important;
-        font-size: 14px !important;
-        border-radius: 15px 15px 0 0 !important;
-        margin: 0 !important;
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-    }
-    
-    /* Chat body styling */
-    .chat-body {
-        padding: 15px !important;
-        max-height: 350px !important;
-        overflow-y: auto !important;
-    }
-    
-    /* Message bubble styling */
-    .message-bubble {
-        margin-bottom: 12px;
-        padding: 8px 12px;
-        border-radius: 18px;
-        max-width: 80%;
-        word-wrap: break-word;
-    }
-    
-    .message-bubble.user {
-        background: #3B82F6;
+    .floating-chat-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
         color: white;
-        margin-left: auto;
-        text-align: right;
+        border: none;
+        font-weight: 600;
+        font-size: 12px;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        animation: pulse 3s infinite;
     }
     
-    .message-bubble.assistant {
-        background: #f1f5f9;
-        color: #1e293b;
-        margin-right: auto;
-        border: 1px solid #e2e8f0;
+    .floating-chat-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6);
     }
     
-    /* Tip bubble styling */
-    .tip-bubble {
-        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-        border: 1px solid #93c5fd;
-        border-radius: 12px;
-        padding: 12px;
-        margin-bottom: 15px;
-        font-size: 13px;
-        color: #1e40af;
-        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
-    }
-    
-    /* Input area styling */
-    .chat-input-section {
-        padding: 15px;
-        border-top: 1px solid #e5e7eb;
-        background: #fafafa;
-        border-radius: 0 0 15px 15px;
-    }
-    
-    .chat-input-section .stTextInput > div > div > input {
-        border-radius: 20px !important;
-        border: 1px solid #d1d5db !important;
-        padding: 10px 15px !important;
-        font-size: 14px !important;
-    }
-    
-    .chat-input-section .stTextInput > div > div > input:focus {
-        border-color: #3B82F6 !important;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
-    }
-    
-    /* Send button styling */
-    .chat-input-section .stButton > button {
-        width: 40px !important;
-        height: 40px !important;
-        border-radius: 50% !important;
-        background-color: #3B82F6 !important;
-        color: white !important;
-        border: none !important;
-        font-size: 16px !important;
-        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
-        transition: all 0.2s ease !important;
-    }
-    
-    .chat-input-section .stButton > button:hover {
-        background-color: #1E40AF !important;
-        transform: scale(1.05) !important;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
-    }
-    
-    /* Close button styling */
-    .close-btn-section .stButton > button {
-        background: rgba(255, 255, 255, 0.2) !important;
-        color: white !important;
-        border: none !important;
-        width: 30px !important;
-        height: 30px !important;
-        border-radius: 50% !important;
-        font-size: 18px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
+    @keyframes pulse {
+        0%, 100% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4); }
+        50% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.8); }
     }
     </style>
     """, unsafe_allow_html=True)
-
-    # Render the floating chat interface
-    if not st.session_state.chat_open:
-        render_floating_button()
-    else:
-        render_chat_bubble()
-
-def render_floating_button():
-    """Render the floating chat button using Streamlit container."""
-    # Create a positioned container for the floating button
-    st.markdown('<div class="floating-chat-container">', unsafe_allow_html=True)
     
-    if st.button("ARIA", key="floating_chat_toggle", help="ARIA - Advanced Risk Intelligence Assistant"):
+    # Hidden Streamlit button for functionality
+    if st.button("", key="aria_chat_btn", help="Open ARIA Chat"):
         st.session_state.chat_open = True
         st.rerun()
     
-    st.markdown('</div>', unsafe_allow_html=True)
+    # Floating button HTML
+    st.markdown("""
+    <div class="floating-chat-btn" onclick="document.querySelector('[data-testid*=\"aria_chat_btn\"] button').click()">
+        ARIA
+    </div>
+    """, unsafe_allow_html=True)
 
-def render_chat_bubble():
-    """Render the chat bubble window using Streamlit components."""
-    
-    # Position the chat bubble container
-    st.markdown('<div class="chat-bubble-container">', unsafe_allow_html=True)
-    
-    with st.container():
+def render_sidebar_chat():
+    """Render chat interface in sidebar when open."""
+    with st.sidebar:
         # Chat header with close button
-        col1, col2 = st.columns([4, 1])
+        col1, col2 = st.columns([3, 1])
         with col1:
-            st.markdown('<div class="chat-header">ARIA - Advanced Risk Intelligence Assistant</div>', unsafe_allow_html=True)
+            st.markdown("**ARIA** - Advanced Risk Intelligence Assistant")
         with col2:
-            st.markdown('<div class="close-btn-section">', unsafe_allow_html=True)
-            if st.button("×", key="floating_close", help="Close chat"):
+            if st.button("×", key="close_chat", help="Close chat"):
                 st.session_state.chat_open = False
                 st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
         
-        # Chat body
-        st.markdown('<div class="chat-body">', unsafe_allow_html=True)
+        st.markdown("---")
         
         # Display rotating tip
         tips = [
@@ -247,34 +103,57 @@ def render_chat_bubble():
         current_time = int(time.time())
         current_tip_index = (current_time // 10) % len(tips)
         
-        st.markdown(f'<div class="tip-bubble">💡 {tips[current_tip_index]}</div>', unsafe_allow_html=True)
+        st.info(f"💡 {tips[current_tip_index]}")
         
-        # Chat messages with bubble styling
+        # Chat messages with conversation bubbles
         if st.session_state.chat_messages:
-            for message in st.session_state.chat_messages[-3:]:
+            st.markdown("**Recent Conversation:**")
+            
+            # CSS for conversation bubbles
+            st.markdown("""
+            <style>
+            .user-message {
+                background: #3B82F6;
+                color: white;
+                padding: 8px 12px;
+                border-radius: 18px 18px 4px 18px;
+                margin: 8px 0 8px 20px;
+                text-align: right;
+                display: block;
+            }
+            
+            .assistant-message {
+                background: #f1f5f9;
+                color: #1e293b;
+                padding: 8px 12px;
+                border-radius: 18px 18px 18px 4px;
+                margin: 8px 20px 8px 0;
+                border: 1px solid #e2e8f0;
+                display: block;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+            
+            for message in st.session_state.chat_messages[-4:]:
                 if message['role'] == 'user':
-                    st.markdown(f'<div class="message-bubble user">{message["content"]}</div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="user-message">{message["content"]}</div>', unsafe_allow_html=True)
                 else:
-                    st.markdown(f'<div class="message-bubble assistant">{message["content"]}</div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="assistant-message">{message["content"]}</div>', unsafe_allow_html=True)
         else:
-            st.markdown('<div style="text-align: center; color: #64748b; padding: 20px; font-style: italic;">Start a conversation with ARIA!</div>', unsafe_allow_html=True)
+            st.markdown("Start a conversation with ARIA!")
         
-        st.markdown('</div>', unsafe_allow_html=True)
+        # Chat input
+        user_input = st.text_input("Ask ARIA about GUARDIAN:", key="chat_input", placeholder="e.g., How do I upload a policy document?")
         
-        # Chat input section
-        st.markdown('<div class="chat-input-section">', unsafe_allow_html=True)
-        
-        col1, col2 = st.columns([4, 1])
+        col1, col2 = st.columns([3, 1])
         with col1:
-            user_input = st.text_input("", key="floating_chat_input", placeholder="Ask ARIA about GUARDIAN...", label_visibility="collapsed")
-        with col2:
-            if st.button("▷", key="floating_send", help="Send message"):
+            if st.button("Send Message", key="send_msg", use_container_width=True):
                 if user_input:
                     handle_user_message(user_input)
-        
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+        with col2:
+            if st.button("▷", key="send_arrow", help="Send"):
+                if user_input:
+                    handle_user_message(user_input)
 
 def handle_user_message(message: str):
     """Handle user chat messages."""
