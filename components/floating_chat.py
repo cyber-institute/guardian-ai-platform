@@ -129,13 +129,23 @@ def render_floating_button():
         st.session_state.chat_open = True
         st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Temporary visible button for testing chat functionality
+    with st.sidebar:
+        st.markdown("---")
+        st.markdown("**Test Chat Interface**")
+        if st.button("🗨️ Test ARIA Chat", key="test_aria_chat", use_container_width=True):
+            st.session_state.chat_open = True
+            st.rerun()
 
 def render_sidebar_chat():
-    """Render chat interface in an expander when open."""
-    # Create a floating chat window using expander
-    with st.expander("💬 ARIA - Advanced Risk Intelligence Assistant", expanded=True):
+    """Render chat interface in sidebar when open."""
+    with st.sidebar:
+        st.markdown("### 💬 ARIA Chat")
+        st.markdown("*Advanced Risk Intelligence Assistant*")
+        
         # Close button
-        if st.button("Close Chat", key="aria_close_chat", use_container_width=True):
+        if st.button("❌ Close Chat", key="aria_close_chat", use_container_width=True):
             st.session_state.chat_open = False
             st.rerun()
         
@@ -143,12 +153,12 @@ def render_sidebar_chat():
         
         # Display rotating tip
         tips = [
-            "Ask me about document scoring to understand the assessment frameworks",
-            "Upload documents in PDF, TXT, or URL format for instant analysis", 
-            "Click on any score badge to see detailed breakdown and recommendations",
-            "Use filters to find documents by region, organization, or document type",
-            "Try asking 'What are the critical gaps in my policy?' for targeted insights",
-            "I can explain GUARDIAN's patent-protected algorithms and methodologies"
+            "Ask me about document scoring frameworks",
+            "Upload documents for instant analysis", 
+            "Click score badges for detailed breakdowns",
+            "Use filters to find documents by criteria",
+            "Ask about critical policy gaps",
+            "Learn about GUARDIAN's algorithms"
         ]
         
         current_time = int(time.time())
@@ -156,92 +166,104 @@ def render_sidebar_chat():
         
         st.info(f"💡 {tips[current_tip_index]}")
         
-        # Chat messages with conversation bubbles
-        if st.session_state.chat_messages:
-            st.markdown("**Recent Conversation:**")
-            
-            # CSS for conversation bubbles
-            st.markdown("""
-            <style>
-            .user-bubble {
-                background: #3B82F6;
-                color: white;
-                padding: 10px 15px;
-                border-radius: 20px 20px 5px 20px;
-                margin: 8px 0 8px 40px;
-                display: inline-block;
-                max-width: 80%;
-                word-wrap: break-word;
-                float: right;
-                clear: both;
-            }
-            
-            .assistant-bubble {
-                background: #f8fafc;
-                color: #334155;
-                padding: 10px 15px;
-                border-radius: 20px 20px 20px 5px;
-                margin: 8px 40px 8px 0;
-                border: 1px solid #e2e8f0;
-                display: inline-block;
-                max-width: 80%;
-                word-wrap: break-word;
-                float: left;
-                clear: both;
-            }
-            
-            .chat-container::after {
-                content: "";
-                display: table;
-                clear: both;
-            }
-            </style>
-            """, unsafe_allow_html=True)
-            
-            st.markdown('<div class="chat-container">', unsafe_allow_html=True)
-            for message in st.session_state.chat_messages[-4:]:
-                if message['role'] == 'user':
-                    st.markdown(f'<div class="user-bubble">{message["content"]}</div>', unsafe_allow_html=True)
-                else:
-                    st.markdown(f'<div class="assistant-bubble">{message["content"]}</div>', unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-        else:
-            st.markdown("*Start a conversation with ARIA by typing below!*")
+        # Chat messages container
+        chat_container = st.container()
         
-        # Chat input
-        user_input = st.text_input("Type your message:", key="aria_chat_input", placeholder="Ask ARIA about GUARDIAN features...")
+        with chat_container:
+            if st.session_state.chat_messages:
+                st.markdown("**Conversation:**")
+                
+                # Display messages in simple format for sidebar
+                for i, message in enumerate(st.session_state.chat_messages[-5:]):
+                    if message['role'] == 'user':
+                        st.markdown(f"**You:** {message['content']}")
+                    else:
+                        st.markdown(f"**ARIA:** {message['content']}")
+                    
+                    if i < len(st.session_state.chat_messages[-5:]) - 1:
+                        st.markdown("---")
+            else:
+                st.markdown("*Start chatting with ARIA below!*")
         
-        col1, col2 = st.columns([4, 1])
+        st.markdown("---")
+        
+        # Chat input section
+        user_input = st.text_input(
+            "Ask ARIA:", 
+            key="aria_chat_input_real", 
+            placeholder="How do I upload documents?",
+            label_visibility="collapsed"
+        )
+        
+        col1, col2 = st.columns([3, 1])
         with col1:
-            if st.button("Send Message", key="aria_send_full", use_container_width=True):
-                if user_input:
-                    handle_user_message(user_input)
+            send_clicked = st.button("Send", key="aria_send_btn", use_container_width=True)
         with col2:
-            if st.button("▷", key="aria_send_arrow", help="Send"):
-                if user_input:
-                    handle_user_message(user_input)
+            clear_clicked = st.button("🗑️", key="aria_clear_btn", help="Clear chat")
+        
+        # Handle button clicks
+        if send_clicked and user_input.strip():
+            handle_user_message(user_input.strip())
+            
+        if clear_clicked:
+            st.session_state.chat_messages = []
+            st.rerun()
 
 def handle_user_message(user_input):
-    """Handle user message and generate response."""
-    if user_input.strip():
-        # Add user message to chat history
-        st.session_state.chat_messages.append({
-            'role': 'user',
-            'content': user_input
-        })
-        
-        # Generate response using the chatbot
-        try:
-            response = chatbot(user_input, st.session_state.chat_session_id)
-            st.session_state.chat_messages.append({
-                'role': 'assistant',
-                'content': response
-            })
-        except Exception as e:
-            st.session_state.chat_messages.append({
-                'role': 'assistant',
-                'content': f"I'm having trouble processing your request right now. Please try asking about GUARDIAN's features, document scoring, or navigation help."
-            })
-        
-        # Clear the input and rerun
-        st.rerun()
+    """Handle user message and generate ARIA response."""
+    # Add user message to chat history
+    st.session_state.chat_messages.append({
+        'role': 'user',
+        'content': user_input
+    })
+    
+    # Generate intelligent response based on GUARDIAN context
+    response = generate_aria_response(user_input)
+    
+    st.session_state.chat_messages.append({
+        'role': 'assistant',
+        'content': response
+    })
+    
+    # Rerun to update display
+    st.rerun()
+
+def generate_aria_response(user_input):
+    """Generate contextual ARIA responses about GUARDIAN."""
+    user_input_lower = user_input.lower()
+    
+    # Document scoring questions
+    if any(word in user_input_lower for word in ['score', 'scoring', 'assessment', 'evaluate']):
+        return "GUARDIAN uses a multi-tier scoring system: AI Cybersecurity (0-100), Quantum Readiness (Tier 1-5), and AI Ethics evaluation. Each score reflects comprehensive content analysis using our patent-protected algorithms. Click any score badge for detailed breakdowns!"
+    
+    # Upload questions
+    elif any(word in user_input_lower for word in ['upload', 'add', 'document', 'file']):
+        return "You can upload documents in multiple ways: 1) Use the file uploader in All Documents tab, 2) Enter URLs for web scraping, 3) Bulk upload via CSV. Supported formats: PDF, TXT, DOCX, and web URLs. Each document gets automatically analyzed and scored."
+    
+    # Gap analysis questions
+    elif any(word in user_input_lower for word in ['gap', 'missing', 'policy', 'recommendation']):
+        return "GUARDIAN's Policy Gap Analysis identifies critical security gaps by comparing your documents against NIST frameworks, quantum readiness standards, and AI ethics benchmarks. Check the Policy Analyzer for specific recommendations based on your document portfolio."
+    
+    # Framework questions
+    elif any(word in user_input_lower for word in ['nist', 'framework', 'standard', 'cybersecurity']):
+        return "GUARDIAN aligns with NIST AI Risk Management Framework, NIST Cybersecurity Framework, and emerging quantum security standards. Our scoring reflects compliance levels with these frameworks and identifies areas needing attention."
+    
+    # Convergence AI questions
+    elif any(word in user_input_lower for word in ['convergence', 'multi-llm', 'bias', 'ensemble']):
+        return "Convergence AI is GUARDIAN's patent-protected multi-LLM system that prevents bias and poisoning attacks. It uses quantum-enhanced routing to synthesize insights from multiple AI models, ensuring more accurate and unbiased document analysis."
+    
+    # Navigation help
+    elif any(word in user_input_lower for word in ['help', 'how', 'navigate', 'use', 'tutorial']):
+        return "Navigate GUARDIAN easily: All Documents tab shows your repository, About tab explains the system, Convergence AI shows our technology. Use filters to find documents, click score badges for details, and upload new content anytime. Need specific help with any feature?"
+    
+    # Quantum questions
+    elif any(word in user_input_lower for word in ['quantum', 'tier', 'readiness']):
+        return "Quantum scoring uses our 5-tier system: Tier 1 (Basic awareness) to Tier 5 (Post-quantum ready). This evaluates quantum security preparedness, cryptographic resilience, and quantum computing integration readiness in your documents."
+    
+    # General greeting
+    elif any(word in user_input_lower for word in ['hello', 'hi', 'help', 'start']):
+        return "Hello! I'm ARIA, your Advanced Risk Intelligence Assistant. I can help you understand GUARDIAN's scoring systems, document management, policy gap analysis, and navigation. What would you like to know about?"
+    
+    # Default response
+    else:
+        return f"I understand you're asking about '{user_input}'. As GUARDIAN's AI assistant, I can help with document scoring, upload processes, policy gap analysis, framework compliance, and system navigation. Could you be more specific about what you'd like to know?"
