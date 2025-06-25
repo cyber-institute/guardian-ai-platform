@@ -244,21 +244,21 @@ def render_sidebar_chat():
         
         st.markdown("---")
         
-        # Chat input section
-        user_input = st.text_input(
-            "Type your message:", 
-            key="aria_chat_input_real", 
-            placeholder="Ask ARIA about GUARDIAN features...",
-            label_visibility="visible"
-        )
+        # Chat input section using form for proper clearing
+        with st.form("aria_chat_form", clear_on_submit=True):
+            user_input = st.text_input(
+                "Type your message:", 
+                placeholder="Ask ARIA about GUARDIAN features...",
+                label_visibility="visible"
+            )
+            
+            col1, col2 = st.columns([2, 1])
+            with col1:
+                send_clicked = st.form_submit_button("Send Message")
+            with col2:
+                clear_clicked = st.form_submit_button("Clear Chat")
         
-        col1, col2 = st.columns([2, 1])
-        with col1:
-            send_clicked = st.button("Send Message", key="aria_send_btn")
-        with col2:
-            clear_clicked = st.button("Clear", key="aria_clear_btn")
-        
-        # Handle button clicks
+        # Handle form submissions
         if send_clicked and user_input.strip():
             handle_user_message(user_input.strip())
             

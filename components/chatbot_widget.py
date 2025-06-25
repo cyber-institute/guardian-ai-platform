@@ -56,11 +56,13 @@ def render_chatbot_widget():
             if st.button("Gap Analysis", key="quick_gaps", help="Policy gap analysis"):
                 handle_quick_question("What is policy gap analysis?")
         
-        # Chat input
-        user_input = st.text_input("Ask ARIA about GUARDIAN:", key="chat_input", placeholder="e.g., How do I upload a policy?")
-        
-        if st.button("Send", key="send_message", use_container_width=True) and user_input:
-            handle_user_message(user_input)
+        # Chat input with form to handle clearing properly
+        with st.form("chat_form", clear_on_submit=True):
+            user_input = st.text_input("Ask ARIA about GUARDIAN:", placeholder="e.g., How do I upload a policy?")
+            submitted = st.form_submit_button("Send", use_container_width=True)
+            
+            if submitted and user_input.strip():
+                handle_user_message(user_input.strip())
         
         # Display recent chat messages
         if st.session_state.chat_messages:
@@ -327,8 +329,7 @@ def handle_user_message(message: str):
             'content': bot_response
         })
     
-    # Clear input and refresh
-    st.session_state.chat_input = ""
+    # Form automatically clears on submit, just rerun to update display
     st.rerun()
 
 def handle_quick_question(question: str):
