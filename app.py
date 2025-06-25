@@ -64,8 +64,8 @@ def main():
         color: #FFFFFF !important;
         border: 2px solid #1E40AF !important;
         border-radius: 8px !important;
-        font-size: 24px !important;
-        font-weight: 700 !important;
+        font-size: 11px !important;
+        font-weight: 400 !important;
         padding: 15px 20px !important;
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
         transition: all 0.3s ease !important;
@@ -102,7 +102,7 @@ def main():
     div[data-testid="stSidebar"] .stButton > button *,
     div[data-testid="stSidebar"] .stFormSubmitButton > button * {
         color: #FFFFFF !important;
-        font-size: 16px !important;
+        font-size: 11px !important;
         font-weight: 400 !important;
         text-shadow: none !important;
     }
