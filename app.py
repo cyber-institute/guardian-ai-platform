@@ -4,6 +4,7 @@ from datetime import datetime
 from components.chatbot_widget import render_chatbot_widget, inject_chatbot_css
 from components.draggable_chat import render_draggable_chat
 from components.ai_assistant_mascot import render_ai_assistant
+from deployment_config import add_authentication_layer, setup_deployment_environment
 
 # Performance optimization: Cache database queries
 @st.cache_data(ttl=300)  # Cache for 5 minutes
@@ -25,12 +26,19 @@ def get_cached_analytics():
         return 0
 
 def main():
+    # Check authentication for private deployment
+    if not add_authentication_layer():
+        return  # Show login screen if not authenticated
+    
     st.set_page_config(
         page_title="GUARDIAN - AI Risk Analysis Navigator",
-        page_icon="",
+        page_icon="🛡️",
         layout="wide",
         initial_sidebar_state="collapsed"
     )
+    
+    # Setup secure deployment environment
+    setup_deployment_environment()
     
     # Onboarding system moved to chatbot widget
     

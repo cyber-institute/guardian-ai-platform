@@ -113,6 +113,7 @@ GUARDIAN (Governance Using AI for Risk Detection, Integration, Analysis, and Not
 
 ## Changelog
 
+- June 25, 2025: Configured private deployment with authentication layer and security features
 - June 25, 2025: Implemented stable floating chat system with speech bubble design and working ARIA interface
 - June 25, 2025: Initial setup
 
