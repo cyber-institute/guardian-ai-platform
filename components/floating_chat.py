@@ -112,10 +112,7 @@ def render_floating_button():
     }
     </style>
     
-    <div class="speech-bubble" onclick="
-        const hiddenBtn = document.querySelector('.hidden-aria-btn button');
-        if (hiddenBtn) hiddenBtn.click();
-    ">
+    <div class="speech-bubble">
         <div class="bubble-lines">
             <div class="bubble-line"></div>
             <div class="bubble-line"></div>
@@ -124,12 +121,8 @@ def render_floating_button():
     </div>
     """, unsafe_allow_html=True)
     
-    # Hidden Streamlit button that actually works
-    st.markdown('<div class="hidden-aria-btn">', unsafe_allow_html=True)
-    if st.button("Open ARIA Chat", key="hidden_aria_button", help="Hidden ARIA button"):
-        st.session_state.chat_open = True
-        st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
+    # For now, just show the fake bubble - we'll connect it later
+    # The test button in sidebar will be the working version
     
     # Always show test button in sidebar for now
     with st.sidebar:
@@ -140,7 +133,7 @@ def render_floating_button():
         st.markdown("""
         <style>
         /* Test button styling */
-        .stButton > button[data-testid="baseButton-secondary"] {
+        .stButton > button {
             background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
             color: white !important;
             border: none !important;
@@ -150,9 +143,11 @@ def render_floating_button():
             padding: 12px 24px !important;
             box-shadow: 0 3px 10px rgba(59, 130, 246, 0.4) !important;
             transition: all 0.3s ease !important;
+            width: auto !important;
+            min-width: 120px !important;
         }
         
-        .stButton > button[data-testid="baseButton-secondary"]:hover {
+        .stButton > button:hover {
             background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
             box-shadow: 0 5px 15px rgba(59, 130, 246, 0.6) !important;
             transform: translateY(-2px) !important;
